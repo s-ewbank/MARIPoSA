@@ -1,0 +1,18 @@
+name: mariposa_v2
+channels:
+  - defaults
+dependencies:
+  - importlib_resources
+  - matplotlib
+  - python=3.8
+  - python-dateutil
+  - pip:
+    - customtkinter==5.2.2
+    - darkdetect
+    - joblib
+    - networkx
+    - pandas
+    - pyyaml
+    - scikit-learn
+    - scipy
+prefix: /opt/anaconda3/envs/mariposa_v2
