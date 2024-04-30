@@ -690,8 +690,8 @@ class Application(customtkinter.CTk):
             #plot.plot_module_usage(labels_df, start, end, int(self.config["fps"]), style=style, cmap=color)
         elif subgroup_option=="comparison":
             labels_df, n_modules = analysis.label_counter_subgroups(self.config, start, end)
-            fig = plot.network_pairwise_comparison(labels_df, 0, 1200, [group1, group2],
-                                                   self.config["fps"],cmap=cmap,include_labels=bool(style))
+            fig = plot.network_pairwise_comparison(self.config, labels_df, 0, 1200, [group1, group2],
+                                                   cmap=cmap,include_labels=bool(style))
             self.plots_generated = self.plots_generated + 1
             self.plot_window = PlotWindow(fig = fig, plot_number = self.plots_generated, master = self)
             self.plot_window.mainloop()
