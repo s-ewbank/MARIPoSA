@@ -6,7 +6,6 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import os
 import io
-from PIL import Image, ImageTk
 
 
 class Application(customtkinter.CTk):
@@ -196,7 +195,7 @@ class Application(customtkinter.CTk):
         customtkinter.CTkButton(self, text="Define subgroups \nwithin data",
                                 command=self.window4a_define_subgroups, image=subgroups_img,
                                 font=('Helvetica', 16)).grid(row=3, column=1, pady=20,sticky="NSEW")
-        customtkinter.CTkButton(self, text="Compare modules to \nmanual scoring", command=self.window1_start,
+        customtkinter.CTkButton(self, text="Compare modules to \nmanual scoring", command=self.window4h_pose_vs_BORIS,
                                 font=('Helvetica', 16)).grid(row=3, column=2, pady=20,sticky="NSEW")
         customtkinter.CTkButton(self, text="Manually combine pose modules", command=self.window1_start,
                                 font=('Helvetica', 16)).grid(row=4, column=1, pady=20,sticky="NSEW")
@@ -495,8 +494,11 @@ class Application(customtkinter.CTk):
         customtkinter.CTkButton(self, text="Embed with linear discriminant analysis",
                                 command=self.window4g_lda_embed,
                                 font=('Helvetica', 16)).grid(row=3, column=1, pady=20, sticky="NSEW")
-        customtkinter.CTkButton(self, text="Classify with natural language processing tools",
-                                command=self.window4g_classify,
+        customtkinter.CTkButton(self, text="Train and evaluate a classifier",
+                                command=self.window4g_train_eval_classifier,
+                                font=('Helvetica', 16)).grid(row=3, column=2, pady=20, sticky="NSEW")
+        customtkinter.CTkButton(self, text="Use a previously created classifier",
+                                command=self.window4g_use_prev_classifier,
                                 font=('Helvetica', 16)).grid(row=4, column=1, pady=20, sticky="NSEW")
         # Bottom back buttons
         customtkinter.CTkButton(self, text="< back to analysis menu", command=self.window3_menu,
@@ -544,11 +546,52 @@ class Application(customtkinter.CTk):
         customtkinter.CTkButton(self, text="<< back to start", command=self.window1_start,
                                 font=('Helvetica', 16)).grid(row=7, column=0, pady=20, padx=20, sticky="W")
 
-    def window4g_classify(self):
+    def window4g_train_eval_classifier(self):
         self.clear_window()
         self.configure_window(7, 4)
         # Title
-        customtkinter.CTkLabel(self, text="Classify with Natural Lanuage Processing Tools",
+        customtkinter.CTkLabel(self, text="Train and Evaluate a Classifier",
+                               font=('Helvetica', 32, "bold")).grid(row=0, column=0, columnspan=4, pady=10)
+        customtkinter.CTkLabel(self, text="Project " + self.config["project_name"],
+                               font=('Helvetica', 20, "bold")).grid(row=1, column=1, columnspan=2, pady=10)
+        customtkinter.CTkLabel(self, text="Enter info about the classifier you would like to train.",
+                               font=('Helvetica', 16)).grid(row=2, column=0, columnspan=4, pady=10)
+
+        # Plot
+        # Choose start and end time
+        customtkinter.CTkLabel(self, text="Start time (seconds)",
+                               font=('Helvetica', 16)).grid(row=3, column=0, pady=10, sticky="E")
+        start = customtkinter.CTkEntry(self)
+        start.grid(row=3, column=1, pady=10, sticky="W")
+        customtkinter.CTkLabel(self, text="End time (seconds)",
+                               font=('Helvetica', 16)).grid(row=3, column=2, pady=10, sticky="E")
+        end = customtkinter.CTkEntry(self)
+        end.grid(row=3, column=3, pady=10, sticky="W")
+        # Choose color
+        customtkinter.CTkLabel(self, text="Colormap for plot",
+                               font=('Helvetica', 16)).grid(row=4, column=0, pady=10, sticky="E")
+        color = customtkinter.CTkComboBox(self, values=["jet", "cividis", "viridis", "magma"])
+        color.grid(row=4, column=1, pady=10, sticky="W")
+        color.set("jet")
+        customtkinter.CTkLabel(self, text="Bin size (seconds)",
+                               font=('Helvetica', 16)).grid(row=4, column=2, pady=10, sticky="E")
+        binsize = customtkinter.CTkEntry(self)
+        binsize.grid(row=4, column=3, pady=10, sticky="W")
+        customtkinter.CTkButton(self, text="Plot it!",
+                                command=lambda: self.lda(int(start.get()), int(end.get()), int(binsize.get()), color.get()),
+                                font=('Helvetica', 16)).grid(row=7, column=3, pady=20)
+        # Bottom back buttons
+        customtkinter.CTkButton(self, text="< back to analysis menu", command=self.window3_menu,
+                                font=('Helvetica', 16)).grid(row=6, column=0, pady=20, padx=20, sticky="W")
+        customtkinter.CTkButton(self, text="<< back to start", command=self.window1_start,
+                                font=('Helvetica', 16)).grid(row=7, column=0, pady=20, padx=20, sticky="W")
+        # TODO:: update LDA classifier window to connect to real functions
+
+    def window4g_use_prev_classifier(self):
+        self.clear_window()
+        self.configure_window(7, 4)
+        # Title
+        customtkinter.CTkLabel(self, text="Use a Previously Trained Classifier",
                                font=('Helvetica', 32, "bold")).grid(row=0, column=0, columnspan=4, pady=10)
         customtkinter.CTkLabel(self, text="Project " + self.config["project_name"],
                                font=('Helvetica', 20, "bold")).grid(row=1, column=1, columnspan=2, pady=10)
@@ -593,6 +636,39 @@ class Application(customtkinter.CTk):
                                 font=('Helvetica', 16)).grid(row=6, column=0, pady=20, padx=20, sticky="W")
         customtkinter.CTkButton(self, text="<< back to start", command=self.window1_start,
                                 font=('Helvetica', 16)).grid(row=7, column=0, pady=20, padx=20, sticky="W")
+        # TODO:: update NLP classifier window to connect to real functions
+
+    def window4h_pose_vs_BORIS(self):
+        self.clear_window()
+        self.configure_window(7, 4)
+        # Title
+        customtkinter.CTkLabel(self, text="Compare Pose Data to Manually Scored Behaviors",
+                               font=('Helvetica', 32, "bold")).grid(row=0, column=0, columnspan=4, pady=10)
+        customtkinter.CTkLabel(self, text="Project " + self.config["project_name"],
+                               font=('Helvetica', 20, "bold")).grid(row=1, column=1, columnspan=2, pady=10)
+        customtkinter.CTkLabel(self, text="Get a matrix showing overlap between pose modules and behaviors manually scored in BORIS.",
+                               font=('Helvetica', 16)).grid(row=2, column=0, columnspan=4, pady=10)
+
+        # Enter data directory
+        customtkinter.CTkLabel(self, text="Path to BORIS data",
+                               font=('Helvetica', 16)).grid(row=3, column=0, pady=10, sticky="E")
+        data_path_entry = customtkinter.CTkEntry(self)
+        data_path_entry.grid(row=3, column=1, padx=5, pady=5, sticky="W")
+        browse_button = customtkinter.CTkButton(self, text="Browse",
+                                                command=lambda: self.window_browse(data_path_entry, type="directory"))
+        browse_button.grid(row=3, column=2, pady=5, sticky="W")
+
+        customtkinter.CTkButton(self, text="Compare!",
+                                command=lambda: self.plot_usage(int(start.get()), int(end.get()),
+                                                                style.get(), color.get(), subgroup_option),
+                                font=('Helvetica', 16)).grid(row=7, column=3, pady=20)
+        # Bottom back buttons
+        customtkinter.CTkButton(self, text="< back to analysis menu", command=self.window3_menu,
+                                font=('Helvetica', 16)).grid(row=6, column=0, pady=20, padx=20, sticky="W")
+        customtkinter.CTkButton(self, text="<< back to start", command=self.window1_start,
+                                font=('Helvetica', 16)).grid(row=7, column=0, pady=20, padx=20, sticky="W")
+        # TODO:: update NLP classifier window to connect to real functions
+
 
     def plot_usage(self, start, end, style, color, subgroup_option):
         if subgroup_option=="no_subgroups":
@@ -635,14 +711,16 @@ class Application(customtkinter.CTk):
             labels_df, n_modules = analysis.label_counter_subgroups(self.config, start, end)
             #plot.plot_module_usage_subgroups(labels_df, start, end, int(self.config["fps"]), style=style, cmap=color)
 
-    def plot_network(self, group1, group2, start, end, style, cmap, subgroup_option):
-        if subgroup_option=="single":
+    def plot_pose_vs_BORIS(self):
+        if subgroup_option=="no_subgroups":
             labels_df, n_modules = analysis.label_counter_nosubgroups(self.config, start, end)
-            #plot.plot_module_usage(labels_df, start, end, int(self.config["fps"]), style=style, cmap=color)
-        elif subgroup_option=="comparison":
+            fig = plot.plot_module_usage(self.config, labels_df, start, end, int(self.config["fps"]), style=style, cmap=color)
+            self.plots_generated = self.plots_generated + 1
+            self.plot_window = PlotWindow(fig = fig, plot_number = self.plots_generated, master = self)
+            self.plot_window.mainloop()
+        elif subgroup_option=="subgroups":
             labels_df, n_modules = analysis.label_counter_subgroups(self.config, start, end)
-            fig = plot.network_pairwise_comparison(self.config, labels_df, 0, 1200, [group1, group2],
-                                                   cmap=cmap,include_labels=bool(style))
+            fig = plot.plot_module_usage_subgroups(self.config, labels_df, start, end, int(self.config["fps"]), style=style, cmap=color)
             self.plots_generated = self.plots_generated + 1
             self.plot_window = PlotWindow(fig = fig, plot_number = self.plots_generated, master = self)
             self.plot_window.mainloop()

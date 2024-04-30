@@ -485,3 +485,11 @@ def plot_lda(config, lda, lda_embeddings, group_labels, nbins, binsize, selected
     plt.tight_layout()
     return fig
 
+def confusion_matrix_plot(config, labels_df):
+    print("Coming soon!")
+    # TODO:: add all-purpose confusion matrix plot function
+
+def pose_to_BORIS_plot(config, labels_df):
+    print("Coming soon!")
+    # TODO:: add function for plotting pose to BORIS comparison matrix
+

@@ -6,6 +6,7 @@ from sklearn.decomposition import PCA
 from sklearn.model_selection import LeaveOneOut
 from sklearn.model_selection import cross_val_score
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
+from sklearn.linear_model import LogisticRegression as LR
 
 def label_counter_nosubgroups(config, start, stop):
     """
@@ -151,6 +152,13 @@ def label_counter_subgroups(config, start, stop, selected_subgroups="all"):
     n_modules = len(modules)
     return labels_df, n_modules
 
+def pose_to_BORIS(config, labels_df):
+    print("Coming soon!")
+    # TODO:: add function for comparing pose and boris data
+
+def combine_pose_modules(config, labels_df):
+    print("Coming soon!")
+    # TODO:: add function for combining pose modules
 
 def lda_labels_timebins(config, labels_df, binsize, selected_subgroups="all", ncomponents=2):
     """
@@ -200,3 +208,60 @@ def lda_labels_timebins(config, labels_df, binsize, selected_subgroups="all", nc
     lda = LDA(n_components=ncomponents)
     lda_embeddings = lda.fit_transform(label_counts, group_labels)
     return lda, lda_embeddings, group_labels, nbins
+
+def lr_labels_timebins(config, labels_df, binsize, selected_subgroups="all"):
+    """
+    Function to compute LDA for data in timebins
+    :param config:
+    :param labels_df:
+    :param binsize:
+    :param selected_subgroups:
+    :param ncomponents:
+    :return:
+    """
+    # TODO:: build out logistic regression classification function
+    # if groupnames == None:
+    #     groupnames = list(np.unique([item[0] for item in labels_df.columns]))
+    if selected_subgroups=="all":
+        selected_subgroups=list(config["subgroups"].keys())
+    n_groups = len(selected_subgroups)
+    # n_groups = len(list(np.unique([item[0] for item in labels_df.columns])))
+    fps = config["fps"]
+    # start_frame = start * fps
+    # stop_frame = stop * fps
+    # labels_df = labels_df[start_frame:stop_frame]
+    # total_frames = stop_frame - start_frame
+    labels_flat = np.array(labels_df)
+    labels_flat = [item for sublist in labels_flat for item in sublist]
+    clusts = np.unique(labels_flat)
+    n_clust = len(clusts)
+
+    label_counts = []
+    nbins = int(labels_df.shape[0] / (binsize * config["fps"]))
+    for g in range(n_groups):
+        for i in range(len(labels_df[selected_subgroups[g]].columns)):
+            label_counts_i = np.zeros(n_clust * nbins)
+            for b in range(nbins):
+                binstart = int(b * (binsize * fps))
+                binstop = int((b + 1) * (binsize * fps))
+                labels_df_sub = labels_df[binstart:binstop]
+                for c in range(n_clust):
+                    label_counts_i[c + n_clust * b] = np.count_nonzero(
+                        labels_df_sub[selected_subgroups[g]][[labels_df[selected_subgroups[g]].columns[i]]] == c) / (5 * 60 * fps)
+            label_counts.append(label_counts_i)
+    label_counts = np.array(label_counts)
+
+    group_labels = []
+    for g in range(n_groups):
+        group_labels.extend([g] * len(labels_df[selected_subgroups[g]].columns))
+
+    lr =  LR().fit(label_counts, group_labels)
+    return lr, group_labels, nbins
+
+def lda_classification(config, labels_df):
+    print("Coming soon!")
+    # TODO:: add LDA classification function
+
+def nlp_classification(config, labels_df):
+    print("Coming soon!")
+    # TODO:: add NLP classification function
