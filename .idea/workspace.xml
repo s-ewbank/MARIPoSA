@@ -4,12 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fb76900-29a9-459d-bd45-1760d8ecd8bb" name="Changes" comment="git config --global --list">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utils/analysis.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils/analysis.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utils/plot.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils/plot.py" afterDir="false" />
-    </list>
+    <list default="true" id="7fb76900-29a9-459d-bd45-1760d8ecd8bb" name="Changes" comment="git config --global --list" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -146,7 +141,7 @@
       <workItem from="1714014208220" duration="2112000" />
       <workItem from="1714156748549" duration="9921000" />
       <workItem from="1715761268938" duration="1441000" />
-      <workItem from="1716353597447" duration="6270000" />
+      <workItem from="1716353597447" duration="6572000" />
     </task>
     <task id="LOCAL-00001" summary="added conda env installable">
       <option name="closed" value="true" />
@@ -188,7 +183,15 @@
       <option name="project" value="LOCAL" />
       <updated>1714502651811</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="git config --global --list">
+      <option name="closed" value="true" />
+      <created>1716360073577</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1716360073577</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
