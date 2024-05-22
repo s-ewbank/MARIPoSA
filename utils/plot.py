@@ -485,9 +485,29 @@ def plot_lda(config, lda, lda_embeddings, group_labels, nbins, binsize, selected
     plt.tight_layout()
     return fig
 
-def confusion_matrix_plot(config, labels_df):
-    print("Coming soon!")
-    # TODO:: add all-purpose confusion matrix plot function
+def plot_conf_mat(confusion, class_num, class_labels, figW=2.5,figH=2.5,cmap="Greens"):
+    """
+    Generate a confusion matrix plot
+    :param confusion: the confusion matrix from sklearn
+    :param class_num: the classes (as integers)
+    :param class_labels: the classes (string names)
+    :param figW: figure width
+    :param figH: figure height
+    :param cmap: colormap
+    :return:
+    """
+    fig = plt.figure(figsize=(figW, figH), dpi=100)
+    plt.imshow(confusion, cmap=cmap)
+    plt.xticks(class_num, class_labels)
+    plt.yticks(class_num, class_labels)
+    for i in range(len(class_labels)):
+        for j in range(len(class_labels)):
+            plt.text(j, i, str(confusion[i, j]), ha='center', va='center', color='black')
+    plt.xlabel('Predicted Dose Label')
+    plt.ylabel('True Dose Label')
+    plt.title('Confusion Matrix')
+    plt.tight_layout()
+    return fig
 
 def pose_to_BORIS_plot(config, labels_df):
     print("Coming soon!")

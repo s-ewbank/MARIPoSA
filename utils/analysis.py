@@ -3,8 +3,8 @@ import pandas as pd
 import os
 from sklearn.tree import plot_tree
 from sklearn.decomposition import PCA
-from sklearn.model_selection import LeaveOneOut
-from sklearn.model_selection import cross_val_score
+from sklearn.model_selection import LeaveOneOut, cross_val_predict
+from sklearn.metrics import accuracy_score, confusion_matrix
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
 from sklearn.linear_model import LogisticRegression as LR
 
@@ -181,6 +181,7 @@ def lda_labels_timebins(config, labels_df, binsize, selected_subgroups="all", nc
     # stop_frame = stop * fps
     # labels_df = labels_df[start_frame:stop_frame]
     # total_frames = stop_frame - start_frame
+    group_dict = {selected_subgroups[i]: i for i in range(len(selected_subgroups))}
     labels_flat = np.array(labels_df)
     labels_flat = [item for sublist in labels_flat for item in sublist]
     clusts = np.unique(labels_flat)
@@ -207,7 +208,7 @@ def lda_labels_timebins(config, labels_df, binsize, selected_subgroups="all", nc
 
     lda = LDA(n_components=ncomponents)
     lda_embeddings = lda.fit_transform(label_counts, group_labels)
-    return lda, lda_embeddings, group_labels, nbins
+    return lda, lda_embeddings, group_labels, group_dict, nbins
 
 def lr_labels_timebins(config, labels_df, binsize, selected_subgroups="all"):
     """
@@ -231,6 +232,7 @@ def lr_labels_timebins(config, labels_df, binsize, selected_subgroups="all"):
     # stop_frame = stop * fps
     # labels_df = labels_df[start_frame:stop_frame]
     # total_frames = stop_frame - start_frame
+    group_dict = {selected_subgroups[i]: i for i in range(len(selected_subgroups))}
     labels_flat = np.array(labels_df)
     labels_flat = [item for sublist in labels_flat for item in sublist]
     clusts = np.unique(labels_flat)
@@ -255,8 +257,22 @@ def lr_labels_timebins(config, labels_df, binsize, selected_subgroups="all"):
     for g in range(n_groups):
         group_labels.extend([g] * len(labels_df[selected_subgroups[g]].columns))
 
-    lr =  LR().fit(label_counts, group_labels)
-    return lr, group_labels, nbins
+    lr = LR().fit(label_counts, group_labels)
+    return lr, group_labels, label_counts, group_dict, nbins
+
+def loocv_conf_mat(model, features, group_labels, group_dict):
+    loo = LeaveOneOut()
+    label_pred = cross_val_predict(model, features, group_labels, cv=loo)
+    accuracy = accuracy_score(group_labels, label_pred)
+    confusion = confusion_matrix(group_labels, label_pred)
+
+    # Get class labels (group names) in the order of group_dict keys
+    class_labels = [key for key, _ in sorted(group_dict.items(), key=lambda item: item[1])]
+    class_num = []
+    for key in group_dict.keys():
+        class_num.append(group_dict[key])
+    print("The overall accuracy by leave-one-out-cross-validation (LOOCV) is " + str(accuracy))
+    return confusion, class_num, class_labels
 
 def lda_classification(config, labels_df):
     print("Coming soon!")

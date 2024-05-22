@@ -491,26 +491,26 @@ class Application(customtkinter.CTk):
                                font=('Helvetica', 16)).grid(row=2, column=0, columnspan=4, pady=10)
 
         # Next menu options
-        customtkinter.CTkButton(self, text="Embed with linear discriminant analysis",
-                                command=self.window4g_lda_embed,
-                                font=('Helvetica', 16)).grid(row=3, column=1, pady=20, sticky="NSEW")
-        customtkinter.CTkButton(self, text="Train and evaluate a classifier",
-                                command=self.window4g_train_eval_classifier,
-                                font=('Helvetica', 16)).grid(row=3, column=2, pady=20, sticky="NSEW")
-        customtkinter.CTkButton(self, text="Use a previously created classifier",
-                                command=self.window4g_use_prev_classifier,
-                                font=('Helvetica', 16)).grid(row=4, column=1, pady=20, sticky="NSEW")
+        customtkinter.CTkButton(self, text="Embed and classify with linear discriminant analysis",
+                                command=self.window4g_lda_embed_classify,
+                                font=('Helvetica', 16)).grid(row=3, column=1, columnspan=2, pady=20, sticky="NSEW")
+        customtkinter.CTkButton(self, text="Classify with logistic regression",
+                                command=self.window4g_lr_classify,
+                                font=('Helvetica', 16)).grid(row=4, column=1, columnspan=2, pady=20, sticky="NSEW")
+        customtkinter.CTkButton(self, text="Classify with natural language processing tools",
+                                command=self.window4g_nlp_classify,
+                                font=('Helvetica', 16)).grid(row=5, column=1, columnspan=2, pady=20, sticky="NSEW")
         # Bottom back buttons
         customtkinter.CTkButton(self, text="< back to analysis menu", command=self.window3_menu,
-                                font=('Helvetica', 16)).grid(row=5, column=1, pady=20, padx=20, sticky="W")
-        customtkinter.CTkButton(self, text="<< back to start", command=self.window1_start,
                                 font=('Helvetica', 16)).grid(row=6, column=1, pady=20, padx=20, sticky="W")
+        customtkinter.CTkButton(self, text="<< back to start", command=self.window1_start,
+                                font=('Helvetica', 16)).grid(row=7, column=1, pady=20, padx=20, sticky="W")
 
-    def window4g_lda_embed(self):
+    def window4g_lda_embed_classify(self):
         self.clear_window()
         self.configure_window(7, 4)
         # Title
-        customtkinter.CTkLabel(self, text="Embed with Linear Discriminant Analysis",
+        customtkinter.CTkLabel(self, text="Embed and Classify with Linear Discriminant Analysis",
                                font=('Helvetica', 32, "bold")).grid(row=0, column=0, columnspan=4, pady=10)
         customtkinter.CTkLabel(self, text="Project " + self.config["project_name"],
                                font=('Helvetica', 20, "bold")).grid(row=1, column=1, columnspan=2, pady=10)
@@ -537,8 +537,14 @@ class Application(customtkinter.CTk):
                                font=('Helvetica', 16)).grid(row=4, column=2, pady=10, sticky="E")
         binsize = customtkinter.CTkEntry(self)
         binsize.grid(row=4, column=3, pady=10, sticky="W")
-        customtkinter.CTkButton(self, text="Plot it!",
-                                command=lambda: self.lda(int(start.get()), int(end.get()), int(binsize.get()), color.get()),
+        customtkinter.CTkButton(self, text="Plot embeddings",
+                                command=lambda: self.lda("embed",int(start.get()), int(end.get()), int(binsize.get()), color.get(),),
+                                font=('Helvetica', 16)).grid(row=5, column=3, pady=20)
+        customtkinter.CTkButton(self, text="Classify and evaluate",
+                                command=lambda: self.lda("classify_eval",int(start.get()), int(end.get()), int(binsize.get()), color.get()),
+                                font=('Helvetica', 16)).grid(row=6, column=3, pady=20)
+        customtkinter.CTkButton(self, text="Save LDA classifier",
+                                command=lambda: self.lda("save",int(start.get()), int(end.get()), int(binsize.get()), color.get()),
                                 font=('Helvetica', 16)).grid(row=7, column=3, pady=20)
         # Bottom back buttons
         customtkinter.CTkButton(self, text="< back to analysis menu", command=self.window3_menu,
@@ -546,11 +552,11 @@ class Application(customtkinter.CTk):
         customtkinter.CTkButton(self, text="<< back to start", command=self.window1_start,
                                 font=('Helvetica', 16)).grid(row=7, column=0, pady=20, padx=20, sticky="W")
 
-    def window4g_train_eval_classifier(self):
+    def window4g_lr_classify(self):
         self.clear_window()
         self.configure_window(7, 4)
         # Title
-        customtkinter.CTkLabel(self, text="Train and Evaluate a Classifier",
+        customtkinter.CTkLabel(self, text="Classify with Logistic Regression",
                                font=('Helvetica', 32, "bold")).grid(row=0, column=0, columnspan=4, pady=10)
         customtkinter.CTkLabel(self, text="Project " + self.config["project_name"],
                                font=('Helvetica', 20, "bold")).grid(row=1, column=1, columnspan=2, pady=10)
@@ -577,8 +583,11 @@ class Application(customtkinter.CTk):
                                font=('Helvetica', 16)).grid(row=4, column=2, pady=10, sticky="E")
         binsize = customtkinter.CTkEntry(self)
         binsize.grid(row=4, column=3, pady=10, sticky="W")
-        customtkinter.CTkButton(self, text="Plot it!",
-                                command=lambda: self.lda(int(start.get()), int(end.get()), int(binsize.get()), color.get()),
+        customtkinter.CTkButton(self, text="Classify and Evaluate",
+                                command=lambda: self.lr("classify_eval",int(start.get()), int(end.get()), int(binsize.get()), color.get()),
+                                font=('Helvetica', 16)).grid(row=6, column=3, pady=20)
+        customtkinter.CTkButton(self, text="Save",
+                                command=lambda: self.lr("save",int(start.get()), int(end.get()), int(binsize.get()), color.get()),
                                 font=('Helvetica', 16)).grid(row=7, column=3, pady=20)
         # Bottom back buttons
         customtkinter.CTkButton(self, text="< back to analysis menu", command=self.window3_menu,
@@ -587,11 +596,11 @@ class Application(customtkinter.CTk):
                                 font=('Helvetica', 16)).grid(row=7, column=0, pady=20, padx=20, sticky="W")
         # TODO:: update LDA classifier window to connect to real functions
 
-    def window4g_use_prev_classifier(self):
+    def window4g_nlp_classify(self):
         self.clear_window()
         self.configure_window(7, 4)
         # Title
-        customtkinter.CTkLabel(self, text="Use a Previously Trained Classifier",
+        customtkinter.CTkLabel(self, text="Classify with Natural Language Processing Tools",
                                font=('Helvetica', 32, "bold")).grid(row=0, column=0, columnspan=4, pady=10)
         customtkinter.CTkLabel(self, text="Project " + self.config["project_name"],
                                font=('Helvetica', 20, "bold")).grid(row=1, column=1, columnspan=2, pady=10)
@@ -725,13 +734,44 @@ class Application(customtkinter.CTk):
             self.plot_window = PlotWindow(fig = fig, plot_number = self.plots_generated, master = self)
             self.plot_window.mainloop()
 
-    def lda(self, start, end, binsize, cmap):
+    def lda(self, do, start, end, binsize, cmap):
         labels_df, n_modules = analysis.label_counter_subgroups(self.config, start, end)
-        lda, lda_embeddings, group_labels, nbins = analysis.lda_labels_timebins(self.config, labels_df, binsize)
-        fig = plot.plot_lda(self.config, lda, lda_embeddings, group_labels, nbins, binsize, cmap=cmap)
-        self.plots_generated = self.plots_generated + 1
-        self.plot_window = PlotWindow(fig=fig, plot_number=self.plots_generated, master=self)
-        self.plot_window.mainloop()
+        lda, lda_embeddings, group_labels, group_dict, nbins = analysis.lda_labels_timebins(self.config, labels_df, binsize)
+        if do=="embed":
+            fig = plot.plot_lda(self.config, lda, lda_embeddings, group_labels, nbins, binsize, cmap=cmap)
+            self.plots_generated = self.plots_generated + 1
+            self.plot_window = PlotWindow(fig=fig, plot_number=self.plots_generated, master=self)
+            self.plot_window.mainloop()
+        elif do=="classify_eval":
+            print("Classifying and evaluating")
+            confusion, class_num, class_labels = analysis.loocv_conf_mat(lda, lda_embeddings, group_labels, group_dict)
+            fig = plot.plot_conf_mat(confusion, class_num, class_labels, cmap="Greens")
+            self.plots_generated = self.plots_generated + 1
+            self.plot_window = PlotWindow(fig=fig, plot_number=self.plots_generated, master=self)
+            self.plot_window.mainloop()
+        elif do=="save":
+            print("Saving LDA plot")
+            fig = plot.plot_lda(self.config, lda, lda_embeddings, group_labels, nbins, binsize, cmap=cmap)
+            self.plots_generated = self.plots_generated + 1
+            self.plot_window = PlotWindow(fig=fig, plot_number=self.plots_generated, master=self)
+            self.plot_window.mainloop()
+
+    def lr(self, do, start, end, binsize, cmap):
+        labels_df, n_modules = analysis.label_counter_subgroups(self.config, start, end)
+        lr, group_labels, label_counts, group_dict, nbins = analysis.lr_labels_timebins(self.config, labels_df, binsize)
+        if do=="classify_eval":
+            print("Classifying and evaluating")
+            confusion, class_num, class_labels = analysis.loocv_conf_mat(lr, label_counts, group_labels, group_dict)
+            fig = plot.plot_conf_mat(confusion, class_num, class_labels, cmap="Greens")
+            self.plots_generated = self.plots_generated + 1
+            self.plot_window = PlotWindow(fig=fig, plot_number=self.plots_generated, master=self)
+            self.plot_window.mainloop()
+        # elif do=="save":
+        #     print("Saving LDA plot")
+        #     fig = plot.plot_lda(self.config, lda, lda_embeddings, group_labels, nbins, binsize, cmap=cmap)
+        #     self.plots_generated = self.plots_generated + 1
+        #     self.plot_window = PlotWindow(fig=fig, plot_number=self.plots_generated, master=self)
+        #     self.plot_window.mainloop()
 
 class PlotWindow(customtkinter.CTk):
     def __init__(self, fig, plot_number, master=None):
