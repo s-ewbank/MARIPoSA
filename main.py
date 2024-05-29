@@ -11,7 +11,7 @@ import io
 class Application(customtkinter.CTk):
     def __init__(self):
         super().__init__()
-        self.title("MARIPOSA")
+        self.title("MARIPoSA")
         customtkinter.set_appearance_mode("dark")
         customtkinter.set_default_color_theme("blue")
         # Set window style
@@ -66,7 +66,7 @@ class Application(customtkinter.CTk):
     def window1_start(self):
         self.clear_window()
         self.projectstart_choice = customtkinter.StringVar(value="New project")
-        customtkinter.CTkLabel(self, text="Welcome to MARIPOSA! 🦋",
+        customtkinter.CTkLabel(self, text="Welcome to MARIPoSA! 🦋",
                                font=('Helvetica', 32, "bold")).grid(row=0, column=0, columnspan=3, pady=10)
         customtkinter.CTkLabel(self, text="Would you like to start a new project or load a previous project?",
                                font=('Helvetica', 16)).grid(row=1, column=0, columnspan=3, pady=10)
@@ -146,7 +146,7 @@ class Application(customtkinter.CTk):
         fps.grid(row=6, column=1, pady=10, sticky="W")
 
         # Enter project directory
-        customtkinter.CTkLabel(self, text="Destination path for MARIPOSA output",
+        customtkinter.CTkLabel(self, text="Destination path for MARIPoSA output",
                                font=('Helvetica', 16)).grid(row=7, column=0, pady=10, sticky="E")
         project_path_entry = customtkinter.CTkEntry(self)
         project_path_entry.grid(row=7, column=1, padx=5, pady=5, sticky="W")
@@ -736,7 +736,7 @@ class Application(customtkinter.CTk):
 
     def lda(self, do, start, end, binsize, cmap):
         labels_df, n_modules = analysis.label_counter_subgroups(self.config, start, end)
-        lda, lda_embeddings, group_labels, group_dict, nbins = analysis.lda_labels_timebins(self.config, labels_df, binsize)
+        lda, lda_embeddings, label_counts, group_labels, group_dict, nbins = analysis.lda_labels_timebins(self.config, labels_df, binsize)
         if do=="embed":
             fig = plot.plot_lda(self.config, lda, lda_embeddings, group_labels, nbins, binsize, cmap=cmap)
             self.plots_generated = self.plots_generated + 1
@@ -744,13 +744,13 @@ class Application(customtkinter.CTk):
             self.plot_window.mainloop()
         elif do=="classify_eval":
             print("Classifying and evaluating")
-            confusion, class_num, class_labels = analysis.loocv_conf_mat(lda, lda_embeddings, group_labels, group_dict)
+            confusion, class_num, class_labels = analysis.loocv_conf_mat(lda, label_counts, group_labels, group_dict)
             fig = plot.plot_conf_mat(confusion, class_num, class_labels, cmap="Greens")
             self.plots_generated = self.plots_generated + 1
             self.plot_window = PlotWindow(fig=fig, plot_number=self.plots_generated, master=self)
             self.plot_window.mainloop()
         elif do=="save":
-            print("Saving LDA plot")
+            print("Saving LDA classifier")
             fig = plot.plot_lda(self.config, lda, lda_embeddings, group_labels, nbins, binsize, cmap=cmap)
             self.plots_generated = self.plots_generated + 1
             self.plot_window = PlotWindow(fig=fig, plot_number=self.plots_generated, master=self)
@@ -776,7 +776,7 @@ class Application(customtkinter.CTk):
 class PlotWindow(customtkinter.CTk):
     def __init__(self, fig, plot_number, master=None):
         super().__init__()
-        self.title('MARIPOSA - Plot ' + str(plot_number))
+        self.title('MARIPoSA - Plot ' + str(plot_number))
 
         # Set window style
         screen_width = self.winfo_screenwidth()

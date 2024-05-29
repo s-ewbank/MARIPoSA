@@ -208,7 +208,7 @@ def lda_labels_timebins(config, labels_df, binsize, selected_subgroups="all", nc
 
     lda = LDA(n_components=ncomponents)
     lda_embeddings = lda.fit_transform(label_counts, group_labels)
-    return lda, lda_embeddings, group_labels, group_dict, nbins
+    return lda, lda_embeddings, label_counts, group_labels, group_dict, nbins
 
 def lr_labels_timebins(config, labels_df, binsize, selected_subgroups="all"):
     """
