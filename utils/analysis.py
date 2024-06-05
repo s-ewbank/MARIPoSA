@@ -272,11 +272,7 @@ def loocv_conf_mat(model, features, group_labels, group_dict):
     for key in group_dict.keys():
         class_num.append(group_dict[key])
     print("The overall accuracy by leave-one-out-cross-validation (LOOCV) is " + str(accuracy))
-    return confusion, class_num, class_labels
-
-def lda_classification(config, labels_df):
-    print("Coming soon!")
-    # TODO:: add LDA classification function
+    return confusion, class_num, class_labels, accuracy
 
 def nlp_classification(config, labels_df):
     print("Coming soon!")

@@ -744,7 +744,7 @@ class Application(customtkinter.CTk):
             self.plot_window.mainloop()
         elif do=="classify_eval":
             print("Classifying and evaluating")
-            confusion, class_num, class_labels = analysis.loocv_conf_mat(lda, label_counts, group_labels, group_dict)
+            confusion, class_num, class_labels, accuracy = analysis.loocv_conf_mat(lda, label_counts, group_labels, group_dict)
             fig = plot.plot_conf_mat(confusion, class_num, class_labels, cmap="Greens")
             self.plots_generated = self.plots_generated + 1
             self.plot_window = PlotWindow(fig=fig, plot_number=self.plots_generated, master=self)
@@ -761,7 +761,7 @@ class Application(customtkinter.CTk):
         lr, group_labels, label_counts, group_dict, nbins = analysis.lr_labels_timebins(self.config, labels_df, binsize)
         if do=="classify_eval":
             print("Classifying and evaluating")
-            confusion, class_num, class_labels = analysis.loocv_conf_mat(lr, label_counts, group_labels, group_dict)
+            confusion, class_num, class_labels, accuracy = analysis.loocv_conf_mat(lr, label_counts, group_labels, group_dict)
             fig = plot.plot_conf_mat(confusion, class_num, class_labels, cmap="Greens")
             self.plots_generated = self.plots_generated + 1
             self.plot_window = PlotWindow(fig=fig, plot_number=self.plots_generated, master=self)

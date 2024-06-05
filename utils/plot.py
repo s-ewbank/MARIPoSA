@@ -77,6 +77,7 @@ def plot_module_usage(config,labels_df,start,stop,figW=4,figH=2,style="bar_scatt
     ax.set_xlabel(config["data_type"] + ' Pose Label')
     ax.set_ylabel('Frequency')
     ax.set_xticks(np.arange(0, n_modules, 1))
+    ax.tick_params(axis='x', rotation=90, labelsize=plt.rcParams['font.size'] * 0.5, pad=2)
     plt.tight_layout()
     return fig
 
@@ -185,11 +186,12 @@ def plot_module_usage_subgroups(config, labels_df, start, stop, figW=6, figH=3,
     ax.set_xlabel(config["data_type"] + ' Pose Label')
     ax.set_ylabel('Frequency')
     ax.set_xticks(np.arange(0, n_modules, 1))
+    ax.tick_params(axis='x', rotation=90, labelsize=plt.rcParams['font.size'] * 0.2 * n_groups, pad=2)
     plt.tight_layout()
     return fig
 
 
-def network_pairwise_comparison(config, labels_df, start, end, groupnames, scaling=0.2,include_labels=True,cmap="bwr"):
+def network_pairwise_comparison(config, labels_df, start, end, groupnames, scaling=1,include_labels=True,cmap="bwr"):
     """
     Plots network depiction of differences in pose module usage and transitions between two subgroups
     :param labels_df: labels_df from label_counter_subgroups
@@ -274,7 +276,8 @@ def network_pairwise_comparison(config, labels_df, start, end, groupnames, scali
     G = nx.from_numpy_array(transition_t_abs * 5000, parallel_edges=True)
     edges = G.edges()
     pos = nx.circular_layout(G)
-    weights = [G[u][v]['weight'] for u, v in edges]
+    scaling = scaling/n_modules
+    weights = [G[u][v]['weight']*scaling*5 for u, v in edges]
     weights = list(np.array(weights) / 4000)
     labels = {}
     plot = nx.draw_circular(G,
@@ -287,7 +290,7 @@ def network_pairwise_comparison(config, labels_df, start, end, groupnames, scali
                             edgecolors=None,
                             with_labels=True,  # Keep this as True to display node labels
                             labels=labels,
-                            font_size=100 * scaling,
+                            font_size=500*scaling,
                             font_weight="bold",
                             font_color="white",
                             width=weights)
@@ -296,7 +299,7 @@ def network_pairwise_comparison(config, labels_df, start, end, groupnames, scali
         for m in range(n_modules):
             x, y = pos[m]
             label = str(m)
-            label_font_size = 24 * scaling * (abs(modulefreqs_t[m]) + 1) / 2
+            label_font_size = 2 + 30 * scaling * (abs(modulefreqs_t[m]) + 1) / 2
             plt.text(x, y, label, color="white", fontsize=label_font_size, fontweight="bold", ha="center", va="center")
 
     sm = plt.cm.ScalarMappable(cmap=plt.get_cmap(cmap), norm=plt.Normalize(vmin=t_min, vmax=t_max))
@@ -485,7 +488,7 @@ def plot_lda(config, lda, lda_embeddings, group_labels, nbins, binsize, selected
     plt.tight_layout()
     return fig
 
-def plot_conf_mat(confusion, class_num, class_labels, figW=2.5,figH=2.5,cmap="Greens"):
+def plot_conf_mat(confusion, class_num, class_labels, figW=2.5,figH=2.5,cmap="Greens",alt_title=False):
     """
     Generate a confusion matrix plot
     :param confusion: the confusion matrix from sklearn
@@ -494,6 +497,7 @@ def plot_conf_mat(confusion, class_num, class_labels, figW=2.5,figH=2.5,cmap="Gr
     :param figW: figure width
     :param figH: figure height
     :param cmap: colormap
+    :param alt_title: title other than confusion matrix
     :return:
     """
     fig = plt.figure(figsize=(figW, figH), dpi=100)
@@ -505,7 +509,10 @@ def plot_conf_mat(confusion, class_num, class_labels, figW=2.5,figH=2.5,cmap="Gr
             plt.text(j, i, str(confusion[i, j]), ha='center', va='center', color='black')
     plt.xlabel('Predicted Dose Label')
     plt.ylabel('True Dose Label')
-    plt.title('Confusion Matrix')
+    if alt_title==False:
+        plt.title('Confusion Matrix')
+    else:
+        plt.title(alt_title)
     plt.tight_layout()
     return fig
 

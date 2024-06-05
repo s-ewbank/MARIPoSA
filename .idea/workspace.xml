@@ -4,13 +4,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fb76900-29a9-459d-bd45-1760d8ecd8bb" name="Changes" comment="updated classification and cross-validation functions">
+    <list default="true" id="7fb76900-29a9-459d-bd45-1760d8ecd8bb" name="Changes" comment="added to demo script, corrected LDA-to-LOOCV">
       <change afterPath="$PROJECT_DIR$/demo/scratch_dist.py" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/demo/scratch_lev.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/demo/demo.py" beforeDir="false" afterPath="$PROJECT_DIR$/demo/demo.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/utils/analysis.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils/analysis.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/plot.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils/plot.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -151,7 +152,9 @@
       <workItem from="1716353597447" duration="6771000" />
       <workItem from="1716416038574" duration="3272000" />
       <workItem from="1716837735086" duration="3142000" />
-      <workItem from="1717015958917" duration="4040000" />
+      <workItem from="1717015958917" duration="6896000" />
+      <workItem from="1717036642921" duration="1201000" />
+      <workItem from="1717387240192" duration="16377000" />
     </task>
     <task id="LOCAL-00001" summary="added conda env installable">
       <option name="closed" value="true" />
@@ -209,7 +212,15 @@
       <option name="project" value="LOCAL" />
       <updated>1716360234753</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="added to demo script, corrected LDA-to-LOOCV">
+      <option name="closed" value="true" />
+      <created>1717023111333</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1717023111333</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -246,10 +257,11 @@
     <MESSAGE value="added conda env installable" />
     <MESSAGE value="git config --global --list" />
     <MESSAGE value="updated classification and cross-validation functions" />
-    <option name="LAST_COMMIT_MESSAGE" value="updated classification and cross-validation functions" />
+    <MESSAGE value="added to demo script, corrected LDA-to-LOOCV" />
+    <option name="LAST_COMMIT_MESSAGE" value="added to demo script, corrected LDA-to-LOOCV" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/PoseVis$main.coverage" NAME="main Coverage Results" MODIFIED="1708980301815" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/MARIPOSA$main.coverage" NAME="main Coverage Results" MODIFIED="1717015693112" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/MARIPOSA$main.coverage" NAME="main Coverage Results" MODIFIED="1717387260494" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>
