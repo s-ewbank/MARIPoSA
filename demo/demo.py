@@ -17,8 +17,8 @@ import numpy as np
 importlib.reload(analysis)
 importlib.reload(plot)
 
-config_path="/Users/snewbank/Behavior/PoseVis_test/240319_KPMS-ivket/config.yaml"
-save_path="/Users/snewbank/Behavior/PoseVis_test/240319_KPMS-ivket/demo/"
+config_path="/Users/snewbank/Behavior/MARIPOSA_test/240605_kpms/config.yaml"
+save_path="/Users/snewbank/Behavior/MARIPOSA_test/240605_kpms/demo/"
 save=True
 
 #Load config
@@ -113,5 +113,10 @@ plot.plot_conf_mat(confusion, class_num, class_labels,alt_title="Logistic Regres
 if save == True:
     plt.savefig(save_path+"lr_confmat.png",dpi=500)
 
-plt.show()
+#BORIS to pose
+BORIS_to_pose_mat = analysis.BORIS_to_pose(config)
+plot.BORIS_to_pose_matrix_plot(config, BORIS_to_pose_mat)
+if save == True:
+    plt.savefig(save_path+"boris_to_pose.png",dpi=500)
 
+plt.show()

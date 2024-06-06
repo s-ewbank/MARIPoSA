@@ -180,6 +180,12 @@ class Application(customtkinter.CTk):
         self.config = config
         self.window3_menu()
 
+    def load_project_BORIS(self):
+        self.clear_window()
+        config = metadata.load_project(self.config_path)
+        self.config = config
+        self.window4h_pose_vs_BORIS()
+
     def window3_menu(self):
         self.clear_window()
         customtkinter.CTkLabel(self, text="Analysis Menu",
@@ -658,26 +664,65 @@ class Application(customtkinter.CTk):
         customtkinter.CTkLabel(self, text="Get a matrix showing overlap between pose modules and behaviors manually scored in BORIS.",
                                font=('Helvetica', 16)).grid(row=2, column=0, columnspan=4, pady=10)
 
-        # Enter data directory
-        customtkinter.CTkLabel(self, text="Path to BORIS data",
-                               font=('Helvetica', 16)).grid(row=3, column=0, pady=10, sticky="E")
-        data_path_entry = customtkinter.CTkEntry(self)
-        data_path_entry.grid(row=3, column=1, padx=5, pady=5, sticky="W")
-        browse_button = customtkinter.CTkButton(self, text="Browse",
-                                                command=lambda: self.window_browse(data_path_entry, type="directory"))
-        browse_button.grid(row=3, column=2, pady=5, sticky="W")
+        customtkinter.CTkButton(self, text="Update config file with manual scoring info from BORIS",
+                                command=self.window4h2_boris_config,
+                                font=('Helvetica', 16)).grid(row=4, column=1, columnspan=2, pady=20, sticky="NSEW")
+        customtkinter.CTkButton(self, text="Get and plot pose module to BORIS comparison matrix",
+                                command=self.window4h3_pose_vs_BORIS,
+                                font=('Helvetica', 16)).grid(row=5, column=1, columnspan=2, pady=20, sticky="NSEW")
+        # Bottom back buttons
+        customtkinter.CTkButton(self, text="< back to analysis menu", command=self.window3_menu,
+                                font=('Helvetica', 16)).grid(row=6, column=0, pady=20, padx=20, sticky="W")
+        customtkinter.CTkButton(self, text="<< back to start", command=self.window1_start,
+                                font=('Helvetica', 16)).grid(row=7, column=0, pady=20, padx=20, sticky="W")
+
+    def window4h2_boris_config(self):
+        self.clear_window()
+        # Title
+        customtkinter.CTkLabel(self, text="Compare Pose Data to Manually Scored Behaviors",
+                               font=('Helvetica', 32, "bold")).grid(row=0, column=0, columnspan=4, pady=10)
+        customtkinter.CTkLabel(self, text="Project " + self.config["project_name"],
+                               font=('Helvetica', 20, "bold")).grid(row=1, column=1, columnspan=2, pady=10)
+        customtkinter.CTkLabel(self, text="Update config with BORIS info.",
+                               font=('Helvetica', 16)).grid(row=2, column=0, columnspan=4, pady=10)
+        instruction_block = customtkinter.CTkTextbox(self, width=int(self.width * 0.8))
+        instruction_block.grid(row=2, column=0, columnspan=3, padx=10, pady=10)
+        instruction_text = """For this step, you will need to manually edit the config file, which you should be able to access by pressing the 'Edit config.yaml' button below.
+        You'll have to edit the boris_directory and boris_to_pose_pairings."""
+        instruction_block.insert("1.0", instruction_text)
+        edit_config_button = customtkinter.CTkButton(self,
+                                                     text="Edit config.yaml",
+                                                     command=lambda: metadata.edit_config(
+                                                         self.config["project_directory"] + "/config.yaml"))
+        edit_config_button.grid(row=3, column=0, columnspan=3, pady=5)
+        # Bottom back buttons
+        customtkinter.CTkButton(self, text="< update config and go back to BORIS menu", command=self.load_project_BORIS,
+                                font=('Helvetica', 16)).grid(row=4, column=0, columnspan=3, pady=5, padx=20, sticky="W")
+        customtkinter.CTkButton(self, text="< update config and go back to analysis menu", command=self.load_project,
+                                font=('Helvetica', 16)).grid(row=5, column=0, columnspan=3, pady=5, padx=20, sticky="W")
+        customtkinter.CTkButton(self, text="<< back to start", command=self.window1_start,
+                                font=('Helvetica', 16)).grid(row=6, column=0, columnspan=3, pady=5, padx=20, sticky="W")
+        self.configure_window(6, 3)
+
+    def window4h3_pose_vs_BORIS(self):
+        self.clear_window()
+        self.configure_window(7, 4)
+        # Title
+        customtkinter.CTkLabel(self, text="Compare Pose Data to Manually Scored Behaviors",
+                               font=('Helvetica', 32, "bold")).grid(row=0, column=0, columnspan=4, pady=10)
+        customtkinter.CTkLabel(self, text="Project " + self.config["project_name"],
+                               font=('Helvetica', 20, "bold")).grid(row=1, column=1, columnspan=2, pady=10)
+        customtkinter.CTkLabel(self, text="Get a matrix showing overlap between pose modules and behaviors manually scored in BORIS.",
+                               font=('Helvetica', 16)).grid(row=2, column=0, columnspan=4, pady=10)
 
         customtkinter.CTkButton(self, text="Compare!",
-                                command=lambda: self.plot_usage(int(start.get()), int(end.get()),
-                                                                style.get(), color.get(), subgroup_option),
+                                command=lambda: self.plot_pose_vs_BORIS(),
                                 font=('Helvetica', 16)).grid(row=7, column=3, pady=20)
         # Bottom back buttons
         customtkinter.CTkButton(self, text="< back to analysis menu", command=self.window3_menu,
                                 font=('Helvetica', 16)).grid(row=6, column=0, pady=20, padx=20, sticky="W")
         customtkinter.CTkButton(self, text="<< back to start", command=self.window1_start,
                                 font=('Helvetica', 16)).grid(row=7, column=0, pady=20, padx=20, sticky="W")
-        # TODO:: update NLP classifier window to connect to real functions
-
 
     def plot_usage(self, start, end, style, color, subgroup_option):
         if subgroup_option=="no_subgroups":
@@ -721,18 +766,11 @@ class Application(customtkinter.CTk):
             #plot.plot_module_usage_subgroups(labels_df, start, end, int(self.config["fps"]), style=style, cmap=color)
 
     def plot_pose_vs_BORIS(self):
-        if subgroup_option=="no_subgroups":
-            labels_df, n_modules = analysis.label_counter_nosubgroups(self.config, start, end)
-            fig = plot.plot_module_usage(self.config, labels_df, start, end, int(self.config["fps"]), style=style, cmap=color)
-            self.plots_generated = self.plots_generated + 1
-            self.plot_window = PlotWindow(fig = fig, plot_number = self.plots_generated, master = self)
-            self.plot_window.mainloop()
-        elif subgroup_option=="subgroups":
-            labels_df, n_modules = analysis.label_counter_subgroups(self.config, start, end)
-            fig = plot.plot_module_usage_subgroups(self.config, labels_df, start, end, int(self.config["fps"]), style=style, cmap=color)
-            self.plots_generated = self.plots_generated + 1
-            self.plot_window = PlotWindow(fig = fig, plot_number = self.plots_generated, master = self)
-            self.plot_window.mainloop()
+        boris_to_pose_output = analysis.BORIS_to_pose(self.config)
+        fig = plot.BORIS_to_pose_matrix_plot(self.config, boris_to_pose_output)
+        self.plots_generated = self.plots_generated + 1
+        self.plot_window = PlotWindow(fig = fig, plot_number = self.plots_generated, master = self)
+        self.plot_window.mainloop()
 
     def lda(self, do, start, end, binsize, cmap):
         labels_df, n_modules = analysis.label_counter_subgroups(self.config, start, end)

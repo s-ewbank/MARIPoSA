@@ -516,7 +516,13 @@ def plot_conf_mat(confusion, class_num, class_labels, figW=2.5,figH=2.5,cmap="Gr
     plt.tight_layout()
     return fig
 
-def pose_to_BORIS_plot(config, labels_df):
-    print("Coming soon!")
-    # TODO:: add function for plotting pose to BORIS comparison matrix
+def BORIS_to_pose_matrix_plot(config, boris_to_pose_output, figW=4, figH=2.5, cmap="Greens"):
+    fig = plt.figure(figsize=(figW, figH), dpi=100)
+    plt.imshow(boris_to_pose_output.to_numpy(dtype='float'),cmap=cmap)
+    plt.xticks(range(len(boris_to_pose_output.columns)),labels=boris_to_pose_output.columns)
+    plt.yticks(range(len(boris_to_pose_output.index)), labels=boris_to_pose_output.index)
+    plt.xlabel(config["data_type"]+" Pose Module")
+    plt.ylabel("Manually Scored\nBehavior")
+    plt.tight_layout()
+    return fig
 

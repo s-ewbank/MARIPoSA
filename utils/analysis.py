@@ -152,9 +152,40 @@ def label_counter_subgroups(config, start, stop, selected_subgroups="all"):
     n_modules = len(modules)
     return labels_df, n_modules
 
-def pose_to_BORIS(config, labels_df):
-    print("Coming soon!")
-    # TODO:: add function for comparing pose and boris data
+def BORIS_to_pose(config):
+    #plot pose to whatever wahtever
+    boris_directory = config["boris_directory"]
+    boris_to_pose_pairings = config["boris_to_pose_pairings"]
+    results=None
+    for pairing in boris_to_pose_pairings:
+        if pairing[0]==None:
+            continue
+        else:
+            config_modulo=config
+            config_modulo["project_files"]=[pairing[1]]
+            labels_df, n_modules = label_counter_nosubgroups(config_modulo,0,1200)
+            boris_i = pd.read_csv(boris_directory + "/" + pairing[0])
+            boris_i["frame"] = np.round(boris_i["time"] / (1 / config["fps"]))
+            boris_i = boris_i.drop_duplicates(subset='frame', keep='first')
+            fr = np.min([len(labels_df), np.max(boris_i["frame"])])
+            boris_i=boris_i[0:int(fr)]
+            labels_df = labels_df[0:int(fr)]
+            boris_i = boris_i.drop(["time", "frame"], axis=1)
+            boris_i = boris_i.reset_index(drop=True)
+            behaviors = list(boris_i.columns)
+            if results is None:
+                results = pd.DataFrame(data=np.zeros([n_modules,len(behaviors)]),columns=behaviors,index=np.arange(0,n_modules))
+            results_i = pd.DataFrame(columns=behaviors, index=np.arange(0, n_modules))
+            for behavior in behaviors:
+                mask = boris_i[behavior]>0
+                masked_labels = labels_df[mask==True]
+                for module in range(n_modules):
+                    results_i.at[module,behavior] = np.sum(masked_labels==module).to_numpy()
+            results=results+results_i
+    results=results.T
+    column_sums = results.sum()
+    normalized_results = results / column_sums
+    return normalized_results
 
 def combine_pose_modules(config, labels_df):
     print("Coming soon!")

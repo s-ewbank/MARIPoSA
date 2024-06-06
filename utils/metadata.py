@@ -33,6 +33,14 @@ def create_project(project_name,data_directory,datatype,output_directory,fps):
     f.write("\n\nproject_files: " + project_files)
     f.write("\n\nsubgroups:")
     f.write("\n  group1:" + project_files_double_indent)
+    f.write("\n\nboris_directory: #boris_directory")
+    f.write("\n\nboris_to_pose_pairings:")
+    f.write("\n  - - #boris file 1 here")
+    f.write("\n    - #pose file 1 here")
+    f.write("\n  - - #boris file 2 here")
+    f.write("\n    - #pose file 2 here")
+    f.write("\n  - - #boris file n here")
+    f.write("\n    - #pose file n here")
     f.close()
 
 
