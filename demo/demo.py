@@ -17,8 +17,8 @@ import numpy as np
 importlib.reload(analysis)
 importlib.reload(plot)
 
-config_path="/Users/snewbank/Behavior/MARIPOSA_test/240605_kpms/config.yaml"
-save_path="/Users/snewbank/Behavior/MARIPOSA_test/240605_kpms/demo/"
+config_path="/Users/snewbank/Behavior/MARIPOSA_test/240605_VAME-test/config.yaml"
+save_path="/Users/snewbank/Behavior/MARIPOSA_test/240605_VAME-test/demo/"
 save=True
 
 #Load config
@@ -115,7 +115,7 @@ if save == True:
 
 #BORIS to pose
 BORIS_to_pose_mat = analysis.BORIS_to_pose(config)
-plot.BORIS_to_pose_matrix_plot(config, BORIS_to_pose_mat)
+plot.BORIS_to_pose_matrix_plot(config, BORIS_to_pose_mat,figH=2.5,figW=5)
 if save == True:
     plt.savefig(save_path+"boris_to_pose.png",dpi=500)
 

@@ -2,6 +2,7 @@ import scipy.io
 from scipy import stats
 import matplotlib.pyplot as plt
 from matplotlib import rcParams
+from matplotlib.patches import Rectangle
 import numpy as np
 import pandas as pd
 import networkx as nx
@@ -517,12 +518,20 @@ def plot_conf_mat(confusion, class_num, class_labels, figW=2.5,figH=2.5,cmap="Gr
     return fig
 
 def BORIS_to_pose_matrix_plot(config, boris_to_pose_output, figW=4, figH=2.5, cmap="Greens"):
-    fig = plt.figure(figsize=(figW, figH), dpi=100)
-    plt.imshow(boris_to_pose_output.to_numpy(dtype='float'),cmap=cmap)
+    fig, ax = plt.subplots(figsize=(figW, figH), dpi=100)
+    plt.imshow(boris_to_pose_output.to_numpy(dtype='float'),cmap=cmap,aspect="auto")
+    data = boris_to_pose_output.to_numpy(dtype='float')
+    num_cols = data.shape[1]
+    for col in range(num_cols):
+        max_row = np.argmax(data[:, col])
+        rect = Rectangle((col - 0.5, max_row - 0.5), 1, 1, edgecolor='purple', facecolor='none', linewidth=1)
+        ax.add_patch(rect)
     plt.xticks(range(len(boris_to_pose_output.columns)),labels=boris_to_pose_output.columns)
     plt.yticks(range(len(boris_to_pose_output.index)), labels=boris_to_pose_output.index)
     plt.xlabel(config["data_type"]+" Pose Module")
     plt.ylabel("Manually Scored\nBehavior")
+    plt.tick_params(axis='x', rotation=90,
+                    labelsize=plt.rcParams['font.size'] * 0.7, pad=2)
     plt.tight_layout()
     return fig
 
