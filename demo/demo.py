@@ -17,9 +17,9 @@ import numpy as np
 importlib.reload(analysis)
 importlib.reload(plot)
 
-config_path="/Users/snewbank/Behavior/MARIPOSA_test/240605_VAME-test/config.yaml"
-save_path="/Users/snewbank/Behavior/MARIPOSA_test/240605_VAME-test/demo/"
-save=True
+config_path="/Users/snewbank/Behavior/MARIPOSA_test/240605_240605_BSOID-test/config.yaml"
+save_path="/Users/snewbank/Behavior/MARIPOSA_test/240605_240605_BSOID-test/demo/"
+save=False
 
 #Load config
 config = metadata.load_project(config_path)
@@ -114,9 +114,18 @@ if save == True:
     plt.savefig(save_path+"lr_confmat.png",dpi=500)
 
 #BORIS to pose
-BORIS_to_pose_mat = analysis.BORIS_to_pose(config)
-plot.BORIS_to_pose_matrix_plot(config, BORIS_to_pose_mat,figH=2.5,figW=5)
+BORIS_to_pose_mat, BORIS_to_pose_mat_normalized, loss = analysis.BORIS_to_pose(config)
+plot.BORIS_to_pose_matrix_plot(config, BORIS_to_pose_mat_normalized,figH=2.5,figW=5)
 if save == True:
     plt.savefig(save_path+"boris_to_pose.png",dpi=500)
+
+plt.show()
+
+#remapping
+labels_df, n_modules = analysis.label_counter_subgroups(config,0,1200)
+fig = plot.plot_module_usage_subgroups(config, labels_df, 0, 1200)
+BORIS_to_pose_mat, BORIS_to_pose_mat_normalized, loss = analysis.BORIS_to_pose(config)
+labels_df = analysis.make_remappings_from_BORIS(config, labels_df, BORIS_to_pose_mat)
+fig = plot.plot_module_usage_subgroups(config, labels_df, 0, 1200)
 
 plt.show()

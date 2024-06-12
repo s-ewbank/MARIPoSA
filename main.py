@@ -660,7 +660,7 @@ class Application(customtkinter.CTk):
         customtkinter.CTkLabel(self, text="Compare Pose Data to Manually Scored Behaviors",
                                font=('Helvetica', 32, "bold")).grid(row=0, column=0, columnspan=4, pady=10)
         customtkinter.CTkLabel(self, text="Project " + self.config["project_name"],
-                               font=('Helvetica', 20, "bold")).grid(row=1, column=1, columnspan=2, pady=10)
+                               font=('Helvetica', 20, "bold")).grid(row=1, column=0, columnspan=4, pady=10)
         customtkinter.CTkLabel(self, text="Get a matrix showing overlap between pose modules and behaviors manually scored in BORIS.",
                                font=('Helvetica', 16)).grid(row=2, column=0, columnspan=4, pady=10)
 
@@ -766,8 +766,8 @@ class Application(customtkinter.CTk):
             #plot.plot_module_usage_subgroups(labels_df, start, end, int(self.config["fps"]), style=style, cmap=color)
 
     def plot_pose_vs_BORIS(self):
-        boris_to_pose_output = analysis.BORIS_to_pose(self.config)
-        fig = plot.BORIS_to_pose_matrix_plot(self.config, boris_to_pose_output)
+        BORIS_to_pose_mat, BORIS_to_pose_mat_normalized, loss = analysis.BORIS_to_pose(self.config)
+        fig = plot.BORIS_to_pose_matrix_plot(self.config, BORIS_to_pose_mat_normalized)
         self.plots_generated = self.plots_generated + 1
         self.plot_window = PlotWindow(fig = fig, plot_number = self.plots_generated, master = self)
         self.plot_window.mainloop()

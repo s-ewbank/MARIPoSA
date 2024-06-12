@@ -153,7 +153,12 @@ def label_counter_subgroups(config, start, stop, selected_subgroups="all"):
     return labels_df, n_modules
 
 def BORIS_to_pose(config):
-    #plot pose to whatever wahtever
+    """
+    Intake paired BORIS one-hot-encoded observation files and pose segmented files and align them to see what behaviors
+    line up with what pose modules
+    :param config: the config
+    :return:
+    """
     boris_directory = config["boris_directory"]
     boris_to_pose_pairings = config["boris_to_pose_pairings"]
     results=None
@@ -161,9 +166,11 @@ def BORIS_to_pose(config):
         if pairing[0]==None:
             continue
         else:
+            labels_df, n_modules = label_counter_nosubgroups(config, 0, 1200)
+            modules = np.unique(labels_df.values.flatten())
             config_modulo=config
             config_modulo["project_files"]=[pairing[1]]
-            labels_df, n_modules = label_counter_nosubgroups(config_modulo,0,1200)
+            labels_df, _ = label_counter_nosubgroups(config_modulo,0,1200)
             boris_i = pd.read_csv(boris_directory + "/" + pairing[0])
             boris_i["frame"] = np.round(boris_i["time"] / (1 / config["fps"]))
             boris_i = boris_i.drop_duplicates(subset='frame', keep='first')
@@ -174,8 +181,8 @@ def BORIS_to_pose(config):
             boris_i = boris_i.reset_index(drop=True)
             behaviors = list(boris_i.columns)
             if results is None:
-                results = pd.DataFrame(data=np.zeros([n_modules,len(behaviors)]),columns=behaviors,index=np.arange(0,n_modules))
-            results_i = pd.DataFrame(columns=behaviors, index=np.arange(0, n_modules))
+                results = pd.DataFrame(data=np.zeros([n_modules,len(behaviors)]),columns=behaviors,index=modules)
+            results_i = pd.DataFrame(columns=behaviors, index=modules)
             for behavior in behaviors:
                 mask = boris_i[behavior]>0
                 masked_labels = labels_df[mask==True]
@@ -184,12 +191,42 @@ def BORIS_to_pose(config):
             results=results+results_i
     results=results.T
     column_sums = results.sum()
+    column_sums = column_sums.replace(0, 1)
     normalized_results = results / column_sums
-    return normalized_results
+    loss_score = np.sum(results.sum()-results.max())/np.sum(results.sum())
+    print(config["data_type"] + " modules map onto scored behaviors with 'loss' of " + str(loss_score))
+    return results, normalized_results, loss_score
 
 def combine_pose_modules(config, labels_df):
-    print("Coming soon!")
-    # TODO:: add function for combining pose modules
+    """
+    Combine pose modules based on remappings key in config
+    :param config: config
+    :param labels_df: from label_counter (subgroups or no_subgroups)
+    :return:
+    """
+    for remapping in config["remappings"]:
+        if remapping[0] is not None:
+            for old_val in remapping[0]:
+                for column in labels_df.columns:
+                    labels_df[labels_df == old_val] = remapping[1]
+    return labels_df
+
+def make_remappings_from_BORIS(config, labels_df, BORIS_to_pose_mat):
+    """
+    Make remappings based on BORIS output and apply to labels_df
+    :param config: config
+    :param labels_df:
+    :param BORIS_to_pose_mat: the non-normalized result matrix (first result option) from BORIS_to_pose
+    :return:
+    """
+    BORIS_to_pose_mat_numeric = BORIS_to_pose_mat.apply(pd.to_numeric, errors='coerce')
+    new_mappings = list(BORIS_to_pose_mat_numeric.idxmax())
+    new_mappings = ['other' if x not in BORIS_to_pose_mat.index else x for x in new_mappings]
+    old_mappings =list(BORIS_to_pose_mat_numeric.idxmax().index)
+    remappings = [[[old_mappings[i]],new_mappings[i]] for i in range(len(old_mappings))]
+    config["remappings"] = remappings
+    combine_pose_modules(config, labels_df)
+    return labels_df
 
 def lda_labels_timebins(config, labels_df, binsize, selected_subgroups="all", ncomponents=2):
     """

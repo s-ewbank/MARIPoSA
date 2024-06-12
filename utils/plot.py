@@ -35,8 +35,13 @@ def plot_module_usage(config,labels_df,start,stop,figW=4,figH=2,style="bar_scatt
     label_counts = np.zeros([labels_df.shape[1], n_modules])
     for i in range(labels_df.shape[1]):
         for m in range(n_modules):
+            module = modules[m]
+            try:
+                module = np.int64(module)
+            except ValueError:
+                pass
             label_counts[i,m] = np.count_nonzero \
-                (labels_df[[labels_df.columns[i]]] == m) /total_frames
+                (labels_df[[labels_df.columns[i]]] == module) /total_frames
     bar_heights = np.mean(label_counts,axis=0)
     bar_sems = np.std(label_counts,axis=0)/np.sqrt(labels_df.shape[1])
 
@@ -122,9 +127,14 @@ def plot_module_usage_subgroups(config, labels_df, start, stop, figW=6, figH=3,
         label_counts_i = np.zeros([group_g_n, n_modules])
         for i in range(group_g_n):
             for m in range(n_modules):
+                module = modules[m]
+                try:
+                    module = np.int64(module)
+                except ValueError:
+                    pass
                 label_counts_i[i, m] = np.count_nonzero \
                                            (labels_df[groupnames[g]][
-                                                [labels_df[groupnames[g]].columns[i]]] == m) / total_frames
+                                                [labels_df[groupnames[g]].columns[i]]] == module) / total_frames
         label_counts.append(label_counts_i)
 
     bar_heights = np.zeros([n_groups, n_modules])
@@ -187,6 +197,7 @@ def plot_module_usage_subgroups(config, labels_df, start, stop, figW=6, figH=3,
     ax.set_xlabel(config["data_type"] + ' Pose Label')
     ax.set_ylabel('Frequency')
     ax.set_xticks(np.arange(0, n_modules, 1))
+    ax.set_xticklabels(modules)
     ax.tick_params(axis='x', rotation=90, labelsize=plt.rcParams['font.size'] * 0.2 * n_groups, pad=2)
     plt.tight_layout()
     return fig
