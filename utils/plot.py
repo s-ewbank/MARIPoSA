@@ -202,6 +202,84 @@ def plot_module_usage_subgroups(config, labels_df, start, stop, figW=6, figH=3,
     plt.tight_layout()
     return fig
 
+def plot_module_usage_stacked(config, labels_df, start, stop, figW=6, figH=3,cmap="viridis_r",title=None,alt_xticks=None):
+    """
+    Plots the frequency of the pose modules occurring by group in the labels dataframe output by the label_counter function.
+    :param labels_df: dataframe output from analysis.label_counter
+    :param start: time in seconds to start dataframe from.
+    :param stop: time in seconds to stop dataframe at.
+    :param fps: frames per second of recording.
+    :param figW: figure width
+    :param figH:
+    :param style:
+    :return:
+    """
+    #To get groupnames in order
+    fps = config["fps"]
+    groupnames = []
+    added_groupnames = set()
+    for item in [header[0] for header in labels_df.columns]:
+        if item not in added_groupnames:
+            groupnames.append(item)
+            added_groupnames.add(item)
+    n_groups=len(groupnames)
+
+    # Frames
+    start_frame = start * fps
+    stop_frame = stop * fps
+    labels_df = labels_df[start_frame:stop_frame]
+    total_frames = stop_frame - start_frame
+    labels_flat = np.array(labels_df)
+    labels_flat = [item for sublist in labels_flat for item in sublist]
+    modules = np.unique(labels_flat)
+    n_modules = len(modules)
+
+    # Label counting
+    label_counts = []
+    for g in range(n_groups):
+        group_g_n=np.sum([item[0]==groupnames[g] for item in labels_df.columns])
+        label_counts_i = np.zeros([group_g_n, n_modules])
+        for i in range(group_g_n):
+            for m in range(n_modules):
+                module = modules[m]
+                try:
+                    module = np.int64(module)
+                except ValueError:
+                    pass
+                label_counts_i[i, m] = np.count_nonzero \
+                                           (labels_df[groupnames[g]][
+                                                [labels_df[groupnames[g]].columns[i]]] == module) / total_frames
+        label_counts.append(label_counts_i)
+
+    bar_heights = np.zeros([n_groups, n_modules])
+    bar_sems = np.zeros([n_groups, n_modules])
+
+    for g in range(n_groups):
+        bar_heights[g, :] = np.mean(label_counts[g], axis=0)
+        bar_sems[g, :] = np.std(label_counts[g], axis=0)/np.sqrt(label_counts[g].shape[0])
+    fig, ax = plt.subplots(figsize=(figW, figH), dpi=100)
+    cmap = plt.get_cmap(cmap)
+    for c in range(len(modules)):
+        if c == 0:
+            bar_bottom = np.zeros(n_groups)
+        ax.bar(np.arange(0, n_groups, 1), bar_heights[:, c], bottom=bar_bottom, align='center', width=0.99)
+        ax.spines['top'].set_visible(False)
+        bar_bottom += bar_heights[:, c]
+        ax.spines['right'].set_visible(False)
+        ax.spines['top'].set_visible(False)
+    ax.set_ylabel("Proportion of Time \nSpent in Pose Module")
+    ax.set_xlim([-0.5, n_groups - 0.5])
+    ax.set_xticks(np.arange(n_groups))
+    if alt_xticks is None:
+        ax.set_xticklabels(groupnames)
+    else:
+        ax.set_xticklabels(alt_xticks)
+    if title is not None:
+        ax.set_title(title)
+    plt.legend(modules,bbox_to_anchor=(1.05, 1))
+    plt.tight_layout()
+    return fig
+
 
 def network_pairwise_comparison(config, labels_df, start, end, groupnames, scaling=1,include_labels=True,cmap="bwr"):
     """
