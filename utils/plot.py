@@ -18,8 +18,8 @@ def plot_module_usage(config,labels_df,start,stop,figW=4,figH=2,style="bar_scatt
     :param stop: time in seconds to stop dataframe at.
     :param fps: frames per second of recording.
     :param figW: figure width
-    :param figH:
-    :param style:
+    :param figH: figure height
+    :param style: "bar_scatter", "bar_error", or "points"
     :return:
     """
     fps = config["fps"]
@@ -532,7 +532,46 @@ def SandPlotClusterFrequency_OverTime(config,
         plt.tight_layout()
         return fig
 
-
+def plot_dist_bins(dist_df, cmap="viridis", plottype="band", figW=6, figH=3):
+    """
+    Plots distance of a keypoint either over time or in bins from dist_df (output of analysis.dist_df_subgroups)
+    :param dist_df: dist_df output from analysis.dist_df_subgroups
+    :param cmap: matplotlib colormap
+    :param plottype: type of plot ("band", "errorbar", or "bar" if no timebins)
+    :param figW: figure width
+    :param figH: figure height
+    :return:
+    """
+    fig, ax = plt.subplots(figsize=(figW, figH), dpi=100)
+    groups=pd.Series([i[0] for i in dist_df.columns]).unique()
+    n_groups=len(groups)
+    if dist_df.shape[0]==1:
+        plottype="bar"
+    cmap = plt.get_cmap(cmap)
+    colors = [cmap([i]) for i in np.linspace(0,1,n_groups)]
+    xticks=dist_df.index
+    for g, group in enumerate(groups):
+        sub_df=dist_df[group]
+        group_mean=sub_df.mean(axis=1)
+        group_sem=sub_df.std(axis=1)/np.sqrt(sub_df.shape[1])
+        if plottype=="errorbar":
+            ax.errorbar(xticks,group_mean,label=group,yerr=group_sem,marker="o",capsize=2,color=colors[g])
+            ax.legend()
+            ax.set_xlabel("Time (m)")
+        elif plottype=="band":
+            ax.plot(xticks,group_mean,label=group,marker="o",color=colors[g])
+            ax.fill_between(xticks,group_mean-group_sem,group_mean+group_sem,alpha=0.2, color=colors[g],edgecolor="none")
+            ax.legend()
+            ax.set_xlabel("Time (m)")
+        elif plottype=="bar":
+            xticks = np.arange(0,n_groups,1)
+            ax.bar(xticks[g],group_mean,color=colors[g],alpha=0.6)
+            ax.errorbar(xticks[g],group_mean,label=group,yerr=group_sem,capsize=2,color="black",linestyle="none")
+        if g==len(groups)-1:
+            ax.set_xticks(xticks)
+            ax.set_xticklabels(groups)
+    ax.set_ylabel("Locomotion (pix)")
+    return fig
 
 def plot_lda(config, lda, lda_embeddings, group_labels, nbins, binsize, selected_subgroups="all",
              figW=4, figH=3, titletype="informative", cmap="jet"):

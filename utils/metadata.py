@@ -48,11 +48,49 @@ def create_project(project_name,data_directory,datatype,output_directory,fps):
     f.write("\n    - #pose file n here")
     f.close()
 
+def make_dlc_config(dlc_path, fps=None, config=None, yaml_path=None):
+    """
+    Create a DLC config
+    :param path:
+    :param fps: frames per second (must be specified if no config is given)
+    :param config: pose config
+    :param yaml_path:
+    :return:
+    """
+    DLC_config = {}
+    DLC_config["path"] = dlc_path
+    if fps is None:
+        if config is not None:
+            DLC_config["fps"] = config["fps"]
+        else:
+            raise ValueError("You need to have either config or fps specified (or both).")
+    elif ((config is None) or (config["fps"] == fps)):
+        DLC_config["fps"] = fps
+    DLC_files = sorted(os.listdir(DLC_config["path"]))
+
+    DLC_config["subgroups"] = {}
+
+    if config is not None:
+        for subgroup in config["subgroups"].keys():
+            DLC_subgroup = []
+            for file in DLC_files:
+                end_handle = file.split("DLC_")[-1]
+                file_handle = file.split("DLC_" + end_handle)[0]
+                if len([i for i in config["subgroups"][subgroup] if file_handle in i]) > 0:
+                    DLC_subgroup.append(file)
+            DLC_config["subgroups"][subgroup] = DLC_subgroup
+
+    if config is not None:
+        yaml_path = config["project_directory"]
+    with open(yaml_path + '/DLC_config.yaml', 'w') as outfile:
+        yaml.dump(DLC_config, outfile, default_flow_style=False)
+
+    return DLC_config
 
 def load_project(config_path):
     """
-    loads project from project_info.py file
-    :param project_info_file:
+    loads project from config.yaml file
+    :param config_path: path to config.yaml file:
     """
     with open(config_path, "r") as file:
         config = yaml.safe_load(file)
