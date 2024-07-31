@@ -117,6 +117,7 @@ def label_counter_subgroups(config, start, stop, selected_subgroups="all"):
                     labels_df = pd.DataFrame(labels_i, columns=[header])
                 else:
                     labels_df.insert(loc=count, value=labels_i, column=header)
+                    labels_df = labels_df.copy()
                 count = count + 1
         labels_df.columns = [header1, header2]
     elif config["data_type"]=="Keypoint-MoSeq":
@@ -283,11 +284,14 @@ def combine_pose_modules(config, labels_df):
     :param labels_df: from label_counter (subgroups or no_subgroups)
     :return:
     """
-    for remapping in config["remappings"]:
+    n_rules=len(config["remappings"])
+    print("Applying " + str(n_rules) + " remapping rules from config.")
+    for r, remapping in enumerate(config["remappings"]):
+        print(str(r+1) + " of " + str(n_rules) + ": Remapping " + str(remapping[0]) + " to " + str(remapping[1]))
         if remapping[0] is not None:
             for old_val in remapping[0]:
                 for column in labels_df.columns:
-                    labels_df[labels_df == old_val] = remapping[1]
+                    labels_df.replace(old_val, remapping[1], inplace=True)
     return labels_df
 
 def make_remappings_from_BORIS(config, labels_df, BORIS_to_pose_mat):
@@ -356,6 +360,38 @@ def lda_labels_timebins(config, labels_df, binsize, selected_subgroups="all", nc
     lda = LDA(n_components=ncomponents)
     lda_embeddings = lda.fit_transform(label_counts, group_labels)
     return lda, lda_embeddings, label_counts, group_labels, group_dict, nbins
+
+def lda_loco_labels_timebins(config, dist_df, ncomponents=2):
+    """
+    Function to compute LDA for loco/kepoint position data in timebins
+    :param config:
+    :param labels_df:
+    :param binsize:
+    :param selected_subgroups:
+    :param ncomponents:
+    :return:
+    """
+    selected_subgroups = pd.Series([i[0] for i in dist_df.columns]).unique()
+    n_groups = len(selected_subgroups)
+    fps = config["fps"]
+    group_dict = {selected_subgroups[i]: i for i in range(len(selected_subgroups))}
+
+    dist_counts = []
+    for g in range(n_groups):
+        for i in range(len(dist_df[selected_subgroups[g]].columns)):
+            sub_df=dist_df[selected_subgroups[g]]
+            dist_counts.append(sub_df[sub_df.columns[i]])
+    dist_counts = np.array(dist_counts)
+
+    group_labels = []
+    for g in range(n_groups):
+        group_labels.extend([g] * len(dist_df[selected_subgroups[g]].columns))
+
+    lda = LDA(n_components=ncomponents)
+    lda_embeddings = lda.fit_transform(dist_counts, group_labels)
+    nbins=dist_df.shape[0]
+    return lda, lda_embeddings, dist_counts, group_labels, group_dict, nbins
+
 
 def lr_labels_timebins(config, labels_df, binsize, selected_subgroups="all"):
     """

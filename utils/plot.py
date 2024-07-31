@@ -433,7 +433,7 @@ def SandPlotClusterFrequency_OverTime(config,
                                       start,
                                       time_per_block,
                                       n_blocks,
-                                      figW=10, figH=3,
+                                      figW=7, figH=3,
                                       posenames=None,
                                       convolve=4,
                                       legend=True,
@@ -460,26 +460,26 @@ def SandPlotClusterFrequency_OverTime(config,
     n_samples = len(labels_df.columns)
     labels_flat = np.array(labels_df)
     labels_flat = [item for sublist in labels_flat for item in sublist]
-    clusts = np.unique(labels_flat)
-    n_clust = len(clusts)
-    block_labels = np.zeros([n_samples, n_clust, n_blocks])
-    block_labels_normal = np.zeros([n_samples, n_clust, n_blocks])
+    modules = np.unique(labels_flat)
+    n_modules = len(modules)
+    block_labels = np.zeros([n_samples, n_modules, n_blocks])
+    block_labels_normal = np.zeros([n_samples, n_modules, n_blocks])
     frames_per_block = int(fps * time_per_block)
     for i in range(n_samples):
         for b in range(n_blocks):
             new_start = start + b * frames_per_block
             x = labels_df[labels_df.columns[i]][new_start:new_start + frames_per_block]
-            for q in range(n_clust):
-                block_labels[i, q, b] = np.count_nonzero(x == q)
-                block_labels_normal[i, q, b] = np.count_nonzero(x == q) / frames_per_block
+            for m, module in enumerate(modules):
+                block_labels[i, m, b] = np.count_nonzero(x == module)
+                block_labels_normal[i, m, b] = np.count_nonzero(x == module) / frames_per_block
 
-    bar_heights = np.zeros([n_blocks, n_clust])
-    bar_heights_normal = np.zeros([n_blocks, n_clust])
-    bar_stds = np.zeros([n_blocks, n_clust])
-    bar_stds_normal = np.zeros([n_blocks, n_clust])
+    bar_heights = np.zeros([n_blocks, n_modules])
+    bar_heights_normal = np.zeros([n_blocks, n_modules])
+    bar_stds = np.zeros([n_blocks, n_modules])
+    bar_stds_normal = np.zeros([n_blocks, n_modules])
 
     for r in range(n_blocks):
-        for q in range(n_clust):
+        for q in range(n_modules):
             bar_heights[r, q] = np.mean(block_labels[:, q, r])
             bar_stds[r, q] = np.std(block_labels[:, q, r])
             bar_heights_normal[r, q] = np.mean(block_labels_normal[:, q, r])
@@ -488,7 +488,7 @@ def SandPlotClusterFrequency_OverTime(config,
     if plottype == 'line':
         fig, ax = plt.subplots(figsize=(figW, figH), dpi=100)
         scale = 1 / (n_blocks + .7)
-        for r in range(n_clust):
+        for r in range(n_modules):
             plt.plot(moving_average(bar_heights_normal[:, r], convolve))
             plt.fill_between(np.arange(0, n_blocks - convolve + 1, 1),
                              moving_average(bar_heights_normal[:, r] + bar_stds_normal[:, r] / np.sqrt(n_samples),
@@ -498,22 +498,25 @@ def SandPlotClusterFrequency_OverTime(config,
                              alpha=0.2)
         if legend == True:
             if posenames == None:
-                posenames = []
-                for i in range(n_clust):
-                    posenames.append("Pose " + str(i))
-                ax.legend(posenames, bbox_to_anchor=(1.1, 1.05))
+                if np.sum([type(m)!=int for m in modules])>0:
+                    posenames=modules
+                else:
+                    posenames = []
+                    for i in range(n_modules):
+                        posenames.append("Pose " + str(i))
+                ax.legend(posenames, loc="upper right", bbox_to_anchor=(1.25, 1.0))
             else:
-                ax.legend(posenames, bbox_to_anchor=(1.1, 1.05))
+                ax.legend(posenames, loc="upper right", bbox_to_anchor=(1.25, 1.0))
 
-        scale = 1 / (n_clust + .7)
+        scale = 1 / (n_modules + .7)
         ax.set_xlabel('Time (minutes)')
         ax.set_ylabel('Moving Average Proportion of \nTime Spent in Pose')
         ax.set_ylim([-0.03, 1.03])
 
     elif plottype == 'area':
         fig, ax = plt.subplots(figsize=(figW, figH), dpi=100)
-        bar_heights_moving_average = np.zeros([n_blocks - convolve + 1, n_clust])
-        for r in range(n_clust):
+        bar_heights_moving_average = np.zeros([n_blocks - convolve + 1, n_modules])
+        for r in range(n_modules):
             bar_heights_moving_average[:, r] = moving_average(bar_heights_normal[:, r], convolve)
         plt.stackplot(np.arange(0, bar_heights_moving_average.shape[0], 1), bar_heights_moving_average.T)
         plt.xlim(0, n_blocks - convolve)
@@ -523,14 +526,18 @@ def SandPlotClusterFrequency_OverTime(config,
 
         if legend == True:
             if posenames == None:
-                posenames = []
-                for i in range(n_clust):
-                    posenames.append("Pose " + str(i))
-                ax.legend(posenames, bbox_to_anchor=(1.1, 1.05))
+                if np.sum([type(m)!=int for m in modules])>0:
+                    posenames=modules
+                else:
+                    posenames = []
+                    for i in range(n_modules):
+                        posenames.append("Pose " + str(i))
+                ax.legend(posenames, loc="upper right", bbox_to_anchor=(1.25, 1.0))
             else:
-                ax.legend(posenames, bbox_to_anchor=(1.1, 1.05), loc="upper left")
+                ax.legend(posenames, loc="upper right", bbox_to_anchor=(1.25, 1.0))
         plt.tight_layout()
         return fig
+
 
 def plot_dist_bins(dist_df, cmap="viridis", plottype="band", figW=6, figH=3):
     """
@@ -543,33 +550,35 @@ def plot_dist_bins(dist_df, cmap="viridis", plottype="band", figW=6, figH=3):
     :return:
     """
     fig, ax = plt.subplots(figsize=(figW, figH), dpi=100)
-    groups=pd.Series([i[0] for i in dist_df.columns]).unique()
-    n_groups=len(groups)
-    if dist_df.shape[0]==1:
-        plottype="bar"
+    groups = pd.Series([i[0] for i in dist_df.columns]).unique()
+    n_groups = len(groups)
+    if dist_df.shape[0] == 1:
+        plottype = "bar"
     cmap = plt.get_cmap(cmap)
-    colors = [cmap([i]) for i in np.linspace(0,1,n_groups)]
-    xticks=dist_df.index
+    colors = [cmap([i]) for i in np.linspace(0, 1, n_groups)]
+    xticks = dist_df.index
     for g, group in enumerate(groups):
-        sub_df=dist_df[group]
-        group_mean=sub_df.mean(axis=1)
-        group_sem=sub_df.std(axis=1)/np.sqrt(sub_df.shape[1])
-        if plottype=="errorbar":
-            ax.errorbar(xticks,group_mean,label=group,yerr=group_sem,marker="o",capsize=2,color=colors[g])
+        sub_df = dist_df[group]
+        group_mean = sub_df.mean(axis=1)
+        group_sem = sub_df.std(axis=1) / np.sqrt(sub_df.shape[1])
+        if plottype == "errorbar":
+            ax.errorbar(xticks, group_mean, label=group, yerr=group_sem, marker="o", capsize=2, color=colors[g])
             ax.legend()
             ax.set_xlabel("Time (m)")
-        elif plottype=="band":
-            ax.plot(xticks,group_mean,label=group,marker="o",color=colors[g])
-            ax.fill_between(xticks,group_mean-group_sem,group_mean+group_sem,alpha=0.2, color=colors[g],edgecolor="none")
+        elif plottype == "band":
+            ax.plot(xticks, group_mean, label=group, marker="o", color=colors[g])
+            ax.fill_between(xticks, group_mean - group_sem, group_mean + group_sem, alpha=0.2, color=colors[g],
+                            edgecolor="none")
             ax.legend()
             ax.set_xlabel("Time (m)")
-        elif plottype=="bar":
-            xticks = np.arange(0,n_groups,1)
-            ax.bar(xticks[g],group_mean,color=colors[g],alpha=0.6)
-            ax.errorbar(xticks[g],group_mean,label=group,yerr=group_sem,capsize=2,color="black",linestyle="none")
-        if g==len(groups)-1:
-            ax.set_xticks(xticks)
-            ax.set_xticklabels(groups)
+        elif plottype == "bar":
+            xticks = np.arange(0, n_groups, 1)
+            ax.bar(xticks[g], group_mean, color=colors[g], alpha=0.6)
+            ax.errorbar(xticks[g], group_mean, label=group, yerr=group_sem, capsize=2, color="black",
+                        linestyle="none")
+            if g == len(groups) - 1:
+                ax.set_xticks(xticks)
+                ax.set_xticklabels(groups)
     ax.set_ylabel("Locomotion (pix)")
     return fig
 
@@ -642,6 +651,24 @@ def plot_conf_mat(confusion, class_num, class_labels, figW=2.5,figH=2.5,cmap="Gr
         plt.title('Confusion Matrix')
     else:
         plt.title(alt_title)
+    plt.tight_layout()
+    return fig
+
+def plot_pc_weights(pca,cmap="PuOr"):
+    """
+    Plot PCA weights
+    :param pca: pca object from sklearn
+    :return: fig
+    """
+    components = pca.components_
+    fig = plt.figure(figsize=(4,2),dpi=100)
+    pc_labels=["PC"+str(i+1) for i in range(pca.components_.shape[0])]
+    plt.imshow(components,cmap=cmap,vmin=-1,vmax=1)
+    plt.title("Principle Component Weights")
+    plt.xticks(np.arange(0,pca.components_.shape[1],1))
+    plt.xlabel("Pose Modules")
+    plt.yticks([0,1],labels=pc_labels)
+    plt.colorbar(cmap=cmap)
     plt.tight_layout()
     return fig
 
