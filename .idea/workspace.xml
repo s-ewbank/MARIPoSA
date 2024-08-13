@@ -4,13 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fb76900-29a9-459d-bd45-1760d8ecd8bb" name="Changes" comment="added to demo script, corrected LDA-to-LOOCV">
-      <change afterPath="$PROJECT_DIR$/demo/scratch_dist.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/demo/scratch_lev.py" afterDir="false" />
+    <list default="true" id="7fb76900-29a9-459d-bd45-1760d8ecd8bb" name="Changes" comment="Set up working biexponential fitting in PK demo, made corrections to some plotting functions">
+      <change afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_rebase_[Changes]/shelved.patch" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_rebase__Changes_.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/demo/demo.py" beforeDir="false" afterPath="$PROJECT_DIR$/demo/demo.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utils/analysis.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils/analysis.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/demo1_module-usage_classify_ketdr.py" beforeDir="false" afterPath="$PROJECT_DIR$/demo/demo1_module-usage_classify_ketdr.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/demo3_pca.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/demo/demo3_pca.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/demo4_pk.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/demo/demo4_pk.ipynb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/utils/plot.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils/plot.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -155,6 +155,8 @@
       <workItem from="1717015958917" duration="6896000" />
       <workItem from="1717036642921" duration="1201000" />
       <workItem from="1717387240192" duration="16377000" />
+      <workItem from="1723495150946" duration="62000" />
+      <workItem from="1723520701774" duration="598000" />
     </task>
     <task id="LOCAL-00001" summary="added conda env installable">
       <option name="closed" value="true" />

@@ -435,6 +435,7 @@ def SandPlotClusterFrequency_OverTime(config,
                                       n_blocks,
                                       figW=7, figH=3,
                                       posenames=None,
+                                      title=None,
                                       convolve=4,
                                       legend=True,
                                       plottype='area'):
@@ -536,7 +537,11 @@ def SandPlotClusterFrequency_OverTime(config,
             else:
                 ax.legend(posenames, loc="upper right", bbox_to_anchor=(1.25, 1.0))
         plt.tight_layout()
-        return fig
+
+    if title!=None:
+        ax.set_title(title)
+
+    return fig
 
 
 def plot_dist_bins(dist_df, cmap="viridis", plottype="band", figW=6, figH=3):

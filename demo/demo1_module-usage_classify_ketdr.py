@@ -84,11 +84,11 @@ for model in [model1, model2, model3]:
     labels_df, n_modules = analysis.label_counter_subgroups(config,0,1200)
     lda, lda_embeddings, label_counts, group_labels, group_dict, nbins = analysis.lda_labels_timebins(config,labels_df,binsize)
     fig = plot.plot_lda(config, lda, lda_embeddings, group_labels, nbins, binsize, cmap="viridis_r")
-    plt.savefig(save_path+"lda_embeddings.png",dpi=500)
+    plt.savefig(save_path+"lda_embeddings_2p5m.png",dpi=500)
     confusion, class_num, class_labels, accuracy = analysis.loocv_conf_mat(lda, label_counts, group_labels, group_dict)
     plot.plot_conf_mat(confusion, class_num, class_labels,alt_title="Linear Discriminant Analysis\nConfusion Matrix")
     if save == True:
-        plt.savefig(save_path+"lda_confmat.png",dpi=500)
+        plt.savefig(save_path+"lda_confmat_2p5m.png",dpi=500)
 
     #Logistic regression analysis - scan
     binsizes=[0.5*60,1*60,2.5*60,5*60,10*60,20*60]
