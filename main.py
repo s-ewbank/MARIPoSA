@@ -10,6 +10,9 @@ import io
 
 
 class Application(customtkinter.CTk):
+    """
+    Main application
+    """
     def __init__(self):
         super().__init__()
         self.title("MARIPoSA")
@@ -24,8 +27,6 @@ class Application(customtkinter.CTk):
         x = (screen_width - self.width) // 2
         y = (screen_height - self.height) // 2
         self.geometry(f'{self.width}x{self.height}+{x}+{y}')
-
-        # Initialize variable to store the project start choice
         self.projectstart_choice = customtkinter.StringVar(value="New project")  # Default choice
         self.datatype = customtkinter.StringVar(value="B-SOiD")  # Default choice
         self.config = None
@@ -37,24 +38,47 @@ class Application(customtkinter.CTk):
         self.window1_start()
 
     def clear_window(self):
+        """
+        Clear window
+        :return:
+        """
         for widget in self.winfo_children():
             widget.destroy()
 
     def configure_window(self, nrows, ncols):
-        # Configure the first row and first column to expand
+        """
+        Configure windows (for grid)
+        :param nrows:
+        :param ncols:
+        :return:
+        """
         for row_index in range(nrows):
             self.grid_rowconfigure(row_index, weight=1)
         for column_index in range(ncols):
             self.grid_columnconfigure(column_index, weight=1)
 
-    def display_error(self, message, row, column, columnspan):
-        self.error_label = customtkinter.CTkLabel(self, text=message, text_color="red", bg_color="#ffe5e3")
-        self.error_label.grid(row=row, column=column, columnspan=columnspan)
-        self.after(3000, lambda: self.error_label.configure(text="",bg_color=""))
+    def display_error(self, message, x,y):
+        """
+        Display error
+        :param message:
+        :param row:
+        :param column:
+        :param columnspan:
+        :return:
+        """
+        print('error')
+        self.error_label = customtkinter.CTkLabel(self, text=message, text_color="red", bg_color="#ffe5e3",anchor=tk.CENTER)
+        self.error_label.place(x=x,y=y)
+        #self.after(3000, lambda: self.error_label.configure(text=""))
 
     @staticmethod
     def window_browse(item_path_entry, type="file"):
-        # Function to open the file dialog and update the file_path_entry with the selected file path
+        """
+        Function to browse files
+        :param item_path_entry:
+        :param type:
+        :return:
+        """
         if type == "file":
             filename = filedialog.askopenfilename()
             item_path_entry.delete(0, customtkinter.END)
@@ -102,8 +126,7 @@ class Application(customtkinter.CTk):
                 self.load_project()
             else:
                 error_message="That path does not exist. please enter an existing path."
-                self.display_error(error_message,4,0,columnspan=2)
-
+                self.display_error(error_message,int(self.width*0.4),int(self.width*0.8))
         else:
             print(self.projectstart_choice)
 
@@ -218,8 +241,8 @@ class Application(customtkinter.CTk):
         customtkinter.CTkLabel(list_frame, text=self.config["data_type"], font=('Helvetica', 16),anchor="w",width=bar_width).pack(side=tk.TOP, fill=tk.X,padx=5)
         customtkinter.CTkLabel(list_frame, text="Subgroups (" + str(len(self.config["subgroups"].keys())) + ")",
                                text_color="#3a7ebf", font=('Helvetica', 16, "bold"),anchor="w",width=bar_width).pack(side=tk.TOP, fill=tk.X,padx=5)
-        for item in list(self.config["subgroups"].keys()):
-            label = customtkinter.CTkLabel(list_frame, text=item,anchor="w",width=bar_width)
+        for key in list(self.config["subgroups"].keys()):
+            label = customtkinter.CTkLabel(list_frame, text=str(key+" ("+str(len(self.config["subgroups"][key]))+")"),anchor="w",width=bar_width)
             label.pack(anchor=tk.W,padx=5)
         customtkinter.CTkLabel(list_frame, text="Project Files (" + str(len(self.config["project_files"])) + ")",
                                text_color="#3a7ebf", font=('Helvetica', 16, "bold"),anchor="w",width=bar_width).pack(side=tk.TOP, fill=tk.X,padx=5)
@@ -250,7 +273,7 @@ class Application(customtkinter.CTk):
         subgroups_img = PhotoImage(file='other/posevis icon 2.png')
         button_width=int(self.width*0.2)
         button_height=int(self.height*0.15)
-        customtkinter.CTkLabel(self, text="Further project configuration:",
+        customtkinter.CTkLabel(self, text="Further configure project:",
                                font=('Helvetica', 16),width=button_width,height=button_height).place(x=int(self.width * 0.3), y=int(self.height * 0.2))
         customtkinter.CTkButton(self, text="Define subgroups \nwithin data",
                                 command=self.window4a_define_subgroups, image=subgroups_img,
@@ -265,11 +288,11 @@ class Application(customtkinter.CTk):
         customtkinter.CTkButton(self, text="Analyze pose module \nusage and transitions",
                                 command=self.window4b_usage_transitions_menu, image=usage_img,
                                 font=('Helvetica', 16),width=button_width,height=button_height).place(x=int(self.width*0.3), y=int(self.height*0.6))
-        customtkinter.CTkButton(self, text="Analyze pose module \nusage over time",
-                                command=self.window4e_usage_overtime_menu,
+        customtkinter.CTkButton(self, text="Embed and measure \ndistance between groups",
+                                command=self.window4e_embed_menu,
                                 font=('Helvetica', 16),width=button_width,height=button_height).place(x=int(self.width*0.52), y=int(self.height*0.6))
-        customtkinter.CTkButton(self, text="Classify and embed \nconditions",
-                                command=self.window4g_classify_and_embed_menu,
+        customtkinter.CTkButton(self, text="Classify conditions",
+                                command=self.window4g_classify_menu,
                                 font=('Helvetica', 16),width=button_width,height=button_height).place(x=int(self.width*0.74), y=int(self.height*0.6))
 
         customtkinter.CTkButton(self, text="◀◀ back to start", command=self.window1_start,
@@ -325,19 +348,28 @@ class Application(customtkinter.CTk):
                                font=('Helvetica', 16)).place(x=int(self.width*0.65), y=int(self.height*0.3),anchor=tk.CENTER)
 
         # Next menu options
-        customtkinter.CTkButton(self, text="Plot pose usage for all individuals",
-                                command=lambda: self.window4c_usage_transitions("no_subgroups"),
-                                font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.4))
+        # customtkinter.CTkButton(self, text="Plot pose usage for all individuals",
+        #                         command=lambda: self.window4c_usage_transitions("no_subgroups"),
+        #                         font=('Helvetica', 16)).place(x=int(self.width*0.65), y=int(self.height*0.35),anchor=tk.CENTER)
+
         customtkinter.CTkButton(self, text="Plot pose usage for subgroups",
-                                command=lambda: self.window4c_usage_transitions("subgroups"),
-                                font=('Helvetica', 16)).place(x=int(self.width*0.7), y=int(self.height*0.4))
-        customtkinter.CTkButton(self, text="Network plot of usage and transitions",
-                                command=lambda: self.window4d_network("single"),
-                                font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.7))
+                                command=lambda: self.window4c_usage_transitions("subgroups"),height=int(self.height*0.15),width=int(self.width*0.6),
+                                font=('Helvetica', 16)).place(x=int(self.width*0.65), y=int(self.height*0.35),anchor=tk.CENTER)
+
+        # customtkinter.CTkButton(self, text="Network plot of usage and transitions",
+        #                         command=lambda: self.window4d_network("single"),
+        #                         font=('Helvetica', 16)).place(x=int(self.width*0.65), y=int(self.height*0.35),anchor=tk.CENTER)
         customtkinter.CTkButton(self, text="Network plot of usage and transitions \nfor subgroups",
-                                command=lambda: self.window4d_network("comparison"),
-                                font=('Helvetica', 16)).place(x=int(self.width*0.7), y=int(self.height*0.7))
-        # Bottom back buttons
+                                command=lambda: self.window4d_network("comparison"),height=int(self.height*0.15),width=int(self.width*0.6),
+                                font=('Helvetica', 16)).place(x=int(self.width*0.65), y=int(self.height*0.52),anchor=tk.CENTER)
+        # Next menu options
+        customtkinter.CTkButton(self, text="Plot pose module usage\n in a subgroup over the\n course of a single session",
+                                command=lambda: self.window4f_usage_overtime("within_session"),height=int(self.height*0.15),width=int(self.width*0.29),
+                                font=('Helvetica', 16)).place(x=int(self.width*0.80), y=int(self.height*0.69),anchor=tk.CENTER)
+        customtkinter.CTkButton(self, text="Plot pose module usage\n in a subgroup across sessions",
+                                command=lambda: self.window4f_usage_overtime("across_sessions"),height=int(self.height*0.15),width=int(self.width*0.29),
+                                font=('Helvetica', 16)).place(x=int(self.width*0.5), y=int(self.height*0.69),anchor=tk.CENTER)
+
         customtkinter.CTkButton(self, text="◀ back to analysis menu", command=self.window3_menu,
                                 font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.83))
         customtkinter.CTkButton(self, text="◀◀ back to start", command=self.window1_start,
@@ -345,36 +377,34 @@ class Application(customtkinter.CTk):
     def window4c_usage_transitions(self,subgroup_option):
         self.clear_window()
         self.create_sidebar_widget()
-        if subgroup_option=="no_subgroups":
-            title_string="Pose Usage and Transition Analysis - All Individuals"
-        elif subgroup_option=="subgroups":
-            title_string="Pose Usage and Transition Analysis - Subgroups"
-        customtkinter.CTkLabel(self, text=title_string,
-                               font=('Helvetica', 32, "bold")).place(x=int(self.width*0.65), y=int(self.height*0.08),anchor=tk.CENTER)
+        customtkinter.CTkLabel(self, text="Viz & Analyze ▶ Usage Analysis ▶ Get & Plot Usage",
+                               font=('Helvetica', 12),text_color="darkgray").place(x=int(self.width*0.3), y=int(self.height*0.02))
+        customtkinter.CTkLabel(self, text="Pose Usage and Transition Analysis",
+                               font=('Helvetica', 32, "bold")).place(x=int(self.width*0.65), y=int(self.height*0.09),anchor=tk.CENTER)
         customtkinter.CTkLabel(self, text="Project "+self.config["project_name"],
-                               font=('Helvetica', 20, "bold")).place(x=int(self.width*0.65), y=int(self.height*0.15),anchor=tk.CENTER)
+                               font=('Helvetica', 20, "bold")).place(x=int(self.width*0.65), y=int(self.height*0.16),anchor=tk.CENTER)
         customtkinter.CTkLabel(self, text="Enter info about your analysis and plotting parameters.",
-                               font=('Helvetica', 16)).grid(row=2, column=0, columnspan=4, pady=10)
+                               font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.25))
 
         # Plot
         # Choose start and end time
         customtkinter.CTkLabel(self, text="Start time (seconds)",
-                               font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.3))
+                               font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.35))
         start = customtkinter.CTkEntry(self)
-        start.place(x=int(self.width*0.5), y=int(self.height*0.3))
+        start.place(x=int(self.width*0.5), y=int(self.height*0.35))
         customtkinter.CTkLabel(self, text="End time (seconds)",
-                               font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.4))
+                               font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.45))
         end = customtkinter.CTkEntry(self)
-        end.place(x=int(self.width*0.5), y=int(self.height*0.4))
+        end.place(x=int(self.width*0.5), y=int(self.height*0.45))
         # Choose color
         customtkinter.CTkLabel(self, text="Colormap for plot",
-                               font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.5))
+                               font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.55))
         color = customtkinter.CTkComboBox(self, values=["jet", "cividis", "viridis", "magma"])
-        color.place(x=int(self.width*0.3), y=int(self.height*0.6))
+        color.place(x=int(self.width*0.3), y=int(self.height*0.65))
         color.set("jet")
         # Choose style for plot
         customtkinter.CTkLabel(self, text="What should the \nplot style be?",
-                               font=('Helvetica', 16)).place(x=int(self.width*0.8), y=int(self.height*0.3))
+                               font=('Helvetica', 16)).place(x=int(self.width*0.7), y=int(self.height*0.35))
         style = customtkinter.StringVar(value="scatter")
         style_options = ["Bar with scattered individual points",
                          "Bar with standard error of the mean",
@@ -384,11 +414,11 @@ class Application(customtkinter.CTk):
             radio_btn = customtkinter.CTkRadioButton(self, text=style_options[s],
                                                      variable=style, value=style_vars[s],
                                                      font=('Helvetica', 16))
-            radio_btn.place(x=int(self.width*0.8), y=int(self.height*0.4+0.1*s))
+            radio_btn.place(x=int(self.width*0.7), y=int(self.height*(0.45+0.1*s)))
         customtkinter.CTkButton(self, text="Plot it!",
                                 command=lambda: self.plot_usage(int(start.get()), int(end.get()),
                                                                 style.get(), color.get(), subgroup_option),
-                                font=('Helvetica', 16)).place(x=int(self.width*0.9), y=int(self.height*0.9))
+                                font=('Helvetica', 16)).place(x=int(self.width*0.8), y=int(self.height*0.9))
         # Bottom back buttons
         customtkinter.CTkButton(self, text="◀ back to analysis menu", command=self.window3_menu,
                                 font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.83))
@@ -403,42 +433,44 @@ class Application(customtkinter.CTk):
             title_string="Network Plot - Single Group"
         elif subgroup_option=="comparison":
             title_string="Network Plot - Comparison"
+        customtkinter.CTkLabel(self, text="Viz & Analyze ▶ Usage Analysis ▶ Network Plot",
+                               font=('Helvetica', 12),text_color="darkgray").place(x=int(self.width*0.3), y=int(self.height*0.02))
         customtkinter.CTkLabel(self, text=title_string,
-                               font=('Helvetica', 32, "bold")).place(x=int(self.width*0.65), y=int(self.height*0.08),anchor=tk.CENTER)
+                               font=('Helvetica', 32, "bold")).place(x=int(self.width*0.65), y=int(self.height*0.09),anchor=tk.CENTER)
         customtkinter.CTkLabel(self, text="Project "+self.config["project_name"],
-                               font=('Helvetica', 20, "bold")).place(x=int(self.width*0.65), y=int(self.height*0.15),anchor=tk.CENTER)
+                               font=('Helvetica', 20, "bold")).place(x=int(self.width*0.65), y=int(self.height*0.16),anchor=tk.CENTER)
 
         customtkinter.CTkLabel(self, text="Enter info about your plotting parameters.",
-                               font=('Helvetica', 16)).place(x=int(self.width*0.65), y=int(self.height*0.3),anchor=tk.CENTER)
+                               font=('Helvetica', 16)).place(x=int(self.width*0.65), y=int(self.height*0.25),anchor=tk.CENTER)
 
         # Plot
         # Choose start and end time
         # Set groups to compare
         customtkinter.CTkLabel(self, text="Comparison group 1",
-                               font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.4))
+                               font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.35))
         group1 = customtkinter.CTkComboBox(self, values=list(self.config["subgroups"].keys()))
-        group1.place(x=int(self.width*0.45), y=int(self.height*0.4))
+        group1.place(x=int(self.width*0.45), y=int(self.height*0.35))
         customtkinter.CTkLabel(self, text="Comparison group 2",
-                               font=('Helvetica', 16)).place(x=int(self.width*0.6), y=int(self.height*0.4))
+                               font=('Helvetica', 16)).place(x=int(self.width*0.6), y=int(self.height*0.35))
         group2 = customtkinter.CTkComboBox(self, values=list(self.config["subgroups"].keys()))
-        group2.place(x=int(self.width*0.75), y=int(self.height*0.4))
-        customtkinter.CTkLabel(self, text="Start time (seconds)",
-                               font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.5))
+        group2.place(x=int(self.width*0.75), y=int(self.height*0.35))
+        customtkinter.CTkLabel(self, text="Start time\n(seconds)",
+                               font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.45))
         start = customtkinter.CTkEntry(self)
-        start.place(x=int(self.width*0.5), y=int(self.height*0.5))
-        customtkinter.CTkLabel(self, text="End time (seconds)",
-                               font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.6))
+        start.place(x=int(self.width*0.45), y=int(self.height*0.45))
+        customtkinter.CTkLabel(self, text="End time\n(seconds)",
+                               font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.55))
         end = customtkinter.CTkEntry(self)
-        end.place(x=int(self.width*0.5), y=int(self.height*0.6))
+        end.place(x=int(self.width*0.45), y=int(self.height*0.55))
         # Choose color
         customtkinter.CTkLabel(self, text="Colormap for plot",
-                               font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.5))
+                               font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.65))
         color = customtkinter.CTkComboBox(self, values=["bwr", "seismic", "PRGn", "BrBG", "PuOr", "PiYG"])
-        color.place(x=int(self.width*0.5), y=int(self.height*0.5))
+        color.place(x=int(self.width*0.45), y=int(self.height*0.65))
         color.set("bwr")
         # Choose style for plot
         customtkinter.CTkLabel(self, text="Label module numbers on plot?",
-                               font=('Helvetica', 16)).place(x=int(self.width*0.6), y=int(self.height*0.6))
+                               font=('Helvetica', 16)).place(x=int(self.width*0.7), y=int(self.height*0.55))
         style = customtkinter.StringVar(value="scatter")
         style_options = ["Yes, label",
                          "No, don't label"]
@@ -447,36 +479,12 @@ class Application(customtkinter.CTk):
             radio_btn = customtkinter.CTkRadioButton(self, text=style_options[s],
                                                      variable=style, value=style_vars[s],
                                                      font=('Helvetica', 16))
-            radio_btn.place(x=int(self.width*0.6), y=int(self.height*(0.7+0.1*s)))
+            radio_btn.place(x=int(self.width*0.7), y=int(self.height*(0.65+0.1*s)))
         customtkinter.CTkButton(self, text="Plot it!",
                                 command=lambda: self.plot_network(group1.get(), group2.get(), int(start.get()),
                                                                   int(end.get()), style.get(), color.get(),
                                                                   subgroup_option),
                                 font=('Helvetica', 16)).place(x=int(self.width*0.8), y=int(self.height*0.9))
-        # Bottom back buttons
-        customtkinter.CTkButton(self, text="◀ back to analysis menu", command=self.window3_menu,
-                                font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.8))
-        customtkinter.CTkButton(self, text="◀◀ back to start", command=self.window1_start,
-                                font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.9))
-
-    def window4e_usage_overtime_menu(self):
-        self.clear_window()
-        self.create_sidebar_widget()
-        customtkinter.CTkLabel(self, text="Pose Usage Over Time Analysis Menu",
-                               font=('Helvetica', 32, "bold")).place(x=int(self.width*0.65), y=int(self.height*0.08),anchor=tk.CENTER)
-        customtkinter.CTkLabel(self, text="Project "+self.config["project_name"],
-                               font=('Helvetica', 20, "bold")).place(x=int(self.width*0.65), y=int(self.height*0.15),anchor=tk.CENTER)
-        customtkinter.CTkLabel(self, text="What kind of plot would you like to generate?",
-                               font=('Helvetica', 16)).grid(row=2, column=0, columnspan=4, pady=10)
-
-        # Next menu options
-        customtkinter.CTkButton(self, text="Plot pose module usage in a subgroup over the course of a single session",
-                                command=lambda: self.window4f_usage_overtime("within_session"),
-                                font=('Helvetica', 16)).grid(row=3, column=1, columnspan=2, pady=20, sticky="NSEW")
-        customtkinter.CTkButton(self, text="Plot pose module usage in a subgroup across sessions",
-                                command=lambda: self.window4f_usage_overtime("across_sessions"),
-                                font=('Helvetica', 16)).grid(row=4, column=1, columnspan=2, pady=20, sticky="NSEW")
-
         # Bottom back buttons
         customtkinter.CTkButton(self, text="◀ back to analysis menu", command=self.window3_menu,
                                 font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.83))
@@ -485,16 +493,18 @@ class Application(customtkinter.CTk):
 
     def window4f_usage_overtime(self, session_option):
         self.clear_window()
-        self.configure_window(5, 4)
+        self.create_sidebar_widget()
         # Title
         if session_option=="within_session":
             title_string="Time Series of Pose Module Usage Within Session"
         elif session_option=="across_sessions":
             title_string="Pose Module Usage Across Sessions"
+        customtkinter.CTkLabel(self, text="Viz & Analyze ▶ Usage Analysis ▶ Within-Session Over Time",
+                               font=('Helvetica', 12),text_color="darkgray").place(x=int(self.width*0.3), y=int(self.height*0.02))
         customtkinter.CTkLabel(self, text=title_string,
-                               font=('Helvetica', 32, "bold")).place(x=int(self.width*0.65), y=int(self.height*0.08),anchor=tk.CENTER)
+                               font=('Helvetica', 32, "bold")).place(x=int(self.width*0.65), y=int(self.height*0.09),anchor=tk.CENTER)
         customtkinter.CTkLabel(self, text="Project "+self.config["project_name"],
-                               font=('Helvetica', 20, "bold")).place(x=int(self.width*0.65), y=int(self.height*0.15),anchor=tk.CENTER)
+                               font=('Helvetica', 20, "bold")).place(x=int(self.width*0.65), y=int(self.height*0.16),anchor=tk.CENTER)
         customtkinter.CTkLabel(self, text="Choose the parameters for your plot.",
                                font=('Helvetica', 16)).grid(row=2, column=0, columnspan=4, pady=10)
 
@@ -542,73 +552,203 @@ class Application(customtkinter.CTk):
         customtkinter.CTkButton(self, text="◀◀ back to start", command=self.window1_start,
                                 font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.9))
 
-    def window4g_classify_and_embed_menu(self):
+    def window4e_embed_menu(self):
         self.clear_window()
         self.create_sidebar_widget()
         # Title
-        customtkinter.CTkLabel(self, text="Classify and Embed Menu",
-                               font=('Helvetica', 32, "bold")).place(x=int(self.width*0.65), y=int(self.height*0.08),anchor=tk.CENTER)
+        customtkinter.CTkLabel(self, text="Viz & Analyze ▶ Embed",
+                               font=('Helvetica', 12),text_color="darkgray").place(x=int(self.width*0.3), y=int(self.height*0.02))
+        customtkinter.CTkLabel(self, text="Embed and Distance Menu",
+                               font=('Helvetica', 32, "bold")).place(x=int(self.width*0.65), y=int(self.height*0.09),anchor=tk.CENTER)
         customtkinter.CTkLabel(self, text="Project "+self.config["project_name"],
-                               font=('Helvetica', 20, "bold")).place(x=int(self.width*0.65), y=int(self.height*0.15),anchor=tk.CENTER)
-        customtkinter.CTkLabel(self, text="What analysis would you like to do?",
-                               font=('Helvetica', 16)).grid(row=2, column=0, columnspan=4, pady=10)
+                               font=('Helvetica', 20, "bold")).place(x=int(self.width*0.65), y=int(self.height*0.16),anchor=tk.CENTER)
+        customtkinter.CTkLabel(self, text="What tool do you want to use to embed and/or measure distance?",
+                               font=('Helvetica', 16)).place(x=int(self.width*0.65), y=int(self.height*0.24),anchor=tk.CENTER)
 
-        # Next menu options
-        customtkinter.CTkButton(self, text="Embed and classify with linear discriminant analysis",
-                                command=self.window4g_lda_embed_classify,
-                                font=('Helvetica', 16)).grid(row=3, column=1, columnspan=2, pady=20, sticky="NSEW")
-        customtkinter.CTkButton(self, text="Classify with logistic regression",
-                                command=self.window4g_lr_classify,
-                                font=('Helvetica', 16)).grid(row=4, column=1, columnspan=2, pady=20, sticky="NSEW")
-        customtkinter.CTkButton(self, text="Classify with natural language processing tools",
-                                command=self.window4g_nlp_classify,
-                                font=('Helvetica', 16)).grid(row=5, column=1, columnspan=2, pady=20, sticky="NSEW")
+        customtkinter.CTkButton(self, text="Sum squared difference from control group",
+                                command=self.window4g_ssd_embed,height=int(self.height*0.15),width=int(self.width*0.6),
+                                font=('Helvetica', 16)).place(x=int(self.width*0.65), y=int(self.height*0.35),anchor=tk.CENTER)
+        customtkinter.CTkButton(self, text="Principal components analysis",
+                                command=self.window4g_pca_embed,height=int(self.height*0.15),width=int(self.width*0.6),
+                                font=('Helvetica', 16)).place(x=int(self.width*0.65), y=int(self.height*0.52),anchor=tk.CENTER)
+        customtkinter.CTkButton(self, text="Linear discriminant analysis",
+                                command=self.window4g_lda_embed_classify,height=int(self.height*0.15),width=int(self.width*0.6),
+                                font=('Helvetica', 16)).place(x=int(self.width*0.65), y=int(self.height*0.69),anchor=tk.CENTER)
         # Bottom back buttons
         customtkinter.CTkButton(self, text="◀ back to analysis menu", command=self.window3_menu,
                                 font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.83))
         customtkinter.CTkButton(self, text="◀◀ back to start", command=self.window1_start,
                                 font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.9))
 
-    def window4g_lda_embed_classify(self):
+
+    def window4g_classify_menu(self):
         self.clear_window()
         self.create_sidebar_widget()
         # Title
-        customtkinter.CTkLabel(self, text="Embed and Classify with Linear Discriminant Analysis",
-                               font=('Helvetica', 32, "bold")).place(x=int(self.width*0.65), y=int(self.height*0.08),anchor=tk.CENTER)
+        customtkinter.CTkLabel(self, text="Viz & Analyze ▶ Classify",
+                               font=('Helvetica', 12),text_color="darkgray").place(x=int(self.width*0.3), y=int(self.height*0.02))
+        customtkinter.CTkLabel(self, text="Classify and Embed Menu",
+                               font=('Helvetica', 32, "bold")).place(x=int(self.width*0.65), y=int(self.height*0.09),anchor=tk.CENTER)
         customtkinter.CTkLabel(self, text="Project "+self.config["project_name"],
-                               font=('Helvetica', 20, "bold")).place(x=int(self.width*0.65), y=int(self.height*0.15),anchor=tk.CENTER)
+                               font=('Helvetica', 20, "bold")).place(x=int(self.width*0.65), y=int(self.height*0.16),anchor=tk.CENTER)
+        customtkinter.CTkLabel(self, text="What tool do you want to use to classify and/or embed?",
+                               font=('Helvetica', 16)).place(x=int(self.width*0.65), y=int(self.height*0.24),anchor=tk.CENTER)
+
+        customtkinter.CTkButton(self, text="Linear discriminant analysis",
+                                command=self.window4g_lda_embed_classify,height=int(self.height*0.15),width=int(self.width*0.6),
+                                font=('Helvetica', 16)).place(x=int(self.width*0.65), y=int(self.height*0.35),anchor=tk.CENTER)
+        customtkinter.CTkButton(self, text="Logistic regression",
+                                command=self.window4g_lr_classify,height=int(self.height*0.15),width=int(self.width*0.6),
+                                font=('Helvetica', 16)).place(x=int(self.width*0.65), y=int(self.height*0.52),anchor=tk.CENTER)
+        customtkinter.CTkButton(self, text="Natural language processing",
+                                command=self.window4g_nlp_classify,height=int(self.height*0.15),width=int(self.width*0.6),
+                                font=('Helvetica', 16)).place(x=int(self.width*0.65), y=int(self.height*0.69),anchor=tk.CENTER)
+        # Bottom back buttons
+        customtkinter.CTkButton(self, text="◀ back to analysis menu", command=self.window3_menu,
+                                font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.83))
+        customtkinter.CTkButton(self, text="◀◀ back to start", command=self.window1_start,
+                                font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.9))
+
+    def window4g_ssd_embed(self):
+        self.clear_window()
+        self.create_sidebar_widget()
+        # Title
+        customtkinter.CTkLabel(self, text="Viz & Analyze ▶ Embed ▶ SSD",
+                               font=('Helvetica', 12),text_color="darkgray").place(x=int(self.width*0.3), y=int(self.height*0.02))
+        customtkinter.CTkLabel(self, text="Sum Squared Difference Embedding",
+                               font=('Helvetica', 32, "bold")).place(x=int(self.width*0.65), y=int(self.height*0.09),anchor=tk.CENTER)
+        customtkinter.CTkLabel(self, text="Project "+self.config["project_name"],
+                               font=('Helvetica', 20, "bold")).place(x=int(self.width*0.65), y=int(self.height*0.16),anchor=tk.CENTER)
         customtkinter.CTkLabel(self, text="Enter info about your analysis and plotting parameters.",
-                               font=('Helvetica', 16)).grid(row=2, column=0, columnspan=4, pady=10)
+                               font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.25))
 
         # Plot
         # Choose start and end time
         customtkinter.CTkLabel(self, text="Start time (seconds)",
-                               font=('Helvetica', 16)).grid(row=3, column=0, pady=10, sticky="E")
+                               font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.35))
         start = customtkinter.CTkEntry(self)
-        start.grid(row=3, column=1, pady=10, sticky="W")
+        start.place(x=int(self.width*0.45), y=int(self.height*0.35))
         customtkinter.CTkLabel(self, text="End time (seconds)",
-                               font=('Helvetica', 16)).grid(row=3, column=2, pady=10, sticky="E")
+                               font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.45))
         end = customtkinter.CTkEntry(self)
-        end.grid(row=3, column=3, pady=10, sticky="W")
+        end.place(x=int(self.width*0.45), y=int(self.height*0.45))
+        customtkinter.CTkLabel(self, text="Bin size (seconds)",
+                               font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.55))
+        binsize = customtkinter.CTkEntry(self)
+        binsize.place(x=int(self.width*0.45), y=int(self.height*0.55))
         # Choose color
         customtkinter.CTkLabel(self, text="Colormap for plot",
-                               font=('Helvetica', 16)).grid(row=4, column=0, pady=10, sticky="E")
+                               font=('Helvetica', 16)).place(x=int(self.width*0.6), y=int(self.height*0.35))
         color = customtkinter.CTkComboBox(self, values=["jet", "cividis", "viridis", "magma"])
-        color.grid(row=4, column=1, pady=10, sticky="W")
+        color.place(x=int(self.width*0.75), y=int(self.height*0.35))
         color.set("jet")
-        customtkinter.CTkLabel(self, text="Bin size (seconds)",
-                               font=('Helvetica', 16)).grid(row=4, column=2, pady=10, sticky="E")
-        binsize = customtkinter.CTkEntry(self)
-        binsize.grid(row=4, column=3, pady=10, sticky="W")
         customtkinter.CTkButton(self, text="Plot embeddings",
                                 command=lambda: self.lda("embed",int(start.get()), int(end.get()), int(binsize.get()), color.get(),),
-                                font=('Helvetica', 16)).grid(row=5, column=3, pady=20)
+                                font=('Helvetica', 16)).place(x=int(self.width*0.8), y=int(self.height*0.76))
         customtkinter.CTkButton(self, text="Classify and evaluate",
                                 command=lambda: self.lda("classify_eval",int(start.get()), int(end.get()), int(binsize.get()), color.get()),
-                                font=('Helvetica', 16)).grid(row=6, column=3, pady=20)
+                                font=('Helvetica', 16)).place(x=int(self.width*0.8), y=int(self.height*0.83))
         customtkinter.CTkButton(self, text="Save LDA classifier",
                                 command=lambda: self.lda("save",int(start.get()), int(end.get()), int(binsize.get()), color.get()),
-                                font=('Helvetica', 16)).grid(row=7, column=3, pady=20)
+                                font=('Helvetica', 16)).place(x=int(self.width*0.8), y=int(self.height*0.9))
+        # Bottom back buttons
+        customtkinter.CTkButton(self, text="◀ back to analysis menu", command=self.window3_menu,
+                                font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.83))
+        customtkinter.CTkButton(self, text="◀◀ back to start", command=self.window1_start,
+                                font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.9))
+
+
+    def window4g_pca_embed(self):
+        self.clear_window()
+        self.create_sidebar_widget()
+        # Title
+        customtkinter.CTkLabel(self, text="Viz & Analyze ▶ Embed ▶ PCA",
+                               font=('Helvetica', 12),text_color="darkgray").place(x=int(self.width*0.3), y=int(self.height*0.02))
+        customtkinter.CTkLabel(self, text="Principal Components Analysis",
+                               font=('Helvetica', 32, "bold")).place(x=int(self.width*0.65), y=int(self.height*0.09),anchor=tk.CENTER)
+        customtkinter.CTkLabel(self, text="Project "+self.config["project_name"],
+                               font=('Helvetica', 20, "bold")).place(x=int(self.width*0.65), y=int(self.height*0.16),anchor=tk.CENTER)
+        customtkinter.CTkLabel(self, text="Enter info about your analysis and plotting parameters.",
+                               font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.25))
+
+        # Plot
+        # Choose start and end time
+        customtkinter.CTkLabel(self, text="Start time (seconds)",
+                               font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.35))
+        start = customtkinter.CTkEntry(self)
+        start.place(x=int(self.width*0.45), y=int(self.height*0.35))
+        customtkinter.CTkLabel(self, text="End time (seconds)",
+                               font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.45))
+        end = customtkinter.CTkEntry(self)
+        end.place(x=int(self.width*0.45), y=int(self.height*0.45))
+        customtkinter.CTkLabel(self, text="Bin size (seconds)",
+                               font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.55))
+        binsize = customtkinter.CTkEntry(self)
+        binsize.place(x=int(self.width*0.45), y=int(self.height*0.55))
+        # Choose color
+        customtkinter.CTkLabel(self, text="Colormap for plot",
+                               font=('Helvetica', 16)).place(x=int(self.width*0.6), y=int(self.height*0.35))
+        color = customtkinter.CTkComboBox(self, values=["jet", "cividis", "viridis", "magma"])
+        color.place(x=int(self.width*0.75), y=int(self.height*0.35))
+        color.set("jet")
+        customtkinter.CTkButton(self, text="Plot embeddings",
+                                command=lambda: self.lda("embed",int(start.get()), int(end.get()), int(binsize.get()), color.get(),),
+                                font=('Helvetica', 16)).place(x=int(self.width*0.8), y=int(self.height*0.76))
+        customtkinter.CTkButton(self, text="Classify and evaluate",
+                                command=lambda: self.lda("classify_eval",int(start.get()), int(end.get()), int(binsize.get()), color.get()),
+                                font=('Helvetica', 16)).place(x=int(self.width*0.8), y=int(self.height*0.83))
+        customtkinter.CTkButton(self, text="Save LDA classifier",
+                                command=lambda: self.lda("save",int(start.get()), int(end.get()), int(binsize.get()), color.get()),
+                                font=('Helvetica', 16)).place(x=int(self.width*0.8), y=int(self.height*0.9))
+        # Bottom back buttons
+        customtkinter.CTkButton(self, text="◀ back to analysis menu", command=self.window3_menu,
+                                font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.83))
+        customtkinter.CTkButton(self, text="◀◀ back to start", command=self.window1_start,
+                                font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.9))
+
+
+    def window4g_lda_embed_classify(self):
+        self.clear_window()
+        self.create_sidebar_widget()
+        # Title
+        customtkinter.CTkLabel(self, text="Viz & Analyze ▶ Embed ▶ LDA",
+                               font=('Helvetica', 12),text_color="darkgray").place(x=int(self.width*0.3), y=int(self.height*0.02))
+        customtkinter.CTkLabel(self, text="Linear Discriminant Analysis",
+                               font=('Helvetica', 32, "bold")).place(x=int(self.width*0.65), y=int(self.height*0.09),anchor=tk.CENTER)
+        customtkinter.CTkLabel(self, text="Project "+self.config["project_name"],
+                               font=('Helvetica', 20, "bold")).place(x=int(self.width*0.65), y=int(self.height*0.16),anchor=tk.CENTER)
+        customtkinter.CTkLabel(self, text="Enter info about your analysis and plotting parameters.",
+                               font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.25))
+
+        # Plot
+        # Choose start and end time
+        customtkinter.CTkLabel(self, text="Start time (seconds)",
+                               font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.35))
+        start = customtkinter.CTkEntry(self)
+        start.place(x=int(self.width*0.45), y=int(self.height*0.35))
+        customtkinter.CTkLabel(self, text="End time (seconds)",
+                               font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.45))
+        end = customtkinter.CTkEntry(self)
+        end.place(x=int(self.width*0.45), y=int(self.height*0.45))
+        customtkinter.CTkLabel(self, text="Bin size (seconds)",
+                               font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.55))
+        binsize = customtkinter.CTkEntry(self)
+        binsize.place(x=int(self.width*0.45), y=int(self.height*0.55))
+        # Choose color
+        customtkinter.CTkLabel(self, text="Colormap for plot",
+                               font=('Helvetica', 16)).place(x=int(self.width*0.6), y=int(self.height*0.35))
+        color = customtkinter.CTkComboBox(self, values=["jet", "cividis", "viridis", "magma"])
+        color.place(x=int(self.width*0.75), y=int(self.height*0.35))
+        color.set("jet")
+        customtkinter.CTkButton(self, text="Plot embeddings",
+                                command=lambda: self.lda("embed",int(start.get()), int(end.get()), int(binsize.get()), color.get(),),
+                                font=('Helvetica', 16)).place(x=int(self.width*0.8), y=int(self.height*0.76))
+        customtkinter.CTkButton(self, text="Classify and evaluate",
+                                command=lambda: self.lda("classify_eval",int(start.get()), int(end.get()), int(binsize.get()), color.get()),
+                                font=('Helvetica', 16)).place(x=int(self.width*0.8), y=int(self.height*0.83))
+        customtkinter.CTkButton(self, text="Save LDA classifier",
+                                command=lambda: self.lda("save",int(start.get()), int(end.get()), int(binsize.get()), color.get()),
+                                font=('Helvetica', 16)).place(x=int(self.width*0.8), y=int(self.height*0.9))
         # Bottom back buttons
         customtkinter.CTkButton(self, text="◀ back to analysis menu", command=self.window3_menu,
                                 font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.83))
@@ -624,34 +764,34 @@ class Application(customtkinter.CTk):
         customtkinter.CTkLabel(self, text="Project "+self.config["project_name"],
                                font=('Helvetica', 20, "bold")).place(x=int(self.width*0.65), y=int(self.height*0.15),anchor=tk.CENTER)
         customtkinter.CTkLabel(self, text="Enter info about the classifier you would like to train.",
-                               font=('Helvetica', 16)).grid(row=2, column=0, columnspan=4, pady=10)
+                               font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.25))
 
         # Plot
         # Choose start and end time
         customtkinter.CTkLabel(self, text="Start time (seconds)",
-                               font=('Helvetica', 16)).grid(row=3, column=0, pady=10, sticky="E")
+                               font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.35))
         start = customtkinter.CTkEntry(self)
-        start.grid(row=3, column=1, pady=10, sticky="W")
+        start.place(x=int(self.width*0.45), y=int(self.height*0.35))
         customtkinter.CTkLabel(self, text="End time (seconds)",
-                               font=('Helvetica', 16)).grid(row=3, column=2, pady=10, sticky="E")
+                               font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.45))
         end = customtkinter.CTkEntry(self)
-        end.grid(row=3, column=3, pady=10, sticky="W")
-        # Choose color
-        customtkinter.CTkLabel(self, text="Colormap for plot",
-                               font=('Helvetica', 16)).grid(row=4, column=0, pady=10, sticky="E")
-        color = customtkinter.CTkComboBox(self, values=["jet", "cividis", "viridis", "magma"])
-        color.grid(row=4, column=1, pady=10, sticky="W")
-        color.set("jet")
+        end.place(x=int(self.width*0.45), y=int(self.height*0.45))
+        # # Choose color
+        # customtkinter.CTkLabel(self, text="Colormap for plot",
+        #                        font=('Helvetica', 16)).grid(row=4, column=0, pady=10, sticky="E")
+        # color = customtkinter.CTkComboBox(self, values=["jet", "cividis", "viridis", "magma"])
+        # color.grid(row=4, column=1, pady=10, sticky="W")
+        # color.set("jet")
         customtkinter.CTkLabel(self, text="Bin size (seconds)",
-                               font=('Helvetica', 16)).grid(row=4, column=2, pady=10, sticky="E")
+                               font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.55))
         binsize = customtkinter.CTkEntry(self)
-        binsize.grid(row=4, column=3, pady=10, sticky="W")
+        binsize.place(x=int(self.width*0.45), y=int(self.height*0.55))
         customtkinter.CTkButton(self, text="Classify and Evaluate",
-                                command=lambda: self.lr("classify_eval",int(start.get()), int(end.get()), int(binsize.get()), color.get()),
-                                font=('Helvetica', 16)).grid(row=6, column=3, pady=20)
+                                command=lambda: self.lr("classify_eval",int(start.get()), int(end.get()), int(binsize.get())),
+                                font=('Helvetica', 16)).place(x=int(self.width*0.8), y=int(self.height*0.83))
         customtkinter.CTkButton(self, text="Save",
-                                command=lambda: self.lr("save",int(start.get()), int(end.get()), int(binsize.get()), color.get()),
-                                font=('Helvetica', 16)).grid(row=7, column=3, pady=20)
+                                command=lambda: self.lr("save",int(start.get()), int(end.get()), int(binsize.get())),
+                                font=('Helvetica', 16)).place(x=int(self.width*0.8), y=int(self.height*0.9))
         # Bottom back buttons
         customtkinter.CTkButton(self, text="◀ back to analysis menu", command=self.window3_menu,
                                 font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.83))
@@ -668,41 +808,18 @@ class Application(customtkinter.CTk):
         customtkinter.CTkLabel(self, text="Project "+self.config["project_name"],
                                font=('Helvetica', 20, "bold")).place(x=int(self.width*0.65), y=int(self.height*0.15),anchor=tk.CENTER)
         customtkinter.CTkLabel(self, text="Enter info about your analysis and plotting parameters.",
-                               font=('Helvetica', 16)).grid(row=2, column=0, columnspan=4, pady=10)
+                               font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.25))
 
         # Plot
         # Choose start and end time
         customtkinter.CTkLabel(self, text="Start time (seconds)",
-                               font=('Helvetica', 16)).grid(row=3, column=0, pady=10, sticky="E")
+                               font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.35))
         start = customtkinter.CTkEntry(self)
-        start.grid(row=3, column=1, pady=10, sticky="W")
+        start.place(x=int(self.width*0.45), y=int(self.height*0.35))
         customtkinter.CTkLabel(self, text="End time (seconds)",
-                               font=('Helvetica', 16)).grid(row=3, column=2, pady=10, sticky="E")
+                               font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.45))
         end = customtkinter.CTkEntry(self)
-        end.grid(row=3, column=3, pady=10, sticky="W")
-        # Choose color
-        customtkinter.CTkLabel(self, text="Colormap for plot",
-                               font=('Helvetica', 16)).grid(row=4, column=0, pady=10, sticky="E")
-        color = customtkinter.CTkComboBox(self, values=["jet", "cividis", "viridis", "magma"])
-        color.grid(row=4, column=1, pady=10, sticky="W")
-        color.set("jet")
-        # Choose style for plot
-        customtkinter.CTkLabel(self, text="What should the \nplot style be?",
-                               font=('Helvetica', 16)).grid(row=4, column=2, rowspan=2, pady=10, sticky="E")
-        style = customtkinter.StringVar(value="scatter")
-        style_options = ["Bar with scattered individual points",
-                         "Bar with standard error of the mean",
-                         "Points with standard error of the mean"]
-        style_vars = ["bar_scatter", "bar_error", "points"]
-        for s in range(len(style_vars)):
-            radio_btn = customtkinter.CTkRadioButton(self, text=style_options[s],
-                                                     variable=style, value=style_vars[s],
-                                                     font=('Helvetica', 16))
-            radio_btn.grid(row=4 + s, column=3, sticky="W")
-        customtkinter.CTkButton(self, text="Plot it!",
-                                command=lambda: self.plot_usage(int(start.get()), int(end.get()),
-                                                                style.get(), color.get(), subgroup_option),
-                                font=('Helvetica', 16)).grid(row=7, column=3, pady=20)
+        end.place(x=int(self.width*0.45), y=int(self.height*0.45))
         # Bottom back buttons
         customtkinter.CTkButton(self, text="◀ back to analysis menu", command=self.window3_menu,
                                 font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.83))
@@ -749,7 +866,7 @@ class Application(customtkinter.CTk):
                                                      text="Edit config.yaml",
                                                      command=lambda: metadata.edit_config(
                                                          self.config["project_directory"] + "/config.yaml"))
-        edit_config_button.grid(row=3, column=0, columnspan=3, pady=5)
+        edit_config_button.place(x=int(self.width * 0.65),y=int(self.height * 0.6),anchor=tk.CENTER)
         # Bottom back buttons
         customtkinter.CTkButton(self, text="◀ update config and go back to BORIS menu", command=self.load_project_BORIS,
                                 font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.76))
@@ -768,11 +885,11 @@ class Application(customtkinter.CTk):
         customtkinter.CTkLabel(self, text="Project "+self.config["project_name"],
                                font=('Helvetica', 20, "bold")).place(x=int(self.width*0.65), y=int(self.height*0.15),anchor=tk.CENTER)
         customtkinter.CTkLabel(self, text="Get a matrix showing overlap between pose modules and behaviors manually scored in BORIS.",
-                               font=('Helvetica', 16)).grid(row=2, column=0, columnspan=4, pady=10)
+                               font=('Helvetica', 16)).place(x=int(self.width*0.65), y=int(self.height*0.4),anchor=tk.CENTER)
 
         customtkinter.CTkButton(self, text="Compare!",
                                 command=lambda: self.plot_pose_vs_BORIS(),
-                                font=('Helvetica', 16)).grid(row=7, column=3, pady=20)
+                                font=('Helvetica', 16)).place(x=int(self.width*0.85), y=int(self.height*0.9))
         # Bottom back buttons
         customtkinter.CTkButton(self, text="◀ back to analysis menu", command=self.window3_menu,
                                 font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.83))
@@ -849,7 +966,7 @@ class Application(customtkinter.CTk):
             self.plot_window = PlotWindow(fig=fig, plot_number=self.plots_generated, master=self)
             self.plot_window.mainloop()
 
-    def lr(self, do, start, end, binsize, cmap):
+    def lr(self, do, start, end, binsize):
         labels_df, n_modules = analysis.label_counter_subgroups(self.config, start, end)
         lr, group_labels, label_counts, group_dict, nbins = analysis.lr_labels_timebins(self.config, labels_df, binsize)
         if do=="classify_eval":
