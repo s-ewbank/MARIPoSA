@@ -258,15 +258,19 @@ class Application(customtkinter.CTk):
 
         return frame
 
+    def create_header(self, header_title, header_path=None):
+        if header_path!=None:
+            customtkinter.CTkLabel(self, text=header_path,
+                                   font=('Helvetica', 12),text_color="#3a7ebf").place(x=int(self.width*0.3), y=int(self.height*0.02))
+        customtkinter.CTkLabel(self, text=header_title,
+                               font=('Helvetica', 32, "bold")).place(x=int(self.width*0.65), y=int(self.height*0.09),anchor=tk.CENTER)
+        customtkinter.CTkLabel(self, text="Project "+self.config["project_name"],
+                               font=('Helvetica', 20, "bold")).place(x=int(self.width*0.65), y=int(self.height*0.16),anchor=tk.CENTER)
 
     def window3_menu(self):
         self.clear_window()
         self.create_sidebar_widget()
-
-        customtkinter.CTkLabel(self, text="Analysis Menu",
-                               font=('Helvetica', 32, "bold")).place(x=int(self.width*0.65), y=int(self.height*0.08),anchor=tk.CENTER)
-        customtkinter.CTkLabel(self, text="Project "+self.config["project_name"],
-                               font=('Helvetica', 20, "bold")).place(x=int(self.width*0.65), y=int(self.height*0.15),anchor=tk.CENTER)
+        self.create_header("Analysis Menu")
 
         # Buttons to analysis windows
         usage_img = PhotoImage(file='other/posevis icon 1.png')
@@ -300,10 +304,7 @@ class Application(customtkinter.CTk):
     def window4a_define_subgroups(self):
         self.clear_window()
         self.create_sidebar_widget()
-        customtkinter.CTkLabel(self, text="Define Subgroups",
-                               font=('Helvetica', 32, "bold")).place(x=int(self.width*0.65), y=int(self.height*0.08),anchor=tk.CENTER)
-        customtkinter.CTkLabel(self, text="Project "+self.config["project_name"],
-                               font=('Helvetica', 20, "bold")).place(x=int(self.width*0.65), y=int(self.height*0.15),anchor=tk.CENTER)
+        self.create_header("Define Subgroups",header_path="Configuration ▶ Subgroup Definition")
         instruction_text = """For this step, you will need to manually edit the config file, which you should be able to access by pressing the 'Edit config.yaml' button below. In the file, there is a section called subgroups with all your files listed as such:
 
         subgroups:
@@ -326,7 +327,7 @@ class Application(customtkinter.CTk):
         # Place the label in the window
         instruction_block.place(x=int(self.width * 0.3),y=int(self.height * 0.22),anchor=tk.NW)
         edit_config_button = customtkinter.CTkButton(self,
-                                                     text="Edit config.yaml",
+                                                     text="Edit config.yaml",font=('Helvetica', 16),
                                                      command=lambda: metadata.edit_config(self.config["project_directory"]+"/config.yaml"))
         edit_config_button.place(x=int(self.width*0.6), y=int(self.height*0.75))
         # Bottom back buttons
@@ -338,11 +339,7 @@ class Application(customtkinter.CTk):
     def window4b_usage_transitions_menu(self):
         self.clear_window()
         self.create_sidebar_widget()
-        customtkinter.CTkLabel(self, text="Pose Usage and Transition Analysis Menu",
-                               font=('Helvetica', 32, "bold")).place(x=int(self.width*0.65), y=int(self.height*0.08),anchor=tk.CENTER)
-        customtkinter.CTkLabel(self, text="Project "+self.config["project_name"],
-                               font=('Helvetica', 20, "bold")).place(x=int(self.width*0.65), y=int(self.height*0.15),anchor=tk.CENTER)
-
+        self.create_header("Pose Usage and Transition Analysis Menu",header_path="Viz & Analyze ▶ Usage Analysis")
 
         customtkinter.CTkLabel(self, text="What kind of plot would you like to generate?",
                                font=('Helvetica', 16)).place(x=int(self.width*0.65), y=int(self.height*0.3),anchor=tk.CENTER)
@@ -377,12 +374,8 @@ class Application(customtkinter.CTk):
     def window4c_usage_transitions(self,subgroup_option):
         self.clear_window()
         self.create_sidebar_widget()
-        customtkinter.CTkLabel(self, text="Viz & Analyze ▶ Usage Analysis ▶ Get & Plot Usage",
-                               font=('Helvetica', 12),text_color="darkgray").place(x=int(self.width*0.3), y=int(self.height*0.02))
-        customtkinter.CTkLabel(self, text="Pose Usage and Transition Analysis",
-                               font=('Helvetica', 32, "bold")).place(x=int(self.width*0.65), y=int(self.height*0.09),anchor=tk.CENTER)
-        customtkinter.CTkLabel(self, text="Project "+self.config["project_name"],
-                               font=('Helvetica', 20, "bold")).place(x=int(self.width*0.65), y=int(self.height*0.16),anchor=tk.CENTER)
+        self.create_header("Get & Plot Pose Usage",header_path="Viz & Analyze ▶ Usage Analysis ▶ Get & Plot Usage")
+
         customtkinter.CTkLabel(self, text="Enter info about your analysis and plotting parameters.",
                                font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.25))
 
@@ -428,17 +421,7 @@ class Application(customtkinter.CTk):
     def window4d_network(self,subgroup_option):
         self.clear_window()
         self.create_sidebar_widget()
-        # Title
-        if subgroup_option=="single":
-            title_string="Network Plot - Single Group"
-        elif subgroup_option=="comparison":
-            title_string="Network Plot - Comparison"
-        customtkinter.CTkLabel(self, text="Viz & Analyze ▶ Usage Analysis ▶ Network Plot",
-                               font=('Helvetica', 12),text_color="darkgray").place(x=int(self.width*0.3), y=int(self.height*0.02))
-        customtkinter.CTkLabel(self, text=title_string,
-                               font=('Helvetica', 32, "bold")).place(x=int(self.width*0.65), y=int(self.height*0.09),anchor=tk.CENTER)
-        customtkinter.CTkLabel(self, text="Project "+self.config["project_name"],
-                               font=('Helvetica', 20, "bold")).place(x=int(self.width*0.65), y=int(self.height*0.16),anchor=tk.CENTER)
+        self.create_header("Network Plot",header_path="Viz & Analyze ▶ Usage Analysis ▶ Network Plot")
 
         customtkinter.CTkLabel(self, text="Enter info about your plotting parameters.",
                                font=('Helvetica', 16)).place(x=int(self.width*0.65), y=int(self.height*0.25),anchor=tk.CENTER)
@@ -499,38 +482,34 @@ class Application(customtkinter.CTk):
             title_string="Time Series of Pose Module Usage Within Session"
         elif session_option=="across_sessions":
             title_string="Pose Module Usage Across Sessions"
-        customtkinter.CTkLabel(self, text="Viz & Analyze ▶ Usage Analysis ▶ Within-Session Over Time",
-                               font=('Helvetica', 12),text_color="darkgray").place(x=int(self.width*0.3), y=int(self.height*0.02))
-        customtkinter.CTkLabel(self, text=title_string,
-                               font=('Helvetica', 32, "bold")).place(x=int(self.width*0.65), y=int(self.height*0.09),anchor=tk.CENTER)
-        customtkinter.CTkLabel(self, text="Project "+self.config["project_name"],
-                               font=('Helvetica', 20, "bold")).place(x=int(self.width*0.65), y=int(self.height*0.16),anchor=tk.CENTER)
+        self.create_header(title_string,header_path="Viz & Analyze ▶ Usage Analysis ▶ Within-Session Over Time")
+
         customtkinter.CTkLabel(self, text="Choose the parameters for your plot.",
-                               font=('Helvetica', 16)).grid(row=2, column=0, columnspan=4, pady=10)
+                               font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.25))
 
 
         # Plot
         # Set group
         customtkinter.CTkLabel(self, text="Subgroup",
-                               font=('Helvetica', 16)).grid(row=3, column=0, pady=10, sticky="E")
+                               font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.35))
         group = customtkinter.CTkComboBox(self, values=list(self.config["subgroups"].keys()))
-        group.grid(row=3, column=1, pady=10, sticky="W")
+        group.place(x=int(self.width*0.45), y=int(self.height*0.35))
         # Choose start and end time
-        customtkinter.CTkLabel(self, text="Start time (seconds)",
-                               font=('Helvetica', 16)).grid(row=4, column=0, pady=10, sticky="E")
+        customtkinter.CTkLabel(self, text="Start time\n(seconds)",
+                               font=('Helvetica', 16)).place(x=int(self.width*0.65), y=int(self.height*0.35))
         start = customtkinter.CTkEntry(self)
-        start.grid(row=4, column=1, pady=10, sticky="W")
-        customtkinter.CTkLabel(self, text="Time per block (seconds)",
-                               font=('Helvetica', 16)).grid(row=5, column=0, pady=10, sticky="E")
+        start.place(x=int(self.width*0.8), y=int(self.height*0.35))
+        customtkinter.CTkLabel(self, text="Time per block\n(seconds)",
+                               font=('Helvetica', 16)).place(x=int(self.width*0.65), y=int(self.height*0.45))
         time_per_block = customtkinter.CTkEntry(self)
-        time_per_block.grid(row=5, column=1, pady=10, sticky="W")
+        time_per_block.place(x=int(self.width*0.8), y=int(self.height*0.45))
         customtkinter.CTkLabel(self, text="Number of blocks",
-                               font=('Helvetica', 16)).grid(row=6, column=0, pady=10, sticky="E")
+                               font=('Helvetica', 16)).place(x=int(self.width*0.65), y=int(self.height*0.55))
         n_blocks = customtkinter.CTkEntry(self)
-        n_blocks.grid(row=6, column=1, pady=10, sticky="W")
+        n_blocks.place(x=int(self.width*0.8), y=int(self.height*0.55))
         # Choose style for plot
         customtkinter.CTkLabel(self, text="What should the \nplot style be?",
-                               font=('Helvetica', 16)).grid(row=5, column=2, rowspan=2, pady=10, sticky="E")
+                               font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.45))
         style = customtkinter.StringVar(value="scatter")
         style_options = ["Area","Line"]
         style_vars = ["area", "line"]
@@ -538,14 +517,14 @@ class Application(customtkinter.CTk):
             radio_btn = customtkinter.CTkRadioButton(self, text=style_options[s],
                                                      variable=style, value=style_vars[s],
                                                      font=('Helvetica', 16))
-            radio_btn.grid(row=5 + s, column=3, sticky="W")
+            radio_btn.place(x=int(self.width*0.3), y=int(self.height*(0.55+0.1*s)))
         customtkinter.CTkButton(self, text="Plot it!",
                                 command=lambda: self.plot_usage_overtime(group.get(),
                                                                          session_option,
                                                                          start=int(start.get()),
                                                                          time_per_block=int(time_per_block.get()),
                                                                          n_blocks=int(n_blocks.get())),
-                                font=('Helvetica', 16)).grid(row=7, column=3, pady=20)
+                                font=('Helvetica', 16)).place(x=int(self.width*0.8), y=int(self.height*0.9))
         # Bottom back buttons
         customtkinter.CTkButton(self, text="◀ back to analysis menu", command=self.window3_menu,
                                 font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.83))
@@ -555,13 +534,8 @@ class Application(customtkinter.CTk):
     def window4e_embed_menu(self):
         self.clear_window()
         self.create_sidebar_widget()
-        # Title
-        customtkinter.CTkLabel(self, text="Viz & Analyze ▶ Embed",
-                               font=('Helvetica', 12),text_color="darkgray").place(x=int(self.width*0.3), y=int(self.height*0.02))
-        customtkinter.CTkLabel(self, text="Embed and Distance Menu",
-                               font=('Helvetica', 32, "bold")).place(x=int(self.width*0.65), y=int(self.height*0.09),anchor=tk.CENTER)
-        customtkinter.CTkLabel(self, text="Project "+self.config["project_name"],
-                               font=('Helvetica', 20, "bold")).place(x=int(self.width*0.65), y=int(self.height*0.16),anchor=tk.CENTER)
+        self.create_header("Embed and Distance Menu",header_path="Viz & Analyze ▶ Embed")
+
         customtkinter.CTkLabel(self, text="What tool do you want to use to embed and/or measure distance?",
                                font=('Helvetica', 16)).place(x=int(self.width*0.65), y=int(self.height*0.24),anchor=tk.CENTER)
 
@@ -584,13 +558,8 @@ class Application(customtkinter.CTk):
     def window4g_classify_menu(self):
         self.clear_window()
         self.create_sidebar_widget()
-        # Title
-        customtkinter.CTkLabel(self, text="Viz & Analyze ▶ Classify",
-                               font=('Helvetica', 12),text_color="darkgray").place(x=int(self.width*0.3), y=int(self.height*0.02))
-        customtkinter.CTkLabel(self, text="Classify and Embed Menu",
-                               font=('Helvetica', 32, "bold")).place(x=int(self.width*0.65), y=int(self.height*0.09),anchor=tk.CENTER)
-        customtkinter.CTkLabel(self, text="Project "+self.config["project_name"],
-                               font=('Helvetica', 20, "bold")).place(x=int(self.width*0.65), y=int(self.height*0.16),anchor=tk.CENTER)
+        self.create_header("Classify and Embed Menu",header_path="Viz & Analyze ▶ Classify")
+
         customtkinter.CTkLabel(self, text="What tool do you want to use to classify and/or embed?",
                                font=('Helvetica', 16)).place(x=int(self.width*0.65), y=int(self.height*0.24),anchor=tk.CENTER)
 
@@ -612,13 +581,8 @@ class Application(customtkinter.CTk):
     def window4g_ssd_embed(self):
         self.clear_window()
         self.create_sidebar_widget()
-        # Title
-        customtkinter.CTkLabel(self, text="Viz & Analyze ▶ Embed ▶ SSD",
-                               font=('Helvetica', 12),text_color="darkgray").place(x=int(self.width*0.3), y=int(self.height*0.02))
-        customtkinter.CTkLabel(self, text="Sum Squared Difference Embedding",
-                               font=('Helvetica', 32, "bold")).place(x=int(self.width*0.65), y=int(self.height*0.09),anchor=tk.CENTER)
-        customtkinter.CTkLabel(self, text="Project "+self.config["project_name"],
-                               font=('Helvetica', 20, "bold")).place(x=int(self.width*0.65), y=int(self.height*0.16),anchor=tk.CENTER)
+        self.create_header("Sum Squared Difference Embedding",header_path="Viz & Analyze ▶ Embed ▶ SSD")
+
         customtkinter.CTkLabel(self, text="Enter info about your analysis and plotting parameters.",
                                font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.25))
 
@@ -661,13 +625,8 @@ class Application(customtkinter.CTk):
     def window4g_pca_embed(self):
         self.clear_window()
         self.create_sidebar_widget()
-        # Title
-        customtkinter.CTkLabel(self, text="Viz & Analyze ▶ Embed ▶ PCA",
-                               font=('Helvetica', 12),text_color="darkgray").place(x=int(self.width*0.3), y=int(self.height*0.02))
-        customtkinter.CTkLabel(self, text="Principal Components Analysis",
-                               font=('Helvetica', 32, "bold")).place(x=int(self.width*0.65), y=int(self.height*0.09),anchor=tk.CENTER)
-        customtkinter.CTkLabel(self, text="Project "+self.config["project_name"],
-                               font=('Helvetica', 20, "bold")).place(x=int(self.width*0.65), y=int(self.height*0.16),anchor=tk.CENTER)
+        self.create_header("Principal Components Analysis",header_path="Viz & Analyze ▶ Embed ▶ PCA")
+
         customtkinter.CTkLabel(self, text="Enter info about your analysis and plotting parameters.",
                                font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.25))
 
@@ -710,13 +669,8 @@ class Application(customtkinter.CTk):
     def window4g_lda_embed_classify(self):
         self.clear_window()
         self.create_sidebar_widget()
-        # Title
-        customtkinter.CTkLabel(self, text="Viz & Analyze ▶ Embed ▶ LDA",
-                               font=('Helvetica', 12),text_color="darkgray").place(x=int(self.width*0.3), y=int(self.height*0.02))
-        customtkinter.CTkLabel(self, text="Linear Discriminant Analysis",
-                               font=('Helvetica', 32, "bold")).place(x=int(self.width*0.65), y=int(self.height*0.09),anchor=tk.CENTER)
-        customtkinter.CTkLabel(self, text="Project "+self.config["project_name"],
-                               font=('Helvetica', 20, "bold")).place(x=int(self.width*0.65), y=int(self.height*0.16),anchor=tk.CENTER)
+        self.create_header("Linear Discriminant Analysis",header_path="Viz & Analyze ▶ Embed ▶ LDA")
+
         customtkinter.CTkLabel(self, text="Enter info about your analysis and plotting parameters.",
                                font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.25))
 
@@ -758,15 +712,11 @@ class Application(customtkinter.CTk):
     def window4g_lr_classify(self):
         self.clear_window()
         self.create_sidebar_widget()
-        # Title
-        customtkinter.CTkLabel(self, text="Classify with logistic regression",
-                               font=('Helvetica', 32, "bold")).place(x=int(self.width*0.65), y=int(self.height*0.08),anchor=tk.CENTER)
-        customtkinter.CTkLabel(self, text="Project "+self.config["project_name"],
-                               font=('Helvetica', 20, "bold")).place(x=int(self.width*0.65), y=int(self.height*0.15),anchor=tk.CENTER)
-        customtkinter.CTkLabel(self, text="Enter info about the classifier you would like to train.",
+        self.create_header("Logistic Regression",header_path="Viz & Analyze ▶ Classify ▶ LogReg")
+
+        customtkinter.CTkLabel(self, text="Enter info about your classification parameters.",
                                font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.25))
 
-        # Plot
         # Choose start and end time
         customtkinter.CTkLabel(self, text="Start time (seconds)",
                                font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.35))
@@ -802,12 +752,9 @@ class Application(customtkinter.CTk):
     def window4g_nlp_classify(self):
         self.clear_window()
         self.create_sidebar_widget()
-        # Title
-        customtkinter.CTkLabel(self, text="Classify with natural language processing tools",
-                               font=('Helvetica', 32, "bold")).place(x=int(self.width*0.65), y=int(self.height*0.08),anchor=tk.CENTER)
-        customtkinter.CTkLabel(self, text="Project "+self.config["project_name"],
-                               font=('Helvetica', 20, "bold")).place(x=int(self.width*0.65), y=int(self.height*0.15),anchor=tk.CENTER)
-        customtkinter.CTkLabel(self, text="Enter info about your analysis and plotting parameters.",
+        self.create_header("Natural Language Processing Tools",header_path="Viz & Analyze ▶ Classify ▶ NLP")
+
+        customtkinter.CTkLabel(self, text="Enter info about your classification parameters.",
                                font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.25))
 
         # Plot
@@ -830,11 +777,7 @@ class Application(customtkinter.CTk):
     def window4h_pose_vs_BORIS(self):
         self.clear_window()
         self.create_sidebar_widget()
-        # Title
-        customtkinter.CTkLabel(self, text="Compare Pose Data to Manual Scoring",
-                               font=('Helvetica', 32, "bold")).place(x=int(self.width*0.65), y=int(self.height*0.08),anchor=tk.CENTER)
-        customtkinter.CTkLabel(self, text="Project "+self.config["project_name"],
-                               font=('Helvetica', 20, "bold")).place(x=int(self.width*0.65), y=int(self.height*0.15),anchor=tk.CENTER)
+        self.create_header("Compare Pose Data to Manual Scoring",header_path="Configure ▶ Manual scoring comparison")
 
         customtkinter.CTkButton(self, text="Update config file with manual scoring info from BORIS",
                                 command=self.window4h2_boris_config,height=int(self.width*0.1),width=int(self.width*0.6),
@@ -851,11 +794,8 @@ class Application(customtkinter.CTk):
     def window4h2_boris_config(self):
         self.clear_window()
         self.create_sidebar_widget()
-        # Title
-        customtkinter.CTkLabel(self, text="Compare Pose Data to Manual Scoring",
-                               font=('Helvetica', 32, "bold")).place(x=int(self.width*0.65), y=int(self.height*0.08),anchor=tk.CENTER)
-        customtkinter.CTkLabel(self, text="Project "+self.config["project_name"],
-                               font=('Helvetica', 20, "bold")).place(x=int(self.width*0.65), y=int(self.height*0.15),anchor=tk.CENTER)
+        self.create_header("Compare Pose Data to Manual Scoring",header_path="Configure ▶ Manual scoring comparison ▶ Update config")
+
         instruction_text = """For this step, you will need to manually edit the config file, which you should be able to access by pressing the 'Edit config.yaml' button below.
         You'll have to edit the boris_directory and boris_to_pose_pairings."""
         instruction_block = tk.Label(self,text=instruction_text, wraplength=int(self.width * 0.65),
@@ -863,7 +803,7 @@ class Application(customtkinter.CTk):
 
         instruction_block.place(x=int(self.width * 0.3),y=int(self.height * 0.3),anchor=tk.NW)
         edit_config_button = customtkinter.CTkButton(self,
-                                                     text="Edit config.yaml",
+                                                     text="Edit config.yaml",font=('Helvetica', 16),
                                                      command=lambda: metadata.edit_config(
                                                          self.config["project_directory"] + "/config.yaml"))
         edit_config_button.place(x=int(self.width * 0.65),y=int(self.height * 0.6),anchor=tk.CENTER)
@@ -879,11 +819,8 @@ class Application(customtkinter.CTk):
     def window4h3_pose_vs_BORIS(self):
         self.clear_window()
         self.create_sidebar_widget()
-        # Title
-        customtkinter.CTkLabel(self, text="Compare Pose Data to Manual Scoring",
-                               font=('Helvetica', 32, "bold")).place(x=int(self.width*0.65), y=int(self.height*0.08),anchor=tk.CENTER)
-        customtkinter.CTkLabel(self, text="Project "+self.config["project_name"],
-                               font=('Helvetica', 20, "bold")).place(x=int(self.width*0.65), y=int(self.height*0.15),anchor=tk.CENTER)
+        self.create_header("Compare Pose Data to Manual Scoring",header_path="Configure ▶ Manual scoring comparison ▶ Plot comparison matrix")
+
         customtkinter.CTkLabel(self, text="Get a matrix showing overlap between pose modules and behaviors manually scored in BORIS.",
                                font=('Helvetica', 16)).place(x=int(self.width*0.65), y=int(self.height*0.4),anchor=tk.CENTER)
 
