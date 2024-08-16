@@ -8,6 +8,66 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import os
 import io
 
+factor=0.6
+
+class MultiDropDown(customtkinter.CTkFrame):
+    def __init__(self, parent, options):
+        super().__init__(parent)
+
+        self.menubutton = customtkinter.CTkButton(self, text="Select option(s) ▼", command=self.toggle_menu,
+                                                  fg_color="gray16",width=int(self.winfo_screenwidth()*0.6*0.1))
+        self.menubutton.pack(padx=0, pady=0)
+
+        # Create a canvas to host the menu items
+        self.canvas = tk.Canvas(self, borderwidth=0, background="gray16",
+                                width=int(self.winfo_screenwidth()*factor*0.1),
+                                height=int(self.winfo_screenheight()*factor*0.15))
+        self.scrollbar = tk.Scrollbar(self, orient="vertical", command=self.canvas.yview)
+
+        # Create a frame inside the canvas to contain the checkboxes
+        self.menu_frame = customtkinter.CTkFrame(self.canvas, corner_radius=0, bg_color="gray16")
+        self.canvas.create_window((0, 0), window=self.menu_frame, anchor="nw")
+
+        # Configure the scrollbar
+        self.canvas.configure(yscrollcommand=self.scrollbar.set)
+
+        # Pack the scrollbar and canvas but keep them hidden initially
+        self.canvas.pack(side="left", fill="both", expand=True)
+        self.scrollbar.pack(side="right", fill="y")
+        self.canvas.pack_forget()
+        self.scrollbar.pack_forget()
+
+        # Add checkboxes to the menu_frame
+        self.choices = {}
+        for choice in options:
+            var = tk.IntVar(value=0)
+            self.choices[choice] = var
+            checkbox = customtkinter.CTkCheckBox(self.menu_frame, text=choice, variable=var, onvalue=1, offvalue=0)
+            checkbox.pack(anchor="w", padx=5, pady=5)
+
+        # Update the scroll region to encompass the menu_frame
+        self.menu_frame.update_idletasks()
+        self.canvas.config(scrollregion=self.canvas.bbox("all"))
+
+    def toggle_menu(self):
+        if self.canvas.winfo_ismapped():
+            self.canvas.pack_forget()
+            self.scrollbar.pack_forget()
+        else:
+            self.canvas.pack(side="left", fill="both", expand=True)
+            self.scrollbar.pack(side="right", fill="y")
+            # self.canvas.lift()  # Ensure it appears on top
+            self.canvas.config(scrollregion=self.canvas.bbox("all"))
+
+    # def update_z_order(self, event=None):
+    #     """Update the z-order of the canvas when the widget is configured."""
+    #     if self.canvas.winfo_ismapped():
+    #         self.canvas.lift()
+
+    def get_selected_values(self):
+        """Return a list of selected values."""
+        return [name for name, var in self.choices.items() if var.get() == 1]
+
 
 class Application(customtkinter.CTk):
     """
@@ -45,18 +105,6 @@ class Application(customtkinter.CTk):
         for widget in self.winfo_children():
             widget.destroy()
 
-    def configure_window(self, nrows, ncols):
-        """
-        Configure windows (for grid)
-        :param nrows:
-        :param ncols:
-        :return:
-        """
-        for row_index in range(nrows):
-            self.grid_rowconfigure(row_index, weight=1)
-        for column_index in range(ncols):
-            self.grid_columnconfigure(column_index, weight=1)
-
     def display_error(self, message, x,y):
         """
         Display error
@@ -68,8 +116,8 @@ class Application(customtkinter.CTk):
         """
         print('error')
         self.error_label = customtkinter.CTkLabel(self, text=message, text_color="red", bg_color="#ffe5e3",anchor=tk.CENTER)
-        self.error_label.place(x=x,y=y)
-        #self.after(3000, lambda: self.error_label.configure(text=""))
+        self.error_label.place(x=x,y=y,anchor=tk.CENTER)
+        self.after(3000, lambda: self.error_label.configure(text="",bg_color="gray16"))
 
     @staticmethod
     def window_browse(item_path_entry, type="file"):
@@ -126,7 +174,7 @@ class Application(customtkinter.CTk):
                 self.load_project()
             else:
                 error_message="That path does not exist. please enter an existing path."
-                self.display_error(error_message,int(self.width*0.4),int(self.width*0.8))
+                self.display_error(error_message,int(self.width*0.5),int(self.height*0.7))
         else:
             print(self.projectstart_choice)
 
@@ -184,7 +232,6 @@ class Application(customtkinter.CTk):
                                     project_name.get(), data_path_entry.get(), self.datatype.get(),
                                     project_path_entry.get(),fps.get()),
                                 font=('Helvetica', 16)).place(x=int(self.width*0.8), y=int(self.height*0.9))
-        self.configure_window(9, 3)
 
     def create_project(self, project_name, data_directory, datatype, output_directory,fps):
         metadata.create_project(project_name, data_directory, datatype, output_directory,fps)
@@ -273,8 +320,11 @@ class Application(customtkinter.CTk):
         self.create_header("Analysis Menu")
 
         # Buttons to analysis windows
-        usage_img = PhotoImage(file='other/posevis icon 1.png')
-        subgroups_img = PhotoImage(file='other/posevis icon 2.png')
+        usage_img = PhotoImage(file='other/usage_icon.png')
+        subgroups_img = PhotoImage(file='other/subgroup_icon.png')
+        embed_img = PhotoImage(file='other/embed_icon.png')
+        classify_img = PhotoImage(file='other/classify_icon.png')
+        remap_img = PhotoImage(file='other/remap_icon.png')
         button_width=int(self.width*0.2)
         button_height=int(self.height*0.15)
         customtkinter.CTkLabel(self, text="Further configure project:",
@@ -282,9 +332,11 @@ class Application(customtkinter.CTk):
         customtkinter.CTkButton(self, text="Define subgroups \nwithin data",
                                 command=self.window4a_define_subgroups, image=subgroups_img,
                                 font=('Helvetica', 16),width=button_width,height=button_height).place(x=int(self.width*0.3), y=int(self.height*0.3))
-        customtkinter.CTkButton(self, text="Compare modules to \nmanual scoring", command=self.window4h_pose_vs_BORIS,
+        customtkinter.CTkButton(self, text="Compare modules to \nmanual scoring",
+                                command=self.window4h_pose_vs_BORIS, image=remap_img,
                                 font=('Helvetica', 16),width=button_width,height=button_height).place(x=int(self.width*0.52), y=int(self.height*0.3))
-        customtkinter.CTkButton(self, text="Manually combine \npose modules", command=self.window1_start,
+        customtkinter.CTkButton(self, text="Manually combine \npose modules",
+                                command=self.window1_start, image=remap_img,
                                 font=('Helvetica', 16),width=button_width,height=button_height).place(x=int(self.width*0.74), y=int(self.height*0.3))
 
         customtkinter.CTkLabel(self, text="Visualize and classify:",
@@ -292,11 +344,11 @@ class Application(customtkinter.CTk):
         customtkinter.CTkButton(self, text="Analyze pose module \nusage and transitions",
                                 command=self.window4b_usage_transitions_menu, image=usage_img,
                                 font=('Helvetica', 16),width=button_width,height=button_height).place(x=int(self.width*0.3), y=int(self.height*0.6))
-        customtkinter.CTkButton(self, text="Embed and measure \ndistance between groups",
-                                command=self.window4e_embed_menu,
+        customtkinter.CTkButton(self, text="Embed and measure \ndistance between \ngroups",
+                                command=self.window4e_embed_menu, image=embed_img,
                                 font=('Helvetica', 16),width=button_width,height=button_height).place(x=int(self.width*0.52), y=int(self.height*0.6))
         customtkinter.CTkButton(self, text="Classify conditions",
-                                command=self.window4g_classify_menu,
+                                command=self.window4g_classify_menu, image=classify_img,
                                 font=('Helvetica', 16),width=button_width,height=button_height).place(x=int(self.width*0.74), y=int(self.height*0.6))
 
         customtkinter.CTkButton(self, text="◀◀ back to start", command=self.window1_start,
@@ -349,14 +401,14 @@ class Application(customtkinter.CTk):
         #                         command=lambda: self.window4c_usage_transitions("no_subgroups"),
         #                         font=('Helvetica', 16)).place(x=int(self.width*0.65), y=int(self.height*0.35),anchor=tk.CENTER)
 
-        customtkinter.CTkButton(self, text="Plot pose usage for subgroups",
+        customtkinter.CTkButton(self, text="Get and plot pose usage",
                                 command=lambda: self.window4c_usage_transitions("subgroups"),height=int(self.height*0.15),width=int(self.width*0.6),
                                 font=('Helvetica', 16)).place(x=int(self.width*0.65), y=int(self.height*0.35),anchor=tk.CENTER)
 
         # customtkinter.CTkButton(self, text="Network plot of usage and transitions",
         #                         command=lambda: self.window4d_network("single"),
         #                         font=('Helvetica', 16)).place(x=int(self.width*0.65), y=int(self.height*0.35),anchor=tk.CENTER)
-        customtkinter.CTkButton(self, text="Network plot of usage and transitions \nfor subgroups",
+        customtkinter.CTkButton(self, text="Network plot of usage and transitions for subgroups",
                                 command=lambda: self.window4d_network("comparison"),height=int(self.height*0.15),width=int(self.width*0.6),
                                 font=('Helvetica', 16)).place(x=int(self.width*0.65), y=int(self.height*0.52),anchor=tk.CENTER)
         # Next menu options
@@ -379,25 +431,27 @@ class Application(customtkinter.CTk):
         customtkinter.CTkLabel(self, text="Enter info about your analysis and plotting parameters.",
                                font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.25))
 
-        # Plot
-        # Choose start and end time
         customtkinter.CTkLabel(self, text="Start time (seconds)",
                                font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.35))
         start = customtkinter.CTkEntry(self)
-        start.place(x=int(self.width*0.5), y=int(self.height*0.35))
+        start.place(x=int(self.width*0.45), y=int(self.height*0.35))
         customtkinter.CTkLabel(self, text="End time (seconds)",
                                font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.45))
         end = customtkinter.CTkEntry(self)
-        end.place(x=int(self.width*0.5), y=int(self.height*0.45))
-        # Choose color
-        customtkinter.CTkLabel(self, text="Colormap for plot",
+        end.place(x=int(self.width*0.45), y=int(self.height*0.45))
+        customtkinter.CTkLabel(self, text="Data to plot",
                                font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.55))
+        dropdown = MultiDropDown(self,options=["all combined"]+list(self.config["subgroups"].keys()))
+        dropdown.place(x=int(self.width*0.45), y=int(self.height*0.55))
+
+        customtkinter.CTkLabel(self, text="Colormap",
+                               font=('Helvetica', 16)).place(x=int(self.width*0.65), y=int(self.height*0.75))
         color = customtkinter.CTkComboBox(self, values=["jet", "cividis", "viridis", "magma"])
-        color.place(x=int(self.width*0.3), y=int(self.height*0.65))
+        color.place(x=int(self.width*0.75), y=int(self.height*0.75))
         color.set("jet")
         # Choose style for plot
-        customtkinter.CTkLabel(self, text="What should the \nplot style be?",
-                               font=('Helvetica', 16)).place(x=int(self.width*0.7), y=int(self.height*0.35))
+        customtkinter.CTkLabel(self, text="What should the plot style be?",
+                               font=('Helvetica', 16)).place(x=int(self.width*0.65), y=int(self.height*0.35))
         style = customtkinter.StringVar(value="scatter")
         style_options = ["Bar with scattered individual points",
                          "Bar with standard error of the mean",
@@ -407,10 +461,11 @@ class Application(customtkinter.CTk):
             radio_btn = customtkinter.CTkRadioButton(self, text=style_options[s],
                                                      variable=style, value=style_vars[s],
                                                      font=('Helvetica', 16))
-            radio_btn.place(x=int(self.width*0.7), y=int(self.height*(0.45+0.1*s)))
+            radio_btn.place(x=int(self.width*0.65), y=int(self.height*(0.45+0.08*s)))
         customtkinter.CTkButton(self, text="Plot it!",
                                 command=lambda: self.plot_usage(int(start.get()), int(end.get()),
-                                                                style.get(), color.get(), subgroup_option),
+                                                                style.get(), color.get(),
+                                                                dropdown.get_selected_values()),
                                 font=('Helvetica', 16)).place(x=int(self.width*0.8), y=int(self.height*0.9))
         # Bottom back buttons
         customtkinter.CTkButton(self, text="◀ back to analysis menu", command=self.window3_menu,
@@ -694,14 +749,24 @@ class Application(customtkinter.CTk):
         color = customtkinter.CTkComboBox(self, values=["jet", "cividis", "viridis", "magma"])
         color.place(x=int(self.width*0.75), y=int(self.height*0.35))
         color.set("jet")
+        customtkinter.CTkLabel(self, text="Subgroups",
+                               font=('Helvetica', 16)).place(x=int(self.width*0.6), y=int(self.height*0.45))
+        dropdown = MultiDropDown(self,options=list(self.config["subgroups"].keys()))
+        dropdown.place(x=int(self.width*0.75), y=int(self.height*0.45))
         customtkinter.CTkButton(self, text="Plot embeddings",
-                                command=lambda: self.lda("embed",int(start.get()), int(end.get()), int(binsize.get()), color.get(),),
+                                command=lambda: self.lda("embed",int(start.get()), int(end.get()),
+                                                         int(binsize.get()), color.get(),
+                                                         dropdown.get_selected_values()),
                                 font=('Helvetica', 16)).place(x=int(self.width*0.8), y=int(self.height*0.76))
         customtkinter.CTkButton(self, text="Classify and evaluate",
-                                command=lambda: self.lda("classify_eval",int(start.get()), int(end.get()), int(binsize.get()), color.get()),
+                                command=lambda: self.lda("classify_eval",int(start.get()), int(end.get()),
+                                                         int(binsize.get()), color.get(),
+                                                         dropdown.get_selected_values()),
                                 font=('Helvetica', 16)).place(x=int(self.width*0.8), y=int(self.height*0.83))
         customtkinter.CTkButton(self, text="Save LDA classifier",
-                                command=lambda: self.lda("save",int(start.get()), int(end.get()), int(binsize.get()), color.get()),
+                                command=lambda: self.lda("save",int(start.get()), int(end.get()),
+                                                         int(binsize.get()), color.get(),
+                                                         dropdown.get_selected_values()),
                                 font=('Helvetica', 16)).place(x=int(self.width*0.8), y=int(self.height*0.9))
         # Bottom back buttons
         customtkinter.CTkButton(self, text="◀ back to analysis menu", command=self.window3_menu,
@@ -814,7 +879,6 @@ class Application(customtkinter.CTk):
                                 font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.83))
         customtkinter.CTkButton(self, text="◀◀ back to start", command=self.window1_start,
                                 font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.9))
-        self.configure_window(6, 3)
 
     def window4h3_pose_vs_BORIS(self):
         self.clear_window()
@@ -833,15 +897,16 @@ class Application(customtkinter.CTk):
         customtkinter.CTkButton(self, text="◀◀ back to start", command=self.window1_start,
                                 font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.9))
 
-    def plot_usage(self, start, end, style, color, subgroup_option):
-        if subgroup_option=="no_subgroups":
+    def plot_usage(self, start, end, style, color, subgroups):
+        if subgroups == ["all combined"]:
             labels_df, n_modules = analysis.label_counter_nosubgroups(self.config, start, end)
             fig = plot.plot_module_usage(self.config, labels_df, start, end, int(self.config["fps"]), style=style, cmap=color)
             self.plots_generated = self.plots_generated + 1
             self.plot_window = PlotWindow(fig = fig, plot_number = self.plots_generated, master = self)
             self.plot_window.mainloop()
-        elif subgroup_option=="subgroups":
-            labels_df, n_modules = analysis.label_counter_subgroups(self.config, start, end)
+        else:
+            selected_subgroups=[i for i in subgroups if (i!="all combined")]
+            labels_df, n_modules = analysis.label_counter_subgroups(self.config, start, end, selected_subgroups=selected_subgroups)
             fig = plot.plot_module_usage_subgroups(self.config, labels_df, start, end, int(self.config["fps"]), style=style, cmap=color)
             self.plots_generated = self.plots_generated + 1
             self.plot_window = PlotWindow(fig = fig, plot_number = self.plots_generated, master = self)
@@ -881,11 +946,11 @@ class Application(customtkinter.CTk):
         self.plot_window = PlotWindow(fig = fig, plot_number = self.plots_generated, master = self)
         self.plot_window.mainloop()
 
-    def lda(self, do, start, end, binsize, cmap):
-        labels_df, n_modules = analysis.label_counter_subgroups(self.config, start, end)
-        lda, lda_embeddings, label_counts, group_labels, group_dict, nbins = analysis.lda_labels_timebins(self.config, labels_df, binsize)
+    def lda(self, do, start, end, binsize, cmap, subgroups):
+        labels_df, n_modules = analysis.label_counter_subgroups(self.config, start, end, selected_subgroups=subgroups)
+        lda, lda_embeddings, label_counts, group_labels, group_dict, nbins = analysis.lda_labels_timebins(self.config, labels_df, binsize, selected_subgroups=subgroups)
         if do=="embed":
-            fig = plot.plot_lda(self.config, lda, lda_embeddings, group_labels, nbins, binsize, cmap=cmap)
+            fig = plot.plot_lda(self.config, lda, lda_embeddings, group_labels, nbins, binsize, cmap=cmap, selected_subgroups=subgroups)
             self.plots_generated = self.plots_generated + 1
             self.plot_window = PlotWindow(fig=fig, plot_number=self.plots_generated, master=self)
             self.plot_window.mainloop()
