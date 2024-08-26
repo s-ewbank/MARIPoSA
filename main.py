@@ -144,7 +144,7 @@ class Application(customtkinter.CTk):
         customtkinter.CTkLabel(self, text="Would you like to start a new project or load a previous project?",
                                font=('Helvetica', 16)).place(x=int(self.width*0.5), y=int(self.height*0.4),anchor=tk.CENTER)
         # Radio buttons for starting new project or loading old project
-        projectstart_options = ["New project", "Load previous"]
+        projectstart_options = ["New project","Load previous"]
         grid_last = 0
         for option in projectstart_options:
             radio_btn = customtkinter.CTkRadioButton(self, text=option, variable=self.projectstart_choice, value=option,
@@ -168,7 +168,7 @@ class Application(customtkinter.CTk):
             self.projectstart_choice = self.projectstart_choice.get()
         self.config_path = config_path
         if self.projectstart_choice == "New project":
-            self.window2_makeproject()
+            self.window1b_projecttype()
         elif self.projectstart_choice == "Load previous":
             if os.path.exists(config_path):
                 self.load_project()
@@ -178,75 +178,159 @@ class Application(customtkinter.CTk):
         else:
             print(self.projectstart_choice)
 
-    def window2_makeproject(self):
+    def window1b_projecttype(self):
         self.clear_window()
-
+        self.projectstart_choice = customtkinter.StringVar(value="New project")
         customtkinter.CTkLabel(self, text="Create a new project",
-                               font=('Helvetica', 32, "bold")).place(x=int(self.width*0.65), y=int(self.height*0.08),anchor=tk.CENTER)
+                               font=('Helvetica', 32, "bold")).place(x=int(self.width*0.5), y=int(self.height*0.1),anchor=tk.CENTER)
+        customtkinter.CTkLabel(self, text="Will the data type for this new dataset be pose estimation or pose segmentation?",
+                               font=('Helvetica', 16)).place(x=int(self.width*0.5), y=int(self.height*0.3),anchor=tk.CENTER)
 
-        customtkinter.CTkLabel(self, text="Project name",
-                               font=('Helvetica', 16)).place(x=int(self.width*0.2), y=int(self.height*0.2))
-        project_name = customtkinter.CTkEntry(self)
-        project_name.place(x=int(self.width*0.5), y=int(self.height*0.2))
+        customtkinter.CTkButton(self, text="Pose estimation\n\n(DeepLabCut or SLEAP)",
+                                command=lambda: self.window2_makeproject("pose_estimation"),height=int(self.height*0.25),width=int(self.width*0.35),
+                                font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.6),anchor=tk.CENTER)
+        customtkinter.CTkButton(self, text="Pose segmentation\n\n(B-SOiD, VAME, or Keypoint-MoSeq)",
+                                command=lambda: self.window2_makeproject("pose_segmentation"),height=int(self.height*0.25),width=int(self.width*0.35),
+                                font=('Helvetica', 16)).place(x=int(self.width*0.7), y=int(self.height*0.6),anchor=tk.CENTER)
 
-        # Enter data directory
-        customtkinter.CTkLabel(self, text="Path to data directory",
-                               font=('Helvetica', 16)).place(x=int(self.width*0.2), y=int(self.height*0.3))
-        data_path_entry = customtkinter.CTkEntry(self)
-        data_path_entry.place(x=int(self.width*0.5), y=int(self.height*0.3))
-        browse_button = customtkinter.CTkButton(self, text="Browse",
-                                                command=lambda: self.window_browse(data_path_entry, type="directory"))
-        browse_button.place(x=int(self.width*0.7), y=int(self.height*0.3))
-
-        #Info about data
-        customtkinter.CTkLabel(self, text="Data type of new project",
-                               font=('Helvetica', 16)).place(x=int(self.width*0.2), y=int(self.height*0.4))
-
-        # Radio buttons for starting new project or loading old project
-        datatype_options = ["B-SOiD", "VAME", "Keypoint-MoSeq"]
-        for r, option in enumerate(datatype_options):
-            radio_btn = customtkinter.CTkRadioButton(self, text=option, variable=self.datatype, value=option,
-                                                     font=('Helvetica', 16))
-            radio_btn.place(x=int(self.width*0.5), y=int(self.height*(0.4+r*0.1)))
-
-        customtkinter.CTkLabel(self, text="Frames per second",
-                               font=('Helvetica', 16)).place(x=int(self.width*0.2), y=int(self.height*0.7))
-        fps = customtkinter.CTkEntry(self)
-        fps.place(x=int(self.width*0.5), y=int(self.height*0.7))
-
-        # Enter project directory
-        customtkinter.CTkLabel(self, text="Destination path for MARIPoSA output",
-                               font=('Helvetica', 16)).place(x=int(self.width*0.2), y=int(self.height*0.8))
-        project_path_entry = customtkinter.CTkEntry(self)
-        project_path_entry.place(x=int(self.width*0.5), y=int(self.height*0.8))
-        browse_button = customtkinter.CTkButton(self, text="Browse",
-                                                command=lambda: self.window_browse(project_path_entry,
-                                                                                   type="directory"))
-        browse_button.place(x=int(self.width*0.7), y=int(self.height*0.8))
-
-        # Back to the initial view
         customtkinter.CTkButton(self, text="◀", command=self.window1_start,
-                                font=('Helvetica', 16)).place(x=int(self.width*0.2), y=int(self.height*0.9))
-        customtkinter.CTkButton(self, text="▶",
-                                command=lambda: self.create_project(
-                                    project_name.get(), data_path_entry.get(), self.datatype.get(),
-                                    project_path_entry.get(),fps.get()),
-                                font=('Helvetica', 16)).place(x=int(self.width*0.8), y=int(self.height*0.9))
+                                font=('Helvetica', 16)).place(x=int(self.width * 0.1), y=int(self.height * 0.9))
 
-    def create_project(self, project_name, data_directory, datatype, output_directory,fps):
-        metadata.create_project(project_name, data_directory, datatype, output_directory,fps)
+    def window2_makeproject(self,type):
+        if type=="pose_estimation":
+            self.clear_window()
+
+            customtkinter.CTkLabel(self, text="Create a new pose estimation project",
+                                   font=('Helvetica', 32, "bold")).place(x=int(self.width*0.5), y=int(self.height*0.08),anchor=tk.CENTER)
+
+            customtkinter.CTkLabel(self, text="Project name",
+                                   font=('Helvetica', 16)).place(x=int(self.width*0.2), y=int(self.height*0.2))
+            project_name = customtkinter.CTkEntry(self)
+            project_name.place(x=int(self.width*0.5), y=int(self.height*0.2))
+
+            # Enter data directory
+            customtkinter.CTkLabel(self, text="Path to data directory",
+                                   font=('Helvetica', 16)).place(x=int(self.width*0.2), y=int(self.height*0.3))
+            data_path_entry = customtkinter.CTkEntry(self)
+            data_path_entry.place(x=int(self.width*0.5), y=int(self.height*0.3))
+            browse_button = customtkinter.CTkButton(self, text="Browse",
+                                                    command=lambda: self.window_browse(data_path_entry, type="directory"))
+            browse_button.place(x=int(self.width*0.7), y=int(self.height*0.3))
+
+            #Info about data
+            customtkinter.CTkLabel(self, text="Source of data for new project",
+                                   font=('Helvetica', 16)).place(x=int(self.width*0.2), y=int(self.height*0.4))
+
+            # Radio buttons for starting new project or loading old project
+            datatype_options = ["DeepLabCut", "SLEAP"]
+            for r, option in enumerate(datatype_options):
+                radio_btn = customtkinter.CTkRadioButton(self, text=option, variable=self.datatype, value=option,
+                                                         font=('Helvetica', 16))
+                radio_btn.place(x=int(self.width*0.5), y=int(self.height*(0.4+r*0.1)))
+
+            customtkinter.CTkLabel(self, text="Frames per second",
+                                   font=('Helvetica', 16)).place(x=int(self.width*0.2), y=int(self.height*0.7))
+            fps = customtkinter.CTkEntry(self)
+            fps.place(x=int(self.width*0.5), y=int(self.height*0.7))
+
+            # Enter project directory
+            customtkinter.CTkLabel(self, text="Destination path for MARIPoSA output",
+                                   font=('Helvetica', 16)).place(x=int(self.width*0.2), y=int(self.height*0.8))
+            project_path_entry = customtkinter.CTkEntry(self)
+            project_path_entry.place(x=int(self.width*0.5), y=int(self.height*0.8))
+            browse_button = customtkinter.CTkButton(self, text="Browse",
+                                                    command=lambda: self.window_browse(project_path_entry,
+                                                                                       type="directory"))
+            browse_button.place(x=int(self.width*0.7), y=int(self.height*0.8))
+
+            # Back to the initial view
+            customtkinter.CTkButton(self, text="◀", command=self.window1_start,
+                                    font=('Helvetica', 16)).place(x=int(self.width*0.1), y=int(self.height*0.9))
+            customtkinter.CTkButton(self, text="▶",
+                                    command=lambda: self.create_PE_project(
+                                        project_name.get(), data_path_entry.get(), self.datatype.get(),
+                                        project_path_entry.get(),fps.get()),
+                                    font=('Helvetica', 16)).place(x=int(self.width*0.8), y=int(self.height*0.9))
+        if type == "pose_segmentation":
+            self.clear_window()
+
+            customtkinter.CTkLabel(self, text="Create a new pose segmentation project",
+                                   font=('Helvetica', 32, "bold")).place(x=int(self.width * 0.5),
+                                                                         y=int(self.height * 0.08), anchor=tk.CENTER)
+
+            customtkinter.CTkLabel(self, text="Project name",
+                                   font=('Helvetica', 16)).place(x=int(self.width * 0.2), y=int(self.height * 0.2))
+            project_name = customtkinter.CTkEntry(self)
+            project_name.place(x=int(self.width * 0.5), y=int(self.height * 0.2))
+
+            # Enter data directory
+            customtkinter.CTkLabel(self, text="Path to data directory",
+                                   font=('Helvetica', 16)).place(x=int(self.width * 0.2), y=int(self.height * 0.3))
+            data_path_entry = customtkinter.CTkEntry(self)
+            data_path_entry.place(x=int(self.width * 0.5), y=int(self.height * 0.3))
+            browse_button = customtkinter.CTkButton(self, text="Browse",
+                                                    command=lambda: self.window_browse(data_path_entry,
+                                                                                       type="directory"))
+            browse_button.place(x=int(self.width * 0.7), y=int(self.height * 0.3))
+
+            # Info about data
+            customtkinter.CTkLabel(self, text="Source of data for new project",
+                                   font=('Helvetica', 16)).place(x=int(self.width * 0.2), y=int(self.height * 0.4))
+
+            # Radio buttons for starting new project or loading old project
+            datatype_options = ["B-SOiD", "VAME", "Keypoint-MoSeq"]
+            for r, option in enumerate(datatype_options):
+                radio_btn = customtkinter.CTkRadioButton(self, text=option, variable=self.datatype, value=option,
+                                                         font=('Helvetica', 16))
+                radio_btn.place(x=int(self.width * 0.5), y=int(self.height * (0.4 + r * 0.1)))
+
+            customtkinter.CTkLabel(self, text="Frames per second",
+                                   font=('Helvetica', 16)).place(x=int(self.width * 0.2), y=int(self.height * 0.7))
+            fps = customtkinter.CTkEntry(self)
+            fps.place(x=int(self.width * 0.5), y=int(self.height * 0.7))
+
+            # Enter project directory
+            customtkinter.CTkLabel(self, text="Destination path for MARIPoSA output",
+                                   font=('Helvetica', 16)).place(x=int(self.width * 0.2), y=int(self.height * 0.8))
+            project_path_entry = customtkinter.CTkEntry(self)
+            project_path_entry.place(x=int(self.width * 0.5), y=int(self.height * 0.8))
+            browse_button = customtkinter.CTkButton(self, text="Browse",
+                                                    command=lambda: self.window_browse(project_path_entry,
+                                                                                       type="directory"))
+            browse_button.place(x=int(self.width * 0.7), y=int(self.height * 0.8))
+
+            # Back to the initial view
+            customtkinter.CTkButton(self, text="◀", command=self.window1_start,
+                                    font=('Helvetica', 16)).place(x=int(self.width * 0.1), y=int(self.height * 0.9))
+            customtkinter.CTkButton(self, text="▶",
+                                    command=lambda: self.create_PS_project(
+                                        project_name.get(), data_path_entry.get(), self.datatype.get(),
+                                        project_path_entry.get(), fps.get()),
+                                    font=('Helvetica', 16)).place(x=int(self.width * 0.8), y=int(self.height * 0.9))
+
+    def create_PE_project(self, project_name, data_directory, data_source, output_directory,fps):
+        metadata.create_PE_project(project_name, data_directory, data_source, output_directory,fps)
         self.clear_window()
         self.project_name = datetime.now().strftime('%y%m%d_') + project_name
-        self.config_path = output_directory + "/" + self.project_name + "/config.yaml"
+        self.config_path = output_directory + "/" + self.project_name + "/config_PE.yaml"
         config = metadata.load_project(self.config_path)
         self.config = config
-        self.window3_menu()
+        self.window3a_PE_menu()
+
+    def create_PS_project(self, project_name, data_directory, data_source, output_directory,fps):
+        metadata.create_PS_project(project_name, data_directory, data_source, output_directory,fps)
+        self.clear_window()
+        self.project_name = datetime.now().strftime('%y%m%d_') + project_name
+        self.config_path = output_directory + "/" + self.project_name + "/config_PS.yaml"
+        config = metadata.load_project(self.config_path)
+        self.config = config
+        self.window3b_PS_menu()
 
     def load_project(self):
         self.clear_window()
         config = metadata.load_project(self.config_path)
         self.config = config
-        self.window3_menu()
+        self.window3b_PS_menu()
 
     def load_project_BORIS(self):
         self.clear_window()
@@ -285,7 +369,7 @@ class Application(customtkinter.CTk):
         customtkinter.CTkLabel(list_frame, text="Config path", text_color="#3a7ebf", font=('Helvetica', 16, "bold"),anchor="w",width=bar_width).pack(side=tk.TOP, fill=tk.X,padx=5)
         customtkinter.CTkLabel(list_frame, text=self.config["project_directory"], font=('Helvetica', 16),anchor="w",width=bar_width).pack(side=tk.TOP, fill=tk.X,padx=5)
         customtkinter.CTkLabel(list_frame, text="Data source", text_color="#3a7ebf", font=('Helvetica', 16, "bold"),anchor="w",width=bar_width).pack(side=tk.TOP, fill=tk.X,padx=5)
-        customtkinter.CTkLabel(list_frame, text=self.config["data_type"], font=('Helvetica', 16),anchor="w",width=bar_width).pack(side=tk.TOP, fill=tk.X,padx=5)
+        customtkinter.CTkLabel(list_frame, text=self.config["data_source"], font=('Helvetica', 16),anchor="w",width=bar_width).pack(side=tk.TOP, fill=tk.X,padx=5)
         customtkinter.CTkLabel(list_frame, text="Subgroups (" + str(len(self.config["subgroups"].keys())) + ")",
                                text_color="#3a7ebf", font=('Helvetica', 16, "bold"),anchor="w",width=bar_width).pack(side=tk.TOP, fill=tk.X,padx=5)
         for key in list(self.config["subgroups"].keys()):
@@ -314,7 +398,47 @@ class Application(customtkinter.CTk):
         customtkinter.CTkLabel(self, text="Project "+self.config["project_name"],
                                font=('Helvetica', 20, "bold")).place(x=int(self.width*0.65), y=int(self.height*0.16),anchor=tk.CENTER)
 
-    def window3_menu(self):
+    def window3a_PE_menu(self):
+        self.clear_window()
+        self.create_sidebar_widget()
+        self.create_header("Analysis Menu")
+
+        # Buttons to analysis windows
+        usage_img = PhotoImage(file='other/usage_icon.png')
+        subgroups_img = PhotoImage(file='other/subgroup_icon.png')
+        embed_img = PhotoImage(file='other/embed_icon.png')
+        classify_img = PhotoImage(file='other/classify_icon.png')
+        remap_img = PhotoImage(file='other/remap_icon.png')
+        button_width=int(self.width*0.2)
+        button_height=int(self.height*0.15)
+        customtkinter.CTkLabel(self, text="Further configure project:",
+                               font=('Helvetica', 16),width=button_width,height=button_height).place(x=int(self.width * 0.3), y=int(self.height * 0.2))
+        # customtkinter.CTkButton(self, text="Define subgroups \nwithin data",
+        #                         command=self.window4a_define_subgroups, image=subgroups_img,
+        #                         font=('Helvetica', 16),width=button_width,height=button_height).place(x=int(self.width*0.3), y=int(self.height*0.3))
+        # customtkinter.CTkButton(self, text="Compare modules to \nmanual scoring",
+        #                         command=self.window4h_pose_vs_BORIS, image=remap_img,
+        #                         font=('Helvetica', 16),width=button_width,height=button_height).place(x=int(self.width*0.52), y=int(self.height*0.3))
+        # customtkinter.CTkButton(self, text="Manually combine \npose modules",
+        #                         command=self.window1_start, image=remap_img,
+        #                         font=('Helvetica', 16),width=button_width,height=button_height).place(x=int(self.width*0.74), y=int(self.height*0.3))
+
+        customtkinter.CTkLabel(self, text="Visualize and classify:",
+                               font=('Helvetica', 16),width=button_width,height=button_height).place(x=int(self.width * 0.3), y=int(self.height * 0.5))
+        # customtkinter.CTkButton(self, text="Analyze pose module \nusage and transitions",
+        #                         command=self.window4b_usage_transitions_menu, image=usage_img,
+        #                         font=('Helvetica', 16),width=button_width,height=button_height).place(x=int(self.width*0.3), y=int(self.height*0.6))
+        # customtkinter.CTkButton(self, text="Embed and measure \ndistance between \ngroups",
+        #                         command=self.window4e_embed_menu, image=embed_img,
+        #                         font=('Helvetica', 16),width=button_width,height=button_height).place(x=int(self.width*0.52), y=int(self.height*0.6))
+        # customtkinter.CTkButton(self, text="Classify conditions",
+        #                         command=self.window4g_classify_menu, image=classify_img,
+        #                         font=('Helvetica', 16),width=button_width,height=button_height).place(x=int(self.width*0.74), y=int(self.height*0.6))
+
+        customtkinter.CTkButton(self, text="◀◀ back to start", command=self.window1_start,
+                                font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.9))
+
+    def window3b_PS_menu(self):
         self.clear_window()
         self.create_sidebar_widget()
         self.create_header("Analysis Menu")
@@ -353,6 +477,7 @@ class Application(customtkinter.CTk):
 
         customtkinter.CTkButton(self, text="◀◀ back to start", command=self.window1_start,
                                 font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.9))
+
     def window4a_define_subgroups(self):
         self.clear_window()
         self.create_sidebar_widget()
@@ -380,10 +505,10 @@ class Application(customtkinter.CTk):
         instruction_block.place(x=int(self.width * 0.3),y=int(self.height * 0.22),anchor=tk.NW)
         edit_config_button = customtkinter.CTkButton(self,
                                                      text="Edit config.yaml",font=('Helvetica', 16),
-                                                     command=lambda: metadata.edit_config(self.config["project_directory"]+"/config.yaml"))
+                                                     command=lambda: metadata.edit_config(self.config_path))
         edit_config_button.place(x=int(self.width*0.6), y=int(self.height*0.75))
         # Bottom back buttons
-        customtkinter.CTkButton(self, text="◀ back to analysis menu", command=self.window3_menu,
+        customtkinter.CTkButton(self, text="◀ back to analysis menu", command=self.window3b_PS_menu,
                                 font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.83))
         customtkinter.CTkButton(self, text="◀◀ back to start", command=self.window1_start,
                                 font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.9))
@@ -419,7 +544,7 @@ class Application(customtkinter.CTk):
                                 command=lambda: self.window4f_usage_overtime("across_sessions"),height=int(self.height*0.15),width=int(self.width*0.29),
                                 font=('Helvetica', 16)).place(x=int(self.width*0.5), y=int(self.height*0.69),anchor=tk.CENTER)
 
-        customtkinter.CTkButton(self, text="◀ back to analysis menu", command=self.window3_menu,
+        customtkinter.CTkButton(self, text="◀ back to analysis menu", command=self.window3b_PS_menu,
                                 font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.83))
         customtkinter.CTkButton(self, text="◀◀ back to start", command=self.window1_start,
                                 font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.9))
@@ -468,7 +593,7 @@ class Application(customtkinter.CTk):
                                                                 dropdown.get_selected_values()),
                                 font=('Helvetica', 16)).place(x=int(self.width*0.8), y=int(self.height*0.9))
         # Bottom back buttons
-        customtkinter.CTkButton(self, text="◀ back to analysis menu", command=self.window3_menu,
+        customtkinter.CTkButton(self, text="◀ back to analysis menu", command=self.window3b_PS_menu,
                                 font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.83))
         customtkinter.CTkButton(self, text="◀◀ back to start", command=self.window1_start,
                                 font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.9))
@@ -524,7 +649,7 @@ class Application(customtkinter.CTk):
                                                                   subgroup_option),
                                 font=('Helvetica', 16)).place(x=int(self.width*0.8), y=int(self.height*0.9))
         # Bottom back buttons
-        customtkinter.CTkButton(self, text="◀ back to analysis menu", command=self.window3_menu,
+        customtkinter.CTkButton(self, text="◀ back to analysis menu", command=self.window3b_PS_menu,
                                 font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.83))
         customtkinter.CTkButton(self, text="◀◀ back to start", command=self.window1_start,
                                 font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.9))
@@ -581,7 +706,7 @@ class Application(customtkinter.CTk):
                                                                          n_blocks=int(n_blocks.get())),
                                 font=('Helvetica', 16)).place(x=int(self.width*0.8), y=int(self.height*0.9))
         # Bottom back buttons
-        customtkinter.CTkButton(self, text="◀ back to analysis menu", command=self.window3_menu,
+        customtkinter.CTkButton(self, text="◀ back to analysis menu", command=self.window3b_PS_menu,
                                 font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.83))
         customtkinter.CTkButton(self, text="◀◀ back to start", command=self.window1_start,
                                 font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.9))
@@ -604,7 +729,7 @@ class Application(customtkinter.CTk):
                                 command=self.window4g_lda_embed_classify,height=int(self.height*0.15),width=int(self.width*0.6),
                                 font=('Helvetica', 16)).place(x=int(self.width*0.65), y=int(self.height*0.69),anchor=tk.CENTER)
         # Bottom back buttons
-        customtkinter.CTkButton(self, text="◀ back to analysis menu", command=self.window3_menu,
+        customtkinter.CTkButton(self, text="◀ back to analysis menu", command=self.window3b_PS_menu,
                                 font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.83))
         customtkinter.CTkButton(self, text="◀◀ back to start", command=self.window1_start,
                                 font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.9))
@@ -628,7 +753,7 @@ class Application(customtkinter.CTk):
                                 command=self.window4g_nlp_classify,height=int(self.height*0.15),width=int(self.width*0.6),
                                 font=('Helvetica', 16)).place(x=int(self.width*0.65), y=int(self.height*0.69),anchor=tk.CENTER)
         # Bottom back buttons
-        customtkinter.CTkButton(self, text="◀ back to analysis menu", command=self.window3_menu,
+        customtkinter.CTkButton(self, text="◀ back to analysis menu", command=self.window3b_PS_menu,
                                 font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.83))
         customtkinter.CTkButton(self, text="◀◀ back to start", command=self.window1_start,
                                 font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.9))
@@ -671,7 +796,7 @@ class Application(customtkinter.CTk):
                                 command=lambda: self.lda("save",int(start.get()), int(end.get()), int(binsize.get()), color.get()),
                                 font=('Helvetica', 16)).place(x=int(self.width*0.8), y=int(self.height*0.9))
         # Bottom back buttons
-        customtkinter.CTkButton(self, text="◀ back to analysis menu", command=self.window3_menu,
+        customtkinter.CTkButton(self, text="◀ back to analysis menu", command=self.window3b_PS_menu,
                                 font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.83))
         customtkinter.CTkButton(self, text="◀◀ back to start", command=self.window1_start,
                                 font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.9))
@@ -715,7 +840,7 @@ class Application(customtkinter.CTk):
                                 command=lambda: self.lda("save",int(start.get()), int(end.get()), int(binsize.get()), color.get()),
                                 font=('Helvetica', 16)).place(x=int(self.width*0.8), y=int(self.height*0.9))
         # Bottom back buttons
-        customtkinter.CTkButton(self, text="◀ back to analysis menu", command=self.window3_menu,
+        customtkinter.CTkButton(self, text="◀ back to analysis menu", command=self.window3b_PS_menu,
                                 font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.83))
         customtkinter.CTkButton(self, text="◀◀ back to start", command=self.window1_start,
                                 font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.9))
@@ -769,7 +894,7 @@ class Application(customtkinter.CTk):
                                                          dropdown.get_selected_values()),
                                 font=('Helvetica', 16)).place(x=int(self.width*0.8), y=int(self.height*0.9))
         # Bottom back buttons
-        customtkinter.CTkButton(self, text="◀ back to analysis menu", command=self.window3_menu,
+        customtkinter.CTkButton(self, text="◀ back to analysis menu", command=self.window3b_PS_menu,
                                 font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.83))
         customtkinter.CTkButton(self, text="◀◀ back to start", command=self.window1_start,
                                 font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.9))
@@ -808,7 +933,7 @@ class Application(customtkinter.CTk):
                                 command=lambda: self.lr("save",int(start.get()), int(end.get()), int(binsize.get())),
                                 font=('Helvetica', 16)).place(x=int(self.width*0.8), y=int(self.height*0.9))
         # Bottom back buttons
-        customtkinter.CTkButton(self, text="◀ back to analysis menu", command=self.window3_menu,
+        customtkinter.CTkButton(self, text="◀ back to analysis menu", command=self.window3b_PS_menu,
                                 font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.83))
         customtkinter.CTkButton(self, text="◀◀ back to start", command=self.window1_start,
                                 font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.9))
@@ -833,7 +958,7 @@ class Application(customtkinter.CTk):
         end = customtkinter.CTkEntry(self)
         end.place(x=int(self.width*0.45), y=int(self.height*0.45))
         # Bottom back buttons
-        customtkinter.CTkButton(self, text="◀ back to analysis menu", command=self.window3_menu,
+        customtkinter.CTkButton(self, text="◀ back to analysis menu", command=self.window3b_PS_menu,
                                 font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.83))
         customtkinter.CTkButton(self, text="◀◀ back to start", command=self.window1_start,
                                 font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.9))
@@ -851,7 +976,7 @@ class Application(customtkinter.CTk):
                                 command=self.window4h3_pose_vs_BORIS,height=int(self.width*0.1),width=int(self.width*0.6),
                                 font=('Helvetica', 16)).place(x=int(self.width*0.65), y=int(self.height*0.6),anchor=tk.CENTER)
         # Bottom back buttons
-        customtkinter.CTkButton(self, text="◀ back to analysis menu", command=self.window3_menu,
+        customtkinter.CTkButton(self, text="◀ back to analysis menu", command=self.window3b_PS_menu,
                                 font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.83))
         customtkinter.CTkButton(self, text="◀◀ back to start", command=self.window1_start,
                                 font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.9))
@@ -875,7 +1000,7 @@ class Application(customtkinter.CTk):
         # Bottom back buttons
         customtkinter.CTkButton(self, text="◀ update config and go back to BORIS menu", command=self.load_project_BORIS,
                                 font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.76))
-        customtkinter.CTkButton(self, text="◀ back to analysis menu", command=self.window3_menu,
+        customtkinter.CTkButton(self, text="◀ back to analysis menu", command=self.window3b_PS_menu,
                                 font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.83))
         customtkinter.CTkButton(self, text="◀◀ back to start", command=self.window1_start,
                                 font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.9))
@@ -892,7 +1017,7 @@ class Application(customtkinter.CTk):
                                 command=lambda: self.plot_pose_vs_BORIS(),
                                 font=('Helvetica', 16)).place(x=int(self.width*0.85), y=int(self.height*0.9))
         # Bottom back buttons
-        customtkinter.CTkButton(self, text="◀ back to analysis menu", command=self.window3_menu,
+        customtkinter.CTkButton(self, text="◀ back to analysis menu", command=self.window3b_PS_menu,
                                 font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.83))
         customtkinter.CTkButton(self, text="◀◀ back to start", command=self.window1_start,
                                 font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.9))
@@ -940,7 +1065,7 @@ class Application(customtkinter.CTk):
             #plot.plot_module_usage_subgroups(labels_df, start, end, int(self.config["fps"]), style=style, cmap=color)
 
     def plot_pose_vs_BORIS(self):
-        BORIS_to_pose_mat, BORIS_to_pose_mat_normalized, loss = analysis.BORIS_to_pose(self.config)
+        BORIS_to_pose_mat, BORIS_to_pose_mat_normalized, loss = analysis.BORIS_to_pose(self.config) # this line is messing up the loaded config
         fig = plot.BORIS_to_pose_matrix_plot(self.config, BORIS_to_pose_mat_normalized)
         self.plots_generated = self.plots_generated + 1
         self.plot_window = PlotWindow(fig = fig, plot_number = self.plots_generated, master = self)

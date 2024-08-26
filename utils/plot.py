@@ -22,7 +22,7 @@ def plot_module_usage(config,labels_df,start,stop,figW=4,figH=2,style="bar_scatt
     :param style: "bar_scatter", "bar_error", or "points"
     :return:
     """
-    fps = config["fps"]
+    fps = int(config["fps"])
     start_frame = start*fps
     stop_frame = stop*fps
     labels_df=labels_df[start_frame:stop_frame]
@@ -80,7 +80,7 @@ def plot_module_usage(config,labels_df,start,stop,figW=4,figH=2,style="bar_scatt
             marker="o",markersize=2.5,linewidth=0.75,
             capsize=2,markeredgewidth=0.75
         )
-    ax.set_xlabel(config["data_type"] + ' Pose Label')
+    ax.set_xlabel(config["data_source"] + ' Pose Label')
     ax.set_ylabel('Frequency')
     ax.set_xticks(np.arange(0, n_modules, 1))
     ax.tick_params(axis='x', rotation=90, labelsize=plt.rcParams['font.size'] * 0.5, pad=2)
@@ -101,7 +101,7 @@ def plot_module_usage_subgroups(config, labels_df, start, stop, figW=6, figH=3,
     :return:
     """
     #To get groupnames in order
-    fps = config["fps"]
+    fps = int(config["fps"])
     groupnames = []
     added_groupnames = set()
     for item in [header[0] for header in labels_df.columns]:
@@ -194,7 +194,7 @@ def plot_module_usage_subgroups(config, labels_df, start, stop, figW=6, figH=3,
     elif legend_pos == "outside":
         ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
 
-    ax.set_xlabel(config["data_type"] + ' Pose Label')
+    ax.set_xlabel(config["data_source"] + ' Pose Label')
     ax.set_ylabel('Frequency')
     ax.set_xticks(np.arange(0, n_modules, 1))
     ax.set_xticklabels(modules)
@@ -215,7 +215,7 @@ def plot_module_usage_stacked(config, labels_df, start, stop, figW=6, figH=3,cma
     :return:
     """
     #To get groupnames in order
-    fps = config["fps"]
+    fps = int(config["fps"])
     groupnames = []
     added_groupnames = set()
     for item in [header[0] for header in labels_df.columns]:
@@ -294,7 +294,7 @@ def network_pairwise_comparison(config, labels_df, start, end, groupnames, scali
     :param cmap: matplotlib colormap
     :return:
     """
-    fps = config["fps"]
+    fps = int(config["fps"])
     fig, ax = plt.subplots(1, 1, figsize=(4,3), dpi=100)
     fig.suptitle(groupnames[0] + " vs. " + groupnames[1], fontsize=16)
 
@@ -457,7 +457,7 @@ def SandPlotClusterFrequency_OverTime(config,
     :param savename:
     :return:
     """
-    fps = config["fps"]
+    fps = int(config["fps"])
     n_samples = len(labels_df.columns)
     labels_flat = np.array(labels_df)
     labels_flat = [item for sublist in labels_flat for item in sublist]
@@ -688,7 +688,7 @@ def BORIS_to_pose_matrix_plot(config, boris_to_pose_output, figW=4, figH=2.5, cm
         ax.add_patch(rect)
     plt.xticks(range(len(boris_to_pose_output.columns)),labels=boris_to_pose_output.columns)
     plt.yticks(range(len(boris_to_pose_output.index)), labels=boris_to_pose_output.index)
-    plt.xlabel(config["data_type"]+" Pose Module")
+    plt.xlabel(config["data_source"]+" Pose Module")
     plt.ylabel("Manually Scored\nBehavior")
     plt.tick_params(axis='x', rotation=90,
                     labelsize=plt.rcParams['font.size'] * 0.7, pad=2)

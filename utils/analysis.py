@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import os
+import copy
 from sklearn.tree import plot_tree
 from sklearn.decomposition import PCA
 from sklearn.model_selection import LeaveOneOut, cross_val_predict
@@ -20,11 +21,11 @@ def label_counter_nosubgroups(config, start, stop):
     :return:
     """
     fps = config["fps"]
-    start_frame = start * fps
-    stop_frame = stop * fps
+    start_frame = start * int(fps)
+    stop_frame = stop * int(fps)
     count = 0
     header = []
-    if config["data_type"]=="B-SOiD":
+    if config["data_source"]=="B-SOiD":
         label_paths=[i for i in config["project_files"] if "labels_" in i]
         for i in range(len(label_paths)):
             header.append(label_paths[i])
@@ -36,7 +37,7 @@ def label_counter_nosubgroups(config, start, stop):
             else:
                 labels_df.insert(loc=count, value=labels_i, column=label_paths[i])
             count = count + 1
-    elif config["data_type"]=="Keypoint-MoSeq":
+    elif config["data_source"]=="Keypoint-MoSeq":
         label_paths=config["project_files"]
         for i in range(len(label_paths)):
             header.append(label_paths[i])
@@ -48,7 +49,7 @@ def label_counter_nosubgroups(config, start, stop):
             else:
                 labels_df.insert(loc=count, value=labels_i, column=label_paths[i])
             count = count + 1
-    elif config["data_type"]=="VAME":
+    elif config["data_source"]=="VAME":
         data_directory = config["data_directory"]
         model_path = ""
         model_path = model_path + "/" + os.listdir(data_directory + "/" + os.listdir(data_directory)[0])[0]
@@ -64,7 +65,7 @@ def label_counter_nosubgroups(config, start, stop):
             else:
                 labels_df.insert(loc=count, value=labels_i, column=config["project_files"][f])
             count = count + 1
-    elif config["data_type"]=="MotionMapper":
+    elif config["data_source"]=="MotionMapper":
         label_paths=config["project_files"]
         for i in range(len(label_paths)):
             header.append(label_paths[i])
@@ -95,15 +96,15 @@ def label_counter_subgroups(config, start, stop, selected_subgroups="all"):
     :return:
     """
     fps = config["fps"]
-    start_frame = start * fps
-    stop_frame = stop * fps
+    start_frame = start * int(fps)
+    stop_frame = stop * int(fps)
     if selected_subgroups=="all":
         selected_subgroups=list(config["subgroups"].keys())
     n_groups = len(selected_subgroups)
     count = 0
     header1 = []
     header2 = []
-    if config["data_type"]=="B-SOiD":
+    if config["data_source"]=="B-SOiD":
         for g in range(n_groups):
             label_paths_g = [i for i in config["subgroups"][selected_subgroups[g]] if "labels_" in i]
             for i in range(len(label_paths_g)):
@@ -120,7 +121,7 @@ def label_counter_subgroups(config, start, stop, selected_subgroups="all"):
                     labels_df = labels_df.copy()
                 count = count + 1
         labels_df.columns = [header1, header2]
-    elif config["data_type"]=="Keypoint-MoSeq":
+    elif config["data_source"]=="Keypoint-MoSeq":
         for g in range(n_groups):
             label_paths_g = config["subgroups"][selected_subgroups[g]]
             for i in range(len(label_paths_g)):
@@ -136,7 +137,7 @@ def label_counter_subgroups(config, start, stop, selected_subgroups="all"):
                     labels_df.insert(loc=count, value=labels_i, column=header)
                 count = count + 1
         labels_df.columns = [header1, header2]
-    elif config["data_type"]=="VAME":
+    elif config["data_source"]=="VAME":
         data_directory = config["data_directory"]
         model_path = ""
         model_path = model_path + "/" + os.listdir(data_directory + "/" + os.listdir(data_directory)[0])[0]
@@ -157,7 +158,7 @@ def label_counter_subgroups(config, start, stop, selected_subgroups="all"):
                     labels_df.insert(loc=count, value=labels_i, column=header)
                 count = count + 1
         labels_df.columns = [header1, header2]
-    elif config["data_type"]=="MotionMapper":
+    elif config["data_source"]=="MotionMapper":
         for g in range(n_groups):
             label_paths_g = config["subgroups"][selected_subgroups[g]]
             for i in range(len(label_paths_g)):
@@ -239,7 +240,7 @@ def BORIS_to_pose(config):
     boris_directory = config["boris_directory"]
     boris_to_pose_pairings = config["boris_to_pose_pairings"]
     results=None
-    config_modulo = config
+    config_modulo = copy.deepcopy(config)
     config_modulo["project_files"]=[pairing[1] for pairing in boris_to_pose_pairings if pairing[0] is not None]
     labels_df, n_modules = label_counter_nosubgroups(config_modulo, 0, 1200)
     modules = np.unique(labels_df.values.flatten())
@@ -247,11 +248,11 @@ def BORIS_to_pose(config):
         if pairing[0]==None:
             continue
         else:
-            config_modulo=config
+            config_modulo = copy.deepcopy(config)
             config_modulo["project_files"]=[pairing[1]]
             labels_df, _ = label_counter_nosubgroups(config_modulo,0,1200)
             boris_i = pd.read_csv(boris_directory + "/" + pairing[0])
-            boris_i["frame"] = np.round(boris_i["time"] / (1 / config["fps"]))
+            boris_i["frame"] = np.round(boris_i["time"] / (1 / int(config["fps"])))
             boris_i = boris_i.drop_duplicates(subset='frame', keep='first')
             fr = np.min([len(labels_df), np.max(boris_i["frame"])])
             boris_i=boris_i[0:int(fr)]
@@ -274,7 +275,7 @@ def BORIS_to_pose(config):
     column_sums = column_sums.replace(0, 1)
     normalized_results = results / column_sums
     loss_score = np.sum(results.sum()-results.max())/np.sum(results.sum())
-    print(config["data_type"] + " modules map onto scored behaviors with 'loss' of " + str(loss_score))
+    print(config["data_source"] + " modules map onto scored behaviors with 'loss' of " + str(loss_score))
     return results, normalized_results, loss_score
 
 def combine_pose_modules(config, labels_df):
@@ -321,17 +322,10 @@ def lda_labels_timebins(config, labels_df, binsize, selected_subgroups="all", nc
     :param ncomponents:
     :return:
     """
-    # if groupnames == None:
-    #     groupnames = list(np.unique([item[0] for item in labels_df.columns]))
     if selected_subgroups=="all":
         selected_subgroups=list(config["subgroups"].keys())
     n_groups = len(selected_subgroups)
-    # n_groups = len(list(np.unique([item[0] for item in labels_df.columns])))
-    fps = config["fps"]
-    # start_frame = start * fps
-    # stop_frame = stop * fps
-    # labels_df = labels_df[start_frame:stop_frame]
-    # total_frames = stop_frame - start_frame
+    fps = int(config["fps"])
     group_dict = {selected_subgroups[i]: i for i in range(len(selected_subgroups))}
     labels_flat = np.array(labels_df)
     labels_flat = [item for sublist in labels_flat for item in sublist]
@@ -339,7 +333,7 @@ def lda_labels_timebins(config, labels_df, binsize, selected_subgroups="all", nc
     n_clust = len(clusts)
 
     label_counts = []
-    nbins = int(labels_df.shape[0] / (binsize * config["fps"]))
+    nbins = int(labels_df.shape[0] / (binsize * fps))
     for g in range(n_groups):
         for i in range(len(labels_df[selected_subgroups[g]].columns)):
             label_counts_i = np.zeros(n_clust * nbins)
@@ -373,7 +367,7 @@ def lda_loco_labels_timebins(config, dist_df, ncomponents=2):
     """
     selected_subgroups = pd.Series([i[0] for i in dist_df.columns]).unique()
     n_groups = len(selected_subgroups)
-    fps = config["fps"]
+    fps = int(config["fps"])
     group_dict = {selected_subgroups[i]: i for i in range(len(selected_subgroups))}
 
     dist_counts = []
@@ -410,7 +404,7 @@ def lr_labels_timebins(config, labels_df, binsize, selected_subgroups="all"):
         selected_subgroups=list(config["subgroups"].keys())
     n_groups = len(selected_subgroups)
     # n_groups = len(list(np.unique([item[0] for item in labels_df.columns])))
-    fps = config["fps"]
+    fps = int(config["fps"])
     # start_frame = start * fps
     # stop_frame = stop * fps
     # labels_df = labels_df[start_frame:stop_frame]
@@ -422,7 +416,7 @@ def lr_labels_timebins(config, labels_df, binsize, selected_subgroups="all"):
     n_clust = len(clusts)
 
     label_counts = []
-    nbins = int(labels_df.shape[0] / (binsize * config["fps"]))
+    nbins = int(labels_df.shape[0] / (binsize * fps))
     for g in range(n_groups):
         for i in range(len(labels_df[selected_subgroups[g]].columns)):
             label_counts_i = np.zeros(n_clust * nbins)
