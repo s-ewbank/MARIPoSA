@@ -6,7 +6,7 @@ A platform for Manageable And Reproducible Integrated Pose Segmentation Analysis
 ### Installation
 Installing the conda environment:
 
-    conda env create -f MARIPOSA/conda/environment.yaml
+    conda env create -f MARIPoSA/conda/environment.yaml
 
 ### Using the GUI
 Activate the newly installed conda environment:
@@ -15,7 +15,7 @@ Activate the newly installed conda environment:
 
 Run the GUI:
 
-    python main.py
+    python MARIPoSA/main.py
 
 In the GUI:
 1. Click "New project"

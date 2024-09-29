@@ -67,7 +67,7 @@ def plot_module_usage(config,labels_df,start,stop,figW=4,figH=2,style="bar_scatt
                 x=np.arange(0, n_modules, 1),
                 y=bar_heights,
                 yerr=bar_sems,
-                linestyle="none",linewidth=0.75,
+                linestyle="none",linewidth=0.6,
                 color="black",capsize=1,markeredgewidth=0.75
             )
     elif style=="points":
@@ -118,6 +118,13 @@ def plot_module_usage_subgroups(config, labels_df, start, stop, figW=6, figH=3,
     labels_flat = np.array(labels_df)
     labels_flat = [item for sublist in labels_flat for item in sublist]
     modules = np.unique(labels_flat)
+    modules_int=[]
+    for module in modules:
+        if isinstance(module, str):
+            modules_int.append(module)
+        else:
+            modules_int.append(int(module))
+    modules=np.array(modules_int)
     n_modules = len(modules)
 
     # Label counting
@@ -164,8 +171,8 @@ def plot_module_usage_subgroups(config, labels_df, start, stop, figW=6, figH=3,
                     x=np.arange(0 + scale * g, n_modules + scale * g, 1),
                     y=bar_heights[g],
                     yerr=bar_sems[g],
-                    linestyle="none",linewidth=0.75,
-                    color="black",capsize=1,markeredgewidth=0.75
+                    linestyle="none",linewidth=0.6,
+                    color="black",capsize=0.3,markeredgewidth=0.75,alpha=0.8
                 )
             bar_alpha=0.85
         for g in range(n_groups):
@@ -196,8 +203,21 @@ def plot_module_usage_subgroups(config, labels_df, start, stop, figW=6, figH=3,
 
     ax.set_xlabel(config["data_source"] + ' Pose Label')
     ax.set_ylabel('Frequency')
-    ax.set_xticks(np.arange(0, n_modules, 1))
-    ax.set_xticklabels(modules)
+    all_num_modules = np.sum([isinstance(module,str) for module in modules])==0
+    print(all_num_modules)
+    print(n_modules)
+    print((all_num_modules==True))
+    print((n_modules>=20))
+    print(((all_num_modules is True) and (n_modules>=20)))
+    if ((all_num_modules) and (n_modules>=20)):
+        print("DID IT")
+        print("joe is cute")
+        xticks=np.arange(0, n_modules, 5, dtype=int)
+        ax.set_xticks(xticks)
+        ax.set_xticklabels(modules[xticks])
+    else:
+        ax.set_xticks(np.arange(0, n_modules, 1))
+        ax.set_xticklabels(modules)
     ax.tick_params(axis='x', rotation=90, labelsize=plt.rcParams['font.size'] * 0.2 * n_groups, pad=2)
     plt.tight_layout()
     return fig
@@ -587,7 +607,7 @@ def plot_dist_bins(dist_df, cmap="viridis", plottype="band", figW=6, figH=3):
     ax.set_ylabel("Locomotion (pix)")
     return fig
 
-def plot_lda(config, lda, lda_embeddings, group_labels, nbins, binsize, selected_subgroups="all",
+def plot_lda(config, lda_result, selected_subgroups="all",
              figW=4, figH=3, titletype="informative", cmap="jet"):
     """
     Plot LDA embeddings
@@ -609,29 +629,30 @@ def plot_lda(config, lda, lda_embeddings, group_labels, nbins, binsize, selected
     n_groups=len(selected_subgroups)
     cmap = plt.get_cmap(cmap)
     colors = [cmap([i]) for i in np.linspace(0,1,len(selected_subgroups))]
-    LD1 = lda_embeddings[:, 0]
-    LD2 = lda_embeddings[:, 1]
+    LD1 = lda_result.lda_embeddings[:, 0]
+    LD2 = lda_result.lda_embeddings[:, 1]
     fig = plt.figure(figsize=(figW, figH), dpi=100)
-    for i in range(len(group_labels)):
+    for i in range(len(lda_result.group_labels)):
         for r in range(n_groups):
-            if group_labels[i] == r:
+            if lda_result.group_labels[i] == r:
                 LD1_i = LD1[i]
                 LD2_i = LD2[i]
                 plt.scatter(LD1_i, LD2_i, c=colors[r], s=23, marker="o")
     leg = plt.legend(selected_subgroups, bbox_to_anchor=(1.05, 1), loc='upper left')
     for i in range(n_groups):
         leg.legendHandles[i].set_color(colors[i])
-    plt.xlabel("LD1 (" + str(int(1000 * lda.explained_variance_ratio_[0]) / 10) + "% Variance Explained)")
-    plt.ylabel("LD2 (" + str(int(1000 * lda.explained_variance_ratio_[1]) / 10) + "% Variance Explained)")
+    plt.xlabel("LD1 (" + str(int(1000 * lda_result.lda.explained_variance_ratio_[0]) / 10) + "% Variance Explained)")
+    plt.ylabel("LD2 (" + str(int(1000 * lda_result.lda.explained_variance_ratio_[1]) / 10) + "% Variance Explained)")
     if titletype == "uninformative":
         plt.title("Linear Discriminant Analysis\n with Time Bins", fontweight="bold")
     elif titletype == "informative":
-        plt.title(str("Linear Discriminant Analysis\n with " + str(nbins) + " " + str(binsize / 60) + "-min time bins"),
+        plt.title(str("Linear Discriminant Analysis\n with " + str(lda_result.nbins) + " " + str(lda_result.binsize / 60) + "-min time bins"),
                   fontweight="bold")
     plt.tight_layout()
     return fig
 
-def plot_conf_mat(confusion, class_num, class_labels, figW=2.5,figH=2.5,cmap="Greens",alt_title=False):
+
+def plot_conf_mat(lda_result, figW=2.5,figH=2.5,cmap="Greens",alt_title=False):
     """
     Generate a confusion matrix plot
     :param confusion: the confusion matrix from sklearn
@@ -644,12 +665,14 @@ def plot_conf_mat(confusion, class_num, class_labels, figW=2.5,figH=2.5,cmap="Gr
     :return:
     """
     fig = plt.figure(figsize=(figW, figH), dpi=100)
-    plt.imshow(confusion, cmap=cmap)
-    plt.xticks(class_num, class_labels)
-    plt.yticks(class_num, class_labels)
+    plt.imshow(lda_result.loocv_confmat, cmap=cmap)
+    class_labels=list(lda_result.group_dict.keys())
+    ticks=[lda_result.group_dict[key] for key in class_labels]
+    plt.xticks(ticks, class_labels)
+    plt.yticks(ticks, class_labels)
     for i in range(len(class_labels)):
         for j in range(len(class_labels)):
-            plt.text(j, i, str(confusion[i, j]), ha='center', va='center', color='black')
+            plt.text(j, i, str(int(lda_result.loocv_confmat[i, j])), ha='center', va='center', color='black')
     plt.xlabel('Predicted Dose Label')
     plt.ylabel('True Dose Label')
     if alt_title==False:
@@ -658,6 +681,35 @@ def plot_conf_mat(confusion, class_num, class_labels, figW=2.5,figH=2.5,cmap="Gr
         plt.title(alt_title)
     plt.tight_layout()
     return fig
+
+
+# def plot_conf_mat(confusion, class_num, class_labels, figW=2.5,figH=2.5,cmap="Greens",alt_title=False):
+#     """
+#     Generate a confusion matrix plot
+#     :param confusion: the confusion matrix from sklearn
+#     :param class_num: the classes (as integers)
+#     :param class_labels: the classes (string names)
+#     :param figW: figure width
+#     :param figH: figure height
+#     :param cmap: colormap
+#     :param alt_title: title other than confusion matrix
+#     :return:
+#     """
+#     fig = plt.figure(figsize=(figW, figH), dpi=100)
+#     plt.imshow(confusion, cmap=cmap)
+#     plt.xticks(class_num, class_labels)
+#     plt.yticks(class_num, class_labels)
+#     for i in range(len(class_labels)):
+#         for j in range(len(class_labels)):
+#             plt.text(j, i, str(confusion[i, j]), ha='center', va='center', color='black')
+#     plt.xlabel('Predicted Dose Label')
+#     plt.ylabel('True Dose Label')
+#     if alt_title==False:
+#         plt.title('Confusion Matrix')
+#     else:
+#         plt.title(alt_title)
+#     plt.tight_layout()
+#     return fig
 
 def plot_pc_weights(pca,cmap="PuOr"):
     """
@@ -677,16 +729,25 @@ def plot_pc_weights(pca,cmap="PuOr"):
     plt.tight_layout()
     return fig
 
-def BORIS_to_pose_matrix_plot(config, boris_to_pose_output, figW=4, figH=2.5, cmap="Greens"):
+def BORIS_to_pose_matrix_plot(config, boris_to_pose_output, figW=4, figH=2.5, cmap="Greens",outline_top_match=True):
     fig, ax = plt.subplots(figsize=(figW, figH), dpi=100)
     plt.imshow(boris_to_pose_output.to_numpy(dtype='float'),cmap=cmap,aspect="auto")
     data = boris_to_pose_output.to_numpy(dtype='float')
     num_cols = data.shape[1]
-    for col in range(num_cols):
-        max_row = np.argmax(data[:, col])
-        rect = Rectangle((col - 0.5, max_row - 0.5), 1, 1, edgecolor='purple', facecolor='none', linewidth=1)
-        ax.add_patch(rect)
-    plt.xticks(range(len(boris_to_pose_output.columns)),labels=boris_to_pose_output.columns)
+    if outline_top_match==True:
+        for col in range(num_cols):
+            max_row = np.argmax(data[:, col])
+            if np.sum(data[:, col]==data[max_row, col])==1:
+                rect = Rectangle((col - 0.5, max_row - 0.5), 1, 1, edgecolor='purple', facecolor='none', linewidth=0.8)
+                ax.add_patch(rect)
+    if len(boris_to_pose_output.columns>=20):
+        xticks=np.arange(0,np.max(boris_to_pose_output.columns),5,dtype=int)
+        xticklabels=np.array(list(boris_to_pose_output.columns),dtype=int)[xticks]
+    else:
+        xticks=range(len(boris_to_pose_output.columns))
+        xticklabels=boris_to_pose_output.columns
+
+    plt.xticks(xticks,labels=xticklabels)
     plt.yticks(range(len(boris_to_pose_output.index)), labels=boris_to_pose_output.index)
     plt.xlabel(config["data_source"]+" Pose Module")
     plt.ylabel("Manually Scored\nBehavior")

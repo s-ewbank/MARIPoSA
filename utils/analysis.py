@@ -8,6 +8,7 @@ from sklearn.model_selection import LeaveOneOut, cross_val_predict
 from sklearn.metrics import accuracy_score, confusion_matrix
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
 from sklearn.linear_model import LogisticRegression as LR
+from sklearn.preprocessing import StandardScaler
 import scipy
 
 def label_counter_nosubgroups(config, start, stop):
@@ -312,14 +313,16 @@ def make_remappings_from_BORIS(config, labels_df, BORIS_to_pose_mat):
     combine_pose_modules(config, labels_df)
     return labels_df
 
-def lda_labels_timebins(config, labels_df, binsize, selected_subgroups="all", ncomponents=2):
+def get_usage_feats(config,
+                    labels_df,
+                    binsize,
+                    selected_subgroups="all"):
     """
-    Function to compute LDA for data in timebins
+
     :param config:
     :param labels_df:
     :param binsize:
     :param selected_subgroups:
-    :param ncomponents:
     :return:
     """
     if selected_subgroups=="all":
@@ -351,9 +354,93 @@ def lda_labels_timebins(config, labels_df, binsize, selected_subgroups="all", nc
     for g in range(n_groups):
         group_labels.extend([g] * len(labels_df[selected_subgroups[g]].columns))
 
+    return label_counts, group_labels
+
+class LdaResult:
+    def __init__(self, lda, lda_embeddings, label_counts, group_labels, group_dict, nbins, binsize,
+                 loocv_accuracy,loocv_confmat):
+        self.lda = lda
+        self.lda_embeddings = lda_embeddings
+        self.label_counts = label_counts
+        self.group_labels = group_labels
+        self.group_dict = group_dict
+        self.nbins = nbins
+        self.binsize = binsize
+        self.loocv_accuracy = loocv_accuracy
+        self.loocv_confmat = loocv_confmat
+
+def lda_labels_timebins(config,
+                        labels_df,
+                        binsize,
+                        selected_subgroups="all",
+                        ncomponents=2,
+                        select_features=False,
+                        loocv=False):
+    """
+    Function to compute LDA for data in timebins
+    :param config: config object
+    :param labels_df: labels_df object
+    :param binsize: bin width in seconds
+    :param selected_subgroups:
+    :param ncomponents: number of linear discriminants
+    :param select_features: False or a number
+    :param loocv: do leave-one-out cross-validation
+    :return:
+    """
+    if selected_subgroups=="all":
+        selected_subgroups=list(config["subgroups"].keys())
+    n_groups = len(selected_subgroups)
+    fps = int(config["fps"])
+    group_dict = {selected_subgroups[i]: i for i in range(len(selected_subgroups))}
+    nbins = int(labels_df.shape[0] / (binsize * fps))
+    label_counts, group_labels = get_usage_feats(config,labels_df,binsize,selected_subgroups=selected_subgroups)
+    label_counts_full = label_counts.copy()
+    group_labels_full = group_labels.copy()
+    if select_features!=False:
+        scaler = StandardScaler()
+        label_counts_scaled = scaler.fit_transform(label_counts)
+        pca = PCA(n_components=1)
+        pca.fit(label_counts_scaled)
+        picks = pca.components_.argsort()[0][0:select_features]
+        label_counts = label_counts[:, picks]
+
     lda = LDA(n_components=ncomponents)
     lda_embeddings = lda.fit_transform(label_counts, group_labels)
-    return lda, lda_embeddings, label_counts, group_labels, group_dict, nbins
+
+    if loocv==True:
+        predictions=[]
+        true_class=[]
+        for sample_i in range(label_counts_full.shape[0]):
+            label_counts_sub=np.delete(label_counts_full,sample_i,axis=0)
+            label_counts_i=label_counts_full[sample_i,:]
+            group_labels_sub=group_labels_full.copy()
+            label_i=group_labels_sub.pop(sample_i)
+            if select_features != False:
+                scaler = StandardScaler()
+                label_counts_sub_scaled = scaler.fit_transform(label_counts_sub)
+                pca = PCA(n_components=1)
+                pca.fit(label_counts_sub_scaled)
+                picks = pca.components_.argsort()[0][0:select_features]
+                label_counts_sub = label_counts_sub[:, picks]
+                label_counts_i = label_counts_i[picks]
+            lda_sub = LDA(n_components=ncomponents)
+            lda_sub.fit(label_counts_sub, group_labels_sub)
+
+            pred=lda_sub.predict(label_counts_i.reshape(1, -1))[0]
+            predictions.append(pred)
+            true_class.append(label_i)
+        predictions=np.array(predictions)
+        true_class=np.array(true_class)
+        classes=np.unique(true_class)
+        loocv_confmat=np.zeros([len(classes),len(classes)])
+        for pred_i in range(len(predictions)):
+            loocv_confmat[predictions[pred_i],true_class[pred_i]]+=1
+        loocv_accuracy=np.mean(predictions==true_class)
+    else:
+        loocv_accuracy="Cross-validation not completed"
+        loocv_confmat="Cross-validation not completed"
+
+    return LdaResult(lda, lda_embeddings, label_counts, group_labels, group_dict, nbins, binsize, loocv_accuracy, loocv_confmat)
 
 def lda_loco_labels_timebins(config, dist_df, ncomponents=2):
     """
@@ -436,20 +523,6 @@ def lr_labels_timebins(config, labels_df, binsize, selected_subgroups="all"):
 
     lr = LR().fit(label_counts, group_labels)
     return lr, group_labels, label_counts, group_dict, nbins
-
-def loocv_conf_mat(model, features, group_labels, group_dict):
-    loo = LeaveOneOut()
-    label_pred = cross_val_predict(model, features, group_labels, cv=loo)
-    accuracy = accuracy_score(group_labels, label_pred)
-    confusion = confusion_matrix(group_labels, label_pred)
-
-    # Get class labels (group names) in the order of group_dict keys
-    class_labels = [key for key, _ in sorted(group_dict.items(), key=lambda item: item[1])]
-    class_num = []
-    for key in group_dict.keys():
-        class_num.append(group_dict[key])
-    print("The overall accuracy by leave-one-out-cross-validation (LOOCV) is " + str(accuracy))
-    return confusion, class_num, class_labels, accuracy
 
 def nlp_classification(config, labels_df):
     print("Coming soon!")

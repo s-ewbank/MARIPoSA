@@ -41,6 +41,14 @@ def create_PS_project(project_name,data_directory,data_source,output_directory,f
         yaml.Dumper.ignore_aliases = lambda self, data: True
         yaml.dump(PS_config, outfile, default_flow_style=False, sort_keys=False, Dumper=yaml.Dumper)
 
+    # Fix comments
+    with open(project_directory+"/config_PS.yaml", 'r') as file:
+        filedata = file.read()
+    filedata = filedata.replace("'#", "#")
+    filedata = filedata.replace('"#', "#")
+    with open(project_directory+"/config_PS.yaml", 'w') as file:
+        file.write(filedata)
+
 def create_PE_project(project_name,data_directory,data_source,output_directory,fps):
     """
     Make project directory and write project_info.py file.
@@ -50,7 +58,7 @@ def create_PE_project(project_name,data_directory,data_source,output_directory,f
     :param output_directory: path where PoseVis output should be created
     """
     if data_source=="DeepLabCut":
-        project_files=sorted(os.listdir(data_directory))
+        project_files=[i for i in sorted(os.listdir(data_directory)) if i.endswith(".csv")]
     elif data_source=="SLEAP":
         project_files=sorted(os.listdir(data_directory))
     project_directory=str(output_directory+"/"+datetime.now().strftime('%y%m%d_')+project_name)

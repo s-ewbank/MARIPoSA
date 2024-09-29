@@ -17,9 +17,9 @@ import numpy as np
 importlib.reload(analysis)
 importlib.reload(plot)
 
-config_path="/Users/snewbank/Behavior/MARIPOSA_test/240605_240605_BSOID-test/config.yaml"
-save_path="/Users/snewbank/Behavior/MARIPOSA_test/240605_240605_BSOID-test/demo/"
-save=False
+config_path="/Users/snewbank/Behavior/MARIPOSA_test/240827_BSOID-test/config_PS.yaml"
+save_path="/Users/snewbank/Behavior/MARIPOSA_test/240827_BSOID-test/demo/"
+save=True
 
 #Load config
 config = metadata.load_project(config_path)
