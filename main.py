@@ -10,65 +10,6 @@ from PIL import Image
 
 factor=0.6
 
-class MultiDropDown(customtkinter.CTkFrame):
-    def __init__(self, parent, options):
-        super().__init__(parent)
-
-        self.menubutton = customtkinter.CTkButton(self, text="Select option(s) ▼", command=self.toggle_menu,
-                                                  fg_color="gray16",width=int(self.winfo_screenwidth()*0.6*0.1))
-        self.menubutton.pack(padx=0, pady=0)
-
-        # Create a canvas to host the menu items
-        self.canvas = tk.Canvas(self, borderwidth=0, background="gray16",
-                                width=int(self.winfo_screenwidth()*factor*0.1),
-                                height=int(self.winfo_screenheight()*factor*0.15))
-        self.scrollbar = tk.Scrollbar(self, orient="vertical", command=self.canvas.yview)
-
-        # Create a frame inside the canvas to contain the checkboxes
-        self.menu_frame = customtkinter.CTkFrame(self.canvas, corner_radius=0, bg_color="gray16")
-        self.canvas.create_window((0, 0), window=self.menu_frame, anchor="nw")
-
-        # Configure the scrollbar
-        self.canvas.configure(yscrollcommand=self.scrollbar.set)
-
-        # Pack the scrollbar and canvas but keep them hidden initially
-        self.canvas.pack(side="left", fill="both", expand=True)
-        self.scrollbar.pack(side="right", fill="y")
-        self.canvas.pack_forget()
-        self.scrollbar.pack_forget()
-
-        # Add checkboxes to the menu_frame
-        self.choices = {}
-        for choice in options:
-            var = tk.IntVar(value=0)
-            self.choices[choice] = var
-            checkbox = customtkinter.CTkCheckBox(self.menu_frame, text=choice, variable=var, onvalue=1, offvalue=0)
-            checkbox.pack(anchor="w", padx=5, pady=5)
-
-        # Update the scroll region to encompass the menu_frame
-        self.menu_frame.update_idletasks()
-        self.canvas.config(scrollregion=self.canvas.bbox("all"))
-
-    def toggle_menu(self):
-        if self.canvas.winfo_ismapped():
-            self.canvas.pack_forget()
-            self.scrollbar.pack_forget()
-        else:
-            self.canvas.pack(side="left", fill="both", expand=True)
-            self.scrollbar.pack(side="right", fill="y")
-            # self.canvas.lift()  # Ensure it appears on top
-            self.canvas.config(scrollregion=self.canvas.bbox("all"))
-
-    # def update_z_order(self, event=None):
-    #     """Update the z-order of the canvas when the widget is configured."""
-    #     if self.canvas.winfo_ismapped():
-    #         self.canvas.lift()
-
-    def get_selected_values(self):
-        """Return a list of selected values."""
-        return [name for name, var in self.choices.items() if var.get() == 1]
-
-
 class Application(customtkinter.CTk):
     """
     Main application
@@ -76,6 +17,7 @@ class Application(customtkinter.CTk):
     def __init__(self):
         super().__init__()
         self.title("MARIPoSA")
+        self.after(200, lambda: self.iconphoto(False, PhotoImage(file="other/MARIPoSA_icon.png")))
         customtkinter.set_appearance_mode("dark")
         customtkinter.set_default_color_theme("blue")
         # Set window style
@@ -1113,6 +1055,66 @@ class Application(customtkinter.CTk):
         #     self.plots_generated = self.plots_generated + 1
         #     self.plot_window = PlotWindow(fig=fig, plot_number=self.plots_generated, master=self)
         #     self.plot_window.mainloop()
+
+
+class MultiDropDown(customtkinter.CTkFrame):
+    def __init__(self, parent, options):
+        super().__init__(parent)
+
+        self.menubutton = customtkinter.CTkButton(self, text="Select option(s) ▼", command=self.toggle_menu,
+                                                  fg_color="gray16",width=int(self.winfo_screenwidth()*0.6*0.1))
+        self.menubutton.pack(padx=0, pady=0)
+
+        # Create a canvas to host the menu items
+        self.canvas = tk.Canvas(self, borderwidth=0, background="gray16",
+                                width=int(self.winfo_screenwidth()*factor*0.1),
+                                height=int(self.winfo_screenheight()*factor*0.15))
+        self.scrollbar = tk.Scrollbar(self, orient="vertical", command=self.canvas.yview)
+
+        # Create a frame inside the canvas to contain the checkboxes
+        self.menu_frame = customtkinter.CTkFrame(self.canvas, corner_radius=0, bg_color="gray16")
+        self.canvas.create_window((0, 0), window=self.menu_frame, anchor="nw")
+
+        # Configure the scrollbar
+        self.canvas.configure(yscrollcommand=self.scrollbar.set)
+
+        # Pack the scrollbar and canvas but keep them hidden initially
+        self.canvas.pack(side="left", fill="both", expand=True)
+        self.scrollbar.pack(side="right", fill="y")
+        self.canvas.pack_forget()
+        self.scrollbar.pack_forget()
+
+        # Add checkboxes to the menu_frame
+        self.choices = {}
+        for choice in options:
+            var = tk.IntVar(value=0)
+            self.choices[choice] = var
+            checkbox = customtkinter.CTkCheckBox(self.menu_frame, text=choice, variable=var, onvalue=1, offvalue=0)
+            checkbox.pack(anchor="w", padx=5, pady=5)
+
+        # Update the scroll region to encompass the menu_frame
+        self.menu_frame.update_idletasks()
+        self.canvas.config(scrollregion=self.canvas.bbox("all"))
+
+    def toggle_menu(self):
+        if self.canvas.winfo_ismapped():
+            self.canvas.pack_forget()
+            self.scrollbar.pack_forget()
+        else:
+            self.canvas.pack(side="left", fill="both", expand=True)
+            self.scrollbar.pack(side="right", fill="y")
+            # self.canvas.lift()  # Ensure it appears on top
+            self.canvas.config(scrollregion=self.canvas.bbox("all"))
+
+    # def update_z_order(self, event=None):
+    #     """Update the z-order of the canvas when the widget is configured."""
+    #     if self.canvas.winfo_ismapped():
+    #         self.canvas.lift()
+
+    def get_selected_values(self):
+        """Return a list of selected values."""
+        return [name for name, var in self.choices.items() if var.get() == 1]
+
 
 class PlotWindow(customtkinter.CTk):
     def __init__(self, fig, plot_number, master=None):

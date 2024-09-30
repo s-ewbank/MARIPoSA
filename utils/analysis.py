@@ -185,6 +185,7 @@ def label_counter_subgroups(config, start, stop, selected_subgroups="all"):
 def get_distance_timebins(DLC_config,filepath,binsize,start,end,bodypart,thresh=70):
     """
     Get distance/locomotion for a body part from a DLC file
+
     :param DLC_config: config file (can be DLC or pose - used only for "fps")
     :param filepath: path to file of interest
     :param binsize: size of timebins (in seconds)
@@ -235,6 +236,7 @@ def BORIS_to_pose(config):
     """
     Intake paired BORIS one-hot-encoded observation files and pose segmented files and align them to see what behaviors
     line up with what pose modules
+
     :param config: the config
     :return:
     """
@@ -282,6 +284,7 @@ def BORIS_to_pose(config):
 def combine_pose_modules(config, labels_df):
     """
     Combine pose modules based on remappings key in config
+
     :param config: config
     :param labels_df: from label_counter (subgroups or no_subgroups)
     :return:
@@ -299,6 +302,7 @@ def combine_pose_modules(config, labels_df):
 def make_remappings_from_BORIS(config, labels_df, BORIS_to_pose_mat):
     """
     Make remappings based on BORIS output and apply to labels_df
+
     :param config: config
     :param labels_df:
     :param BORIS_to_pose_mat: the non-normalized result matrix (first result option) from BORIS_to_pose
@@ -318,10 +322,11 @@ def get_usage_feats(config,
                     binsize,
                     selected_subgroups="all"):
     """
+    Reshape labels dataframe from label_counter_subgroups to be an array of features
 
-    :param config:
-    :param labels_df:
-    :param binsize:
+    :param config: config object
+    :param labels_df: labels dataframe from label_counter_subgroups
+    :param binsize: width of bins in seconds
     :param selected_subgroups:
     :return:
     """
@@ -378,6 +383,7 @@ def lda_labels_timebins(config,
                         loocv=False):
     """
     Function to compute LDA for data in timebins
+
     :param config: config object
     :param labels_df: labels_df object
     :param binsize: bin width in seconds
@@ -445,6 +451,7 @@ def lda_labels_timebins(config,
 def lda_loco_labels_timebins(config, dist_df, ncomponents=2):
     """
     Function to compute LDA for loco/kepoint position data in timebins
+
     :param config:
     :param labels_df:
     :param binsize:
@@ -477,6 +484,7 @@ def lda_loco_labels_timebins(config, dist_df, ncomponents=2):
 def lr_labels_timebins(config, labels_df, binsize, selected_subgroups="all"):
     """
     Function to compute LDA for data in timebins
+
     :param config:
     :param labels_df:
     :param binsize:

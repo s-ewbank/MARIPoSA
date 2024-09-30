@@ -6,11 +6,12 @@ import sys
 
 def create_PS_project(project_name,data_directory,data_source,output_directory,fps):
     """
-    Make project directory and write project_info.py file.
+    Make project directory and write config_PS.yaml file.
+
     :param project_name: what to call your creation
     :param data_directory: path to source data
     :param data_source: B-SOiD, VAME, or Keypoint-MoSeq
-    :param output_directory: path where PoseVis output should be created
+    :param output_directory: path where output directory and config file should be created
     """
 
     if data_source == "B-SOiD":
@@ -51,11 +52,13 @@ def create_PS_project(project_name,data_directory,data_source,output_directory,f
 
 def create_PE_project(project_name,data_directory,data_source,output_directory,fps):
     """
-    Make project directory and write project_info.py file.
+    Make project directory and write config_PE.yaml file.
+
     :param project_name: what to call your creation
     :param data_directory: path to source data
-    :param datatype: DeepLabCut or SLEAP
-    :param output_directory: path where PoseVis output should be created
+    :param data_source: DeepLabCut or SLEAP
+    :param output_directory: path where output directory and config file should be created
+    :param fps: frames per second
     """
     if data_source=="DeepLabCut":
         project_files=[i for i in sorted(os.listdir(data_directory)) if i.endswith(".csv")]
@@ -79,8 +82,9 @@ def create_PE_project(project_name,data_directory,data_source,output_directory,f
 
 def load_project(config_path):
     """
-    loads project from config.yaml file
-    :param config_path: path to config.yaml file:
+    Loads project from config_PS.yaml or config_PE.yaml file
+
+    :param config_path: path to config file:
     """
     with open(config_path, "r") as file:
         config = yaml.safe_load(file)

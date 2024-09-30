@@ -13,6 +13,7 @@ rcParams['font.sans-serif'] = ['Arial']
 def plot_module_usage(config,labels_df,start,stop,figW=4,figH=2,style="bar_scatter",cmap="jet"):
     """
     Plots the frequency of the pose modules occurring by group in the labels dataframe output by the label_counter function.
+
     :param labels_df: dataframe output from analysis.label_counter
     :param start: time in seconds to start dataframe from.
     :param stop: time in seconds to stop dataframe at.
@@ -91,6 +92,7 @@ def plot_module_usage_subgroups(config, labels_df, start, stop, figW=6, figH=3,
                                 style="bar_scatter",legend_pos="inside", cmap="viridis_r"):
     """
     Plots the frequency of the pose modules occurring by group in the labels dataframe output by the label_counter function.
+
     :param labels_df: dataframe output from analysis.label_counter
     :param start: time in seconds to start dataframe from.
     :param stop: time in seconds to stop dataframe at.
@@ -225,6 +227,7 @@ def plot_module_usage_subgroups(config, labels_df, start, stop, figW=6, figH=3,
 def plot_module_usage_stacked(config, labels_df, start, stop, figW=6, figH=3,cmap="viridis_r",title=None,alt_xticks=None):
     """
     Plots the frequency of the pose modules occurring by group in the labels dataframe output by the label_counter function.
+
     :param labels_df: dataframe output from analysis.label_counter
     :param start: time in seconds to start dataframe from.
     :param stop: time in seconds to stop dataframe at.
@@ -304,6 +307,7 @@ def plot_module_usage_stacked(config, labels_df, start, stop, figW=6, figH=3,cma
 def network_pairwise_comparison(config, labels_df, start, end, groupnames, scaling=1,include_labels=True,cmap="bwr"):
     """
     Plots network depiction of differences in pose module usage and transitions between two subgroups
+
     :param labels_df: labels_df from label_counter_subgroups
     :param start: time to start at in seconds
     :param end: time to end at in seconds
@@ -423,6 +427,7 @@ def network_pairwise_comparison(config, labels_df, start, end, groupnames, scali
 def transition_counter(labels_df, groupnames):
     """
     Generates a Pandas dataframe containing transitions within the labels df.
+
     :param labels_df:
     :param groupnames:
     :return:
@@ -461,6 +466,7 @@ def SandPlotClusterFrequency_OverTime(config,
                                       plottype='area'):
     """
     Plots usage of pose modules over time within a session
+
     :param labels_df:
     :param start: time to start at in seconds
     :param time_per_block: time per block in seconds
@@ -567,6 +573,7 @@ def SandPlotClusterFrequency_OverTime(config,
 def plot_dist_bins(dist_df, cmap="viridis", plottype="band", figW=6, figH=3):
     """
     Plots distance of a keypoint either over time or in bins from dist_df (output of analysis.dist_df_subgroups)
+
     :param dist_df: dist_df output from analysis.dist_df_subgroups
     :param cmap: matplotlib colormap
     :param plottype: type of plot ("band", "errorbar", or "bar" if no timebins)
@@ -611,6 +618,7 @@ def plot_lda(config, lda_result, selected_subgroups="all",
              figW=4, figH=3, titletype="informative", cmap="jet"):
     """
     Plot LDA embeddings
+
     :param config: config file
     :param lda: lda from lda_labels_timebins()
     :param lda_embeddings: embeddings from lda_labels_timebins()
@@ -655,6 +663,7 @@ def plot_lda(config, lda_result, selected_subgroups="all",
 def plot_conf_mat(lda_result, figW=2.5,figH=2.5,cmap="Greens",alt_title=False):
     """
     Generate a confusion matrix plot
+
     :param confusion: the confusion matrix from sklearn
     :param class_num: the classes (as integers)
     :param class_labels: the classes (string names)
@@ -714,6 +723,7 @@ def plot_conf_mat(lda_result, figW=2.5,figH=2.5,cmap="Greens",alt_title=False):
 def plot_pc_weights(pca,cmap="PuOr"):
     """
     Plot PCA weights
+
     :param pca: pca object from sklearn
     :return: fig
     """

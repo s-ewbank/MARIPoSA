@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>utils.metadata &mdash; MARIPoSA 0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=44496db0"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            MARIPoSA
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../metadata.html">Metadata</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../analysis.html">Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../plot.html">Plot</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">MARIPoSA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">utils.metadata</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for utils.metadata</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">import</span> <span class="nn">yaml</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<div class="viewcode-block" id="create_PS_project"><a class="viewcode-back" href="../../metadata.html#utils.metadata.create_PS_project">[docs]</a><span class="k">def</span> <span class="nf">create_PS_project</span><span class="p">(</span><span class="n">project_name</span><span class="p">,</span><span class="n">data_directory</span><span class="p">,</span><span class="n">data_source</span><span class="p">,</span><span class="n">output_directory</span><span class="p">,</span><span class="n">fps</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Make project directory and write config_PS.yaml file.</span>
+
+<span class="sd">    :param project_name: what to call your creation</span>
+<span class="sd">    :param data_directory: path to source data</span>
+<span class="sd">    :param data_source: B-SOiD, VAME, or Keypoint-MoSeq</span>
+<span class="sd">    :param output_directory: path where output directory and config file should be created</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">data_source</span> <span class="o">==</span> <span class="s2">&quot;B-SOiD&quot;</span><span class="p">:</span>
+        <span class="n">project_files</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">data_directory</span><span class="p">))</span>
+    <span class="k">elif</span> <span class="n">data_source</span> <span class="o">==</span> <span class="s2">&quot;VAME&quot;</span><span class="p">:</span>
+        <span class="n">project_files</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">([</span><span class="n">item</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">data_directory</span><span class="p">)</span> <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_directory</span><span class="p">,</span> <span class="n">item</span><span class="p">))])</span>
+    <span class="k">elif</span> <span class="n">data_source</span> <span class="o">==</span> <span class="s2">&quot;Keypoint-MoSeq&quot;</span><span class="p">:</span>
+        <span class="n">project_files</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">data_directory</span><span class="p">))</span>
+    <span class="n">project_directory</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">output_directory</span><span class="o">+</span><span class="s2">&quot;/&quot;</span><span class="o">+</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%y%m</span><span class="si">%d</span><span class="s1">_&#39;</span><span class="p">)</span><span class="o">+</span><span class="n">project_name</span><span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">project_directory</span><span class="p">)</span>
+
+    <span class="n">PS_config</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">PS_config</span><span class="p">[</span><span class="s2">&quot;project_name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%y%m</span><span class="si">%d</span><span class="s1">_&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="n">project_name</span>
+    <span class="n">PS_config</span><span class="p">[</span><span class="s2">&quot;data_directory&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">data_directory</span><span class="p">)</span>
+    <span class="n">PS_config</span><span class="p">[</span><span class="s2">&quot;project_directory&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">output_directory</span><span class="o">+</span><span class="s2">&quot;/&quot;</span><span class="o">+</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%y%m</span><span class="si">%d</span><span class="s1">_&#39;</span><span class="p">)</span><span class="o">+</span><span class="n">project_name</span><span class="p">)</span>
+    <span class="n">PS_config</span><span class="p">[</span><span class="s2">&quot;data_type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Pose segmentation&quot;</span>
+    <span class="n">PS_config</span><span class="p">[</span><span class="s2">&quot;data_source&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">data_source</span><span class="p">)</span>
+    <span class="n">PS_config</span><span class="p">[</span><span class="s2">&quot;fps&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">fps</span><span class="p">)</span>
+    <span class="n">PS_config</span><span class="p">[</span><span class="s2">&quot;project_files&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">project_files</span>
+    <span class="n">PS_config</span><span class="p">[</span><span class="s2">&quot;subgroups&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;group1&quot;</span> <span class="p">:</span> <span class="n">project_files</span><span class="p">}</span>
+    <span class="n">PS_config</span><span class="p">[</span><span class="s2">&quot;remappings&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[[</span><span class="s2">&quot;#old_poses; e.g., [1,2,3]&quot;</span><span class="p">,</span><span class="s2">&quot;#new_pose; e.g., 400&quot;</span><span class="p">],</span>
+                          <span class="p">[</span><span class="s2">&quot;#old_poses; e.g., [1,2,3]&quot;</span><span class="p">,</span><span class="s2">&quot;#new_pose; e.g., 400&quot;</span><span class="p">]]</span>
+    <span class="n">PS_config</span><span class="p">[</span><span class="s2">&quot;boris_directory&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;#/path/to/boris&quot;</span>
+    <span class="n">PS_config</span><span class="p">[</span><span class="s2">&quot;boris_to_pose_pairings&quot;</span><span class="p">]</span><span class="o">=</span><span class="p">[[</span><span class="s2">&quot;#boris file 1 here&quot;</span><span class="p">,</span><span class="s2">&quot;#pose file 1 here&quot;</span><span class="p">],</span>
+                                      <span class="p">[</span><span class="s2">&quot;#boris file 2 here&quot;</span><span class="p">,</span><span class="s2">&quot;#pose file 2 here&quot;</span><span class="p">],</span>
+                                      <span class="p">[</span><span class="s2">&quot;#boris file n here&quot;</span><span class="p">,</span><span class="s2">&quot;#pose file n here&quot;</span><span class="p">]]</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">project_directory</span><span class="o">+</span><span class="s2">&quot;/config_PS.yaml&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">outfile</span><span class="p">:</span>
+        <span class="n">yaml</span><span class="o">.</span><span class="n">Dumper</span><span class="o">.</span><span class="n">ignore_aliases</span> <span class="o">=</span> <span class="k">lambda</span> <span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="kc">True</span>
+        <span class="n">yaml</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">PS_config</span><span class="p">,</span> <span class="n">outfile</span><span class="p">,</span> <span class="n">default_flow_style</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">Dumper</span><span class="o">=</span><span class="n">yaml</span><span class="o">.</span><span class="n">Dumper</span><span class="p">)</span>
+
+    <span class="c1"># Fix comments</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">project_directory</span><span class="o">+</span><span class="s2">&quot;/config_PS.yaml&quot;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+        <span class="n">filedata</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+    <span class="n">filedata</span> <span class="o">=</span> <span class="n">filedata</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;&#39;#&quot;</span><span class="p">,</span> <span class="s2">&quot;#&quot;</span><span class="p">)</span>
+    <span class="n">filedata</span> <span class="o">=</span> <span class="n">filedata</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;&quot;#&#39;</span><span class="p">,</span> <span class="s2">&quot;#&quot;</span><span class="p">)</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">project_directory</span><span class="o">+</span><span class="s2">&quot;/config_PS.yaml&quot;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+        <span class="n">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">filedata</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="create_PE_project"><a class="viewcode-back" href="../../metadata.html#utils.metadata.create_PE_project">[docs]</a><span class="k">def</span> <span class="nf">create_PE_project</span><span class="p">(</span><span class="n">project_name</span><span class="p">,</span><span class="n">data_directory</span><span class="p">,</span><span class="n">data_source</span><span class="p">,</span><span class="n">output_directory</span><span class="p">,</span><span class="n">fps</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Make project directory and write config_PE.yaml file.</span>
+
+<span class="sd">    :param project_name: what to call your creation</span>
+<span class="sd">    :param data_directory: path to source data</span>
+<span class="sd">    :param data_source: DeepLabCut or SLEAP</span>
+<span class="sd">    :param output_directory: path where output directory and config file should be created</span>
+<span class="sd">    :param fps: frames per second</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">data_source</span><span class="o">==</span><span class="s2">&quot;DeepLabCut&quot;</span><span class="p">:</span>
+        <span class="n">project_files</span><span class="o">=</span><span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">data_directory</span><span class="p">))</span> <span class="k">if</span> <span class="n">i</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.csv&quot;</span><span class="p">)]</span>
+    <span class="k">elif</span> <span class="n">data_source</span><span class="o">==</span><span class="s2">&quot;SLEAP&quot;</span><span class="p">:</span>
+        <span class="n">project_files</span><span class="o">=</span><span class="nb">sorted</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">data_directory</span><span class="p">))</span>
+    <span class="n">project_directory</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">output_directory</span><span class="o">+</span><span class="s2">&quot;/&quot;</span><span class="o">+</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%y%m</span><span class="si">%d</span><span class="s1">_&#39;</span><span class="p">)</span><span class="o">+</span><span class="n">project_name</span><span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">project_directory</span><span class="p">)</span>
+
+    <span class="n">PE_config</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">PE_config</span><span class="p">[</span><span class="s2">&quot;project_name&quot;</span><span class="p">]</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%y%m</span><span class="si">%d</span><span class="s1">_&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="n">project_name</span>
+    <span class="n">PE_config</span><span class="p">[</span><span class="s2">&quot;data_directory&quot;</span><span class="p">]</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">data_directory</span><span class="p">)</span>
+    <span class="n">PE_config</span><span class="p">[</span><span class="s2">&quot;project_directory&quot;</span><span class="p">]</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">output_directory</span><span class="o">+</span><span class="s2">&quot;/&quot;</span><span class="o">+</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%y%m</span><span class="si">%d</span><span class="s1">_&#39;</span><span class="p">)</span><span class="o">+</span><span class="n">project_name</span><span class="p">)</span>
+    <span class="n">PE_config</span><span class="p">[</span><span class="s2">&quot;data_type&quot;</span><span class="p">]</span><span class="o">=</span><span class="s2">&quot;Pose estimation&quot;</span>
+    <span class="n">PE_config</span><span class="p">[</span><span class="s2">&quot;data_source&quot;</span><span class="p">]</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">data_source</span><span class="p">)</span>
+    <span class="n">PE_config</span><span class="p">[</span><span class="s2">&quot;fps&quot;</span><span class="p">]</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">fps</span><span class="p">)</span>
+    <span class="n">PE_config</span><span class="p">[</span><span class="s2">&quot;project_files&quot;</span><span class="p">]</span><span class="o">=</span><span class="n">project_files</span>
+    <span class="n">PE_config</span><span class="p">[</span><span class="s2">&quot;subgroups&quot;</span><span class="p">]</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;group1&quot;</span> <span class="p">:</span> <span class="n">project_files</span><span class="p">}</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">project_directory</span><span class="o">+</span><span class="s2">&quot;/config_PE.yaml&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">outfile</span><span class="p">:</span>
+        <span class="n">yaml</span><span class="o">.</span><span class="n">Dumper</span><span class="o">.</span><span class="n">ignore_aliases</span> <span class="o">=</span> <span class="k">lambda</span> <span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="kc">True</span>
+        <span class="n">yaml</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">PE_config</span><span class="p">,</span> <span class="n">outfile</span><span class="p">,</span> <span class="n">default_flow_style</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">Dumper</span><span class="o">=</span><span class="n">yaml</span><span class="o">.</span><span class="n">Dumper</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="load_project"><a class="viewcode-back" href="../../metadata.html#utils.metadata.load_project">[docs]</a><span class="k">def</span> <span class="nf">load_project</span><span class="p">(</span><span class="n">config_path</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Loads project from config_PS.yaml or config_PE.yaml file</span>
+
+<span class="sd">    :param config_path: path to config file:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">config_path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">config</span></div>
+
+<span class="k">def</span> <span class="nf">edit_config</span><span class="p">(</span><span class="n">config_path</span><span class="p">):</span>
+    <span class="n">config</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">config_path</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span><span class="o">==</span><span class="s2">&quot;win32&quot;</span><span class="p">:</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">startfile</span><span class="p">(</span><span class="n">config_path</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span><span class="o">==</span><span class="s2">&quot;darwin&quot;</span><span class="p">:</span>
+        <span class="n">subprocess</span><span class="o">.</span><span class="n">call</span><span class="p">([</span><span class="s2">&quot;open&quot;</span><span class="p">,</span><span class="n">config_path</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">subprocess</span><span class="o">.</span><span class="n">call</span><span class="p">([</span><span class="s2">&quot;xdg-open&quot;</span><span class="p">,</span> <span class="n">config_path</span><span class="p">])</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Sedona Ewbank.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>utils.plot &mdash; MARIPoSA 0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=44496db0"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            MARIPoSA
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../metadata.html">Metadata</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../analysis.html">Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../plot.html">Plot</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">MARIPoSA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">utils.plot</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for utils.plot</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">scipy.io</span>
+<span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">stats</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">rcParams</span>
+<span class="kn">from</span> <span class="nn">matplotlib.patches</span> <span class="kn">import</span> <span class="n">Rectangle</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">networkx</span> <span class="k">as</span> <span class="nn">nx</span>
+<span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;font.family&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;sans-serif&#39;</span>
+<span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;font.sans-serif&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Arial&#39;</span><span class="p">]</span>
+
+
+<div class="viewcode-block" id="plot_module_usage"><a class="viewcode-back" href="../../plot.html#utils.plot.plot_module_usage">[docs]</a><span class="k">def</span> <span class="nf">plot_module_usage</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="n">labels_df</span><span class="p">,</span><span class="n">start</span><span class="p">,</span><span class="n">stop</span><span class="p">,</span><span class="n">figW</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span><span class="n">figH</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">style</span><span class="o">=</span><span class="s2">&quot;bar_scatter&quot;</span><span class="p">,</span><span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;jet&quot;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Plots the frequency of the pose modules occurring by group in the labels dataframe output by the label_counter function.</span>
+
+<span class="sd">    :param labels_df: dataframe output from analysis.label_counter</span>
+<span class="sd">    :param start: time in seconds to start dataframe from.</span>
+<span class="sd">    :param stop: time in seconds to stop dataframe at.</span>
+<span class="sd">    :param fps: frames per second of recording.</span>
+<span class="sd">    :param figW: figure width</span>
+<span class="sd">    :param figH: figure height</span>
+<span class="sd">    :param style: &quot;bar_scatter&quot;, &quot;bar_error&quot;, or &quot;points&quot;</span>
+<span class="sd">    :return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">fps</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;fps&quot;</span><span class="p">])</span>
+    <span class="n">start_frame</span> <span class="o">=</span> <span class="n">start</span><span class="o">*</span><span class="n">fps</span>
+    <span class="n">stop_frame</span> <span class="o">=</span> <span class="n">stop</span><span class="o">*</span><span class="n">fps</span>
+    <span class="n">labels_df</span><span class="o">=</span><span class="n">labels_df</span><span class="p">[</span><span class="n">start_frame</span><span class="p">:</span><span class="n">stop_frame</span><span class="p">]</span>
+    <span class="n">total_frames</span> <span class="o">=</span> <span class="n">stop_frame</span><span class="o">-</span><span class="n">start_frame</span>
+    <span class="n">labels_flat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">labels_df</span><span class="p">)</span>
+    <span class="n">labels_flat</span> <span class="o">=</span> <span class="p">[</span><span class="n">item</span> <span class="k">for</span> <span class="n">sublist</span> <span class="ow">in</span> <span class="n">labels_flat</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">sublist</span><span class="p">]</span>
+    <span class="n">modules</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">labels_flat</span><span class="p">)</span>
+    <span class="n">n_modules</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">modules</span><span class="p">)</span>
+
+    <span class="n">label_counts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">labels_df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">n_modules</span><span class="p">])</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">labels_df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+        <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_modules</span><span class="p">):</span>
+            <span class="n">module</span> <span class="o">=</span> <span class="n">modules</span><span class="p">[</span><span class="n">m</span><span class="p">]</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">module</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">(</span><span class="n">module</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                <span class="k">pass</span>
+            <span class="n">label_counts</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">m</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span> \
+                <span class="p">(</span><span class="n">labels_df</span><span class="p">[[</span><span class="n">labels_df</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">i</span><span class="p">]]]</span> <span class="o">==</span> <span class="n">module</span><span class="p">)</span> <span class="o">/</span><span class="n">total_frames</span>
+    <span class="n">bar_heights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">label_counts</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">bar_sems</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">label_counts</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">labels_df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="n">figW</span><span class="p">,</span><span class="n">figH</span><span class="p">),</span><span class="n">dpi</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+    <span class="n">cmap</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">get_cmap</span><span class="p">(</span><span class="n">cmap</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">((</span><span class="n">style</span><span class="o">==</span><span class="s2">&quot;bar_scatter&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">style</span><span class="o">==</span><span class="s2">&quot;bar_error&quot;</span><span class="p">)):</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span>
+            <span class="n">x</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n_modules</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+            <span class="n">height</span><span class="o">=</span><span class="n">bar_heights</span><span class="p">,</span>
+            <span class="n">width</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span>
+            <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+            <span class="n">color</span><span class="o">=</span><span class="n">cmap</span><span class="p">([</span><span class="mf">0.1</span><span class="p">])</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">style</span><span class="o">==</span><span class="s2">&quot;bar_scatter&quot;</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">label_counts</span><span class="p">)):</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n_modules</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">,</span> <span class="n">n_modules</span><span class="p">),</span>
+                           <span class="n">label_counts</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                           <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span>
+                           <span class="n">s</span><span class="o">=</span><span class="mf">0.5</span>
+                           <span class="p">)</span>
+        <span class="k">elif</span> <span class="n">style</span><span class="o">==</span><span class="s2">&quot;bar_error&quot;</span><span class="p">:</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">errorbar</span><span class="p">(</span>
+                <span class="n">x</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n_modules</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                <span class="n">y</span><span class="o">=</span><span class="n">bar_heights</span><span class="p">,</span>
+                <span class="n">yerr</span><span class="o">=</span><span class="n">bar_sems</span><span class="p">,</span>
+                <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">,</span><span class="n">linewidth</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span>
+                <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span><span class="n">capsize</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">markeredgewidth</span><span class="o">=</span><span class="mf">0.75</span>
+            <span class="p">)</span>
+    <span class="k">elif</span> <span class="n">style</span><span class="o">==</span><span class="s2">&quot;points&quot;</span><span class="p">:</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">errorbar</span><span class="p">(</span>
+            <span class="n">x</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n_modules</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+            <span class="n">y</span><span class="o">=</span><span class="n">bar_heights</span><span class="p">,</span>
+            <span class="n">yerr</span><span class="o">=</span><span class="n">bar_sems</span><span class="p">,</span>
+            <span class="n">color</span><span class="o">=</span><span class="n">cmap</span><span class="p">([</span><span class="mf">0.1</span><span class="p">]),</span>
+            <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">,</span>
+            <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;o&quot;</span><span class="p">,</span><span class="n">markersize</span><span class="o">=</span><span class="mf">2.5</span><span class="p">,</span><span class="n">linewidth</span><span class="o">=</span><span class="mf">0.75</span><span class="p">,</span>
+            <span class="n">capsize</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">markeredgewidth</span><span class="o">=</span><span class="mf">0.75</span>
+        <span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;data_source&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39; Pose Label&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Frequency&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n_modules</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span> <span class="n">labelsize</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;font.size&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">fig</span></div>
+
+<div class="viewcode-block" id="plot_module_usage_subgroups"><a class="viewcode-back" href="../../plot.html#utils.plot.plot_module_usage_subgroups">[docs]</a><span class="k">def</span> <span class="nf">plot_module_usage_subgroups</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">labels_df</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">,</span> <span class="n">figW</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">figH</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+                                <span class="n">style</span><span class="o">=</span><span class="s2">&quot;bar_scatter&quot;</span><span class="p">,</span><span class="n">legend_pos</span><span class="o">=</span><span class="s2">&quot;inside&quot;</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;viridis_r&quot;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Plots the frequency of the pose modules occurring by group in the labels dataframe output by the label_counter function.</span>
+
+<span class="sd">    :param labels_df: dataframe output from analysis.label_counter</span>
+<span class="sd">    :param start: time in seconds to start dataframe from.</span>
+<span class="sd">    :param stop: time in seconds to stop dataframe at.</span>
+<span class="sd">    :param fps: frames per second of recording.</span>
+<span class="sd">    :param figW: figure width</span>
+<span class="sd">    :param figH:</span>
+<span class="sd">    :param style:</span>
+<span class="sd">    :return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1">#To get groupnames in order</span>
+    <span class="n">fps</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;fps&quot;</span><span class="p">])</span>
+    <span class="n">groupnames</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">added_groupnames</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="p">[</span><span class="n">header</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">header</span> <span class="ow">in</span> <span class="n">labels_df</span><span class="o">.</span><span class="n">columns</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="n">item</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">added_groupnames</span><span class="p">:</span>
+            <span class="n">groupnames</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+            <span class="n">added_groupnames</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+    <span class="n">n_groups</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">groupnames</span><span class="p">)</span>
+
+    <span class="c1"># Frames</span>
+    <span class="n">start_frame</span> <span class="o">=</span> <span class="n">start</span> <span class="o">*</span> <span class="n">fps</span>
+    <span class="n">stop_frame</span> <span class="o">=</span> <span class="n">stop</span> <span class="o">*</span> <span class="n">fps</span>
+    <span class="n">labels_df</span> <span class="o">=</span> <span class="n">labels_df</span><span class="p">[</span><span class="n">start_frame</span><span class="p">:</span><span class="n">stop_frame</span><span class="p">]</span>
+    <span class="n">total_frames</span> <span class="o">=</span> <span class="n">stop_frame</span> <span class="o">-</span> <span class="n">start_frame</span>
+    <span class="n">labels_flat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">labels_df</span><span class="p">)</span>
+    <span class="n">labels_flat</span> <span class="o">=</span> <span class="p">[</span><span class="n">item</span> <span class="k">for</span> <span class="n">sublist</span> <span class="ow">in</span> <span class="n">labels_flat</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">sublist</span><span class="p">]</span>
+    <span class="n">modules</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">labels_flat</span><span class="p">)</span>
+    <span class="n">modules_int</span><span class="o">=</span><span class="p">[]</span>
+    <span class="k">for</span> <span class="n">module</span> <span class="ow">in</span> <span class="n">modules</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">modules_int</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">module</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">modules_int</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">module</span><span class="p">))</span>
+    <span class="n">modules</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">modules_int</span><span class="p">)</span>
+    <span class="n">n_modules</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">modules</span><span class="p">)</span>
+
+    <span class="c1"># Label counting</span>
+    <span class="n">label_counts</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_groups</span><span class="p">):</span>
+        <span class="n">group_g_n</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">([</span><span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="n">groupnames</span><span class="p">[</span><span class="n">g</span><span class="p">]</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">labels_df</span><span class="o">.</span><span class="n">columns</span><span class="p">])</span>
+        <span class="n">label_counts_i</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">group_g_n</span><span class="p">,</span> <span class="n">n_modules</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">group_g_n</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_modules</span><span class="p">):</span>
+                <span class="n">module</span> <span class="o">=</span> <span class="n">modules</span><span class="p">[</span><span class="n">m</span><span class="p">]</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">module</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">(</span><span class="n">module</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                    <span class="k">pass</span>
+                <span class="n">label_counts_i</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">m</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span> \
+                                           <span class="p">(</span><span class="n">labels_df</span><span class="p">[</span><span class="n">groupnames</span><span class="p">[</span><span class="n">g</span><span class="p">]][</span>
+                                                <span class="p">[</span><span class="n">labels_df</span><span class="p">[</span><span class="n">groupnames</span><span class="p">[</span><span class="n">g</span><span class="p">]]</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">i</span><span class="p">]]]</span> <span class="o">==</span> <span class="n">module</span><span class="p">)</span> <span class="o">/</span> <span class="n">total_frames</span>
+        <span class="n">label_counts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">label_counts_i</span><span class="p">)</span>
+
+    <span class="n">bar_heights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">n_groups</span><span class="p">,</span> <span class="n">n_modules</span><span class="p">])</span>
+    <span class="n">bar_sems</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">n_groups</span><span class="p">,</span> <span class="n">n_modules</span><span class="p">])</span>
+
+    <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_groups</span><span class="p">):</span>
+        <span class="n">bar_heights</span><span class="p">[</span><span class="n">g</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">label_counts</span><span class="p">[</span><span class="n">g</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">bar_sems</span><span class="p">[</span><span class="n">g</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">label_counts</span><span class="p">[</span><span class="n">g</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">label_counts</span><span class="p">[</span><span class="n">g</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="n">figW</span><span class="p">,</span> <span class="n">figH</span><span class="p">),</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+    <span class="n">scale</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="n">n_groups</span> <span class="o">+</span> <span class="mf">.7</span><span class="p">)</span>
+    <span class="n">cmap</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">get_cmap</span><span class="p">(</span><span class="n">cmap</span><span class="p">)</span>
+    <span class="n">colors</span> <span class="o">=</span> <span class="p">[</span><span class="n">cmap</span><span class="p">([</span><span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="n">n_groups</span><span class="p">)]</span>
+    <span class="k">if</span> <span class="p">((</span><span class="n">style</span><span class="o">==</span><span class="s2">&quot;bar_scatter&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">style</span><span class="o">==</span><span class="s2">&quot;bar_error&quot;</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="n">style</span><span class="o">==</span><span class="s2">&quot;bar_scatter&quot;</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_groups</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">label_counts</span><span class="p">[</span><span class="n">g</span><span class="p">])):</span>
+                    <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span>
+                        <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span> <span class="o">+</span> <span class="n">scale</span> <span class="o">*</span> <span class="n">g</span><span class="p">,</span> <span class="n">n_modules</span> <span class="o">+</span> <span class="n">scale</span> <span class="o">*</span> <span class="n">g</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.1</span> <span class="o">*</span> <span class="n">scale</span><span class="p">,</span> <span class="n">n_modules</span><span class="p">),</span>
+                        <span class="n">label_counts</span><span class="p">[</span><span class="n">g</span><span class="p">][</span><span class="n">i</span><span class="p">],</span>
+                        <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span>
+                        <span class="n">s</span><span class="o">=</span><span class="mf">0.5</span>
+                        <span class="p">)</span>
+            <span class="n">bar_alpha</span><span class="o">=</span><span class="mf">0.5</span>
+        <span class="k">elif</span> <span class="n">style</span><span class="o">==</span><span class="s2">&quot;bar_error&quot;</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_groups</span><span class="p">):</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">errorbar</span><span class="p">(</span>
+                    <span class="n">x</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span> <span class="o">+</span> <span class="n">scale</span> <span class="o">*</span> <span class="n">g</span><span class="p">,</span> <span class="n">n_modules</span> <span class="o">+</span> <span class="n">scale</span> <span class="o">*</span> <span class="n">g</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                    <span class="n">y</span><span class="o">=</span><span class="n">bar_heights</span><span class="p">[</span><span class="n">g</span><span class="p">],</span>
+                    <span class="n">yerr</span><span class="o">=</span><span class="n">bar_sems</span><span class="p">[</span><span class="n">g</span><span class="p">],</span>
+                    <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">,</span><span class="n">linewidth</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span>
+                    <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span><span class="n">capsize</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span><span class="n">markeredgewidth</span><span class="o">=</span><span class="mf">0.75</span><span class="p">,</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.8</span>
+                <span class="p">)</span>
+            <span class="n">bar_alpha</span><span class="o">=</span><span class="mf">0.85</span>
+        <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_groups</span><span class="p">):</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span>
+                <span class="n">x</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span> <span class="o">+</span> <span class="n">scale</span> <span class="o">*</span> <span class="n">g</span><span class="p">,</span> <span class="n">n_modules</span> <span class="o">+</span> <span class="n">scale</span> <span class="o">*</span> <span class="n">g</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                <span class="n">height</span><span class="o">=</span><span class="n">bar_heights</span><span class="p">[</span><span class="n">g</span><span class="p">],</span>
+                <span class="n">width</span><span class="o">=</span><span class="n">scale</span><span class="p">,</span>
+                <span class="n">alpha</span><span class="o">=</span><span class="n">bar_alpha</span><span class="p">,</span>
+                <span class="n">color</span><span class="o">=</span><span class="n">colors</span><span class="p">[</span><span class="n">g</span><span class="p">],</span>
+                <span class="n">label</span><span class="o">=</span><span class="n">groupnames</span><span class="p">[</span><span class="n">g</span><span class="p">]</span>
+            <span class="p">)</span>
+    <span class="k">elif</span> <span class="n">style</span><span class="o">==</span><span class="s2">&quot;points&quot;</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_groups</span><span class="p">):</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">errorbar</span><span class="p">(</span>
+                <span class="n">x</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n_modules</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                <span class="n">y</span><span class="o">=</span><span class="n">bar_heights</span><span class="p">[</span><span class="n">g</span><span class="p">],</span>
+                <span class="n">yerr</span><span class="o">=</span><span class="n">bar_sems</span><span class="p">[</span><span class="n">g</span><span class="p">],</span>
+                <span class="n">color</span><span class="o">=</span><span class="n">colors</span><span class="p">[</span><span class="n">g</span><span class="p">],</span>
+                <span class="n">label</span><span class="o">=</span><span class="n">groupnames</span><span class="p">[</span><span class="n">g</span><span class="p">],</span>
+                <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">,</span>
+                <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;o&quot;</span><span class="p">,</span><span class="n">markersize</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span><span class="n">linewidth</span><span class="o">=</span><span class="mf">0.75</span><span class="p">,</span>
+                <span class="n">capsize</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">markeredgewidth</span><span class="o">=</span><span class="mf">0.75</span>
+            <span class="p">)</span>
+    <span class="k">if</span> <span class="n">legend_pos</span> <span class="o">==</span> <span class="s2">&quot;inside&quot;</span><span class="p">:</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+    <span class="k">elif</span> <span class="n">legend_pos</span> <span class="o">==</span> <span class="s2">&quot;outside&quot;</span><span class="p">:</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">bbox_to_anchor</span><span class="o">=</span><span class="p">(</span><span class="mf">1.05</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">loc</span><span class="o">=</span><span class="s1">&#39;upper left&#39;</span><span class="p">)</span>
+
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;data_source&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39; Pose Label&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Frequency&#39;</span><span class="p">)</span>
+    <span class="n">all_num_modules</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">([</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">module</span><span class="p">,</span><span class="nb">str</span><span class="p">)</span> <span class="k">for</span> <span class="n">module</span> <span class="ow">in</span> <span class="n">modules</span><span class="p">])</span><span class="o">==</span><span class="mi">0</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">all_num_modules</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">n_modules</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">((</span><span class="n">all_num_modules</span><span class="o">==</span><span class="kc">True</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">((</span><span class="n">n_modules</span><span class="o">&gt;=</span><span class="mi">20</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(((</span><span class="n">all_num_modules</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">n_modules</span><span class="o">&gt;=</span><span class="mi">20</span><span class="p">)))</span>
+    <span class="k">if</span> <span class="p">((</span><span class="n">all_num_modules</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">n_modules</span><span class="o">&gt;=</span><span class="mi">20</span><span class="p">)):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;DID IT&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;joe is cute&quot;</span><span class="p">)</span>
+        <span class="n">xticks</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n_modules</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">(</span><span class="n">xticks</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">(</span><span class="n">modules</span><span class="p">[</span><span class="n">xticks</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n_modules</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">(</span><span class="n">modules</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span> <span class="n">labelsize</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;font.size&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="mf">0.2</span> <span class="o">*</span> <span class="n">n_groups</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">fig</span></div>
+
+<div class="viewcode-block" id="plot_module_usage_stacked"><a class="viewcode-back" href="../../plot.html#utils.plot.plot_module_usage_stacked">[docs]</a><span class="k">def</span> <span class="nf">plot_module_usage_stacked</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">labels_df</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">,</span> <span class="n">figW</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">figH</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span><span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;viridis_r&quot;</span><span class="p">,</span><span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">alt_xticks</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Plots the frequency of the pose modules occurring by group in the labels dataframe output by the label_counter function.</span>
+
+<span class="sd">    :param labels_df: dataframe output from analysis.label_counter</span>
+<span class="sd">    :param start: time in seconds to start dataframe from.</span>
+<span class="sd">    :param stop: time in seconds to stop dataframe at.</span>
+<span class="sd">    :param fps: frames per second of recording.</span>
+<span class="sd">    :param figW: figure width</span>
+<span class="sd">    :param figH:</span>
+<span class="sd">    :param style:</span>
+<span class="sd">    :return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1">#To get groupnames in order</span>
+    <span class="n">fps</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;fps&quot;</span><span class="p">])</span>
+    <span class="n">groupnames</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">added_groupnames</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="p">[</span><span class="n">header</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">header</span> <span class="ow">in</span> <span class="n">labels_df</span><span class="o">.</span><span class="n">columns</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="n">item</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">added_groupnames</span><span class="p">:</span>
+            <span class="n">groupnames</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+            <span class="n">added_groupnames</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+    <span class="n">n_groups</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">groupnames</span><span class="p">)</span>
+
+    <span class="c1"># Frames</span>
+    <span class="n">start_frame</span> <span class="o">=</span> <span class="n">start</span> <span class="o">*</span> <span class="n">fps</span>
+    <span class="n">stop_frame</span> <span class="o">=</span> <span class="n">stop</span> <span class="o">*</span> <span class="n">fps</span>
+    <span class="n">labels_df</span> <span class="o">=</span> <span class="n">labels_df</span><span class="p">[</span><span class="n">start_frame</span><span class="p">:</span><span class="n">stop_frame</span><span class="p">]</span>
+    <span class="n">total_frames</span> <span class="o">=</span> <span class="n">stop_frame</span> <span class="o">-</span> <span class="n">start_frame</span>
+    <span class="n">labels_flat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">labels_df</span><span class="p">)</span>
+    <span class="n">labels_flat</span> <span class="o">=</span> <span class="p">[</span><span class="n">item</span> <span class="k">for</span> <span class="n">sublist</span> <span class="ow">in</span> <span class="n">labels_flat</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">sublist</span><span class="p">]</span>
+    <span class="n">modules</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">labels_flat</span><span class="p">)</span>
+    <span class="n">n_modules</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">modules</span><span class="p">)</span>
+
+    <span class="c1"># Label counting</span>
+    <span class="n">label_counts</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_groups</span><span class="p">):</span>
+        <span class="n">group_g_n</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">([</span><span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="n">groupnames</span><span class="p">[</span><span class="n">g</span><span class="p">]</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">labels_df</span><span class="o">.</span><span class="n">columns</span><span class="p">])</span>
+        <span class="n">label_counts_i</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">group_g_n</span><span class="p">,</span> <span class="n">n_modules</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">group_g_n</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_modules</span><span class="p">):</span>
+                <span class="n">module</span> <span class="o">=</span> <span class="n">modules</span><span class="p">[</span><span class="n">m</span><span class="p">]</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">module</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">(</span><span class="n">module</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                    <span class="k">pass</span>
+                <span class="n">label_counts_i</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">m</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span> \
+                                           <span class="p">(</span><span class="n">labels_df</span><span class="p">[</span><span class="n">groupnames</span><span class="p">[</span><span class="n">g</span><span class="p">]][</span>
+                                                <span class="p">[</span><span class="n">labels_df</span><span class="p">[</span><span class="n">groupnames</span><span class="p">[</span><span class="n">g</span><span class="p">]]</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">i</span><span class="p">]]]</span> <span class="o">==</span> <span class="n">module</span><span class="p">)</span> <span class="o">/</span> <span class="n">total_frames</span>
+        <span class="n">label_counts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">label_counts_i</span><span class="p">)</span>
+
+    <span class="n">bar_heights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">n_groups</span><span class="p">,</span> <span class="n">n_modules</span><span class="p">])</span>
+    <span class="n">bar_sems</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">n_groups</span><span class="p">,</span> <span class="n">n_modules</span><span class="p">])</span>
+
+    <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_groups</span><span class="p">):</span>
+        <span class="n">bar_heights</span><span class="p">[</span><span class="n">g</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">label_counts</span><span class="p">[</span><span class="n">g</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">bar_sems</span><span class="p">[</span><span class="n">g</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">label_counts</span><span class="p">[</span><span class="n">g</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">label_counts</span><span class="p">[</span><span class="n">g</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="n">figW</span><span class="p">,</span> <span class="n">figH</span><span class="p">),</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+    <span class="n">cmap</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">get_cmap</span><span class="p">(</span><span class="n">cmap</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">modules</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="n">c</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">bar_bottom</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_groups</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n_groups</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">bar_heights</span><span class="p">[:,</span> <span class="n">c</span><span class="p">],</span> <span class="n">bottom</span><span class="o">=</span><span class="n">bar_bottom</span><span class="p">,</span> <span class="n">align</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mf">0.99</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">spines</span><span class="p">[</span><span class="s1">&#39;top&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">bar_bottom</span> <span class="o">+=</span> <span class="n">bar_heights</span><span class="p">[:,</span> <span class="n">c</span><span class="p">]</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">spines</span><span class="p">[</span><span class="s1">&#39;right&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">spines</span><span class="p">[</span><span class="s1">&#39;top&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Proportion of Time </span><span class="se">\n</span><span class="s2">Spent in Pose Module&quot;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">([</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">n_groups</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">])</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n_groups</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">alt_xticks</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">(</span><span class="n">groupnames</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">(</span><span class="n">alt_xticks</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">title</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">modules</span><span class="p">,</span><span class="n">bbox_to_anchor</span><span class="o">=</span><span class="p">(</span><span class="mf">1.05</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">fig</span></div>
+
+
+<div class="viewcode-block" id="network_pairwise_comparison"><a class="viewcode-back" href="../../plot.html#utils.plot.network_pairwise_comparison">[docs]</a><span class="k">def</span> <span class="nf">network_pairwise_comparison</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">labels_df</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">groupnames</span><span class="p">,</span> <span class="n">scaling</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">include_labels</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;bwr&quot;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Plots network depiction of differences in pose module usage and transitions between two subgroups</span>
+
+<span class="sd">    :param labels_df: labels_df from label_counter_subgroups</span>
+<span class="sd">    :param start: time to start at in seconds</span>
+<span class="sd">    :param end: time to end at in seconds</span>
+<span class="sd">    :param groupnames: two groups to include in the 1-vs-1 comparison - order is important</span>
+<span class="sd">    :param fps: frames per second</span>
+<span class="sd">    :param scaling:</span>
+<span class="sd">    :param include_labels:</span>
+<span class="sd">    :param cmap: matplotlib colormap</span>
+<span class="sd">    :return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">fps</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;fps&quot;</span><span class="p">])</span>
+    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="n">groupnames</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot; vs. &quot;</span> <span class="o">+</span> <span class="n">groupnames</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+
+    <span class="n">t_min</span> <span class="o">=</span> <span class="o">-</span><span class="mi">3</span>
+    <span class="n">t_max</span> <span class="o">=</span> <span class="mi">3</span>
+
+    <span class="c1">#Count label occurences</span>
+    <span class="n">start_frame</span> <span class="o">=</span> <span class="n">start</span> <span class="o">*</span> <span class="n">fps</span>
+    <span class="n">stop_frame</span> <span class="o">=</span> <span class="n">end</span> <span class="o">*</span> <span class="n">fps</span>
+    <span class="n">labels_df</span> <span class="o">=</span> <span class="n">labels_df</span><span class="p">[</span><span class="n">start_frame</span><span class="p">:</span><span class="n">stop_frame</span><span class="p">]</span>
+    <span class="n">total_frames</span> <span class="o">=</span> <span class="n">stop_frame</span> <span class="o">-</span> <span class="n">start_frame</span>
+    <span class="n">labels_flat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">labels_df</span><span class="p">)</span>
+    <span class="n">labels_flat</span> <span class="o">=</span> <span class="p">[</span><span class="n">item</span> <span class="k">for</span> <span class="n">sublist</span> <span class="ow">in</span> <span class="n">labels_flat</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">sublist</span><span class="p">]</span>
+    <span class="n">modules</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">labels_flat</span><span class="p">)</span>
+    <span class="n">n_modules</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">modules</span><span class="p">)</span>
+    <span class="n">label_counts</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+        <span class="n">group_g_n</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">([</span><span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="n">groupnames</span><span class="p">[</span><span class="n">g</span><span class="p">]</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">labels_df</span><span class="o">.</span><span class="n">columns</span><span class="p">])</span>
+        <span class="n">label_counts_i</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">group_g_n</span><span class="p">,</span> <span class="n">n_modules</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">group_g_n</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_modules</span><span class="p">):</span>
+                <span class="n">label_counts_i</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">m</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span> \
+                                           <span class="p">(</span><span class="n">labels_df</span><span class="p">[</span><span class="n">groupnames</span><span class="p">[</span><span class="n">g</span><span class="p">]][</span>
+                                                <span class="p">[</span><span class="n">labels_df</span><span class="p">[</span><span class="n">groupnames</span><span class="p">[</span><span class="n">g</span><span class="p">]]</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">i</span><span class="p">]]]</span> <span class="o">==</span> <span class="n">m</span><span class="p">)</span> <span class="o">/</span> <span class="n">total_frames</span>
+        <span class="n">label_counts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">label_counts_i</span><span class="p">)</span>
+    <span class="n">modulefreqs_t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_modules</span><span class="p">)</span>
+    <span class="n">modulefreqs_p</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_modules</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_modules</span><span class="p">):</span>
+        <span class="n">clust_i_control</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="n">m</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">label_counts</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+        <span class="n">clust_i_exp</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="n">m</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">label_counts</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
+        <span class="n">modulefreqs_t</span><span class="p">[</span><span class="n">m</span><span class="p">]</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">ttest_ind</span><span class="p">(</span><span class="n">clust_i_control</span><span class="p">,</span> <span class="n">clust_i_exp</span><span class="p">)</span><span class="o">.</span><span class="n">statistic</span>
+        <span class="n">modulefreqs_p</span><span class="p">[</span><span class="n">m</span><span class="p">]</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">ttest_ind</span><span class="p">(</span><span class="n">clust_i_control</span><span class="p">,</span> <span class="n">clust_i_exp</span><span class="p">)</span><span class="o">.</span><span class="n">pvalue</span>
+        <span class="k">if</span> <span class="n">modulefreqs_p</span><span class="p">[</span><span class="n">m</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mf">0.05</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;P-value for cluster &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">m</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; difference is &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span>
+                <span class="nb">round</span><span class="p">(</span><span class="n">modulefreqs_p</span><span class="p">[</span><span class="n">m</span><span class="p">],</span> <span class="mi">4</span><span class="p">))</span> <span class="o">+</span> <span class="s2">&quot;; t score is &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">modulefreqs_t</span><span class="p">[</span><span class="n">m</span><span class="p">],</span> <span class="mi">4</span><span class="p">)))</span>
+
+    <span class="c1"># transitions</span>
+    <span class="n">transition_matrix_grp1</span><span class="p">,</span> <span class="n">transition_matrix_grp2</span> <span class="o">=</span> <span class="n">transition_counter</span><span class="p">(</span><span class="n">labels_df</span><span class="p">,</span> <span class="n">groupnames</span><span class="p">)</span>
+    <span class="n">transition_t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">n_modules</span><span class="p">,</span> <span class="n">n_modules</span><span class="p">])</span>
+    <span class="n">transition_t_abs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">n_modules</span><span class="p">,</span> <span class="n">n_modules</span><span class="p">])</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_modules</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_modules</span><span class="p">):</span>
+            <span class="n">transition_matrix_grp1_ij</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">transition_matrix_grp1</span><span class="p">)]</span>
+            <span class="n">transition_matrix_grp2_ij</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">transition_matrix_grp2</span><span class="p">)]</span>
+            <span class="n">transition_t</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">ttest_ind</span><span class="p">(</span><span class="n">transition_matrix_grp1_ij</span><span class="p">,</span> <span class="n">transition_matrix_grp2_ij</span><span class="p">)</span><span class="o">.</span><span class="n">statistic</span>
+            <span class="n">pval_i</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">ttest_ind</span><span class="p">(</span><span class="n">transition_matrix_grp1_ij</span><span class="p">,</span> <span class="n">transition_matrix_grp2_ij</span><span class="p">)</span><span class="o">.</span><span class="n">pvalue</span>
+            <span class="k">if</span> <span class="n">pval_i</span> <span class="o">&lt;</span> <span class="mf">0.05</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;P-value for transition from cluster &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">+</span>
+                      <span class="s2">&quot; to cluster &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">j</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; is &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">pval_i</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span> <span class="o">+</span> <span class="s2">&quot;; t score is &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span>
+                    <span class="nb">round</span><span class="p">(</span><span class="n">transition_t</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">],</span> <span class="mi">4</span><span class="p">)))</span>
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">transition_t</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">])</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="n">transition_t</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">transition_t_abs</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">absolute</span><span class="p">(</span><span class="n">transition_t</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">])</span>
+    <span class="n">transition_t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">transition_t</span><span class="p">)</span>
+    <span class="n">G</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">from_numpy_array</span><span class="p">(</span><span class="n">transition_t</span><span class="p">,</span> <span class="n">parallel_edges</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">edges</span> <span class="o">=</span> <span class="n">G</span><span class="o">.</span><span class="n">edges</span><span class="p">()</span>
+    <span class="n">pos</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">circular_layout</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+    <span class="n">weights</span> <span class="o">=</span> <span class="p">[</span><span class="n">G</span><span class="p">[</span><span class="n">u</span><span class="p">][</span><span class="n">v</span><span class="p">][</span><span class="s1">&#39;weight&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">u</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">edges</span><span class="p">]</span>
+    <span class="n">colormap</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">get_cmap</span><span class="p">(</span><span class="n">cmap</span><span class="p">)</span>
+    <span class="n">colors</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">weights</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="n">weights</span><span class="p">[</span><span class="n">w</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">col_w</span> <span class="o">=</span> <span class="n">colormap</span><span class="p">([</span><span class="mf">0.95</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="n">weights</span><span class="p">[</span><span class="n">w</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">col_w</span> <span class="o">=</span> <span class="n">colormap</span><span class="p">([</span><span class="mf">0.05</span><span class="p">])</span>
+        <span class="n">colors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">col_w</span><span class="p">)</span>
+    <span class="n">G</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">from_numpy_array</span><span class="p">(</span><span class="n">transition_t_abs</span> <span class="o">*</span> <span class="mi">5000</span><span class="p">,</span> <span class="n">parallel_edges</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">edges</span> <span class="o">=</span> <span class="n">G</span><span class="o">.</span><span class="n">edges</span><span class="p">()</span>
+    <span class="n">pos</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">circular_layout</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+    <span class="n">scaling</span> <span class="o">=</span> <span class="n">scaling</span><span class="o">/</span><span class="n">n_modules</span>
+    <span class="n">weights</span> <span class="o">=</span> <span class="p">[</span><span class="n">G</span><span class="p">[</span><span class="n">u</span><span class="p">][</span><span class="n">v</span><span class="p">][</span><span class="s1">&#39;weight&#39;</span><span class="p">]</span><span class="o">*</span><span class="n">scaling</span><span class="o">*</span><span class="mi">5</span> <span class="k">for</span> <span class="n">u</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">edges</span><span class="p">]</span>
+    <span class="n">weights</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span> <span class="o">/</span> <span class="mi">4000</span><span class="p">)</span>
+    <span class="n">labels</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">plot</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">draw_circular</span><span class="p">(</span><span class="n">G</span><span class="p">,</span>
+                            <span class="n">node_color</span><span class="o">=</span><span class="n">modulefreqs_t</span><span class="p">,</span>
+                            <span class="n">cmap</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">get_cmap</span><span class="p">(</span><span class="n">cmap</span><span class="p">),</span>
+                            <span class="n">vmin</span><span class="o">=-</span><span class="mi">3</span><span class="p">,</span>
+                            <span class="n">vmax</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+                            <span class="n">node_size</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">absolute</span><span class="p">(</span><span class="n">modulefreqs_t</span><span class="p">)</span> <span class="o">*</span> <span class="mi">1000</span> <span class="o">*</span> <span class="n">scaling</span><span class="p">,</span>
+                            <span class="n">edge_color</span><span class="o">=</span><span class="n">colors</span><span class="p">,</span>
+                            <span class="n">edgecolors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                            <span class="n">with_labels</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>  <span class="c1"># Keep this as True to display node labels</span>
+                            <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span>
+                            <span class="n">font_size</span><span class="o">=</span><span class="mi">500</span><span class="o">*</span><span class="n">scaling</span><span class="p">,</span>
+                            <span class="n">font_weight</span><span class="o">=</span><span class="s2">&quot;bold&quot;</span><span class="p">,</span>
+                            <span class="n">font_color</span><span class="o">=</span><span class="s2">&quot;white&quot;</span><span class="p">,</span>
+                            <span class="n">width</span><span class="o">=</span><span class="n">weights</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">include_labels</span><span class="o">==</span><span class="kc">True</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_modules</span><span class="p">):</span>
+            <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">pos</span><span class="p">[</span><span class="n">m</span><span class="p">]</span>
+            <span class="n">label</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+            <span class="n">label_font_size</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">30</span> <span class="o">*</span> <span class="n">scaling</span> <span class="o">*</span> <span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">modulefreqs_t</span><span class="p">[</span><span class="n">m</span><span class="p">])</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;white&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="n">label_font_size</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s2">&quot;bold&quot;</span><span class="p">,</span> <span class="n">ha</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span> <span class="n">va</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">)</span>
+
+    <span class="n">sm</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">ScalarMappable</span><span class="p">(</span><span class="n">cmap</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">get_cmap</span><span class="p">(</span><span class="n">cmap</span><span class="p">),</span> <span class="n">norm</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">Normalize</span><span class="p">(</span><span class="n">vmin</span><span class="o">=</span><span class="n">t_min</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="n">t_max</span><span class="p">))</span>
+    <span class="n">sm</span><span class="o">.</span><span class="n">set_array</span><span class="p">([])</span>
+    <span class="n">cbar</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">sm</span><span class="p">,</span> <span class="n">shrink</span><span class="o">=</span><span class="mf">0.7</span><span class="p">)</span>
+    <span class="n">cbar</span><span class="o">.</span><span class="n">set_label</span><span class="p">(</span><span class="s1">&#39;t-score&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">margins</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mf">0.4</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">0.4</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">fig</span></div>
+
+
+<div class="viewcode-block" id="transition_counter"><a class="viewcode-back" href="../../plot.html#utils.plot.transition_counter">[docs]</a><span class="k">def</span> <span class="nf">transition_counter</span><span class="p">(</span><span class="n">labels_df</span><span class="p">,</span> <span class="n">groupnames</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generates a Pandas dataframe containing transitions within the labels df.</span>
+
+<span class="sd">    :param labels_df:</span>
+<span class="sd">    :param groupnames:</span>
+<span class="sd">    :return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">unique_values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">labels_df</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+    <span class="n">transition_matrix_grp1</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">transition_matrix_grp2</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">groupnames</span><span class="p">)):</span>
+        <span class="n">labels_df_g</span> <span class="o">=</span> <span class="n">labels_df</span><span class="p">[</span><span class="n">groupnames</span><span class="p">[</span><span class="n">g</span><span class="p">]]</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">labels_df_g</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+            <span class="n">transition_matrix_g</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">unique_values</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">unique_values</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">labels_df_g</span><span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">labels_df_g</span><span class="p">)[</span><span class="n">c</span><span class="p">]])</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="n">from_value</span> <span class="o">=</span> <span class="n">labels_df_g</span><span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">labels_df_g</span><span class="p">)[</span><span class="n">c</span><span class="p">]][</span><span class="n">i</span><span class="p">]</span>
+                <span class="n">to_value</span> <span class="o">=</span> <span class="n">labels_df_g</span><span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">labels_df_g</span><span class="p">)[</span><span class="n">c</span><span class="p">]][</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+                <span class="n">transition_matrix_g</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">from_value</span><span class="p">,</span> <span class="n">to_value</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">fill_diagonal</span><span class="p">(</span><span class="n">transition_matrix_g</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">g</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">transition_matrix_grp1</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">transition_matrix_g</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">g</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">transition_matrix_grp2</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">transition_matrix_g</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">transition_matrix_grp1</span><span class="p">,</span> <span class="n">transition_matrix_grp2</span></div>
+
+<span class="k">def</span> <span class="nf">moving_average</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">w</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">convolve</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">w</span><span class="p">),</span> <span class="s1">&#39;valid&#39;</span><span class="p">)</span> <span class="o">/</span> <span class="n">w</span>
+
+<div class="viewcode-block" id="SandPlotClusterFrequency_OverTime"><a class="viewcode-back" href="../../plot.html#utils.plot.SandPlotClusterFrequency_OverTime">[docs]</a><span class="k">def</span> <span class="nf">SandPlotClusterFrequency_OverTime</span><span class="p">(</span><span class="n">config</span><span class="p">,</span>
+                                      <span class="n">labels_df</span><span class="p">,</span>
+                                      <span class="n">start</span><span class="p">,</span>
+                                      <span class="n">time_per_block</span><span class="p">,</span>
+                                      <span class="n">n_blocks</span><span class="p">,</span>
+                                      <span class="n">figW</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span> <span class="n">figH</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+                                      <span class="n">posenames</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                      <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                      <span class="n">convolve</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+                                      <span class="n">legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                      <span class="n">plottype</span><span class="o">=</span><span class="s1">&#39;area&#39;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Plots usage of pose modules over time within a session</span>
+
+<span class="sd">    :param labels_df:</span>
+<span class="sd">    :param start: time to start at in seconds</span>
+<span class="sd">    :param time_per_block: time per block in seconds</span>
+<span class="sd">    :param fps: frames per second</span>
+<span class="sd">    :param n_blocks:</span>
+<span class="sd">    :param figW:</span>
+<span class="sd">    :param figH:</span>
+<span class="sd">    :param posenames:</span>
+<span class="sd">    :param title:</span>
+<span class="sd">    :param convolve:</span>
+<span class="sd">    :param legend:</span>
+<span class="sd">    :param plottype:</span>
+<span class="sd">    :param saveplots:</span>
+<span class="sd">    :param savename:</span>
+<span class="sd">    :return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">fps</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;fps&quot;</span><span class="p">])</span>
+    <span class="n">n_samples</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">labels_df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+    <span class="n">labels_flat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">labels_df</span><span class="p">)</span>
+    <span class="n">labels_flat</span> <span class="o">=</span> <span class="p">[</span><span class="n">item</span> <span class="k">for</span> <span class="n">sublist</span> <span class="ow">in</span> <span class="n">labels_flat</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">sublist</span><span class="p">]</span>
+    <span class="n">modules</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">labels_flat</span><span class="p">)</span>
+    <span class="n">n_modules</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">modules</span><span class="p">)</span>
+    <span class="n">block_labels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">n_samples</span><span class="p">,</span> <span class="n">n_modules</span><span class="p">,</span> <span class="n">n_blocks</span><span class="p">])</span>
+    <span class="n">block_labels_normal</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">n_samples</span><span class="p">,</span> <span class="n">n_modules</span><span class="p">,</span> <span class="n">n_blocks</span><span class="p">])</span>
+    <span class="n">frames_per_block</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">fps</span> <span class="o">*</span> <span class="n">time_per_block</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_samples</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_blocks</span><span class="p">):</span>
+            <span class="n">new_start</span> <span class="o">=</span> <span class="n">start</span> <span class="o">+</span> <span class="n">b</span> <span class="o">*</span> <span class="n">frames_per_block</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">labels_df</span><span class="p">[</span><span class="n">labels_df</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">i</span><span class="p">]][</span><span class="n">new_start</span><span class="p">:</span><span class="n">new_start</span> <span class="o">+</span> <span class="n">frames_per_block</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">m</span><span class="p">,</span> <span class="n">module</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">modules</span><span class="p">):</span>
+                <span class="n">block_labels</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">b</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">x</span> <span class="o">==</span> <span class="n">module</span><span class="p">)</span>
+                <span class="n">block_labels_normal</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">b</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">x</span> <span class="o">==</span> <span class="n">module</span><span class="p">)</span> <span class="o">/</span> <span class="n">frames_per_block</span>
+
+    <span class="n">bar_heights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">n_blocks</span><span class="p">,</span> <span class="n">n_modules</span><span class="p">])</span>
+    <span class="n">bar_heights_normal</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">n_blocks</span><span class="p">,</span> <span class="n">n_modules</span><span class="p">])</span>
+    <span class="n">bar_stds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">n_blocks</span><span class="p">,</span> <span class="n">n_modules</span><span class="p">])</span>
+    <span class="n">bar_stds_normal</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">n_blocks</span><span class="p">,</span> <span class="n">n_modules</span><span class="p">])</span>
+
+    <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_blocks</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_modules</span><span class="p">):</span>
+            <span class="n">bar_heights</span><span class="p">[</span><span class="n">r</span><span class="p">,</span> <span class="n">q</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">block_labels</span><span class="p">[:,</span> <span class="n">q</span><span class="p">,</span> <span class="n">r</span><span class="p">])</span>
+            <span class="n">bar_stds</span><span class="p">[</span><span class="n">r</span><span class="p">,</span> <span class="n">q</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">block_labels</span><span class="p">[:,</span> <span class="n">q</span><span class="p">,</span> <span class="n">r</span><span class="p">])</span>
+            <span class="n">bar_heights_normal</span><span class="p">[</span><span class="n">r</span><span class="p">,</span> <span class="n">q</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">block_labels_normal</span><span class="p">[:,</span> <span class="n">q</span><span class="p">,</span> <span class="n">r</span><span class="p">])</span>
+            <span class="n">bar_stds_normal</span><span class="p">[</span><span class="n">r</span><span class="p">,</span> <span class="n">q</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">block_labels_normal</span><span class="p">[:,</span> <span class="n">q</span><span class="p">,</span> <span class="n">r</span><span class="p">])</span>
+
+    <span class="k">if</span> <span class="n">plottype</span> <span class="o">==</span> <span class="s1">&#39;line&#39;</span><span class="p">:</span>
+        <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="n">figW</span><span class="p">,</span> <span class="n">figH</span><span class="p">),</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+        <span class="n">scale</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="n">n_blocks</span> <span class="o">+</span> <span class="mf">.7</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_modules</span><span class="p">):</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">moving_average</span><span class="p">(</span><span class="n">bar_heights_normal</span><span class="p">[:,</span> <span class="n">r</span><span class="p">],</span> <span class="n">convolve</span><span class="p">))</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n_blocks</span> <span class="o">-</span> <span class="n">convolve</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                             <span class="n">moving_average</span><span class="p">(</span><span class="n">bar_heights_normal</span><span class="p">[:,</span> <span class="n">r</span><span class="p">]</span> <span class="o">+</span> <span class="n">bar_stds_normal</span><span class="p">[:,</span> <span class="n">r</span><span class="p">]</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">n_samples</span><span class="p">),</span>
+                                            <span class="n">convolve</span><span class="p">),</span>
+                             <span class="n">moving_average</span><span class="p">(</span><span class="n">bar_heights_normal</span><span class="p">[:,</span> <span class="n">r</span><span class="p">]</span> <span class="o">-</span> <span class="n">bar_stds_normal</span><span class="p">[:,</span> <span class="n">r</span><span class="p">]</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">n_samples</span><span class="p">),</span>
+                                            <span class="n">convolve</span><span class="p">),</span>
+                             <span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">legend</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">posenames</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">([</span><span class="nb">type</span><span class="p">(</span><span class="n">m</span><span class="p">)</span><span class="o">!=</span><span class="nb">int</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">modules</span><span class="p">])</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+                    <span class="n">posenames</span><span class="o">=</span><span class="n">modules</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">posenames</span> <span class="o">=</span> <span class="p">[]</span>
+                    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_modules</span><span class="p">):</span>
+                        <span class="n">posenames</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Pose &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">posenames</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="s2">&quot;upper right&quot;</span><span class="p">,</span> <span class="n">bbox_to_anchor</span><span class="o">=</span><span class="p">(</span><span class="mf">1.25</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">posenames</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="s2">&quot;upper right&quot;</span><span class="p">,</span> <span class="n">bbox_to_anchor</span><span class="o">=</span><span class="p">(</span><span class="mf">1.25</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">))</span>
+
+        <span class="n">scale</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="n">n_modules</span> <span class="o">+</span> <span class="mf">.7</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Time (minutes)&#39;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Moving Average Proportion of </span><span class="se">\n</span><span class="s1">Time Spent in Pose&#39;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">([</span><span class="o">-</span><span class="mf">0.03</span><span class="p">,</span> <span class="mf">1.03</span><span class="p">])</span>
+
+    <span class="k">elif</span> <span class="n">plottype</span> <span class="o">==</span> <span class="s1">&#39;area&#39;</span><span class="p">:</span>
+        <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="n">figW</span><span class="p">,</span> <span class="n">figH</span><span class="p">),</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+        <span class="n">bar_heights_moving_average</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">n_blocks</span> <span class="o">-</span> <span class="n">convolve</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">n_modules</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_modules</span><span class="p">):</span>
+            <span class="n">bar_heights_moving_average</span><span class="p">[:,</span> <span class="n">r</span><span class="p">]</span> <span class="o">=</span> <span class="n">moving_average</span><span class="p">(</span><span class="n">bar_heights_normal</span><span class="p">[:,</span> <span class="n">r</span><span class="p">],</span> <span class="n">convolve</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">stackplot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">bar_heights_moving_average</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">),</span> <span class="n">bar_heights_moving_average</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n_blocks</span> <span class="o">-</span> <span class="n">convolve</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Time (minutes)&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Moving Average Proportion </span><span class="se">\n</span><span class="s1">of Time Spent in Pose&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">legend</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">posenames</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">([</span><span class="nb">type</span><span class="p">(</span><span class="n">m</span><span class="p">)</span><span class="o">!=</span><span class="nb">int</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">modules</span><span class="p">])</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+                    <span class="n">posenames</span><span class="o">=</span><span class="n">modules</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">posenames</span> <span class="o">=</span> <span class="p">[]</span>
+                    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_modules</span><span class="p">):</span>
+                        <span class="n">posenames</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Pose &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">posenames</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="s2">&quot;upper right&quot;</span><span class="p">,</span> <span class="n">bbox_to_anchor</span><span class="o">=</span><span class="p">(</span><span class="mf">1.25</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">posenames</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="s2">&quot;upper right&quot;</span><span class="p">,</span> <span class="n">bbox_to_anchor</span><span class="o">=</span><span class="p">(</span><span class="mf">1.25</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">))</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">title</span><span class="o">!=</span><span class="kc">None</span><span class="p">:</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">fig</span></div>
+
+
+<div class="viewcode-block" id="plot_dist_bins"><a class="viewcode-back" href="../../plot.html#utils.plot.plot_dist_bins">[docs]</a><span class="k">def</span> <span class="nf">plot_dist_bins</span><span class="p">(</span><span class="n">dist_df</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;viridis&quot;</span><span class="p">,</span> <span class="n">plottype</span><span class="o">=</span><span class="s2">&quot;band&quot;</span><span class="p">,</span> <span class="n">figW</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">figH</span><span class="o">=</span><span class="mi">3</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Plots distance of a keypoint either over time or in bins from dist_df (output of analysis.dist_df_subgroups)</span>
+
+<span class="sd">    :param dist_df: dist_df output from analysis.dist_df_subgroups</span>
+<span class="sd">    :param cmap: matplotlib colormap</span>
+<span class="sd">    :param plottype: type of plot (&quot;band&quot;, &quot;errorbar&quot;, or &quot;bar&quot; if no timebins)</span>
+<span class="sd">    :param figW: figure width</span>
+<span class="sd">    :param figH: figure height</span>
+<span class="sd">    :return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="n">figW</span><span class="p">,</span> <span class="n">figH</span><span class="p">),</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+    <span class="n">groups</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">([</span><span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">dist_df</span><span class="o">.</span><span class="n">columns</span><span class="p">])</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
+    <span class="n">n_groups</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">groups</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">dist_df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">plottype</span> <span class="o">=</span> <span class="s2">&quot;bar&quot;</span>
+    <span class="n">cmap</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">get_cmap</span><span class="p">(</span><span class="n">cmap</span><span class="p">)</span>
+    <span class="n">colors</span> <span class="o">=</span> <span class="p">[</span><span class="n">cmap</span><span class="p">([</span><span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">n_groups</span><span class="p">)]</span>
+    <span class="n">xticks</span> <span class="o">=</span> <span class="n">dist_df</span><span class="o">.</span><span class="n">index</span>
+    <span class="k">for</span> <span class="n">g</span><span class="p">,</span> <span class="n">group</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">groups</span><span class="p">):</span>
+        <span class="n">sub_df</span> <span class="o">=</span> <span class="n">dist_df</span><span class="p">[</span><span class="n">group</span><span class="p">]</span>
+        <span class="n">group_mean</span> <span class="o">=</span> <span class="n">sub_df</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">group_sem</span> <span class="o">=</span> <span class="n">sub_df</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">sub_df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">plottype</span> <span class="o">==</span> <span class="s2">&quot;errorbar&quot;</span><span class="p">:</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">errorbar</span><span class="p">(</span><span class="n">xticks</span><span class="p">,</span> <span class="n">group_mean</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">group</span><span class="p">,</span> <span class="n">yerr</span><span class="o">=</span><span class="n">group_sem</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;o&quot;</span><span class="p">,</span> <span class="n">capsize</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">colors</span><span class="p">[</span><span class="n">g</span><span class="p">])</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Time (m)&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">plottype</span> <span class="o">==</span> <span class="s2">&quot;band&quot;</span><span class="p">:</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">xticks</span><span class="p">,</span> <span class="n">group_mean</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">group</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;o&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">colors</span><span class="p">[</span><span class="n">g</span><span class="p">])</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span><span class="n">xticks</span><span class="p">,</span> <span class="n">group_mean</span> <span class="o">-</span> <span class="n">group_sem</span><span class="p">,</span> <span class="n">group_mean</span> <span class="o">+</span> <span class="n">group_sem</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">colors</span><span class="p">[</span><span class="n">g</span><span class="p">],</span>
+                            <span class="n">edgecolor</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Time (m)&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">plottype</span> <span class="o">==</span> <span class="s2">&quot;bar&quot;</span><span class="p">:</span>
+            <span class="n">xticks</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n_groups</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">xticks</span><span class="p">[</span><span class="n">g</span><span class="p">],</span> <span class="n">group_mean</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">colors</span><span class="p">[</span><span class="n">g</span><span class="p">],</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.6</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">errorbar</span><span class="p">(</span><span class="n">xticks</span><span class="p">[</span><span class="n">g</span><span class="p">],</span> <span class="n">group_mean</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">group</span><span class="p">,</span> <span class="n">yerr</span><span class="o">=</span><span class="n">group_sem</span><span class="p">,</span> <span class="n">capsize</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span>
+                        <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">g</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">groups</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">(</span><span class="n">xticks</span><span class="p">)</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">(</span><span class="n">groups</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Locomotion (pix)&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">fig</span></div>
+
+<div class="viewcode-block" id="plot_lda"><a class="viewcode-back" href="../../plot.html#utils.plot.plot_lda">[docs]</a><span class="k">def</span> <span class="nf">plot_lda</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">lda_result</span><span class="p">,</span> <span class="n">selected_subgroups</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">,</span>
+             <span class="n">figW</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">figH</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">titletype</span><span class="o">=</span><span class="s2">&quot;informative&quot;</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;jet&quot;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Plot LDA embeddings</span>
+
+<span class="sd">    :param config: config file</span>
+<span class="sd">    :param lda: lda from lda_labels_timebins()</span>
+<span class="sd">    :param lda_embeddings: embeddings from lda_labels_timebins()</span>
+<span class="sd">    :param group_labels: group_labels from lda_labels_timebins()</span>
+<span class="sd">    :param nbins: number of bins from lda_labels_timebins()</span>
+<span class="sd">    :param binsize: binsize</span>
+<span class="sd">    :param selected_subgroups: which subgroups to plot</span>
+<span class="sd">    :param figW: width of the figure</span>
+<span class="sd">    :param figH: height of the figure</span>
+<span class="sd">    :param titletype: type of title - options are &quot;informative&quot;, &quot;uninformative&quot;</span>
+<span class="sd">    :param cmap: matplotlib colormap</span>
+<span class="sd">    :return: figure</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">selected_subgroups</span><span class="o">==</span><span class="s2">&quot;all&quot;</span><span class="p">:</span>
+        <span class="n">selected_subgroups</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;subgroups&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+    <span class="n">n_groups</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">selected_subgroups</span><span class="p">)</span>
+    <span class="n">cmap</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">get_cmap</span><span class="p">(</span><span class="n">cmap</span><span class="p">)</span>
+    <span class="n">colors</span> <span class="o">=</span> <span class="p">[</span><span class="n">cmap</span><span class="p">([</span><span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">selected_subgroups</span><span class="p">))]</span>
+    <span class="n">LD1</span> <span class="o">=</span> <span class="n">lda_result</span><span class="o">.</span><span class="n">lda_embeddings</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">LD2</span> <span class="o">=</span> <span class="n">lda_result</span><span class="o">.</span><span class="n">lda_embeddings</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="n">figW</span><span class="p">,</span> <span class="n">figH</span><span class="p">),</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">lda_result</span><span class="o">.</span><span class="n">group_labels</span><span class="p">)):</span>
+        <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_groups</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">lda_result</span><span class="o">.</span><span class="n">group_labels</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="n">r</span><span class="p">:</span>
+                <span class="n">LD1_i</span> <span class="o">=</span> <span class="n">LD1</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                <span class="n">LD2_i</span> <span class="o">=</span> <span class="n">LD2</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">LD1_i</span><span class="p">,</span> <span class="n">LD2_i</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="n">colors</span><span class="p">[</span><span class="n">r</span><span class="p">],</span> <span class="n">s</span><span class="o">=</span><span class="mi">23</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;o&quot;</span><span class="p">)</span>
+    <span class="n">leg</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">selected_subgroups</span><span class="p">,</span> <span class="n">bbox_to_anchor</span><span class="o">=</span><span class="p">(</span><span class="mf">1.05</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">loc</span><span class="o">=</span><span class="s1">&#39;upper left&#39;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_groups</span><span class="p">):</span>
+        <span class="n">leg</span><span class="o">.</span><span class="n">legendHandles</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">set_color</span><span class="p">(</span><span class="n">colors</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;LD1 (&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="mi">1000</span> <span class="o">*</span> <span class="n">lda_result</span><span class="o">.</span><span class="n">lda</span><span class="o">.</span><span class="n">explained_variance_ratio_</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="mi">10</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;% Variance Explained)&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;LD2 (&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="mi">1000</span> <span class="o">*</span> <span class="n">lda_result</span><span class="o">.</span><span class="n">lda</span><span class="o">.</span><span class="n">explained_variance_ratio_</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="mi">10</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;% Variance Explained)&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">titletype</span> <span class="o">==</span> <span class="s2">&quot;uninformative&quot;</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Linear Discriminant Analysis</span><span class="se">\n</span><span class="s2"> with Time Bins&quot;</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s2">&quot;bold&quot;</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">titletype</span> <span class="o">==</span> <span class="s2">&quot;informative&quot;</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="s2">&quot;Linear Discriminant Analysis</span><span class="se">\n</span><span class="s2"> with &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">lda_result</span><span class="o">.</span><span class="n">nbins</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">lda_result</span><span class="o">.</span><span class="n">binsize</span> <span class="o">/</span> <span class="mi">60</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;-min time bins&quot;</span><span class="p">),</span>
+                  <span class="n">fontweight</span><span class="o">=</span><span class="s2">&quot;bold&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">fig</span></div>
+
+
+<div class="viewcode-block" id="plot_conf_mat"><a class="viewcode-back" href="../../plot.html#utils.plot.plot_conf_mat">[docs]</a><span class="k">def</span> <span class="nf">plot_conf_mat</span><span class="p">(</span><span class="n">lda_result</span><span class="p">,</span> <span class="n">figW</span><span class="o">=</span><span class="mf">2.5</span><span class="p">,</span><span class="n">figH</span><span class="o">=</span><span class="mf">2.5</span><span class="p">,</span><span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;Greens&quot;</span><span class="p">,</span><span class="n">alt_title</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generate a confusion matrix plot</span>
+
+<span class="sd">    :param confusion: the confusion matrix from sklearn</span>
+<span class="sd">    :param class_num: the classes (as integers)</span>
+<span class="sd">    :param class_labels: the classes (string names)</span>
+<span class="sd">    :param figW: figure width</span>
+<span class="sd">    :param figH: figure height</span>
+<span class="sd">    :param cmap: colormap</span>
+<span class="sd">    :param alt_title: title other than confusion matrix</span>
+<span class="sd">    :return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="n">figW</span><span class="p">,</span> <span class="n">figH</span><span class="p">),</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">lda_result</span><span class="o">.</span><span class="n">loocv_confmat</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">)</span>
+    <span class="n">class_labels</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">lda_result</span><span class="o">.</span><span class="n">group_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+    <span class="n">ticks</span><span class="o">=</span><span class="p">[</span><span class="n">lda_result</span><span class="o">.</span><span class="n">group_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">class_labels</span><span class="p">]</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">ticks</span><span class="p">,</span> <span class="n">class_labels</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">yticks</span><span class="p">(</span><span class="n">ticks</span><span class="p">,</span> <span class="n">class_labels</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">class_labels</span><span class="p">)):</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">class_labels</span><span class="p">)):</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">lda_result</span><span class="o">.</span><span class="n">loocv_confmat</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">])),</span> <span class="n">ha</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">,</span> <span class="n">va</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Predicted Dose Label&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;True Dose Label&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">alt_title</span><span class="o">==</span><span class="kc">False</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Confusion Matrix&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="n">alt_title</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">fig</span></div>
+
+
+<span class="c1"># def plot_conf_mat(confusion, class_num, class_labels, figW=2.5,figH=2.5,cmap=&quot;Greens&quot;,alt_title=False):</span>
+<span class="c1">#     &quot;&quot;&quot;</span>
+<span class="c1">#     Generate a confusion matrix plot</span>
+<span class="c1">#     :param confusion: the confusion matrix from sklearn</span>
+<span class="c1">#     :param class_num: the classes (as integers)</span>
+<span class="c1">#     :param class_labels: the classes (string names)</span>
+<span class="c1">#     :param figW: figure width</span>
+<span class="c1">#     :param figH: figure height</span>
+<span class="c1">#     :param cmap: colormap</span>
+<span class="c1">#     :param alt_title: title other than confusion matrix</span>
+<span class="c1">#     :return:</span>
+<span class="c1">#     &quot;&quot;&quot;</span>
+<span class="c1">#     fig = plt.figure(figsize=(figW, figH), dpi=100)</span>
+<span class="c1">#     plt.imshow(confusion, cmap=cmap)</span>
+<span class="c1">#     plt.xticks(class_num, class_labels)</span>
+<span class="c1">#     plt.yticks(class_num, class_labels)</span>
+<span class="c1">#     for i in range(len(class_labels)):</span>
+<span class="c1">#         for j in range(len(class_labels)):</span>
+<span class="c1">#             plt.text(j, i, str(confusion[i, j]), ha=&#39;center&#39;, va=&#39;center&#39;, color=&#39;black&#39;)</span>
+<span class="c1">#     plt.xlabel(&#39;Predicted Dose Label&#39;)</span>
+<span class="c1">#     plt.ylabel(&#39;True Dose Label&#39;)</span>
+<span class="c1">#     if alt_title==False:</span>
+<span class="c1">#         plt.title(&#39;Confusion Matrix&#39;)</span>
+<span class="c1">#     else:</span>
+<span class="c1">#         plt.title(alt_title)</span>
+<span class="c1">#     plt.tight_layout()</span>
+<span class="c1">#     return fig</span>
+
+<div class="viewcode-block" id="plot_pc_weights"><a class="viewcode-back" href="../../plot.html#utils.plot.plot_pc_weights">[docs]</a><span class="k">def</span> <span class="nf">plot_pc_weights</span><span class="p">(</span><span class="n">pca</span><span class="p">,</span><span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;PuOr&quot;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Plot PCA weights</span>
+
+<span class="sd">    :param pca: pca object from sklearn</span>
+<span class="sd">    :return: fig</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">components</span> <span class="o">=</span> <span class="n">pca</span><span class="o">.</span><span class="n">components_</span>
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span><span class="n">dpi</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+    <span class="n">pc_labels</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;PC&quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">pca</span><span class="o">.</span><span class="n">components_</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])]</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">components</span><span class="p">,</span><span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span><span class="n">vmin</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span><span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Principle Component Weights&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">pca</span><span class="o">.</span><span class="n">components_</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="mi">1</span><span class="p">))</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Pose Modules&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">yticks</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span><span class="n">labels</span><span class="o">=</span><span class="n">pc_labels</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">fig</span></div>
+
+<span class="k">def</span> <span class="nf">BORIS_to_pose_matrix_plot</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">boris_to_pose_output</span><span class="p">,</span> <span class="n">figW</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">figH</span><span class="o">=</span><span class="mf">2.5</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;Greens&quot;</span><span class="p">,</span><span class="n">outline_top_match</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="n">figW</span><span class="p">,</span> <span class="n">figH</span><span class="p">),</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">boris_to_pose_output</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;float&#39;</span><span class="p">),</span><span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span><span class="n">aspect</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">)</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">boris_to_pose_output</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;float&#39;</span><span class="p">)</span>
+    <span class="n">num_cols</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">outline_top_match</span><span class="o">==</span><span class="kc">True</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_cols</span><span class="p">):</span>
+            <span class="n">max_row</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">data</span><span class="p">[:,</span> <span class="n">col</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">data</span><span class="p">[:,</span> <span class="n">col</span><span class="p">]</span><span class="o">==</span><span class="n">data</span><span class="p">[</span><span class="n">max_row</span><span class="p">,</span> <span class="n">col</span><span class="p">])</span><span class="o">==</span><span class="mi">1</span><span class="p">:</span>
+                <span class="n">rect</span> <span class="o">=</span> <span class="n">Rectangle</span><span class="p">((</span><span class="n">col</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">max_row</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">),</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;purple&#39;</span><span class="p">,</span> <span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.8</span><span class="p">)</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">add_patch</span><span class="p">(</span><span class="n">rect</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">boris_to_pose_output</span><span class="o">.</span><span class="n">columns</span><span class="o">&gt;=</span><span class="mi">20</span><span class="p">):</span>
+        <span class="n">xticks</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">boris_to_pose_output</span><span class="o">.</span><span class="n">columns</span><span class="p">),</span><span class="mi">5</span><span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+        <span class="n">xticklabels</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">boris_to_pose_output</span><span class="o">.</span><span class="n">columns</span><span class="p">),</span><span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)[</span><span class="n">xticks</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">xticks</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">boris_to_pose_output</span><span class="o">.</span><span class="n">columns</span><span class="p">))</span>
+        <span class="n">xticklabels</span><span class="o">=</span><span class="n">boris_to_pose_output</span><span class="o">.</span><span class="n">columns</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">xticks</span><span class="p">,</span><span class="n">labels</span><span class="o">=</span><span class="n">xticklabels</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">yticks</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">boris_to_pose_output</span><span class="o">.</span><span class="n">index</span><span class="p">)),</span> <span class="n">labels</span><span class="o">=</span><span class="n">boris_to_pose_output</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;data_source&quot;</span><span class="p">]</span><span class="o">+</span><span class="s2">&quot; Pose Module&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Manually Scored</span><span class="se">\n</span><span class="s2">Behavior&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span>
+                    <span class="n">labelsize</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;font.size&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="mf">0.7</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">fig</span>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Sedona Ewbank.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

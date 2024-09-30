@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Welcome to MARIPoSA’s documentation! &mdash; MARIPoSA 0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=44496db0"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Metadata" href="metadata.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="#" class="icon icon-home">
+            MARIPoSA
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="metadata.html">Metadata</a></li>
+<li class="toctree-l1"><a class="reference internal" href="analysis.html">Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plot.html">Plot</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">MARIPoSA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="#" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Welcome to MARIPoSA’s documentation!</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="welcome-to-mariposa-s-documentation">
+<h1>Welcome to MARIPoSA’s documentation!<a class="headerlink" href="#welcome-to-mariposa-s-documentation" title="Permalink to this heading"></a></h1>
+<a class="reference internal image-reference" href="_images/MARIPoSA_icon.png"><img alt="MARIPoSA" src="_images/MARIPoSA_icon.png" style="width: 100px;" /></a>
+<p>A platform for Manageable And Reproducible Integrated Pose Segmentation Analysis (MARIPoSA). See below for instructions on a quick start, or navigate through the tutorials and function descriptions for more detailed descriptions of the software functionality.</p>
+<section id="quick-start">
+<h2>Quick Start<a class="headerlink" href="#quick-start" title="Permalink to this heading"></a></h2>
+<section id="with-gui">
+<h3>With GUI:<a class="headerlink" href="#with-gui" title="Permalink to this heading"></a></h3>
+<p>First, install the conda environment:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda<span class="w"> </span>env<span class="w"> </span>create<span class="w"> </span>-f<span class="w"> </span>MARIPoSA/conda/environment.yaml
+</pre></div>
+</div>
+<p>Activate the newly installed conda environment:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda<span class="w"> </span>activate<span class="w"> </span>mariposa
+</pre></div>
+</div>
+<p>Run the GUI:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>MARIPoSA/main.py
+</pre></div>
+</div>
+<p>In the GUI:</p>
+<ol class="arabic simple">
+<li><p>Click “New project”</p></li>
+<li><p>Enter project metadata.</p>
+<ul class="simple">
+<li><p>NOTE: For “Path to data directory” - if you datatype is B-SOiD or Keypoints-MoSeq, you should enter the path to a folder containing all the label .csv files with their original names; if your datatype is VAME you should enter the path to the “results” folder ouptut by VAME which contains nested subdirectories of a structure like “video1/VAME/hmm-15/15_km_label_video1.npy”</p></li>
+</ul>
+</li>
+<li><p>Start your analysis!</p></li>
+</ol>
+</section>
+<section id="with-python-package">
+<h3>With Python package:<a class="headerlink" href="#with-python-package" title="Permalink to this heading"></a></h3>
+<p>Activate the newly installed conda environment</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda<span class="w"> </span>activate<span class="w"> </span>mariposa
+</pre></div>
+</div>
+<p>Check out the demo scripts for a full analysis and plotting pipeline!</p>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="metadata.html">Metadata</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="metadata.html#utils.metadata.create_PE_project"><code class="docutils literal notranslate"><span class="pre">create_PE_project()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="metadata.html#utils.metadata.create_PS_project"><code class="docutils literal notranslate"><span class="pre">create_PS_project()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="metadata.html#utils.metadata.load_project"><code class="docutils literal notranslate"><span class="pre">load_project()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="analysis.html">Analysis</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="analysis.html#utils.analysis.BORIS_to_pose"><code class="docutils literal notranslate"><span class="pre">BORIS_to_pose()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="analysis.html#utils.analysis.combine_pose_modules"><code class="docutils literal notranslate"><span class="pre">combine_pose_modules()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="analysis.html#utils.analysis.get_distance_timebins"><code class="docutils literal notranslate"><span class="pre">get_distance_timebins()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="analysis.html#utils.analysis.get_usage_feats"><code class="docutils literal notranslate"><span class="pre">get_usage_feats()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="analysis.html#utils.analysis.label_counter_nosubgroups"><code class="docutils literal notranslate"><span class="pre">label_counter_nosubgroups()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="analysis.html#utils.analysis.label_counter_subgroups"><code class="docutils literal notranslate"><span class="pre">label_counter_subgroups()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="analysis.html#utils.analysis.lda_labels_timebins"><code class="docutils literal notranslate"><span class="pre">lda_labels_timebins()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="analysis.html#utils.analysis.lda_loco_labels_timebins"><code class="docutils literal notranslate"><span class="pre">lda_loco_labels_timebins()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="analysis.html#utils.analysis.lr_labels_timebins"><code class="docutils literal notranslate"><span class="pre">lr_labels_timebins()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="analysis.html#utils.analysis.make_remappings_from_BORIS"><code class="docutils literal notranslate"><span class="pre">make_remappings_from_BORIS()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="plot.html">Plot</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="plot.html#utils.plot.SandPlotClusterFrequency_OverTime"><code class="docutils literal notranslate"><span class="pre">SandPlotClusterFrequency_OverTime()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot.html#utils.plot.network_pairwise_comparison"><code class="docutils literal notranslate"><span class="pre">network_pairwise_comparison()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot.html#utils.plot.plot_conf_mat"><code class="docutils literal notranslate"><span class="pre">plot_conf_mat()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot.html#utils.plot.plot_dist_bins"><code class="docutils literal notranslate"><span class="pre">plot_dist_bins()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot.html#utils.plot.plot_lda"><code class="docutils literal notranslate"><span class="pre">plot_lda()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot.html#utils.plot.plot_module_usage"><code class="docutils literal notranslate"><span class="pre">plot_module_usage()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot.html#utils.plot.plot_module_usage_stacked"><code class="docutils literal notranslate"><span class="pre">plot_module_usage_stacked()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot.html#utils.plot.plot_module_usage_subgroups"><code class="docutils literal notranslate"><span class="pre">plot_module_usage_subgroups()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot.html#utils.plot.plot_pc_weights"><code class="docutils literal notranslate"><span class="pre">plot_pc_weights()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot.html#utils.plot.transition_counter"><code class="docutils literal notranslate"><span class="pre">transition_counter()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="metadata.html" class="btn btn-neutral float-right" title="Metadata" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Sedona Ewbank.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

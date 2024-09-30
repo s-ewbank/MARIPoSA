@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Plot &mdash; MARIPoSA 0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=44496db0"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Analysis" href="analysis.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            MARIPoSA
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="metadata.html">Metadata</a></li>
+<li class="toctree-l1"><a class="reference internal" href="analysis.html">Analysis</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Plot</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#utils.plot.SandPlotClusterFrequency_OverTime"><code class="docutils literal notranslate"><span class="pre">SandPlotClusterFrequency_OverTime()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#utils.plot.network_pairwise_comparison"><code class="docutils literal notranslate"><span class="pre">network_pairwise_comparison()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#utils.plot.plot_conf_mat"><code class="docutils literal notranslate"><span class="pre">plot_conf_mat()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#utils.plot.plot_dist_bins"><code class="docutils literal notranslate"><span class="pre">plot_dist_bins()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#utils.plot.plot_lda"><code class="docutils literal notranslate"><span class="pre">plot_lda()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#utils.plot.plot_module_usage"><code class="docutils literal notranslate"><span class="pre">plot_module_usage()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#utils.plot.plot_module_usage_stacked"><code class="docutils literal notranslate"><span class="pre">plot_module_usage_stacked()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#utils.plot.plot_module_usage_subgroups"><code class="docutils literal notranslate"><span class="pre">plot_module_usage_subgroups()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#utils.plot.plot_pc_weights"><code class="docutils literal notranslate"><span class="pre">plot_pc_weights()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#utils.plot.transition_counter"><code class="docutils literal notranslate"><span class="pre">transition_counter()</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">MARIPoSA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Plot</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/plot.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-utils.plot">
+<span id="plot"></span><h1>Plot<a class="headerlink" href="#module-utils.plot" title="Permalink to this heading"></a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="utils.plot.SandPlotClusterFrequency_OverTime">
+<span class="sig-prename descclassname"><span class="pre">utils.plot.</span></span><span class="sig-name descname"><span class="pre">SandPlotClusterFrequency_OverTime</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_per_block</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_blocks</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figW</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">7</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figH</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">posenames</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">convolve</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plottype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'area'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/utils/plot.html#SandPlotClusterFrequency_OverTime"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.plot.SandPlotClusterFrequency_OverTime" title="Permalink to this definition"></a></dt>
+<dd><p>Plots usage of pose modules over time within a session</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>labels_df</strong> – </p></li>
+<li><p><strong>start</strong> – time to start at in seconds</p></li>
+<li><p><strong>time_per_block</strong> – time per block in seconds</p></li>
+<li><p><strong>fps</strong> – frames per second</p></li>
+<li><p><strong>n_blocks</strong> – </p></li>
+<li><p><strong>figW</strong> – </p></li>
+<li><p><strong>figH</strong> – </p></li>
+<li><p><strong>posenames</strong> – </p></li>
+<li><p><strong>title</strong> – </p></li>
+<li><p><strong>convolve</strong> – </p></li>
+<li><p><strong>legend</strong> – </p></li>
+<li><p><strong>plottype</strong> – </p></li>
+<li><p><strong>saveplots</strong> – </p></li>
+<li><p><strong>savename</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="utils.plot.network_pairwise_comparison">
+<span class="sig-prename descclassname"><span class="pre">utils.plot.</span></span><span class="sig-name descname"><span class="pre">network_pairwise_comparison</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">groupnames</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scaling</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'bwr'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/utils/plot.html#network_pairwise_comparison"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.plot.network_pairwise_comparison" title="Permalink to this definition"></a></dt>
+<dd><p>Plots network depiction of differences in pose module usage and transitions between two subgroups</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>labels_df</strong> – labels_df from label_counter_subgroups</p></li>
+<li><p><strong>start</strong> – time to start at in seconds</p></li>
+<li><p><strong>end</strong> – time to end at in seconds</p></li>
+<li><p><strong>groupnames</strong> – two groups to include in the 1-vs-1 comparison - order is important</p></li>
+<li><p><strong>fps</strong> – frames per second</p></li>
+<li><p><strong>scaling</strong> – </p></li>
+<li><p><strong>include_labels</strong> – </p></li>
+<li><p><strong>cmap</strong> – matplotlib colormap</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="utils.plot.plot_conf_mat">
+<span class="sig-prename descclassname"><span class="pre">utils.plot.</span></span><span class="sig-name descname"><span class="pre">plot_conf_mat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lda_result</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figW</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figH</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Greens'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alt_title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/utils/plot.html#plot_conf_mat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.plot.plot_conf_mat" title="Permalink to this definition"></a></dt>
+<dd><p>Generate a confusion matrix plot</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>confusion</strong> – the confusion matrix from sklearn</p></li>
+<li><p><strong>class_num</strong> – the classes (as integers)</p></li>
+<li><p><strong>class_labels</strong> – the classes (string names)</p></li>
+<li><p><strong>figW</strong> – figure width</p></li>
+<li><p><strong>figH</strong> – figure height</p></li>
+<li><p><strong>cmap</strong> – colormap</p></li>
+<li><p><strong>alt_title</strong> – title other than confusion matrix</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="utils.plot.plot_dist_bins">
+<span class="sig-prename descclassname"><span class="pre">utils.plot.</span></span><span class="sig-name descname"><span class="pre">plot_dist_bins</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dist_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'viridis'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plottype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'band'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figW</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">6</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figH</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/utils/plot.html#plot_dist_bins"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.plot.plot_dist_bins" title="Permalink to this definition"></a></dt>
+<dd><p>Plots distance of a keypoint either over time or in bins from dist_df (output of analysis.dist_df_subgroups)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dist_df</strong> – dist_df output from analysis.dist_df_subgroups</p></li>
+<li><p><strong>cmap</strong> – matplotlib colormap</p></li>
+<li><p><strong>plottype</strong> – type of plot (“band”, “errorbar”, or “bar” if no timebins)</p></li>
+<li><p><strong>figW</strong> – figure width</p></li>
+<li><p><strong>figH</strong> – figure height</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="utils.plot.plot_lda">
+<span class="sig-prename descclassname"><span class="pre">utils.plot.</span></span><span class="sig-name descname"><span class="pre">plot_lda</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lda_result</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">selected_subgroups</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'all'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figW</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figH</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">titletype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'informative'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'jet'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/utils/plot.html#plot_lda"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.plot.plot_lda" title="Permalink to this definition"></a></dt>
+<dd><p>Plot LDA embeddings</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config</strong> – config file</p></li>
+<li><p><strong>lda</strong> – lda from lda_labels_timebins()</p></li>
+<li><p><strong>lda_embeddings</strong> – embeddings from lda_labels_timebins()</p></li>
+<li><p><strong>group_labels</strong> – group_labels from lda_labels_timebins()</p></li>
+<li><p><strong>nbins</strong> – number of bins from lda_labels_timebins()</p></li>
+<li><p><strong>binsize</strong> – binsize</p></li>
+<li><p><strong>selected_subgroups</strong> – which subgroups to plot</p></li>
+<li><p><strong>figW</strong> – width of the figure</p></li>
+<li><p><strong>figH</strong> – height of the figure</p></li>
+<li><p><strong>titletype</strong> – type of title - options are “informative”, “uninformative”</p></li>
+<li><p><strong>cmap</strong> – matplotlib colormap</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>figure</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="utils.plot.plot_module_usage">
+<span class="sig-prename descclassname"><span class="pre">utils.plot.</span></span><span class="sig-name descname"><span class="pre">plot_module_usage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figW</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figH</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">style</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'bar_scatter'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'jet'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/utils/plot.html#plot_module_usage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.plot.plot_module_usage" title="Permalink to this definition"></a></dt>
+<dd><p>Plots the frequency of the pose modules occurring by group in the labels dataframe output by the label_counter function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>labels_df</strong> – dataframe output from analysis.label_counter</p></li>
+<li><p><strong>start</strong> – time in seconds to start dataframe from.</p></li>
+<li><p><strong>stop</strong> – time in seconds to stop dataframe at.</p></li>
+<li><p><strong>fps</strong> – frames per second of recording.</p></li>
+<li><p><strong>figW</strong> – figure width</p></li>
+<li><p><strong>figH</strong> – figure height</p></li>
+<li><p><strong>style</strong> – “bar_scatter”, “bar_error”, or “points”</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="utils.plot.plot_module_usage_stacked">
+<span class="sig-prename descclassname"><span class="pre">utils.plot.</span></span><span class="sig-name descname"><span class="pre">plot_module_usage_stacked</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figW</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">6</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figH</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'viridis_r'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alt_xticks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/utils/plot.html#plot_module_usage_stacked"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.plot.plot_module_usage_stacked" title="Permalink to this definition"></a></dt>
+<dd><p>Plots the frequency of the pose modules occurring by group in the labels dataframe output by the label_counter function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>labels_df</strong> – dataframe output from analysis.label_counter</p></li>
+<li><p><strong>start</strong> – time in seconds to start dataframe from.</p></li>
+<li><p><strong>stop</strong> – time in seconds to stop dataframe at.</p></li>
+<li><p><strong>fps</strong> – frames per second of recording.</p></li>
+<li><p><strong>figW</strong> – figure width</p></li>
+<li><p><strong>figH</strong> – </p></li>
+<li><p><strong>style</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="utils.plot.plot_module_usage_subgroups">
+<span class="sig-prename descclassname"><span class="pre">utils.plot.</span></span><span class="sig-name descname"><span class="pre">plot_module_usage_subgroups</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figW</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">6</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figH</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">style</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'bar_scatter'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legend_pos</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'inside'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'viridis_r'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/utils/plot.html#plot_module_usage_subgroups"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.plot.plot_module_usage_subgroups" title="Permalink to this definition"></a></dt>
+<dd><p>Plots the frequency of the pose modules occurring by group in the labels dataframe output by the label_counter function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>labels_df</strong> – dataframe output from analysis.label_counter</p></li>
+<li><p><strong>start</strong> – time in seconds to start dataframe from.</p></li>
+<li><p><strong>stop</strong> – time in seconds to stop dataframe at.</p></li>
+<li><p><strong>fps</strong> – frames per second of recording.</p></li>
+<li><p><strong>figW</strong> – figure width</p></li>
+<li><p><strong>figH</strong> – </p></li>
+<li><p><strong>style</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="utils.plot.plot_pc_weights">
+<span class="sig-prename descclassname"><span class="pre">utils.plot.</span></span><span class="sig-name descname"><span class="pre">plot_pc_weights</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pca</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'PuOr'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/utils/plot.html#plot_pc_weights"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.plot.plot_pc_weights" title="Permalink to this definition"></a></dt>
+<dd><p>Plot PCA weights</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>pca</strong> – pca object from sklearn</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>fig</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="utils.plot.transition_counter">
+<span class="sig-prename descclassname"><span class="pre">utils.plot.</span></span><span class="sig-name descname"><span class="pre">transition_counter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">labels_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">groupnames</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/utils/plot.html#transition_counter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.plot.transition_counter" title="Permalink to this definition"></a></dt>
+<dd><p>Generates a Pandas dataframe containing transitions within the labels df.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>labels_df</strong> – </p></li>
+<li><p><strong>groupnames</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="analysis.html" class="btn btn-neutral float-left" title="Analysis" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Sedona Ewbank.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
