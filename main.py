@@ -6,7 +6,7 @@ from datetime import datetime
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import os
-import io
+from PIL import Image
 
 factor=0.6
 
@@ -138,9 +138,12 @@ class Application(customtkinter.CTk):
 
     def window1_start(self):
         self.clear_window()
+
+        logo_img = customtkinter.CTkImage(dark_image=Image.open('other/MARIPoSA_icon.png'),size=(100,100))
         self.projectstart_choice = customtkinter.StringVar(value="New project")
-        customtkinter.CTkLabel(self, text="MARIPoSA 🦋",
+        customtkinter.CTkLabel(self, text="MARIPoSA",
                                font=('Helvetica', 32, "bold")).place(x=int(self.width*0.5), y=int(self.height*0.1),anchor=tk.CENTER)
+        customtkinter.CTkLabel(self, text="",image=logo_img).place(x=int(self.width*0.5), y=int(self.height*0.25),anchor=tk.CENTER)
         customtkinter.CTkLabel(self, text="Would you like to start a new project or load a previous project?",
                                font=('Helvetica', 16)).place(x=int(self.width*0.5), y=int(self.height*0.4),anchor=tk.CENTER)
         # Radio buttons for starting new project or loading old project
@@ -1073,22 +1076,23 @@ class Application(customtkinter.CTk):
 
     def lda(self, do, start, end, binsize, cmap, subgroups):
         labels_df, n_modules = analysis.label_counter_subgroups(self.config, start, end, selected_subgroups=subgroups)
-        lda, lda_embeddings, label_counts, group_labels, group_dict, nbins = analysis.lda_labels_timebins(self.config, labels_df, binsize, selected_subgroups=subgroups)
         if do=="embed":
-            fig = plot.plot_lda(self.config, lda, lda_embeddings, group_labels, nbins, binsize, cmap=cmap, selected_subgroups=subgroups)
+            lda_result = analysis.lda_labels_timebins(self.config, labels_df, binsize, selected_subgroups=subgroups)
+            fig = plot.plot_lda(self.config, lda_result, cmap=cmap, selected_subgroups=subgroups)
             self.plots_generated = self.plots_generated + 1
             self.plot_window = PlotWindow(fig=fig, plot_number=self.plots_generated, master=self)
             self.plot_window.mainloop()
         elif do=="classify_eval":
             print("Classifying and evaluating")
-            confusion, class_num, class_labels, accuracy = analysis.loocv_conf_mat(lda, label_counts, group_labels, group_dict)
-            fig = plot.plot_conf_mat(confusion, class_num, class_labels, cmap="Greens")
+            lda_result = analysis.lda_labels_timebins(self.config, labels_df, binsize, selected_subgroups=subgroups, loocv=True)
+            fig = plot.plot_conf_mat(lda_result, cmap="Greens")
             self.plots_generated = self.plots_generated + 1
             self.plot_window = PlotWindow(fig=fig, plot_number=self.plots_generated, master=self)
             self.plot_window.mainloop()
         elif do=="save":
             print("Saving LDA classifier")
-            fig = plot.plot_lda(self.config, lda, lda_embeddings, group_labels, nbins, binsize, cmap=cmap)
+            lda_result = analysis.lda_labels_timebins(self.config, labels_df, binsize, selected_subgroups=subgroups)
+            fig = plot.plot_lda(self.config, lda_result, cmap=cmap, selected_subgroups=subgroups)
             self.plots_generated = self.plots_generated + 1
             self.plot_window = PlotWindow(fig=fig, plot_number=self.plots_generated, master=self)
             self.plot_window.mainloop()
