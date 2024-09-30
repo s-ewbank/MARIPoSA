@@ -1,4 +1,5 @@
 # MARIPoSA
+<img src="other/MARIPoSA_icon.png" alt="alt text" width="150" height="150">
 
 ### Description
 A platform for Manageable And Reproducible Integrated Pose Segmentation Analysis (MARIPoSA).
