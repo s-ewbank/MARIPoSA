@@ -562,7 +562,8 @@ def SandPlotClusterFrequency_OverTime(config,
                 ax.legend(posenames, loc="upper right", bbox_to_anchor=(1.25, 1.0))
             else:
                 ax.legend(posenames, loc="upper right", bbox_to_anchor=(1.25, 1.0))
-        plt.tight_layout()
+
+    plt.tight_layout()
 
     if title!=None:
         ax.set_title(title)
@@ -614,8 +615,7 @@ def plot_dist_bins(dist_df, cmap="viridis", plottype="band", figW=6, figH=3):
     ax.set_ylabel("Locomotion (pix)")
     return fig
 
-def plot_lda(config, lda_result, selected_subgroups="all",
-             figW=4, figH=3, titletype="informative", cmap="jet"):
+def plot_lda(config, lda_result, figW=4, figH=3, titletype="informative", cmap="jet"):
     """
     Plot LDA embeddings
 
@@ -625,15 +625,13 @@ def plot_lda(config, lda_result, selected_subgroups="all",
     :param group_labels: group_labels from lda_labels_timebins()
     :param nbins: number of bins from lda_labels_timebins()
     :param binsize: binsize
-    :param selected_subgroups: which subgroups to plot
     :param figW: width of the figure
     :param figH: height of the figure
     :param titletype: type of title - options are "informative", "uninformative"
     :param cmap: matplotlib colormap
     :return: figure
     """
-    if selected_subgroups=="all":
-        selected_subgroups=list(config["subgroups"].keys())
+    selected_subgroups=list(lda_result.group_dict.keys())
     n_groups=len(selected_subgroups)
     cmap = plt.get_cmap(cmap)
     colors = [cmap([i]) for i in np.linspace(0,1,len(selected_subgroups))]

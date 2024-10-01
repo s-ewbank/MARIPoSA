@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Demo 2: Scalar locomotion data from DeepLabCut &mdash; MARIPoSA 0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css" />
+      <link rel="stylesheet" type="text/css" href="_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Demo 3: Principal Components Analysis" href="demo3_pca.html" />
+    <link rel="prev" title="Demo 1: Basic project creation, pose usage plots, and classification" href="demo1_start.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            MARIPoSA
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="demo1_start.html">Demo 1: Basic project creation, pose usage plots, and classification</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Demo 2: Scalar locomotion data from DeepLabCut</a></li>
+<li class="toctree-l1"><a class="reference internal" href="demo3_pca.html">Demo 3: Principal Components Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="demo4_pk.html">Demo 4: Reducing data to a single dimension based on distance to a control behavior distribution</a></li>
+<li class="toctree-l1"><a class="reference internal" href="metadata.html">Metadata</a></li>
+<li class="toctree-l1"><a class="reference internal" href="analysis.html">Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plot.html">Plot</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">MARIPoSA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Demo 2: Scalar locomotion data from DeepLabCut</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/demo2_dlc.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="demo-2-scalar-locomotion-data-from-deeplabcut">
+<h1>Demo 2: Scalar locomotion data from DeepLabCut<a class="headerlink" href="#demo-2-scalar-locomotion-data-from-deeplabcut" title="Permalink to this heading"></a></h1>
+<p>Import dependencies</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># #set up paths</span>
+<span class="kn">import</span> <span class="nn">importlib</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="c1"># #This block only important for running as script</span>
+<span class="c1"># script_dir = os.path.dirname(os.path.abspath(__file__))</span>
+<span class="c1"># mariposa_dir = os.path.dirname(script_dir)</span>
+<span class="c1"># utils_dir = os.path.join(mariposa_dir, &#39;utils&#39;)</span>
+<span class="c1"># sys.path.append(utils_dir)</span>
+<span class="c1"># sys.path.append(mariposa_dir)</span>
+
+<span class="c1">#import utils</span>
+<span class="kn">from</span> <span class="nn">utils</span> <span class="kn">import</span> <span class="n">analysis</span><span class="p">,</span> <span class="n">plot</span><span class="p">,</span> <span class="n">metadata</span>
+
+<span class="n">importlib</span><span class="o">.</span><span class="n">reload</span><span class="p">(</span><span class="n">analysis</span><span class="p">)</span>
+<span class="n">importlib</span><span class="o">.</span><span class="n">reload</span><span class="p">(</span><span class="n">plot</span><span class="p">)</span>
+<span class="n">importlib</span><span class="o">.</span><span class="n">reload</span><span class="p">(</span><span class="n">metadata</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">ModuleNotFoundError</span><span class="g g-Whitespace">                       </span>Traceback (most recent call last)
+<span class="o">/</span><span class="n">var</span><span class="o">/</span><span class="n">folders</span><span class="o">/</span><span class="n">v1</span><span class="o">/</span><span class="mi">8</span><span class="n">qlykyv97dbb5jhzq44rpdh80000gn</span><span class="o">/</span><span class="n">T</span><span class="o">/</span><span class="n">ipykernel_90234</span><span class="o">/</span><span class="mf">2906842752.</span><span class="n">py</span> <span class="ow">in</span> <span class="o">&lt;</span><span class="n">module</span><span class="o">&gt;</span>
+<span class="g g-Whitespace">     </span><span class="mi">13</span> 
+<span class="g g-Whitespace">     </span><span class="mi">14</span> <span class="c1">#import utils</span>
+<span class="ne">---&gt; </span><span class="mi">15</span> <span class="kn">from</span> <span class="nn">utils</span> <span class="kn">import</span> <span class="n">analysis</span><span class="p">,</span> <span class="n">plot</span><span class="p">,</span> <span class="n">metadata</span>
+<span class="g g-Whitespace">     </span><span class="mi">16</span> 
+<span class="g g-Whitespace">     </span><span class="mi">17</span> <span class="n">importlib</span><span class="o">.</span><span class="n">reload</span><span class="p">(</span><span class="n">analysis</span><span class="p">)</span>
+
+<span class="ne">ModuleNotFoundError</span>: No module named &#39;utils&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<p>Load config</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">config_path</span><span class="o">=</span><span class="s2">&quot;/Users/snewbank/Behavior/MARIPOSA_test/240605_240605_BSOID-test/config.yaml&quot;</span>
+<span class="n">save_path</span><span class="o">=</span><span class="s2">&quot;/Users/snewbank/Behavior/MARIPOSA_test/240605_240605_BSOID-test/demo/&quot;</span>
+<span class="n">save</span><span class="o">=</span><span class="kc">False</span>
+
+<span class="c1">#Load config</span>
+<span class="n">config</span> <span class="o">=</span> <span class="n">metadata</span><span class="o">.</span><span class="n">load_project</span><span class="p">(</span><span class="n">config_path</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">path</span><span class="o">=</span><span class="s2">&quot;/Users/snewbank/Behavior/B-SOID-Analysis/23-09-02-ketdr-csvs/&quot;</span>
+<span class="n">config_path</span><span class="o">=</span><span class="s2">&quot;/Users/snewbank/Behavior/MARIPOSA_test/240605_240605_BSOID-test/DLC_config.yaml&quot;</span>
+<span class="n">make_config</span><span class="o">=</span><span class="kc">False</span>
+<span class="k">if</span> <span class="n">make_config</span><span class="o">==</span><span class="kc">True</span><span class="p">:</span>
+    <span class="n">DLC_config</span> <span class="o">=</span> <span class="n">metadata</span><span class="o">.</span><span class="n">make_dlc_config</span><span class="p">(</span><span class="n">path</span><span class="p">,</span><span class="n">fps</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span><span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">DLC_config</span><span class="o">=</span><span class="n">metadata</span><span class="o">.</span><span class="n">load_project</span><span class="p">(</span><span class="n">config_path</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">thresh</span><span class="o">=</span><span class="mi">70</span>
+<span class="n">fps</span><span class="o">=</span><span class="mi">30</span>
+<span class="n">start</span><span class="o">=</span><span class="mi">0</span>
+<span class="n">end</span><span class="o">=</span><span class="mi">20</span><span class="o">*</span><span class="mi">60</span>
+<span class="n">binsize</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="mf">2.5</span><span class="o">*</span><span class="mi">60</span><span class="p">)</span>
+<span class="n">selected_subgroups</span><span class="o">=</span><span class="s2">&quot;all&quot;</span>
+
+<span class="n">dist_df</span> <span class="o">=</span> <span class="n">analysis</span><span class="o">.</span><span class="n">dist_df_subgroups</span><span class="p">(</span><span class="n">DLC_config</span><span class="p">,</span> <span class="n">binsize</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">thresh</span><span class="o">=</span><span class="mi">70</span><span class="p">,</span> <span class="n">selected_subgroups</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">)</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plot</span><span class="o">.</span><span class="n">plot_dist_bins</span><span class="p">(</span><span class="n">dist_df</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;viridis_r&quot;</span><span class="p">,</span> <span class="n">plottype</span><span class="o">=</span><span class="s2">&quot;band&quot;</span><span class="p">)</span>
+<span class="n">fig</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/a2bcdecd1275b8bfbf0703293e05799b25f3abb9da12ab0b0343ed4a13d88330.png" src="_images/a2bcdecd1275b8bfbf0703293e05799b25f3abb9da12ab0b0343ed4a13d88330.png" />
+<img alt="_images/a2bcdecd1275b8bfbf0703293e05799b25f3abb9da12ab0b0343ed4a13d88330.png" src="_images/a2bcdecd1275b8bfbf0703293e05799b25f3abb9da12ab0b0343ed4a13d88330.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">thresh</span><span class="o">=</span><span class="mi">70</span>
+<span class="n">fps</span><span class="o">=</span><span class="mi">30</span>
+<span class="n">start</span><span class="o">=</span><span class="mi">0</span>
+<span class="n">end</span><span class="o">=</span><span class="mi">20</span><span class="o">*</span><span class="mi">60</span>
+<span class="n">selected_subgroups</span><span class="o">=</span><span class="s2">&quot;all&quot;</span>
+
+<span class="n">binsizes</span><span class="o">=</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="mi">1</span><span class="o">*</span><span class="mi">60</span><span class="p">),</span><span class="nb">int</span><span class="p">(</span><span class="mf">2.5</span><span class="o">*</span><span class="mi">60</span><span class="p">),</span><span class="nb">int</span><span class="p">(</span><span class="mi">5</span><span class="o">*</span><span class="mi">60</span><span class="p">),</span><span class="nb">int</span><span class="p">(</span><span class="mi">5</span><span class="o">*</span><span class="mi">60</span><span class="p">),</span><span class="nb">int</span><span class="p">(</span><span class="mi">10</span><span class="o">*</span><span class="mi">60</span><span class="p">)]</span>
+<span class="k">for</span> <span class="n">binsize</span> <span class="ow">in</span> <span class="n">binsizes</span><span class="p">:</span>
+    <span class="n">dist_df</span> <span class="o">=</span> <span class="n">analysis</span><span class="o">.</span><span class="n">dist_df_subgroups</span><span class="p">(</span><span class="n">DLC_config</span><span class="p">,</span> <span class="n">binsize</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">thresh</span><span class="o">=</span><span class="mi">70</span><span class="p">,</span> <span class="n">selected_subgroups</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">)</span>
+    <span class="n">lda</span><span class="p">,</span> <span class="n">lda_embeddings</span><span class="p">,</span> <span class="n">dist_counts</span><span class="p">,</span> <span class="n">group_labels</span><span class="p">,</span> <span class="n">group_dict</span><span class="p">,</span> <span class="n">nbins</span> <span class="o">=</span> <span class="n">analysis</span><span class="o">.</span><span class="n">lda_loco_labels_timebins</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">dist_df</span><span class="p">,</span> <span class="n">ncomponents</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">plot</span><span class="o">.</span><span class="n">plot_lda</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">lda</span><span class="p">,</span> <span class="n">lda_embeddings</span><span class="p">,</span> <span class="n">group_labels</span><span class="p">,</span> <span class="n">nbins</span><span class="p">,</span> <span class="n">binsize</span><span class="p">,</span><span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;viridis_r&quot;</span><span class="p">)</span>
+    
+    <span class="n">confusion</span><span class="p">,</span> <span class="n">class_num</span><span class="p">,</span> <span class="n">class_labels</span><span class="p">,</span> <span class="n">accuracy</span> <span class="o">=</span> <span class="n">analysis</span><span class="o">.</span><span class="n">loocv_conf_mat</span><span class="p">(</span><span class="n">lda</span><span class="p">,</span> <span class="n">dist_counts</span><span class="p">,</span> <span class="n">group_labels</span><span class="p">,</span> <span class="n">group_dict</span><span class="p">)</span>
+    <span class="n">plot</span><span class="o">.</span><span class="n">plot_conf_mat</span><span class="p">(</span><span class="n">confusion</span><span class="p">,</span> <span class="n">class_num</span><span class="p">,</span> <span class="n">class_labels</span><span class="p">,</span> <span class="n">figW</span><span class="o">=</span><span class="mf">2.5</span><span class="p">,</span><span class="n">figH</span><span class="o">=</span><span class="mf">2.5</span><span class="p">,</span><span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;Greens&quot;</span><span class="p">,</span><span class="n">alt_title</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Binsize &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">binsize</span><span class="p">)</span> <span class="o">+</span><span class="s2">&quot; accuracy: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">accuracy</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>The overall accuracy by leave-one-out-cross-validation (LOOCV) is 0.46153846153846156
+Binsize 60 accuracy: 0.46153846153846156
+The overall accuracy by leave-one-out-cross-validation (LOOCV) is 0.6153846153846154
+Binsize 150 accuracy: 0.6153846153846154
+The overall accuracy by leave-one-out-cross-validation (LOOCV) is 0.6153846153846154
+Binsize 300 accuracy: 0.6153846153846154
+The overall accuracy by leave-one-out-cross-validation (LOOCV) is 0.6153846153846154
+Binsize 300 accuracy: 0.6153846153846154
+The overall accuracy by leave-one-out-cross-validation (LOOCV) is 0.5769230769230769
+Binsize 600 accuracy: 0.5769230769230769
+</pre></div>
+</div>
+<img alt="_images/fc9dcd91536e6142bca8490e85765b08d68b53ea428accaaf27ed176613ed363.png" src="_images/fc9dcd91536e6142bca8490e85765b08d68b53ea428accaaf27ed176613ed363.png" />
+<img alt="_images/6ca335e2c818ad6eaac663d7598eaf5fff744a83ed96d63671e9c2ba54d24fda.png" src="_images/6ca335e2c818ad6eaac663d7598eaf5fff744a83ed96d63671e9c2ba54d24fda.png" />
+<img alt="_images/b0b45b2a40ef82643c54f4dc668e988c4c7679d005d609f5edd1440ff933bbe1.png" src="_images/b0b45b2a40ef82643c54f4dc668e988c4c7679d005d609f5edd1440ff933bbe1.png" />
+<img alt="_images/351482dfa109e4b9399e773c61de3547da762704ed6175e77d7b03f1fc1facb7.png" src="_images/351482dfa109e4b9399e773c61de3547da762704ed6175e77d7b03f1fc1facb7.png" />
+<img alt="_images/5c1ffa972351b84c8b4e97d8c9cc429b83871e3654590a635a2fc42de2142446.png" src="_images/5c1ffa972351b84c8b4e97d8c9cc429b83871e3654590a635a2fc42de2142446.png" />
+<img alt="_images/28b7d615adc23d01c35ebf20f39a556d33c72c26283b7d56afddefa21f8ca50c.png" src="_images/28b7d615adc23d01c35ebf20f39a556d33c72c26283b7d56afddefa21f8ca50c.png" />
+<img alt="_images/5c1ffa972351b84c8b4e97d8c9cc429b83871e3654590a635a2fc42de2142446.png" src="_images/5c1ffa972351b84c8b4e97d8c9cc429b83871e3654590a635a2fc42de2142446.png" />
+<img alt="_images/28b7d615adc23d01c35ebf20f39a556d33c72c26283b7d56afddefa21f8ca50c.png" src="_images/28b7d615adc23d01c35ebf20f39a556d33c72c26283b7d56afddefa21f8ca50c.png" />
+<img alt="_images/09009d4c0f0ec6e7b3015a2dfad9cf635e8581629cc80759535e59fbdb796559.png" src="_images/09009d4c0f0ec6e7b3015a2dfad9cf635e8581629cc80759535e59fbdb796559.png" />
+<img alt="_images/547af931bbf68b3a857b7c0defa446b6714a37fc6a4d5949f6f0f5ef99266723.png" src="_images/547af931bbf68b3a857b7c0defa446b6714a37fc6a4d5949f6f0f5ef99266723.png" />
+</div>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="demo1_start.html" class="btn btn-neutral float-left" title="Demo 1: Basic project creation, pose usage plots, and classification" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="demo3_pca.html" class="btn btn-neutral float-right" title="Demo 3: Principal Components Analysis" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Sedona Ewbank.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

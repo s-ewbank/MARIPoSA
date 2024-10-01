@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Demo 1: Basic project creation, pose usage plots, and classification &mdash; MARIPoSA 0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css" />
+      <link rel="stylesheet" type="text/css" href="_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Demo 2: Scalar locomotion data from DeepLabCut" href="demo2_dlc.html" />
+    <link rel="prev" title="Welcome to MARIPoSA’s documentation!" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            MARIPoSA
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Demo 1: Basic project creation, pose usage plots, and classification</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#initializing-the-project">Initializing the project</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#computing-and-visualizing-module-usage">Computing and visualizing module usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#classification">Classification</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="demo2_dlc.html">Demo 2: Scalar locomotion data from DeepLabCut</a></li>
+<li class="toctree-l1"><a class="reference internal" href="demo3_pca.html">Demo 3: Principal Components Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="demo4_pk.html">Demo 4: Reducing data to a single dimension based on distance to a control behavior distribution</a></li>
+<li class="toctree-l1"><a class="reference internal" href="metadata.html">Metadata</a></li>
+<li class="toctree-l1"><a class="reference internal" href="analysis.html">Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plot.html">Plot</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">MARIPoSA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Demo 1: Basic project creation, pose usage plots, and classification</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/demo1_start.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="demo-1-basic-project-creation-pose-usage-plots-and-classification">
+<h1>Demo 1: Basic project creation, pose usage plots, and classification<a class="headerlink" href="#demo-1-basic-project-creation-pose-usage-plots-and-classification" title="Permalink to this heading"></a></h1>
+<section id="initializing-the-project">
+<h2>Initializing the project<a class="headerlink" href="#initializing-the-project" title="Permalink to this heading"></a></h2>
+<p>First, we will import dependencies.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">importlib</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="c1">#This block only important for running as script</span>
+<span class="c1"># script_dir = os.path.dirname(os.path.abspath(__file__))</span>
+<span class="c1"># mariposa_dir = os.path.dirname(script_dir)</span>
+<span class="c1"># utils_dir = os.path.join(mariposa_dir, &#39;utils&#39;)</span>
+<span class="c1"># sys.path.append(utils_dir)</span>
+<span class="c1"># sys.path.append(mariposa_dir)</span>
+
+<span class="c1">#import utils</span>
+<span class="kn">from</span> <span class="nn">utils</span> <span class="kn">import</span> <span class="n">analysis</span><span class="p">,</span> <span class="n">plot</span><span class="p">,</span> <span class="n">metadata</span>
+
+<span class="c1"># importlib.reload(analysis)</span>
+<span class="c1"># importlib.reload(plot)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">ModuleNotFoundError</span><span class="g g-Whitespace">                       </span>Traceback (most recent call last)
+<span class="o">/</span><span class="n">var</span><span class="o">/</span><span class="n">folders</span><span class="o">/</span><span class="n">v1</span><span class="o">/</span><span class="mi">8</span><span class="n">qlykyv97dbb5jhzq44rpdh80000gn</span><span class="o">/</span><span class="n">T</span><span class="o">/</span><span class="n">ipykernel_90007</span><span class="o">/</span><span class="mf">319854871.</span><span class="n">py</span> <span class="ow">in</span> <span class="o">&lt;</span><span class="n">module</span><span class="o">&gt;</span>
+<span class="g g-Whitespace">     </span><span class="mi">14</span> 
+<span class="g g-Whitespace">     </span><span class="mi">15</span> <span class="c1">#import utils</span>
+<span class="ne">---&gt; </span><span class="mi">16</span> <span class="kn">from</span> <span class="nn">utils</span> <span class="kn">import</span> <span class="n">analysis</span><span class="p">,</span> <span class="n">plot</span><span class="p">,</span> <span class="n">metadata</span>
+<span class="g g-Whitespace">     </span><span class="mi">17</span> 
+<span class="g g-Whitespace">     </span><span class="mi">18</span> <span class="c1"># importlib.reload(analysis)</span>
+
+<span class="ne">ModuleNotFoundError</span>: No module named &#39;utils&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<p>Then we will set the paths for our config file and where and whether to save plots, and then load the config!</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">config_path</span><span class="o">=</span><span class="s2">&quot;/Users/snewbank/Behavior/MARIPOSA_test/240904_VAME-full/config_PS.yaml&quot;</span>
+<span class="n">save_path</span><span class="o">=</span><span class="s2">&quot;/Users/snewbank/Behavior/MARIPOSA_test/240904_VAME-full/demo/&quot;</span>
+<span class="n">save</span><span class="o">=</span><span class="kc">False</span>
+
+<span class="c1">#Load config</span>
+<span class="n">config</span> <span class="o">=</span> <span class="n">metadata</span><span class="o">.</span><span class="n">load_project</span><span class="p">(</span><span class="n">config_path</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="computing-and-visualizing-module-usage">
+<h2>Computing and visualizing module usage<a class="headerlink" href="#computing-and-visualizing-module-usage" title="Permalink to this heading"></a></h2>
+<p>Now we will plot pose usage without subgroups.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#plot without subgroups</span>
+<span class="n">labels_df</span><span class="p">,</span> <span class="n">n_modules</span> <span class="o">=</span> <span class="n">analysis</span><span class="o">.</span><span class="n">label_counter_nosubgroups</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plot</span><span class="o">.</span><span class="n">plot_module_usage</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">labels_df</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span><span class="n">style</span><span class="o">=</span><span class="s2">&quot;points&quot;</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">save</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">save_path</span><span class="o">+</span><span class="s2">&quot;labels_no_subgroups.png&quot;</span><span class="p">,</span><span class="n">dpi</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+/Users/snewbank/PycharmProjects/MARIPoSA/utils/analysis.py:67: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  labels_df.insert(loc=count, value=labels_i, column=config[&quot;project_files&quot;][f])
+</pre></div>
+</div>
+<img alt="_images/9692379e6dfaf5a872fbe07736570200c6e84e6a00a39fff89dc987dff57c92c.png" src="_images/9692379e6dfaf5a872fbe07736570200c6e84e6a00a39fff89dc987dff57c92c.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">selected_subgroups</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;saliv&quot;</span><span class="p">,</span><span class="s2">&quot;k1iv&quot;</span><span class="p">,</span><span class="s2">&quot;k5iv&quot;</span><span class="p">,</span><span class="s2">&quot;k10iv&quot;</span><span class="p">]</span>
+<span class="n">labels_df</span><span class="p">,</span> <span class="n">n_modules</span> <span class="o">=</span> <span class="n">analysis</span><span class="o">.</span><span class="n">label_counter_subgroups</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1200</span><span class="p">,</span><span class="n">selected_subgroups</span><span class="o">=</span><span class="n">selected_subgroups</span><span class="p">)</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plot</span><span class="o">.</span><span class="n">plot_module_usage_subgroups</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">labels_df</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1200</span><span class="p">,</span> <span class="n">figW</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">figH</span><span class="o">=</span><span class="mf">2.5</span><span class="p">,</span> <span class="n">legend_pos</span><span class="o">=</span><span class="s2">&quot;outside&quot;</span><span class="p">,</span>
+                                       <span class="n">style</span><span class="o">=</span><span class="s2">&quot;bar_scatter&quot;</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">save</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">save_path</span> <span class="o">+</span> <span class="s2">&quot;labels_subgroups.png&quot;</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+15
+True
+False
+False
+</pre></div>
+</div>
+<img alt="_images/2cc5dbf0cb304041423d2f03b86e710715bc1270727a160eb8d9a1b624d60fb7.png" src="_images/2cc5dbf0cb304041423d2f03b86e710715bc1270727a160eb8d9a1b624d60fb7.png" />
+</div>
+</div>
+<p>Then we will do a network-style visualization of how pose usage and transition frequency differs between two groups</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">comparison_groups</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;saliv&quot;</span><span class="p">,</span><span class="s2">&quot;k10iv&quot;</span><span class="p">]</span>
+<span class="n">labels_df</span><span class="p">,</span> <span class="n">n_modules</span> <span class="o">=</span> <span class="n">analysis</span><span class="o">.</span><span class="n">label_counter_subgroups</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1200</span><span class="p">)</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plot</span><span class="o">.</span><span class="n">network_pairwise_comparison</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">labels_df</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1200</span><span class="p">,</span> <span class="n">comparison_groups</span><span class="p">,</span><span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;PRGn&quot;</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">save</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">save_path</span><span class="o">+</span><span class="s2">&quot;network_comparison.png&quot;</span><span class="p">,</span><span class="n">dpi</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>P-value for cluster 2 difference is 0.0; t score is 8.5327
+P-value for cluster 5 difference is 0.0096; t score is 3.0767
+P-value for cluster 8 difference is 0.0004; t score is -4.7862
+P-value for cluster 9 difference is 0.0409; t score is -2.2898
+P-value for cluster 10 difference is 0.0001; t score is -5.7855
+P-value for cluster 11 difference is 0.0019; t score is 3.9591
+P-value for transition from cluster 0 to cluster 2 is 0.0349; t score is 2.3778
+P-value for transition from cluster 1 to cluster 3 is 0.0168; t score is 2.776
+P-value for transition from cluster 2 to cluster 5 is 0.0009; t score is 4.377
+P-value for transition from cluster 2 to cluster 12 is 0.0308; t score is 2.4471
+P-value for transition from cluster 3 to cluster 12 is 0.0193; t score is 2.6989
+P-value for transition from cluster 5 to cluster 2 is 0.0011; t score is 4.2697
+P-value for transition from cluster 5 to cluster 7 is 0.024; t score is 2.5824
+P-value for transition from cluster 7 to cluster 5 is 0.0231; t score is 2.6032
+P-value for transition from cluster 8 to cluster 9 is 0.0038; t score is -3.5763
+P-value for transition from cluster 8 to cluster 10 is 0.0025; t score is -3.8011
+P-value for transition from cluster 8 to cluster 13 is 0.0081; t score is -3.1691
+P-value for transition from cluster 9 to cluster 8 is 0.0032; t score is -3.6768
+P-value for transition from cluster 9 to cluster 10 is 0.0184; t score is -2.7257
+P-value for transition from cluster 10 to cluster 4 is 0.0297; t score is -2.4659
+P-value for transition from cluster 10 to cluster 8 is 0.0136; t score is -2.8877
+P-value for transition from cluster 10 to cluster 12 is 0.0077; t score is -3.1975
+P-value for transition from cluster 10 to cluster 13 is 0.0247; t score is -2.5672
+P-value for transition from cluster 11 to cluster 1 is 0.0195; t score is 2.6958
+P-value for transition from cluster 13 to cluster 0 is 0.0031; t score is -3.6935
+P-value for transition from cluster 13 to cluster 8 is 0.0326; t score is -2.4158
+P-value for transition from cluster 13 to cluster 10 is 0.0083; t score is -3.1558
+</pre></div>
+</div>
+<img alt="_images/14ed6c4a027b055562c67ae87faee2a3652e04617387a012279de7346fd3b96c.png" src="_images/14ed6c4a027b055562c67ae87faee2a3652e04617387a012279de7346fd3b96c.png" />
+</div>
+</div>
+<p>And now a “sand plot” showing mean pose usage density over time in a group.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">group</span><span class="o">=</span><span class="s2">&quot;saliv&quot;</span>
+<span class="n">labels_df</span><span class="p">,</span> <span class="n">n_modules</span> <span class="o">=</span> <span class="n">analysis</span><span class="o">.</span><span class="n">label_counter_subgroups</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">60</span><span class="o">*</span><span class="mi">20</span><span class="p">,</span><span class="n">selected_subgroups</span><span class="o">=</span><span class="p">[</span><span class="n">group</span><span class="p">])</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plot</span><span class="o">.</span><span class="n">SandPlotClusterFrequency_OverTime</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">labels_df</span><span class="p">[</span><span class="n">group</span><span class="p">],</span><span class="mi">0</span><span class="p">,</span> <span class="mi">60</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span><span class="n">figW</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span><span class="n">figH</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">save</span><span class="o">==</span><span class="kc">True</span><span class="p">:</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">save_path</span><span class="o">+</span><span class="n">group</span><span class="o">+</span><span class="s2">&quot;_sandplot.png&quot;</span><span class="p">,</span><span class="n">dpi</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span>
+
+<span class="n">group</span><span class="o">=</span><span class="s2">&quot;k10iv&quot;</span>
+<span class="n">labels_df</span><span class="p">,</span> <span class="n">n_modules</span> <span class="o">=</span> <span class="n">analysis</span><span class="o">.</span><span class="n">label_counter_subgroups</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">60</span><span class="o">*</span><span class="mi">20</span><span class="p">,</span><span class="n">selected_subgroups</span><span class="o">=</span><span class="p">[</span><span class="n">group</span><span class="p">])</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plot</span><span class="o">.</span><span class="n">SandPlotClusterFrequency_OverTime</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">labels_df</span><span class="p">[</span><span class="n">group</span><span class="p">],</span><span class="mi">0</span><span class="p">,</span> <span class="mi">60</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span><span class="n">figW</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span><span class="n">figH</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">save</span><span class="o">==</span><span class="kc">True</span><span class="p">:</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">save_path</span><span class="o">+</span><span class="n">group</span><span class="o">+</span><span class="s2">&quot;_sandplot.png&quot;</span><span class="p">,</span><span class="n">dpi</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/571dec1bb0bf52a60ded7d9a282426eeee7d693ca170f30d668370215f8bb99c.png" src="_images/571dec1bb0bf52a60ded7d9a282426eeee7d693ca170f30d668370215f8bb99c.png" />
+<img alt="_images/52f78232089d0559c40e4ea554dfa7354562db8a06d0291fbf0d49002b331f81.png" src="_images/52f78232089d0559c40e4ea554dfa7354562db8a06d0291fbf0d49002b331f81.png" />
+</div>
+</div>
+<p>And now, let’s look at some of these same analyses “remapped” into manual scoring space with our BORIS-to-pose-file mappings.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#BORIS to pose</span>
+<span class="n">BORIS_to_pose_mat</span><span class="p">,</span> <span class="n">BORIS_to_pose_mat_normalized</span><span class="p">,</span> <span class="n">loss</span> <span class="o">=</span> <span class="n">analysis</span><span class="o">.</span><span class="n">BORIS_to_pose</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+<span class="n">plot</span><span class="o">.</span><span class="n">BORIS_to_pose_matrix_plot</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">BORIS_to_pose_mat_normalized</span><span class="p">,</span><span class="n">figH</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">figW</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">save</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">save_path</span><span class="o">+</span><span class="s2">&quot;boris_to_pose.png&quot;</span><span class="p">,</span><span class="n">dpi</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span>
+
+<span class="c1">#remapping</span>
+<span class="n">selected_subgroups</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;saliv&quot;</span><span class="p">,</span><span class="s2">&quot;k1iv&quot;</span><span class="p">,</span><span class="s2">&quot;k5iv&quot;</span><span class="p">,</span><span class="s2">&quot;k10iv&quot;</span><span class="p">]</span>
+<span class="n">labels_df</span><span class="p">,</span> <span class="n">n_modules</span> <span class="o">=</span> <span class="n">analysis</span><span class="o">.</span><span class="n">label_counter_subgroups</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1200</span><span class="p">,</span><span class="n">selected_subgroups</span><span class="o">=</span><span class="n">selected_subgroups</span><span class="p">)</span>
+<span class="n">BORIS_to_pose_mat</span><span class="p">,</span> <span class="n">BORIS_to_pose_mat_normalized</span><span class="p">,</span> <span class="n">loss</span> <span class="o">=</span> <span class="n">analysis</span><span class="o">.</span><span class="n">BORIS_to_pose</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+<span class="n">labels_df</span> <span class="o">=</span> <span class="n">analysis</span><span class="o">.</span><span class="n">make_remappings_from_BORIS</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">labels_df</span><span class="p">,</span> <span class="n">BORIS_to_pose_mat</span><span class="p">)</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plot</span><span class="o">.</span><span class="n">plot_module_usage_subgroups</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">labels_df</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1200</span><span class="p">,</span><span class="n">figW</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span><span class="n">figH</span><span class="o">=</span><span class="mf">2.5</span><span class="p">,</span><span class="n">legend_pos</span><span class="o">=</span><span class="s2">&quot;outside&quot;</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">save</span><span class="o">==</span><span class="kc">True</span><span class="p">:</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">save_path</span><span class="o">+</span><span class="s2">&quot;remapped_labels_subgroups.png&quot;</span><span class="p">,</span><span class="n">dpi</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span>
+
+<span class="c1">#plot over time - remapped</span>
+<span class="n">group</span><span class="o">=</span><span class="s2">&quot;k10iv&quot;</span>
+<span class="n">labels_df</span><span class="p">,</span> <span class="n">n_modules</span> <span class="o">=</span> <span class="n">analysis</span><span class="o">.</span><span class="n">label_counter_subgroups</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">60</span><span class="o">*</span><span class="mi">50</span><span class="p">,</span><span class="n">selected_subgroups</span><span class="o">=</span><span class="p">[</span><span class="n">group</span><span class="p">])</span>
+<span class="n">BORIS_to_pose_mat</span><span class="p">,</span> <span class="n">BORIS_to_pose_mat_normalized</span><span class="p">,</span> <span class="n">loss</span> <span class="o">=</span> <span class="n">analysis</span><span class="o">.</span><span class="n">BORIS_to_pose</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+<span class="n">labels_df</span> <span class="o">=</span> <span class="n">analysis</span><span class="o">.</span><span class="n">make_remappings_from_BORIS</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">labels_df</span><span class="p">,</span> <span class="n">BORIS_to_pose_mat</span><span class="p">)</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plot</span><span class="o">.</span><span class="n">SandPlotClusterFrequency_OverTime</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">labels_df</span><span class="p">[</span><span class="n">group</span><span class="p">],</span><span class="mi">0</span><span class="p">,</span> <span class="mi">60</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">save</span><span class="o">==</span><span class="kc">True</span><span class="p">:</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">save_path</span><span class="o">+</span><span class="s2">&quot;remapped_sandplot.png&quot;</span><span class="p">,</span><span class="n">dpi</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>done with [&#39;2023-07-18_18-19-50_bm04_k10iv_2023-07-18_18-19-50_bm04_k10iv.csv&#39;, &#39;2023-07-18_18-19-50_bm04_k10iv&#39;]
+done with [&#39;2023-06-20_19-10-38_bf04_k1iv_2023-06-20_19-10-38_bf04_k1iv.csv&#39;, &#39;2023-06-20_19-10-38_bf04_k1iv&#39;]
+VAME modules map onto scored behaviors with &#39;loss&#39; of 0.3304357516995431
+done with [&#39;2023-07-18_18-19-50_bm04_k10iv_2023-07-18_18-19-50_bm04_k10iv.csv&#39;, &#39;2023-07-18_18-19-50_bm04_k10iv&#39;]
+done with [&#39;2023-06-20_19-10-38_bf04_k1iv_2023-06-20_19-10-38_bf04_k1iv.csv&#39;, &#39;2023-06-20_19-10-38_bf04_k1iv&#39;]
+VAME modules map onto scored behaviors with &#39;loss&#39; of 0.3304357516995431
+Applying 15 remapping rules from config.
+1 of 15: Remapping [0] to rear
+2 of 15: Remapping [1] to ataxic 4-5
+3 of 15: Remapping [2] to explore
+4 of 15: Remapping [3] to ataxic 4-5
+5 of 15: Remapping [4] to ataxic 4-5
+6 of 15: Remapping [5] to explore
+7 of 15: Remapping [6] to sleep
+8 of 15: Remapping [7] to ataxic 1-3
+9 of 15: Remapping [8] to walk
+10 of 15: Remapping [9] to walk
+11 of 15: Remapping [10] to ataxic 4-5
+12 of 15: Remapping [11] to groom
+13 of 15: Remapping [12] to ataxic 4-5
+14 of 15: Remapping [13] to walk
+15 of 15: Remapping [14] to ataxic 4-5
+False
+7
+False
+False
+False
+done with [&#39;2023-07-18_18-19-50_bm04_k10iv_2023-07-18_18-19-50_bm04_k10iv.csv&#39;, &#39;2023-07-18_18-19-50_bm04_k10iv&#39;]
+done with [&#39;2023-06-20_19-10-38_bf04_k1iv_2023-06-20_19-10-38_bf04_k1iv.csv&#39;, &#39;2023-06-20_19-10-38_bf04_k1iv&#39;]
+VAME modules map onto scored behaviors with &#39;loss&#39; of 0.3304357516995431
+Applying 15 remapping rules from config.
+1 of 15: Remapping [0] to rear
+2 of 15: Remapping [1] to ataxic 4-5
+3 of 15: Remapping [2] to explore
+4 of 15: Remapping [3] to ataxic 4-5
+5 of 15: Remapping [4] to ataxic 4-5
+6 of 15: Remapping [5] to explore
+7 of 15: Remapping [6] to sleep
+8 of 15: Remapping [7] to ataxic 1-3
+9 of 15: Remapping [8] to walk
+10 of 15: Remapping [9] to walk
+11 of 15: Remapping [10] to ataxic 4-5
+12 of 15: Remapping [11] to groom
+13 of 15: Remapping [12] to ataxic 4-5
+14 of 15: Remapping [13] to walk
+15 of 15: Remapping [14] to ataxic 4-5
+</pre></div>
+</div>
+<img alt="_images/52e441e9f21d64e971f2d3196776a68c652b169ed5a97f4e000e43cc48b7f36a.png" src="_images/52e441e9f21d64e971f2d3196776a68c652b169ed5a97f4e000e43cc48b7f36a.png" />
+<img alt="_images/852762fab899ea04875e25afa54cc9312a7eebafe305a2c4f0f6b7f61806f70a.png" src="_images/852762fab899ea04875e25afa54cc9312a7eebafe305a2c4f0f6b7f61806f70a.png" />
+<img alt="_images/433e272211cf03963102c676c2822a50da7cd4a0b60fd5697aa4b2354ec0af13.png" src="_images/433e272211cf03963102c676c2822a50da7cd4a0b60fd5697aa4b2354ec0af13.png" />
+</div>
+</div>
+</section>
+<section id="classification">
+<h2>Classification<a class="headerlink" href="#classification" title="Permalink to this heading"></a></h2>
+<p>Now we will do some classification! Let’s just start with a simple linear discriminant analysis - no time blocks</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">labels_df</span><span class="p">,</span> <span class="n">n_modules</span> <span class="o">=</span> <span class="n">analysis</span><span class="o">.</span><span class="n">label_counter_subgroups</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1200</span><span class="p">,</span><span class="n">selected_subgroups</span><span class="o">=</span><span class="n">selected_subgroups</span><span class="p">)</span>
+<span class="n">lda_result</span> <span class="o">=</span> <span class="n">analysis</span><span class="o">.</span><span class="n">lda_labels_timebins</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="n">labels_df</span><span class="p">,</span><span class="mi">1200</span><span class="p">,</span><span class="n">loocv</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">selected_subgroups</span><span class="o">=</span><span class="n">selected_subgroups</span><span class="p">)</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plot</span><span class="o">.</span><span class="n">plot_lda</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">lda_result</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;viridis_r&quot;</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">save</span><span class="o">==</span><span class="kc">True</span><span class="p">:</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">save_path</span><span class="o">+</span><span class="s2">&quot;lda_embeddings.png&quot;</span><span class="p">,</span><span class="n">dpi</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span>
+<span class="n">plot</span><span class="o">.</span><span class="n">plot_conf_mat</span><span class="p">(</span><span class="n">lda_result</span><span class="p">,</span><span class="n">alt_title</span><span class="o">=</span><span class="s2">&quot;Linear Discriminant Analysis</span><span class="se">\n</span><span class="s2">Confusion Matrix&quot;</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">save</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">save_path</span><span class="o">+</span><span class="s2">&quot;lda_confmat.png&quot;</span><span class="p">,</span><span class="n">dpi</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/d76a8253230e804d52c85106c1ea47f965efb54d536a2c4ea40d4e2626085e1c.png" src="_images/d76a8253230e804d52c85106c1ea47f965efb54d536a2c4ea40d4e2626085e1c.png" />
+<img alt="_images/513e2dfaf3bfac6c5c6c08687d246faa51d7d6d2df3096f28934a8af1ea20849.png" src="_images/513e2dfaf3bfac6c5c6c08687d246faa51d7d6d2df3096f28934a8af1ea20849.png" />
+</div>
+</div>
+<p>And then we’ll scan different bin widths (seconds) to see what time discritization gives the best classification performance.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">binsizes</span><span class="o">=</span><span class="p">[</span><span class="mf">0.5</span><span class="o">*</span><span class="mi">60</span><span class="p">,</span><span class="mi">1</span><span class="o">*</span><span class="mi">60</span><span class="p">,</span><span class="mf">2.5</span><span class="o">*</span><span class="mi">60</span><span class="p">,</span><span class="mi">5</span><span class="o">*</span><span class="mi">60</span><span class="p">,</span><span class="mi">10</span><span class="o">*</span><span class="mi">60</span><span class="p">,</span><span class="mi">20</span><span class="o">*</span><span class="mi">60</span><span class="p">]</span>
+<span class="n">accuracies</span><span class="o">=</span><span class="p">[]</span>
+<span class="k">for</span> <span class="n">binsize</span> <span class="ow">in</span> <span class="n">binsizes</span><span class="p">:</span>
+    <span class="n">labels_df</span><span class="p">,</span> <span class="n">n_modules</span> <span class="o">=</span> <span class="n">analysis</span><span class="o">.</span><span class="n">label_counter_subgroups</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1200</span><span class="p">,</span><span class="n">selected_subgroups</span><span class="o">=</span><span class="n">selected_subgroups</span><span class="p">)</span>
+    <span class="n">lda_result</span> <span class="o">=</span> <span class="n">analysis</span><span class="o">.</span><span class="n">lda_labels_timebins</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="n">labels_df</span><span class="p">,</span><span class="n">binsize</span><span class="p">,</span><span class="n">loocv</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">selected_subgroups</span><span class="o">=</span><span class="n">selected_subgroups</span><span class="p">)</span>
+    <span class="n">accuracies</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">lda_result</span><span class="o">.</span><span class="n">loocv_accuracy</span><span class="p">)</span>
+
+<span class="n">loocv_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">&quot;binsize&quot;</span><span class="p">:</span> <span class="n">binsizes</span><span class="p">,</span> <span class="s2">&quot;LOOCV&quot;</span><span class="p">:</span> <span class="n">accuracies</span><span class="p">})</span>
+<span class="n">best_bin_arg</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">loocv_df</span><span class="o">.</span><span class="n">LOOCV</span><span class="p">)</span>
+<span class="n">best_bin</span><span class="o">=</span><span class="n">loocv_df</span><span class="o">.</span><span class="n">binsize</span><span class="p">[</span><span class="n">best_bin_arg</span><span class="p">]</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="mf">2.5</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">loocv_df</span><span class="o">.</span><span class="n">binsize</span><span class="p">,</span><span class="n">loocv_df</span><span class="o">.</span><span class="n">LOOCV</span><span class="p">,</span><span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span><span class="n">marker</span><span class="o">=</span><span class="s2">&quot;o&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Bin size (s)&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Linear Discriminant Analysis </span><span class="se">\n</span><span class="s2">LOOCV Accuracy&quot;</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="k">if</span> <span class="n">save</span><span class="o">==</span><span class="kc">True</span><span class="p">:</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">save_path</span><span class="o">+</span><span class="s2">&quot;lda_loocv_scan.png&quot;</span><span class="p">,</span><span class="n">dpi</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span>
+    <span class="n">loocv_df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">save_path</span><span class="o">+</span><span class="s2">&quot;lda_loocv.csv&quot;</span><span class="p">)</span>
+
+<span class="c1"># Linear discriminant analysis - plot</span>
+<span class="n">binsize</span><span class="o">=</span><span class="n">best_bin</span>
+<span class="n">labels_df</span><span class="p">,</span> <span class="n">n_modules</span> <span class="o">=</span> <span class="n">analysis</span><span class="o">.</span><span class="n">label_counter_subgroups</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1200</span><span class="p">,</span><span class="n">selected_subgroups</span><span class="o">=</span><span class="n">selected_subgroups</span><span class="p">)</span>
+<span class="n">lda_result</span> <span class="o">=</span> <span class="n">analysis</span><span class="o">.</span><span class="n">lda_labels_timebins</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="n">labels_df</span><span class="p">,</span><span class="n">binsize</span><span class="p">,</span><span class="n">loocv</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">selected_subgroups</span><span class="o">=</span><span class="n">selected_subgroups</span><span class="p">)</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plot</span><span class="o">.</span><span class="n">plot_lda</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">lda_result</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;viridis_r&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">save_path</span><span class="o">+</span><span class="s2">&quot;lda_embeddings_bestbin.png&quot;</span><span class="p">,</span><span class="n">dpi</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span>
+<span class="n">plot</span><span class="o">.</span><span class="n">plot_conf_mat</span><span class="p">(</span><span class="n">lda_result</span><span class="p">,</span><span class="n">alt_title</span><span class="o">=</span><span class="s2">&quot;Linear Discriminant Analysis</span><span class="se">\n</span><span class="s2">Confusion Matrix&quot;</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">save</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">save_path</span><span class="o">+</span><span class="s2">&quot;lda_confmat_bestbin.png&quot;</span><span class="p">,</span><span class="n">dpi</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/565e739241f92c5f9b111d6a599e0f00ea5dc439eca99ea2ccab664568905858.png" src="_images/565e739241f92c5f9b111d6a599e0f00ea5dc439eca99ea2ccab664568905858.png" />
+<img alt="_images/83a8143a65f56c77cb059221cb804b3ac8155395c1c6f503e0812894dcbd0c10.png" src="_images/83a8143a65f56c77cb059221cb804b3ac8155395c1c6f503e0812894dcbd0c10.png" />
+<img alt="_images/9108e3067b0442f5d3f149118c5c1ef932336f16ab9bf03656df225e140e7843.png" src="_images/9108e3067b0442f5d3f149118c5c1ef932336f16ab9bf03656df225e140e7843.png" />
+</div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="Welcome to MARIPoSA’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="demo2_dlc.html" class="btn btn-neutral float-right" title="Demo 2: Scalar locomotion data from DeepLabCut" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Sedona Ewbank.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

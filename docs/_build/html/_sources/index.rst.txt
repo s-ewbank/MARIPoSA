@@ -60,6 +60,10 @@ Check out the demo scripts for a full analysis and plotting pipeline!
    :maxdepth: 2
    :caption: Contents:
 
+   demo1_start
+   demo2_dlc
+   demo3_pca
+   demo4_pk
    metadata
    analysis
    plot
