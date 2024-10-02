@@ -51,7 +51,7 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Demo 1: Basic project creation, pose usage plots, and classification</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#initializing-the-project">Initializing the project</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#computing-and-visualizing-module-usage">Computing and visualizing module usage</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#classification">Classification</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#classification-with-linear-discriminant-analysis">Classification with Linear Discriminant Analysis</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="demo2_dlc.html">Demo 2: Scalar locomotion data from DeepLabCut</a></li>
@@ -118,7 +118,7 @@
 <div class="cell_output docutils container">
 <div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
 <span class="ne">ModuleNotFoundError</span><span class="g g-Whitespace">                       </span>Traceback (most recent call last)
-<span class="o">/</span><span class="n">var</span><span class="o">/</span><span class="n">folders</span><span class="o">/</span><span class="n">v1</span><span class="o">/</span><span class="mi">8</span><span class="n">qlykyv97dbb5jhzq44rpdh80000gn</span><span class="o">/</span><span class="n">T</span><span class="o">/</span><span class="n">ipykernel_90007</span><span class="o">/</span><span class="mf">319854871.</span><span class="n">py</span> <span class="ow">in</span> <span class="o">&lt;</span><span class="n">module</span><span class="o">&gt;</span>
+<span class="o">/</span><span class="n">var</span><span class="o">/</span><span class="n">folders</span><span class="o">/</span><span class="n">v1</span><span class="o">/</span><span class="mi">8</span><span class="n">qlykyv97dbb5jhzq44rpdh80000gn</span><span class="o">/</span><span class="n">T</span><span class="o">/</span><span class="n">ipykernel_96051</span><span class="o">/</span><span class="mf">319854871.</span><span class="n">py</span> <span class="ow">in</span> <span class="o">&lt;</span><span class="n">module</span><span class="o">&gt;</span>
 <span class="g g-Whitespace">     </span><span class="mi">14</span> 
 <span class="g g-Whitespace">     </span><span class="mi">15</span> <span class="c1">#import utils</span>
 <span class="ne">---&gt; </span><span class="mi">16</span> <span class="kn">from</span> <span class="nn">utils</span> <span class="kn">import</span> <span class="n">analysis</span><span class="p">,</span> <span class="n">plot</span><span class="p">,</span> <span class="n">metadata</span>
@@ -911,12 +911,12 @@ Applying 15 remapping rules from config.
 </div>
 </div>
 </section>
-<section id="classification">
-<h2>Classification<a class="headerlink" href="#classification" title="Permalink to this heading"></a></h2>
-<p>Now we will do some classification! Let’s just start with a simple linear discriminant analysis - no time blocks</p>
+<section id="classification-with-linear-discriminant-analysis">
+<h2>Classification with Linear Discriminant Analysis<a class="headerlink" href="#classification-with-linear-discriminant-analysis" title="Permalink to this heading"></a></h2>
+<p>Now we will do some classification! Let’s just start with a simple linear discriminant analysis based on module usage across an entire session - no time blocks or feature subselection. To achieve this, we will use our analysis.label_counter_subgroups function and a new function, analysis.lda_labels_timebins, which outputs a result of class LdaResult containing the fitted LDA model, the input features and class labels, and (optionally) leave-one-out cross-validation accuracy and confusion matrix.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">labels_df</span><span class="p">,</span> <span class="n">n_modules</span> <span class="o">=</span> <span class="n">analysis</span><span class="o">.</span><span class="n">label_counter_subgroups</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1200</span><span class="p">,</span><span class="n">selected_subgroups</span><span class="o">=</span><span class="n">selected_subgroups</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">labels_df</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">analysis</span><span class="o">.</span><span class="n">label_counter_subgroups</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1200</span><span class="p">,</span><span class="n">selected_subgroups</span><span class="o">=</span><span class="n">selected_subgroups</span><span class="p">)</span>
 <span class="n">lda_result</span> <span class="o">=</span> <span class="n">analysis</span><span class="o">.</span><span class="n">lda_labels_timebins</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="n">labels_df</span><span class="p">,</span><span class="mi">1200</span><span class="p">,</span><span class="n">loocv</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">selected_subgroups</span><span class="o">=</span><span class="n">selected_subgroups</span><span class="p">)</span>
 <span class="n">fig</span> <span class="o">=</span> <span class="n">plot</span><span class="o">.</span><span class="n">plot_lda</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">lda_result</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;viridis_r&quot;</span><span class="p">)</span>
 <span class="k">if</span> <span class="n">save</span><span class="o">==</span><span class="kc">True</span><span class="p">:</span>

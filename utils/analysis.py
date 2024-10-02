@@ -379,7 +379,7 @@ def lda_labels_timebins(config,
                         binsize,
                         selected_subgroups="all",
                         ncomponents=2,
-                        select_features=False,
+                        feature_selection=None,
                         loocv=False):
     """
     Function to compute LDA for data in timebins
@@ -389,7 +389,7 @@ def lda_labels_timebins(config,
     :param binsize: bin width in seconds
     :param selected_subgroups:
     :param ncomponents: number of linear discriminants
-    :param select_features: False or a number
+    :param feature_selection: None for no feature selection or tuple of method "pca","f" and number of features
     :param loocv: do leave-one-out cross-validation
     :return:
     """
@@ -402,14 +402,23 @@ def lda_labels_timebins(config,
     label_counts, group_labels = get_usage_feats(config,labels_df,binsize,selected_subgroups=selected_subgroups)
     label_counts_full = label_counts.copy()
     group_labels_full = group_labels.copy()
-    if select_features!=False:
-        scaler = StandardScaler()
-        label_counts_scaled = scaler.fit_transform(label_counts)
-        pca = PCA(n_components=1)
-        pca.fit(label_counts_scaled)
-        picks = pca.components_.argsort()[0][0:select_features]
-        label_counts = label_counts[:, picks]
-
+    if feature_selection is not None:
+        if feature_selection[0]=="pca":
+            scaler = StandardScaler()
+            label_counts_scaled = scaler.fit_transform(label_counts)
+            pca = PCA(n_components=1)
+            pca.fit(label_counts_scaled)
+            picks = pca.components_.argsort()[0][0:feature_selection[1]]
+            label_counts = label_counts[:, picks]
+        elif feature_selection[0]=="f":
+            group_data = []
+            for g in range(n_groups):
+                group_data.append(label_counts[np.array(group_labels) == g, :])
+            result = scipy.stats.f_oneway(*group_data)
+            ranked_stats = sorted(result[0])
+            ranked_stats.reverse()
+            picks=result[0]>=ranked_stats[feature_selection[1]]
+            label_counts = label_counts[:, picks]
     lda = LDA(n_components=ncomponents)
     lda_embeddings = lda.fit_transform(label_counts, group_labels)
 
@@ -421,12 +430,21 @@ def lda_labels_timebins(config,
             label_counts_i=label_counts_full[sample_i,:]
             group_labels_sub=group_labels_full.copy()
             label_i=group_labels_sub.pop(sample_i)
-            if select_features != False:
-                scaler = StandardScaler()
-                label_counts_sub_scaled = scaler.fit_transform(label_counts_sub)
-                pca = PCA(n_components=1)
-                pca.fit(label_counts_sub_scaled)
-                picks = pca.components_.argsort()[0][0:select_features]
+            if feature_selection is not None:
+                if feature_selection[0]=="pca":
+                    scaler = StandardScaler()
+                    label_counts_sub_scaled = scaler.fit_transform(label_counts_sub)
+                    pca = PCA(n_components=1)
+                    pca.fit(label_counts_sub_scaled)
+                    picks = pca.components_.argsort()[0][0:feature_selection[1]]
+                elif feature_selection[0]=="f":
+                    group_data_sub = []
+                    for g in range(n_groups):
+                        group_data_sub.append(label_counts_sub[np.array(group_labels_sub) == g, :])
+                    result = scipy.stats.f_oneway(*group_data_sub)
+                    ranked_stats = sorted(result[0])
+                    ranked_stats.reverse()
+                    picks=result[0]>=ranked_stats[feature_selection[1]]
                 label_counts_sub = label_counts_sub[:, picks]
                 label_counts_i = label_counts_i[picks]
             lda_sub = LDA(n_components=ncomponents)

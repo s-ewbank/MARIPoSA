@@ -1020,7 +1020,7 @@ class Application(customtkinter.CTk):
         labels_df, n_modules = analysis.label_counter_subgroups(self.config, start, end, selected_subgroups=subgroups)
         if do=="embed":
             lda_result = analysis.lda_labels_timebins(self.config, labels_df, binsize, selected_subgroups=subgroups)
-            fig = plot.plot_lda(self.config, lda_result, cmap=cmap, selected_subgroups=subgroups)
+            fig = plot.plot_lda(self.config, lda_result, cmap=cmap)
             self.plots_generated = self.plots_generated + 1
             self.plot_window = PlotWindow(fig=fig, plot_number=self.plots_generated, master=self)
             self.plot_window.mainloop()
@@ -1034,7 +1034,7 @@ class Application(customtkinter.CTk):
         elif do=="save":
             print("Saving LDA classifier")
             lda_result = analysis.lda_labels_timebins(self.config, labels_df, binsize, selected_subgroups=subgroups)
-            fig = plot.plot_lda(self.config, lda_result, cmap=cmap, selected_subgroups=subgroups)
+            fig = plot.plot_lda(self.config, lda_result, cmap=cmap)
             self.plots_generated = self.plots_generated + 1
             self.plot_window = PlotWindow(fig=fig, plot_number=self.plots_generated, master=self)
             self.plot_window.mainloop()
