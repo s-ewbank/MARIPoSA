@@ -56,8 +56,10 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Analysis</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#utils.analysis.BORIS_to_pose"><code class="docutils literal notranslate"><span class="pre">BORIS_to_pose()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#utils.analysis.combine_pose_modules"><code class="docutils literal notranslate"><span class="pre">combine_pose_modules()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#utils.analysis.feat_select"><code class="docutils literal notranslate"><span class="pre">feat_select()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#utils.analysis.get_distance_timebins"><code class="docutils literal notranslate"><span class="pre">get_distance_timebins()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#utils.analysis.get_usage_feats"><code class="docutils literal notranslate"><span class="pre">get_usage_feats()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#utils.analysis.get_usage_ssd"><code class="docutils literal notranslate"><span class="pre">get_usage_ssd()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#utils.analysis.label_counter_nosubgroups"><code class="docutils literal notranslate"><span class="pre">label_counter_nosubgroups()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#utils.analysis.label_counter_subgroups"><code class="docutils literal notranslate"><span class="pre">label_counter_subgroups()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#utils.analysis.lda_labels_timebins"><code class="docutils literal notranslate"><span class="pre">lda_labels_timebins()</span></code></a></li>
@@ -128,6 +130,27 @@ line up with what pose modules</p>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="utils.analysis.feat_select">
+<span class="sig-prename descclassname"><span class="pre">utils.analysis.</span></span><span class="sig-name descname"><span class="pre">feat_select</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">usage_feats</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'f'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_feats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/utils/analysis.html#feat_select"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.analysis.feat_select" title="Permalink to this definition"></a></dt>
+<dd><p>A function for subselecting features that may be most relevant for classification</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>label_counts</strong> – label_counts array returned by analysis.get_usage_feats</p></li>
+<li><p><strong>group_labels</strong> – group_labels list returned by analysis.get_usage_feats</p></li>
+<li><p><strong>feat_names</strong> – feat_names list returned by analysis.get_usage_feats</p></li>
+<li><p><strong>method</strong> – Method for feature selection (“f”, “pca”)</p></li>
+<li><p><strong>n_feats</strong> – Number of features to select</p></li>
+<li><p><strong>verbose</strong> – Print output or not</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="utils.analysis.get_distance_timebins">
 <span class="sig-prename descclassname"><span class="pre">utils.analysis.</span></span><span class="sig-name descname"><span class="pre">get_distance_timebins</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">DLC_config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filepath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">binsize</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bodypart</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">thresh</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">70</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/utils/analysis.html#get_distance_timebins"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.analysis.get_distance_timebins" title="Permalink to this definition"></a></dt>
 <dd><p>Get distance/locomotion for a body part from a DLC file</p>
@@ -166,6 +189,15 @@ line up with what pose modules</p>
 <dd class="field-even"><p></p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="utils.analysis.get_usage_ssd">
+<span class="sig-prename descclassname"><span class="pre">utils.analysis.</span></span><span class="sig-name descname"><span class="pre">get_usage_ssd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">control_usage_feats</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exp_usage_feats</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/utils/analysis.html#get_usage_ssd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.analysis.get_usage_ssd" title="Permalink to this definition"></a></dt>
+<dd><p>Get the time-resolved sum squared difference in module usage relative to a control distribution of usage.
+:param control_usage_feats: output from analysis.get_usage_feats for the control group ONLY
+:param exp_usage_feats:
+:return:</p>
 </dd></dl>
 
 <dl class="py function">
@@ -209,7 +241,7 @@ line up with what pose modules</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="utils.analysis.lda_labels_timebins">
-<span class="sig-prename descclassname"><span class="pre">utils.analysis.</span></span><span class="sig-name descname"><span class="pre">lda_labels_timebins</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">binsize</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">selected_subgroups</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'all'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ncomponents</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">select_features</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loocv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/utils/analysis.html#lda_labels_timebins"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.analysis.lda_labels_timebins" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">utils.analysis.</span></span><span class="sig-name descname"><span class="pre">lda_labels_timebins</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">binsize</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">selected_subgroups</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'all'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ncomponents</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feature_selection</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loocv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/utils/analysis.html#lda_labels_timebins"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.analysis.lda_labels_timebins" title="Permalink to this definition"></a></dt>
 <dd><p>Function to compute LDA for data in timebins</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -219,7 +251,7 @@ line up with what pose modules</p>
 <li><p><strong>binsize</strong> – bin width in seconds</p></li>
 <li><p><strong>selected_subgroups</strong> – </p></li>
 <li><p><strong>ncomponents</strong> – number of linear discriminants</p></li>
-<li><p><strong>select_features</strong> – False or a number</p></li>
+<li><p><strong>feature_selection</strong> – None for no feature selection or tuple of method “pca”,”f” and number of features</p></li>
 <li><p><strong>loocv</strong> – do leave-one-out cross-validation</p></li>
 </ul>
 </dd>
