@@ -317,6 +317,57 @@ def make_remappings_from_BORIS(config, labels_df, BORIS_to_pose_mat):
     combine_pose_modules(config, labels_df)
     return labels_df
 
+class UsageFeats:
+    def __init__(self, label_counts, group_labels, feat_names, group_dict):
+        self.label_counts = label_counts
+        self.group_labels = group_labels
+        self.feat_names = feat_names
+        self.group_dict = group_dict
+
+    def to_df(self):
+        colnames=[]
+        flip_group_dict = {v: k for k, v in self.group_dict.items()}
+        for i in self.group_labels:
+            colnames.append(flip_group_dict[i])
+        df = pd.DataFrame(self.label_counts, columns=self.feat_names, index=colnames)
+        return df
+
+    def collapse_timebins(self):
+        colnames=[]
+        flip_group_dict = {v: k for k, v in self.group_dict.items()}
+        for i in self.group_labels:
+            colnames.append(flip_group_dict[i])
+        df = pd.DataFrame(self.label_counts, columns=self.feat_names, index=colnames)
+        extracted = [i.split("_")[0] for i in df.columns]
+        modules = pd.Series(extracted).unique()
+
+        df_notimebins = pd.DataFrame(index=df.index, columns=modules)
+        for module in modules:
+            df_notimebins[module] = df.filter(like=module + "_").mean(axis=1)
+
+        return UsageFeats(np.array(df_notimebins), self.group_labels, df_notimebins.columns, self.group_dict)
+
+    def apply_picks(self,pick_names):
+        feats = self.to_df().columns
+        if set(pick_names)<=set(feats):
+            colnames=[]
+            flip_group_dict = {v: k for k, v in self.group_dict.items()}
+            for i in self.group_labels:
+                colnames.append(flip_group_dict[i])
+            df = pd.DataFrame(self.label_counts, columns=self.feat_names, index=colnames)
+            df_sub = df[pick_names]
+            return UsageFeats(np.array(df_sub), self.group_labels, df_sub.columns, self.group_dict)
+        else:
+            print("Picks not found in features, presuming that you are applying no-bin picks to binned data and adjusting accordingly...")
+            print("Input picks: {}".format(pick_names))
+            new_picks = []
+            for pick in pick_names:
+                new_picks.extend([i for i in feats if pick+"_" in i])
+            print("Applied picks: {}".format(new_picks))
+            picked_feats = self.apply_picks(new_picks)
+            return picked_feats
+
+
 def get_usage_feats(config,
                     labels_df,
                     binsize,
@@ -341,7 +392,12 @@ def get_usage_feats(config,
     n_clust = len(clusts)
 
     label_counts = []
+
     nbins = int(labels_df.shape[0] / (binsize * fps))
+    feat_names_made=False
+    feat_names=[]
+
+    group_labels = []
     for g in range(n_groups):
         for i in range(len(labels_df[selected_subgroups[g]].columns)):
             label_counts_i = np.zeros(n_clust * nbins)
@@ -351,15 +407,94 @@ def get_usage_feats(config,
                 labels_df_sub = labels_df[binstart:binstop]
                 for c in range(n_clust):
                     label_counts_i[c + n_clust * b] = np.count_nonzero(
-                        labels_df_sub[selected_subgroups[g]][[labels_df[selected_subgroups[g]].columns[i]]] == c) / (5 * 60 * fps)
+                        labels_df_sub[selected_subgroups[g]][[labels_df_sub[selected_subgroups[g]].columns[i]]] == c) / (binsize * fps)
+                    if feat_names_made==False:
+                        if nbins>1:
+                            feat_names.append(f"module{c}_t{int(binstart/fps)}-{int(binstop/fps)}")
+                        else:
+                            feat_names.append(f"module{c}")
             label_counts.append(label_counts_i)
+            group_labels.append(g)
+            feat_names_made=True
     label_counts = np.array(label_counts)
 
-    group_labels = []
-    for g in range(n_groups):
-        group_labels.extend([g] * len(labels_df[selected_subgroups[g]].columns))
+    return UsageFeats(label_counts, group_labels, feat_names, group_dict)
 
-    return label_counts, group_labels
+def feat_select(usage_feats, method="f", n_feats=10, verbose=True):
+    """
+    A function for subselecting features that may be most relevant for classification
+
+    :param label_counts: label_counts array returned by analysis.get_usage_feats
+    :param group_labels: group_labels list returned by analysis.get_usage_feats
+    :param feat_names: feat_names list returned by analysis.get_usage_feats
+    :param method: Method for feature selection ("f", "pca")
+    :param n_feats: Number of features to select
+    :param verbose: Print output or not
+    :return:
+    """
+    n_groups=len(np.unique(usage_feats.group_labels))
+    picks=[]
+    if method=="pca":
+        scaler = StandardScaler()
+        label_counts_scaled = scaler.fit_transform(usage_feats.label_counts)
+        pca = PCA(n_components=1)
+        pca.fit(label_counts_scaled)
+        picks = pca.components_.argsort()[0][0:n_feats]
+        text="Features selected by PCA were: "
+    elif method=="f":
+        group_data = []
+        for g in range(n_groups):
+            group_data.append(usage_feats.label_counts[np.array(usage_feats.group_labels) == g, :])
+        result = scipy.stats.f_oneway(*group_data)
+        ranked_stats = sorted(result[0])
+        ranked_stats.reverse()
+        picks=result[0]>ranked_stats[n_feats]
+        text="Features selected by f-stat were: "
+
+    n_picks=0
+    pick_names=[]
+    for p, pick in enumerate(picks):
+        if pick:
+            pick_names.append(usage_feats.feat_names[p])
+            n_picks=n_picks+1
+            if n_picks!=np.sum(picks):
+                text+=str(usage_feats.feat_names[p])+", "
+            else:
+                text+=str(usage_feats.feat_names[p])+"."
+
+
+    if verbose==True:
+        print(text)
+
+    return picks, pick_names
+
+
+def get_usage_ssd(control_usage_feats, exp_usage_feats):
+    """
+    Get the time-resolved sum squared difference in module usage relative to a control distribution of usage.
+    :param control_usage_feats: output from analysis.get_usage_feats for the control group ONLY
+    :param exp_usage_feats:
+    :return:
+    """
+    control_usage_feats_df = control_usage_feats.to_df()
+    exp_usage_df = exp_usage_feats.to_df()
+    control_usage = control_usage_feats_df.mean(axis=0)
+
+    exp_usage_df_sqdiff = exp_usage_df.copy()
+
+    for module in control_usage.index:
+        mod_cols = [i for i in exp_usage_df.columns if module + '_' in i]
+        exp_usage_df_sqdiff[mod_cols] = np.square(exp_usage_df_sqdiff[mod_cols] - control_usage[module])
+
+    extracted = [col.split("_t")[1].split("-")[0] for col in exp_usage_df.columns]
+    binstarts = pd.Series(extracted).unique()
+    exp_usage_df_ssd = pd.DataFrame(index=exp_usage_df.index, columns=binstarts)
+
+    for i in range(len(exp_usage_df_ssd.index)):
+        for bin in binstarts:
+            exp_usage_df_ssd.iloc[i][bin] = np.sum(exp_usage_df_sqdiff.iloc[i].filter(like="_t" + bin + "-"))
+
+    return exp_usage_df_ssd
 
 class LdaResult:
     def __init__(self, lda, lda_embeddings, label_counts, group_labels, group_dict, nbins, binsize,
@@ -399,28 +534,14 @@ def lda_labels_timebins(config,
     fps = int(config["fps"])
     group_dict = {selected_subgroups[i]: i for i in range(len(selected_subgroups))}
     nbins = int(labels_df.shape[0] / (binsize * fps))
-    label_counts, group_labels = get_usage_feats(config,labels_df,binsize,selected_subgroups=selected_subgroups)
-    label_counts_full = label_counts.copy()
-    group_labels_full = group_labels.copy()
+    usage_feats = get_usage_feats(config,labels_df,binsize,selected_subgroups=selected_subgroups)
+    label_counts_full = usage_feats.label_counts.copy()
+    group_labels_full = usage_feats.group_labels.copy()
     if feature_selection is not None:
-        if feature_selection[0]=="pca":
-            scaler = StandardScaler()
-            label_counts_scaled = scaler.fit_transform(label_counts)
-            pca = PCA(n_components=1)
-            pca.fit(label_counts_scaled)
-            picks = pca.components_.argsort()[0][0:feature_selection[1]]
-            label_counts = label_counts[:, picks]
-        elif feature_selection[0]=="f":
-            group_data = []
-            for g in range(n_groups):
-                group_data.append(label_counts[np.array(group_labels) == g, :])
-            result = scipy.stats.f_oneway(*group_data)
-            ranked_stats = sorted(result[0])
-            ranked_stats.reverse()
-            picks=result[0]>=ranked_stats[feature_selection[1]]
-            label_counts = label_counts[:, picks]
+        picks, _ = feat_select(usage_feats, method=feature_selection[0], n_feats=feature_selection[1])
+        label_counts = usage_feats.label_counts[:, picks]
     lda = LDA(n_components=ncomponents)
-    lda_embeddings = lda.fit_transform(label_counts, group_labels)
+    lda_embeddings = lda.fit_transform(usage_feats.label_counts, usage_feats.group_labels)
 
     if loocv==True:
         predictions=[]
@@ -431,20 +552,7 @@ def lda_labels_timebins(config,
             group_labels_sub=group_labels_full.copy()
             label_i=group_labels_sub.pop(sample_i)
             if feature_selection is not None:
-                if feature_selection[0]=="pca":
-                    scaler = StandardScaler()
-                    label_counts_sub_scaled = scaler.fit_transform(label_counts_sub)
-                    pca = PCA(n_components=1)
-                    pca.fit(label_counts_sub_scaled)
-                    picks = pca.components_.argsort()[0][0:feature_selection[1]]
-                elif feature_selection[0]=="f":
-                    group_data_sub = []
-                    for g in range(n_groups):
-                        group_data_sub.append(label_counts_sub[np.array(group_labels_sub) == g, :])
-                    result = scipy.stats.f_oneway(*group_data_sub)
-                    ranked_stats = sorted(result[0])
-                    ranked_stats.reverse()
-                    picks=result[0]>=ranked_stats[feature_selection[1]]
+                picks, _ = feat_select(usage_feats, method=feature_selection[0], n_feats=feature_selection[1], verbose=False)
                 label_counts_sub = label_counts_sub[:, picks]
                 label_counts_i = label_counts_i[picks]
             lda_sub = LDA(n_components=ncomponents)
@@ -464,7 +572,8 @@ def lda_labels_timebins(config,
         loocv_accuracy="Cross-validation not completed"
         loocv_confmat="Cross-validation not completed"
 
-    return LdaResult(lda, lda_embeddings, label_counts, group_labels, group_dict, nbins, binsize, loocv_accuracy, loocv_confmat)
+    return LdaResult(lda, lda_embeddings, label_counts, usage_feats.group_labels,
+                     group_dict, nbins, binsize, loocv_accuracy, loocv_confmat)
 
 def lda_loco_labels_timebins(config, dist_df, ncomponents=2):
     """
