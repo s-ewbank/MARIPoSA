@@ -1,14 +1,15 @@
 import scipy.io
 from scipy import stats
 import matplotlib.pyplot as plt
-from matplotlib import rcParams
+from matplotlib import rcParams, gridspec
 from matplotlib.patches import Rectangle
 import numpy as np
 import pandas as pd
 import networkx as nx
 rcParams['font.family'] = 'sans-serif'
 rcParams['font.sans-serif'] = ['Arial']
-
+from matplotlib.patches import Ellipse
+from utils import analysis
 
 def plot_module_usage(config,labels_df,start,stop,figW=4,figH=2,style="bar_scatter",cmap="jet"):
     """
@@ -206,14 +207,7 @@ def plot_module_usage_subgroups(config, labels_df, start, stop, figW=6, figH=3,
     ax.set_xlabel(config["data_source"] + ' Pose Label')
     ax.set_ylabel('Frequency')
     all_num_modules = np.sum([isinstance(module,str) for module in modules])==0
-    print(all_num_modules)
-    print(n_modules)
-    print((all_num_modules==True))
-    print((n_modules>=20))
-    print(((all_num_modules is True) and (n_modules>=20)))
     if ((all_num_modules) and (n_modules>=20)):
-        print("DID IT")
-        print("joe is cute")
         xticks=np.arange(0, n_modules, 5, dtype=int)
         ax.set_xticks(xticks)
         ax.set_xticklabels(modules[xticks])
@@ -615,7 +609,15 @@ def plot_dist_bins(dist_df, cmap="viridis", plottype="band", figW=6, figH=3):
     ax.set_ylabel("Locomotion (pix)")
     return fig
 
-def plot_lda(config, lda_result, figW=4, figH=3, titletype="informative", cmap="jet"):
+def make_and_plot_ellipse(mean, cov, color, label=None):
+    eigenvalues, eigenvectors = np.linalg.eig(cov)
+    angle = np.arctan2(eigenvectors[1, 0], eigenvectors[0, 0]) * 180 / np.pi
+    ell = Ellipse(mean, width=2 * np.sqrt(eigenvalues[0]), height=2 * np.sqrt(eigenvalues[1]),
+                   angle=angle, facecolor=color, alpha=0.25, label=label,edgecolor="none")
+    plt.gca().add_patch(ell)
+
+def plot_lda(config, lda_result, figW=4, figH=3, titletype="informative", cmap="jet", marker_dict=None,
+             draw_ellipse=False,alt_labels=None):
     """
     Plot LDA embeddings
 
@@ -628,25 +630,49 @@ def plot_lda(config, lda_result, figW=4, figH=3, titletype="informative", cmap="
     :param figW: width of the figure
     :param figH: height of the figure
     :param titletype: type of title - options are "informative", "uninformative"
-    :param cmap: matplotlib colormap
+    :param cmap: matplotlib colormap OR a dictionary with keys corresponding to group names and values corresponding to colors
+    :param marker_dict: dictionary with keys corresponding to group names and values corresponding to colors
+    :param draw_ellipse: whether to simulate data and draw an ellipse fitted to the class of the data or not
+    :param alt_labels: dictionary giving alternate labels for each subgroup key
     :return: figure
     """
     selected_subgroups=list(lda_result.group_dict.keys())
     n_groups=len(selected_subgroups)
-    cmap = plt.get_cmap(cmap)
-    colors = [cmap([i]) for i in np.linspace(0,1,len(selected_subgroups))]
+    flip_group_dict = {v: k for k, v in lda_result.group_dict.items()}
+    if type(cmap) != dict:
+        cmap = plt.get_cmap(cmap)
+        colors = [cmap([i]) for i in np.linspace(0,1,len(selected_subgroups))]
+    else:
+        colors = []
+        for r in range(n_groups):
+            group = flip_group_dict[r]
+            colors.append(cmap[group])
+    if marker_dict is not None:
+        markers = []
+        for r in range(n_groups):
+            group = flip_group_dict[r]
+            markers.append(marker_dict[group])
+    else:
+        markers = ["o"]*n_groups
     LD1 = lda_result.lda_embeddings[:, 0]
     LD2 = lda_result.lda_embeddings[:, 1]
     fig = plt.figure(figsize=(figW, figH), dpi=100)
-    for i in range(len(lda_result.group_labels)):
-        for r in range(n_groups):
+    for r in range(n_groups):
+        label_in_legend = False
+        for i in range(len(lda_result.group_labels)):
             if lda_result.group_labels[i] == r:
                 LD1_i = LD1[i]
                 LD2_i = LD2[i]
-                plt.scatter(LD1_i, LD2_i, c=colors[r], s=23, marker="o")
-    leg = plt.legend(selected_subgroups, bbox_to_anchor=(1.05, 1), loc='upper left')
-    for i in range(n_groups):
-        leg.legendHandles[i].set_color(colors[i])
+                if alt_labels is None:
+                    label = flip_group_dict[r]
+                else:
+                    label = alt_labels[flip_group_dict[r]]
+                if label_in_legend==True:
+                    plt.scatter(LD1_i, LD2_i, c=colors[r], s=23, marker=markers[r])
+                else:
+                    plt.scatter(LD1_i, LD2_i, c=colors[r], s=23, marker=markers[r],label=label)
+                    label_in_legend=True
+    plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
     plt.xlabel("LD1 (" + str(int(1000 * lda_result.lda.explained_variance_ratio_[0]) / 10) + "% Variance Explained)")
     plt.ylabel("LD2 (" + str(int(1000 * lda_result.lda.explained_variance_ratio_[1]) / 10) + "% Variance Explained)")
     if titletype == "uninformative":
@@ -654,11 +680,149 @@ def plot_lda(config, lda_result, figW=4, figH=3, titletype="informative", cmap="
     elif titletype == "informative":
         plt.title(str("Linear Discriminant Analysis\n with " + str(lda_result.nbins) + " " + str(lda_result.binsize / 60) + "-min time bins"),
                   fontweight="bold")
+    if draw_ellipse==True:
+        for r in range(n_groups):
+            class_dat = lda_result.label_counts[[i == r for i in lda_result.group_labels], :]
+            emb = lda_result.lda.transform(class_dat[:,lda_result.feat_picks])
+            mean = np.mean(emb, axis=0)
+            cov = np.cov(emb, rowvar=False)
+            make_and_plot_ellipse(mean, cov, color=colors[r], label=flip_group_dict[r])
     plt.tight_layout()
     return fig
 
 
-def plot_conf_mat(lda_result, figW=2.5,figH=2.5,cmap="Greens",alt_title=False):
+def plot_lda_weights(config, lda_result, n_modules, hide_nofeat_mods=False, remap=False, figW=6, figH=4):
+    """
+
+    :param lda_result:
+    :param n_modules:
+    :param hide_nofeat_mods:
+    :return:
+    """
+    weights = lda_result.get_discriminant_weights()
+    mods = [f"module{i}" for i in range(n_modules)]
+    bins = []
+    for b in range(lda_result.nbins):
+        binstart = int(b * (lda_result.binsize))
+        binstop = int((b + 1) * (lda_result.binsize))
+        bins.append(f"t{binstart}-{binstop}")
+
+    figs = []
+    for LD in list(weights.columns):
+        weights_reshaped = pd.DataFrame(index=bins, columns=mods)
+        for bin, row in weights_reshaped.iterrows():
+            for mod in weights_reshaped.columns:
+                if len(bins) == 1:
+                    i = mod
+                else:
+                    i = mod + "_" + bin
+                if i not in weights.index:
+                    weights_reshaped.at[bin, mod] = np.nan
+                else:
+                    weights_reshaped.at[bin, mod] = weights.at[i, LD]
+        if hide_nofeat_mods == True:
+            weights_reshaped = weights_reshaped.dropna(axis=1, how='all')
+
+        if remap == False:
+            fig = plt.figure(figsize=(figW, figH))
+            vlim = np.max([np.abs(weights_reshaped.max().max()), np.abs(weights_reshaped.min().min())])
+            data = np.array(weights_reshaped, dtype=np.float32)
+            plt.imshow(data, cmap="seismic", vmin=-vlim, vmax=vlim, aspect="auto",interpolation=None)
+            plt.imshow(np.zeros_like(data) + 0.8, cmap="gray", vmax=1, vmin=0, aspect="auto")
+            plt.imshow(data, cmap="seismic", vmin=-vlim, vmax=vlim, aspect="auto",interpolation=None)
+            names = [i.replace("module", "") for i in weights_reshaped.columns]
+            if len(names) > 50:
+                tick_positions = range(0, len(names), 10)
+                tick_labels = [names[i] for i in tick_positions]
+                plt.xticks(ticks=tick_positions, labels=tick_labels)
+            elif len(names) > 20:
+                tick_positions = range(0, len(names), 5)
+                tick_labels = [names[i] for i in tick_positions]
+                plt.xticks(ticks=tick_positions, labels=tick_labels)
+            else:
+                plt.xticks(ticks=range(weights_reshaped.shape[1]), labels=names)
+
+            binnames = [bin.replace("t", "") for bin in bins]
+            if len(binnames) > 10:
+                tick_positions = range(0, len(binnames), 5)
+                tick_labels=[]
+                for t in tick_positions:
+                    tick_labels.append(binnames[t])
+                plt.yticks(ticks=tick_positions, labels=tick_labels)
+            else:
+                plt.yticks(ticks=range(len(bins)), labels=[bin.replace("t", "") for bin in bins])
+            cbar = plt.colorbar()
+            cbar.set_label('Weight')
+            plt.ylabel('Time bin (s)')
+            plt.xlabel("Modules")
+            plt.title(LD)
+
+        elif remap == True:
+            vlim = np.max([np.abs(weights_reshaped.max().max()), np.abs(weights_reshaped.min().min())])
+            fig = plt.figure(figsize=(figW, figH))
+
+            BORIS_to_pose_mat, BORIS_to_pose_mat_normalized, loss = analysis.BORIS_to_pose(config)
+            analysis.make_remappings_from_BORIS(config, None, BORIS_to_pose_mat)
+
+            behaviors = BORIS_to_pose_mat_normalized.index
+            mapped_behaviors = {}
+            for beh in behaviors:
+                beh_mod = []
+                beh_mod.extend([i[0][0] for i in config["remappings"] if i[1] == beh])
+                if len(beh_mod) > 0:
+                    mapped_behaviors[beh] = beh_mod
+
+            widths = []
+            for b, beh_i in enumerate(list(mapped_behaviors.keys())):
+                mapped_behaviors[beh_i] = ["module" + str(int(i)) for i in mapped_behaviors[beh_i]]
+                if hide_nofeat_mods == True:
+                    mapped_behaviors[beh_i] = [i for i in mapped_behaviors[beh_i] if i in weights_reshaped.columns]
+                if len(mapped_behaviors[beh_i]) > 0:
+                    widths.append(len(mapped_behaviors[beh_i]))
+                else:
+                    del mapped_behaviors[beh_i]
+            total_mods = np.sum(widths)
+            widths.extend([total_mods / 15])
+            widths = widths / np.sum(widths)
+            gs = gridspec.GridSpec(1, len(widths), width_ratios=widths)
+            for b, beh_i in enumerate(list(mapped_behaviors.keys())):
+                ax = plt.subplot(gs[b])
+                beh_i_mods = mapped_behaviors[beh_i]
+                data = np.array(weights_reshaped[beh_i_mods], dtype=np.float32)
+                ax.imshow(data, cmap="seismic", aspect="auto", vmin=-vlim, vmax=vlim,interpolation=None)
+                ax.imshow(np.zeros_like(data) + 0.8, cmap="gray", vmax=1, vmin=0, aspect="auto")
+                cb = ax.imshow(data, cmap="seismic", aspect="auto", vmin=-vlim, vmax=vlim,interpolation=None)
+                ax.set_xticks(ticks=range(len(mapped_behaviors[beh_i])), labels=mapped_behaviors[beh_i])
+                ax.set_xlabel(beh_i)
+                names = [i.replace("module", "") for i in weights_reshaped[beh_i_mods].columns]
+                if total_mods < 30:
+                    ax.set_xticks(ticks=range(weights_reshaped[beh_i_mods].shape[1]), labels=names)
+                else:
+                    ax.set_xticks(ticks=range(weights_reshaped[beh_i_mods].shape[1]), labels=[])
+
+                binnames = [bin.replace("t", "") for bin in bins]
+                if b == 0:
+                    ax.set_ylabel('Time bin (s)')
+                    if len(binnames) > 10:
+                        tick_positions = range(0, len(binnames), 5)
+                        tick_labels=[]
+                        for t in tick_positions:
+                            tick_labels.append(binnames[t])
+                        ax.set_yticks(ticks=tick_positions, labels=tick_labels)
+                    else:
+                        ax.set_yticks(ticks=range(len(bins)), labels=[bin.replace("t", "") for bin in bins])
+                else:
+                    ax.set_yticks(ticks=range(len(bins)), labels=[])
+            plt.suptitle(LD)
+            cbar_ax = plt.subplot(gs[-1])
+            cbar = plt.colorbar(cb, cax=cbar_ax)
+            cbar.set_label("Weight")
+        plt.tight_layout()
+        figs.append(fig)
+    return figs
+
+def plot_conf_mat(lda_result, figW=2.5,figH=2.5,cmap="Greens",
+                  alt_title=False,rotate_xticks=False,alt_labels=None):
     """
     Generate a confusion matrix plot
 
@@ -669,19 +833,30 @@ def plot_conf_mat(lda_result, figW=2.5,figH=2.5,cmap="Greens",alt_title=False):
     :param figH: figure height
     :param cmap: colormap
     :param alt_title: title other than confusion matrix
+    :param rotate_xticks: whether or not to rotate xticks
     :return:
     """
     fig = plt.figure(figsize=(figW, figH), dpi=100)
     plt.imshow(lda_result.loocv_confmat, cmap=cmap)
     class_labels=list(lda_result.group_dict.keys())
+    if alt_labels is not None:
+        class_labels_ticks=class_labels.copy()
+        for i in range(len(class_labels_ticks)):
+            class_labels_ticks[i]=alt_labels[class_labels[i]]
+    else:
+        class_labels_ticks=class_labels.copy()
+
     ticks=[lda_result.group_dict[key] for key in class_labels]
-    plt.xticks(ticks, class_labels)
-    plt.yticks(ticks, class_labels)
+    if rotate_xticks==True:
+        plt.xticks(ticks, class_labels_ticks,rotation=90)
+    else:
+        plt.xticks(ticks, class_labels_ticks)
+    plt.yticks(ticks, class_labels_ticks)
     for i in range(len(class_labels)):
         for j in range(len(class_labels)):
             plt.text(j, i, str(int(lda_result.loocv_confmat[i, j])), ha='center', va='center', color='black')
-    plt.xlabel('Predicted Dose Label')
-    plt.ylabel('True Dose Label')
+    plt.xlabel('Predicted Class')
+    plt.ylabel('True Class')
     if alt_title==False:
         plt.title('Confusion Matrix')
     else:

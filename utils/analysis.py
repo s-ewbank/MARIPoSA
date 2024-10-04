@@ -36,6 +36,7 @@ def label_counter_nosubgroups(config, start, stop):
             if i == 0:
                 labels_df = pd.DataFrame(labels_i, columns=[header])
             else:
+                labels_df = labels_df.copy()
                 labels_df.insert(loc=count, value=labels_i, column=label_paths[i])
             count = count + 1
     elif config["data_source"]=="Keypoint-MoSeq":
@@ -49,6 +50,7 @@ def label_counter_nosubgroups(config, start, stop):
                 labels_df = pd.DataFrame(labels_i, columns=[header])
             else:
                 labels_df.insert(loc=count, value=labels_i, column=label_paths[i])
+                labels_df = labels_df.copy()
             count = count + 1
     elif config["data_source"]=="VAME":
         data_directory = config["data_directory"]
@@ -65,6 +67,7 @@ def label_counter_nosubgroups(config, start, stop):
                 labels_df = pd.DataFrame(labels_i, columns=[header])
             else:
                 labels_df.insert(loc=count, value=labels_i, column=config["project_files"][f])
+                labels_df = labels_df.copy()
             count = count + 1
     elif config["data_source"]=="MotionMapper":
         label_paths=config["project_files"]
@@ -76,6 +79,7 @@ def label_counter_nosubgroups(config, start, stop):
                 labels_df = pd.DataFrame(labels_i, columns=[header])
             else:
                 labels_df.insert(loc=count, value=labels_i, column=label_paths[i])
+                labels_df = labels_df.copy()
             count = count + 1
 
     #Get number of modules
@@ -136,6 +140,7 @@ def label_counter_subgroups(config, start, stop, selected_subgroups="all"):
                     labels_df = pd.DataFrame(labels_i, columns=[header])
                 else:
                     labels_df.insert(loc=count, value=labels_i, column=header)
+                    labels_df = labels_df.copy()
                 count = count + 1
         labels_df.columns = [header1, header2]
     elif config["data_source"]=="VAME":
@@ -157,6 +162,7 @@ def label_counter_subgroups(config, start, stop, selected_subgroups="all"):
                     labels_df = pd.DataFrame(labels_i, columns=[header])
                 else:
                     labels_df.insert(loc=count, value=labels_i, column=header)
+                    labels_df = labels_df.copy()
                 count = count + 1
         labels_df.columns = [header1, header2]
     elif config["data_source"]=="MotionMapper":
@@ -299,6 +305,7 @@ def combine_pose_modules(config, labels_df):
                     labels_df.replace(old_val, remapping[1], inplace=True)
     return labels_df
 
+
 def make_remappings_from_BORIS(config, labels_df, BORIS_to_pose_mat):
     """
     Make remappings based on BORIS output and apply to labels_df
@@ -314,8 +321,9 @@ def make_remappings_from_BORIS(config, labels_df, BORIS_to_pose_mat):
     old_mappings =list(BORIS_to_pose_mat_numeric.idxmax().index)
     remappings = [[[old_mappings[i]],new_mappings[i]] for i in range(len(old_mappings))]
     config["remappings"] = remappings
-    combine_pose_modules(config, labels_df)
-    return labels_df
+    if labels_df is not None:
+        combine_pose_modules(config, labels_df)
+        return labels_df
 
 class UsageFeats:
     def __init__(self, label_counts, group_labels, feat_names, group_dict):
@@ -323,6 +331,9 @@ class UsageFeats:
         self.group_labels = group_labels
         self.feat_names = feat_names
         self.group_dict = group_dict
+        mean_check = np.allclose(np.mean(label_counts, axis=0), 0, atol=0.1)
+        std_check = np.allclose(np.std(label_counts, axis=0), 1, atol=0.1)
+        self.scaled = mean_check and std_check
 
     def to_df(self):
         colnames=[]
@@ -366,6 +377,11 @@ class UsageFeats:
             print("Applied picks: {}".format(new_picks))
             picked_feats = self.apply_picks(new_picks)
             return picked_feats
+
+    def scale(self):
+        scaler = StandardScaler()
+        label_counts_scaled = scaler.fit_transform(self.label_counts)
+        return UsageFeats(label_counts_scaled, self.group_labels, self.feat_names, self.group_dict)
 
 
 def get_usage_feats(config,
@@ -435,10 +451,10 @@ def feat_select(usage_feats, method="f", n_feats=10, verbose=True):
     n_groups=len(np.unique(usage_feats.group_labels))
     picks=[]
     if method=="pca":
-        scaler = StandardScaler()
-        label_counts_scaled = scaler.fit_transform(usage_feats.label_counts)
+        if usage_feats.scaled == False:
+            usage_feats = usage_feats.scale()
         pca = PCA(n_components=1)
-        pca.fit(label_counts_scaled)
+        pca.fit(usage_feats.label_counts)
         picks = pca.components_.argsort()[0][0:n_feats]
         text="Features selected by PCA were: "
     elif method=="f":
@@ -446,9 +462,13 @@ def feat_select(usage_feats, method="f", n_feats=10, verbose=True):
         for g in range(n_groups):
             group_data.append(usage_feats.label_counts[np.array(usage_feats.group_labels) == g, :])
         result = scipy.stats.f_oneway(*group_data)
-        ranked_stats = sorted(result[0])
+        stats = np.nan_to_num(result[0], nan=0)
+        ranked_stats = sorted(stats)
         ranked_stats.reverse()
-        picks=result[0]>ranked_stats[n_feats]
+        if n_feats>=len(ranked_stats):
+            picks=result[0]>-np.inf
+        else:
+            picks=result[0]>=ranked_stats[n_feats]
         text="Features selected by f-stat were: "
 
     n_picks=0
@@ -497,17 +517,42 @@ def get_usage_ssd(control_usage_feats, exp_usage_feats):
     return exp_usage_df_ssd
 
 class LdaResult:
-    def __init__(self, lda, lda_embeddings, label_counts, group_labels, group_dict, nbins, binsize,
+    def __init__(self, lda, lda_embeddings, label_counts, group_labels, feat_picks, feat_names, group_dict, nbins, binsize,
                  loocv_accuracy,loocv_confmat):
         self.lda = lda
         self.lda_embeddings = lda_embeddings
         self.label_counts = label_counts
         self.group_labels = group_labels
+        self.feat_picks = feat_picks
+        self.feat_names = feat_names
         self.group_dict = group_dict
         self.nbins = nbins
         self.binsize = binsize
         self.loocv_accuracy = loocv_accuracy
         self.loocv_confmat = loocv_confmat
+
+    def get_discriminant_weights(self):
+        n_feats = np.sum(self.feat_picks)
+        n_components = len(self.lda.explained_variance_ratio_)
+        LD_weightings = np.zeros([n_feats,n_components])
+        for feat in range(n_feats):
+            test=np.zeros(n_feats)
+            test[feat]=1
+            LD_weightings[feat,:] = self.lda.transform([test])[0]
+        LD_names=[f"LD{i+1}" for i in range(n_components)]
+        LD_weightings = pd.DataFrame(LD_weightings,index=self.feat_names,columns=LD_names)
+
+        # Test function, no longer needed
+        # cmap = plt.get_cmap("viridis_r")
+        # colors = [cmap([i]) for i in np.linspace(0,1,len(selected_subgroups))]
+        #
+        # data = lda_result.label_counts[:,lda_result.feat_picks]
+        # for d in range(data.shape[0]):
+        #     x=np.sum(LD_weightings[:,0]*data[d,:])
+        #     y=np.sum(LD_weightings[:,1]*data[d,:])
+        #     plt.scatter(x,y,color = colors[lda_result.group_labels[d]])
+
+        return(LD_weightings)
 
 def lda_labels_timebins(config,
                         labels_df,
@@ -515,7 +560,7 @@ def lda_labels_timebins(config,
                         selected_subgroups="all",
                         ncomponents=2,
                         feature_selection=None,
-                        loocv=False):
+                        loocv=False, scale=True):
     """
     Function to compute LDA for data in timebins
 
@@ -535,13 +580,19 @@ def lda_labels_timebins(config,
     group_dict = {selected_subgroups[i]: i for i in range(len(selected_subgroups))}
     nbins = int(labels_df.shape[0] / (binsize * fps))
     usage_feats = get_usage_feats(config,labels_df,binsize,selected_subgroups=selected_subgroups)
+    if scale==True:
+        usage_feats = usage_feats.scale()
     label_counts_full = usage_feats.label_counts.copy()
     group_labels_full = usage_feats.group_labels.copy()
     if feature_selection is not None:
-        picks, _ = feat_select(usage_feats, method=feature_selection[0], n_feats=feature_selection[1])
-        label_counts = usage_feats.label_counts[:, picks]
-    lda = LDA(n_components=ncomponents)
-    lda_embeddings = lda.fit_transform(usage_feats.label_counts, usage_feats.group_labels)
+        feat_picks, feat_names = feat_select(usage_feats, method=feature_selection[0], n_feats=feature_selection[1])
+        label_counts = usage_feats.label_counts[:, feat_picks]
+    else:
+        feat_names = usage_feats.feat_names
+        feat_picks = [True for feat in feat_names]
+        label_counts = usage_feats.label_counts
+    lda = LDA(n_components=ncomponents,store_covariance=True)
+    lda_embeddings = lda.fit_transform(label_counts, usage_feats.group_labels)
 
     if loocv==True:
         predictions=[]
@@ -572,7 +623,7 @@ def lda_labels_timebins(config,
         loocv_accuracy="Cross-validation not completed"
         loocv_confmat="Cross-validation not completed"
 
-    return LdaResult(lda, lda_embeddings, label_counts, usage_feats.group_labels,
+    return LdaResult(lda, lda_embeddings, usage_feats.label_counts, usage_feats.group_labels, feat_picks, feat_names,
                      group_dict, nbins, binsize, loocv_accuracy, loocv_confmat)
 
 def lda_loco_labels_timebins(config, dist_df, ncomponents=2):
