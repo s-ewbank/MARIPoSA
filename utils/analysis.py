@@ -554,6 +554,52 @@ class LdaResult:
 
         return(LD_weightings)
 
+
+    def get_mahalanobis_distance(self,type="point_to_point"):
+        """
+        Calculates Mahalanobis distance between groups
+
+        :param type: Whether to do pairwise point to point ("point_to_point") distances or point to centroid ("point_to_centroid") distances
+        :return: a dictionary of pairwise distances
+        """
+        dists = {}
+        for k1_ind, k1 in enumerate(list(self.group_dict.keys())):
+            for k2_ind, k2 in enumerate(list(self.group_dict.keys())):
+                if k1_ind >= k2_ind and type=="point_to_point":
+                    continue
+                else:
+                    mas = [i == self.group_dict[k1] for i in self.group_labels]
+                    g1 = self.label_counts[:, self.feat_picks][mas, :]
+                    m1 = np.mean(g1, axis=0)
+                    mas = [i == self.group_dict[k2] for i in self.group_labels]
+                    g2 = self.label_counts[:, self.feat_picks][mas, :]
+
+                    if type=="point_to_point":
+                        dists_k1k2 = []
+                        if k1 != k2:
+                            for i in range(g1.shape[0]):
+                                for j in range(g2.shape[0]):
+                                    dists_k1k2.append(scipy.spatial.distance.mahalanobis(g1[i], g2[j], self.lda.covariance_))
+                        else:
+                            for i in range(g1.shape[0]):
+                                for j in range(g2.shape[0]):
+                                    if j > i:
+                                        dists_k1k2.append(scipy.spatial.distance.mahalanobis(g1[i], g2[j], self.lda.covariance_))
+                        dists[k1 + "____vs____" + k2] = dists_k1k2
+                    elif type=="point_to_centroid":
+                        dists_k1k2 = []
+                        if k1 != k2:
+                            for j in range(g2.shape[0]):
+                                dists_k1k2.append(scipy.spatial.distance.mahalanobis(m1, g2[j], self.lda.covariance_))
+                        else:
+                            for j in range(g2.shape[0]):
+                                    dists_k1k2.append(scipy.spatial.distance.mahalanobis(m1, g2[j], self.lda.covariance_))
+                        dists[k1 + "-CENTROID____vs____" + k2] = dists_k1k2
+                    else:
+                        raise ValueError("Invalid comparison type! Comparison must be 'point_to_point' or 'point_to_centroid'.")
+
+        return dists
+
 def lda_labels_timebins(config,
                         labels_df,
                         binsize,

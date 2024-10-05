@@ -218,7 +218,7 @@ def plot_module_usage_subgroups(config, labels_df, start, stop, figW=6, figH=3,
     plt.tight_layout()
     return fig
 
-def plot_module_usage_stacked(config, labels_df, start, stop, figW=6, figH=3,cmap="viridis_r",title=None,alt_xticks=None):
+def plot_module_usage_stacked(config, labels_df, start, stop, figW=6, figH=3,cmap="viridis_r",title=None, alt_xticks=None,legend=True):
     """
     Plots the frequency of the pose modules occurring by group in the labels dataframe output by the label_counter function.
 
@@ -228,7 +228,10 @@ def plot_module_usage_stacked(config, labels_df, start, stop, figW=6, figH=3,cma
     :param fps: frames per second of recording.
     :param figW: figure width
     :param figH:
-    :param style:
+    :param cmap:
+    :param title:
+    :param alt_xticks:
+    :param legend:
     :return:
     """
     #To get groupnames in order
@@ -293,12 +296,13 @@ def plot_module_usage_stacked(config, labels_df, start, stop, figW=6, figH=3,cma
         ax.set_xticklabels(alt_xticks)
     if title is not None:
         ax.set_title(title)
-    plt.legend(modules,bbox_to_anchor=(1.05, 1))
+    if legend==True:
+        plt.legend(modules,bbox_to_anchor=(1.05, 1))
     plt.tight_layout()
     return fig
 
 
-def network_pairwise_comparison(config, labels_df, start, end, groupnames, scaling=1,include_labels=True,cmap="bwr"):
+def network_pairwise_comparison(config, labels_df, start, end, groupnames, scaling=1,include_labels=True,cmap="bwr",tscale=3):
     """
     Plots network depiction of differences in pose module usage and transitions between two subgroups
 
@@ -316,8 +320,8 @@ def network_pairwise_comparison(config, labels_df, start, end, groupnames, scali
     fig, ax = plt.subplots(1, 1, figsize=(4,3), dpi=100)
     fig.suptitle(groupnames[0] + " vs. " + groupnames[1], fontsize=16)
 
-    t_min = -3
-    t_max = 3
+    t_min = -tscale
+    t_max = tscale
 
     #Count label occurences
     start_frame = start * fps
@@ -862,6 +866,61 @@ def plot_conf_mat(lda_result, figW=2.5,figH=2.5,cmap="Greens",
     else:
         plt.title(alt_title)
     plt.tight_layout()
+    return fig
+
+
+def plot_dist_boxplot(dists, dist_from, figW=5, figH=3,alt_labels=None):
+    """
+    Plot distance boxplots
+
+    :param dists: dists returned from lda_result.get_mahalanobis_distance()
+    :param dist_from: a group from the dataset from which to calculate all the distances
+    :param figW:
+    :param figH:
+    :return:
+    """
+
+    centroid=np.sum(["CENTROID" in i for i in list(dists.keys())])>0
+
+    if centroid:
+        pairings = [i for i in list(dists.keys()) if dist_from+"-CENTROID" in i]
+        centroid_lab = " Centroid"
+    else:
+        pairings = [i for i in list(dists.keys()) if dist_from in i]
+        centroid_lab=""
+
+    pairings_ticks = [i.replace("____vs____", "").replace(dist_from, "").replace("-CENTROID", "") for i in pairings]
+    if alt_labels is not None:
+        for p,tick in enumerate(pairings_ticks):
+            if tick=="":
+                pairings_ticks[p]=dist_from
+        pairings_ticks = [alt_labels[p] for p in pairings_ticks]
+
+    fig = plt.figure(figsize=(figW, figH))
+    xticks = []
+    for p, pair in enumerate(pairings):
+        xticks.append(p)
+        c1 = "#4198B5"
+        c2 = "#D8EBF1"
+
+        box = plt.boxplot(np.array(dists[pair]), positions=[p], widths=0.5,
+                          patch_artist=True,
+                          boxprops=dict(facecolor=c2, color=c1),
+                          whiskerprops=dict(color=c1),
+                          capprops=dict(color=c1),
+                          medianprops=dict(color=c1),
+                          flierprops=dict(markerfacecolor=c1, marker='o', markersize=4))
+
+        dist_from_name=dist_from
+        if alt_labels is not None:
+            dist_from_name=alt_labels[dist_from]
+
+        plt.ylabel('Mahalanoubis Distance\nfrom '+dist_from_name+centroid_lab)
+        plt.yticks([])
+
+    plt.xticks(ticks=xticks, labels=pairings_ticks, rotation=90)
+    plt.tight_layout()
+
     return fig
 
 
