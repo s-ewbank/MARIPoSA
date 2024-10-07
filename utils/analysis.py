@@ -306,7 +306,7 @@ def combine_pose_modules(config, labels_df):
     return labels_df
 
 
-def make_remappings_from_BORIS(config, labels_df, BORIS_to_pose_mat):
+def make_remappings_from_BORIS(config, labels_df=None, BORIS_to_pose_mat=None):
     """
     Make remappings based on BORIS output and apply to labels_df
 
@@ -324,6 +324,8 @@ def make_remappings_from_BORIS(config, labels_df, BORIS_to_pose_mat):
     if labels_df is not None:
         combine_pose_modules(config, labels_df)
         return labels_df
+    else:
+        return config
 
 class UsageFeats:
     def __init__(self, label_counts, group_labels, feat_names, group_dict):

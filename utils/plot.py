@@ -8,8 +8,9 @@ import pandas as pd
 import networkx as nx
 rcParams['font.family'] = 'sans-serif'
 rcParams['font.sans-serif'] = ['Arial']
-from matplotlib.patches import Ellipse
+from matplotlib.patches import Patch, Ellipse
 from utils import analysis
+import textwrap
 
 def plot_module_usage(config,labels_df,start,stop,figW=4,figH=2,style="bar_scatter",cmap="jet"):
     """
@@ -218,7 +219,14 @@ def plot_module_usage_subgroups(config, labels_df, start, stop, figW=6, figH=3,
     plt.tight_layout()
     return fig
 
-def plot_module_usage_stacked(config, labels_df, start, stop, figW=6, figH=3,cmap="viridis_r",title=None, alt_xticks=None,legend=True):
+def is_nonnum(value):
+    try:
+        int(value)
+        return False
+    except (ValueError, TypeError):
+        return True
+
+def plot_module_usage_stacked(config, labels_df, start, stop, figW=6, figH=3, BORIS_to_pose_mat=None, title=None, alt_xticks=None,legend=True,long_legend=True):
     """
     Plots the frequency of the pose modules occurring by group in the labels dataframe output by the label_counter function.
 
@@ -228,10 +236,11 @@ def plot_module_usage_stacked(config, labels_df, start, stop, figW=6, figH=3,cma
     :param fps: frames per second of recording.
     :param figW: figure width
     :param figH:
-    :param cmap:
+    :param BORIS_to_pose_mat:
     :param title:
     :param alt_xticks:
     :param legend:
+    :param long_legend: for boris re-colored stacked plot only - whether or not to have the pose module numbers in the legend
     :return:
     """
     #To get groupnames in order
@@ -252,7 +261,12 @@ def plot_module_usage_stacked(config, labels_df, start, stop, figW=6, figH=3,cma
     labels_flat = np.array(labels_df)
     labels_flat = [item for sublist in labels_flat for item in sublist]
     modules = np.unique(labels_flat)
-    n_modules = len(modules)
+    any_nonint = np.sum([is_nonnum(i) for i in modules])
+    if any_nonint:
+        n_modules = len(modules)
+    else:
+        n_modules = int(np.max(modules)+1)
+        modules = np.arange(0,n_modules,1)
 
     # Label counting
     label_counts = []
@@ -278,16 +292,49 @@ def plot_module_usage_stacked(config, labels_df, start, stop, figW=6, figH=3,cma
         bar_heights[g, :] = np.mean(label_counts[g], axis=0)
         bar_sems[g, :] = np.std(label_counts[g], axis=0)/np.sqrt(label_counts[g].shape[0])
     fig, ax = plt.subplots(figsize=(figW, figH), dpi=100)
-    cmap = plt.get_cmap(cmap)
-    for c in range(len(modules)):
-        if c == 0:
-            bar_bottom = np.zeros(n_groups)
-        ax.bar(np.arange(0, n_groups, 1), bar_heights[:, c], bottom=bar_bottom, align='center', width=0.99)
-        ax.spines['top'].set_visible(False)
-        bar_bottom += bar_heights[:, c]
-        ax.spines['right'].set_visible(False)
-        ax.spines['top'].set_visible(False)
+    if BORIS_to_pose_mat is None:
+        for m, module in enumerate(modules):
+            if any_nonint:
+                module = m
+            if module == 0:
+                bar_bottom = np.zeros(n_groups)
+            ax.bar(np.arange(0, n_groups, 1), bar_heights[:, module], bottom=bar_bottom, align='center', width=0.99)
+            ax.spines['top'].set_visible(False)
+            bar_bottom += bar_heights[:, module]
+            ax.spines['right'].set_visible(False)
+            ax.spines['top'].set_visible(False)
+    else:
+        behaviors=list(BORIS_to_pose_mat.index)+["other"]
+        n_behaviors=len(behaviors)
+        leg_handles_col0=[]
+        leg_handles_col1=[]
+        leg_labels=[""]*n_behaviors
+        bottom=True
+        cm_list = ['Greys', 'YlOrBr', 'magma', 'Blues', 'Reds', 'Purples','copper', 'BuGn', 'bone', 'YlGn', 'YlGnBu', 'YlOrRd']
+        for remap in range(n_behaviors):
+            sub_modules=[int(i[0][0]) for i in config["remappings"] if i[1]==behaviors[remap]]
+            cmap=plt.get_cmap(cm_list[remap])
+            colors=[cmap([0.4]),cmap([0.5])]
+            leg_handles_col0.extend([Patch(facecolor=colors[0], edgecolor='none')])
+            leg_handles_col1.extend([Patch(facecolor=colors[1], edgecolor='none')])
+            if long_legend:
+                leg_labels.append(behaviors[remap]+"   ("+str(len(sub_modules))+" modules)")
+            else:
+                leg_labels.append(behaviors[remap])#+" "+str(sub_modules))
+            if len(sub_modules)>0:
+                for c in sub_modules:
+                    if c in modules:
+                        if bottom==True:
+                            bar_bottom = np.zeros(n_groups)
+                            bottom=False
+                        ax.bar(np.arange(0, n_groups, 1), bar_heights[:, c], bottom=bar_bottom, align='center',
+                               width=0.99,color=colors[c%2])
+                        ax.spines['top'].set_visible(False)
+                        bar_bottom += bar_heights[:, c]
+                        ax.spines['right'].set_visible(False)
+                        ax.spines['top'].set_visible(False)
     ax.set_ylabel("Proportion of Time \nSpent in Pose Module")
+    ax.set_yticks([0,0.2,0.4,0.6,0.8,1])
     ax.set_xlim([-0.5, n_groups - 0.5])
     ax.set_xticks(np.arange(n_groups))
     if alt_xticks is None:
@@ -297,7 +344,23 @@ def plot_module_usage_stacked(config, labels_df, start, stop, figW=6, figH=3,cma
     if title is not None:
         ax.set_title(title)
     if legend==True:
-        plt.legend(modules,bbox_to_anchor=(1.05, 1))
+        if BORIS_to_pose_mat is None:
+            if len(modules>10):
+                leg_modules = []
+                for col in range(10):
+                    items = [i for i in modules if int(i % 10) == col]
+                    if len(items)>1:
+                        leg_modules.append("Modules "+', '.join(map(str, items)))
+                    else:
+                        leg_modules.append("Module " + str(items[0]))
+            else:
+                leg_modules=modules
+            plt.legend(leg_modules,bbox_to_anchor=(1.05, 1))
+        else:
+            leg_handles=leg_handles_col0+leg_handles_col1
+            ax.legend(handles=leg_handles,
+                labels=leg_labels,
+                ncol=2, handletextpad=0.5, handlelength=1.0, columnspacing=-0.5,bbox_to_anchor=(1.05, 1))
     plt.tight_layout()
     return fig
 
@@ -460,7 +523,8 @@ def SandPlotClusterFrequency_OverTime(config,
                                       posenames=None,
                                       title=None,
                                       convolve=4,
-                                      legend=True,
+                                      legend=True,long_legend=True,
+                                      BORIS_to_pose_mat=None,
                                       plottype='area'):
     """
     Plots usage of pose modules over time within a session
@@ -543,23 +607,63 @@ def SandPlotClusterFrequency_OverTime(config,
         bar_heights_moving_average = np.zeros([n_blocks - convolve + 1, n_modules])
         for r in range(n_modules):
             bar_heights_moving_average[:, r] = moving_average(bar_heights_normal[:, r], convolve)
-        plt.stackplot(np.arange(0, bar_heights_moving_average.shape[0], 1), bar_heights_moving_average.T)
-        plt.xlim(0, n_blocks - convolve)
-        plt.ylim(0, 1)
-        plt.xlabel('Time (minutes)')
-        plt.ylabel('Moving Average Proportion \nof Time Spent in Pose')
+        if BORIS_to_pose_mat is None:
+            plt.stackplot(np.arange(0, bar_heights_moving_average.shape[0], 1), bar_heights_moving_average.T)
+            plt.xlim(0, n_blocks - convolve)
+            plt.ylim(0, 1)
+            plt.xlabel('Time (minutes)')
+            plt.ylabel('Moving Average Proportion \nof Time Spent in Pose')
+        else:
+            bar_heights_moving_average_rearranged=np.zeros_like(bar_heights_moving_average)
+            behaviors=list(BORIS_to_pose_mat.index)+["other"]
+            n_behaviors=len(behaviors)
+            leg_handles_col0=[]
+            leg_handles_col1=[]
+            leg_labels=[""]*n_behaviors
+            bottom=True
+            cm_list = ['Greys', 'YlOrBr', 'magma', 'Blues', 'Reds', 'Purples','copper', 'BuGn', 'bone', 'YlGn', 'YlGnBu', 'YlOrRd']
+            count=0
+            plot_colors=[]
+            for remap in range(n_behaviors):
+                sub_modules=[int(i[0][0]) for i in config["remappings"] if i[1]==behaviors[remap]]
+                cmap=plt.get_cmap(cm_list[remap])
+                colors=[cmap([0.4]),cmap([0.5])]
+                leg_handles_col0.extend([Patch(facecolor=colors[0], edgecolor='none')])
+                leg_handles_col1.extend([Patch(facecolor=colors[1], edgecolor='none')])
+                if long_legend:
+                    leg_labels.append(behaviors[remap]+"   ("+str(len(sub_modules))+" modules)")
+                else:
+                    leg_labels.append(behaviors[remap])#+" "+str(sub_modules))
+                if len(sub_modules)>0:
+                    for c in sub_modules:
+                        if c in modules:
+                            bar_heights_moving_average_rearranged[count,:]=bar_heights_moving_average[c,:]
+                            count=count+1
+                            plot_colors.append(colors[c%2])
+            plt.stackplot(np.arange(0, bar_heights_moving_average_rearranged.shape[0], 1), bar_heights_moving_average.T,
+                          colors=plot_colors)
+            plt.xlim(0, n_blocks - convolve)
+            plt.ylim(0, 1)
+            plt.xlabel('Time (minutes)')
+            plt.ylabel('Moving Average Proportion \nof Time Spent in Pose')
 
         if legend == True:
-            if posenames == None:
-                if np.sum([type(m)!=int for m in modules])>0:
-                    posenames=modules
+            if BORIS_to_pose_mat is None:
+                if posenames == None:
+                    if np.sum([type(m)!=int for m in modules])>0:
+                        posenames=modules
+                    else:
+                        posenames = []
+                        for i in range(n_modules):
+                            posenames.append("Pose " + str(i))
+                    ax.legend(posenames, loc="upper right", bbox_to_anchor=(1.25, 1.0))
                 else:
-                    posenames = []
-                    for i in range(n_modules):
-                        posenames.append("Pose " + str(i))
-                ax.legend(posenames, loc="upper right", bbox_to_anchor=(1.25, 1.0))
+                    ax.legend(posenames, loc="upper right", bbox_to_anchor=(1.25, 1.0))
             else:
-                ax.legend(posenames, loc="upper right", bbox_to_anchor=(1.25, 1.0))
+                leg_handles=leg_handles_col0+leg_handles_col1
+                ax.legend(handles=leg_handles,
+                    labels=leg_labels,
+                    ncol=2, handletextpad=0.5, handlelength=1.0, columnspacing=-0.5,bbox_to_anchor=(1.55, 1))
 
     plt.tight_layout()
 
