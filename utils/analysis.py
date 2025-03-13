@@ -11,7 +11,190 @@ from sklearn.linear_model import LogisticRegression as LR
 from sklearn.preprocessing import StandardScaler
 import scipy
 
-def label_counter_nosubgroups(config, start, stop):
+# def label_counter_nosubgroups(config, start, stop):
+#     """
+#     Generates a Pandas dataframe containing the labels for every frame in the specified time range for the video paths in defined groups.
+#
+#     :param config: the config
+#     :param start: time in seconds to start dataframe from.
+#     :param stop: time in seconds to stop dataframe at.
+#     :param fps: frames per second of recording.
+#     :return:
+#     """
+#     fps = config["fps"]
+#     start_frame = start * int(fps)
+#     stop_frame = stop * int(fps)
+#     count = 0
+#     header = []
+#     if config["data_source"]=="B-SOiD":
+#         label_paths=[i for i in config["project_files"] if "labels_" in i]
+#         for i in range(len(label_paths)):
+#             header.append(label_paths[i])
+#             labels_i = np.loadtxt(
+#                 str(config["data_directory"] + "/" + label_paths[i]),
+#                 delimiter=",", skiprows=3, usecols=1)[start_frame:stop_frame]
+#             if i == 0:
+#                 labels_df = pd.DataFrame(labels_i, columns=[header])
+#             else:
+#                 labels_df = labels_df.copy()
+#                 labels_df.insert(loc=count, value=labels_i, column=label_paths[i])
+#             count = count + 1
+#     elif config["data_source"]=="Keypoint-MoSeq":
+#         label_paths=config["project_files"]
+#         for i in range(len(label_paths)):
+#             header.append(label_paths[i])
+#             labels_i = np.loadtxt(
+#                 str(config["data_directory"] + "/" + label_paths[i]),
+#                 delimiter=",", skiprows=1, usecols=0)[start_frame:stop_frame]
+#             if i == 0:
+#                 labels_df = pd.DataFrame(labels_i, columns=[header])
+#             else:
+#                 labels_df.insert(loc=count, value=labels_i, column=label_paths[i])
+#                 labels_df = labels_df.copy()
+#             count = count + 1
+#     elif config["data_source"]=="VAME":
+#         data_directory = config["data_directory"]
+#         model_path = ""
+#         model_path = model_path + "/" + os.listdir(data_directory + "/" + os.listdir(data_directory)[0])[0]
+#         model_path = model_path + "/" + os.listdir(data_directory + "/" + os.listdir(data_directory)[0] + model_path)[
+#             0] + "/"
+#         for f in range(len(config["project_files"])):
+#             header.append(config["project_files"][f])
+#             datstr = [i for i in os.listdir(data_directory + "/" + config["project_files"][f] + model_path) if "_label_" in i][0]
+#             labels_i = np.load(data_directory + "/" + config["project_files"][f] + model_path + datstr)[
+#                        start_frame:stop_frame]
+#             if f == 0:
+#                 labels_df = pd.DataFrame(labels_i, columns=[header])
+#             else:
+#                 labels_df.insert(loc=count, value=labels_i, column=config["project_files"][f])
+#                 labels_df = labels_df.copy()
+#             count = count + 1
+#     elif config["data_source"]=="MotionMapper":
+#         label_paths=config["project_files"]
+#         for i in range(len(label_paths)):
+#             header.append(label_paths[i])
+#             labels_i = scipy.io.loadmat(config["data_directory"]+"/"+label_paths[i])["ethogram_data"]
+#             labels_i = np.sum(labels_i,axis=1)
+#             if i == 0:
+#                 labels_df = pd.DataFrame(labels_i, columns=[header])
+#             else:
+#                 labels_df.insert(loc=count, value=labels_i, column=label_paths[i])
+#                 labels_df = labels_df.copy()
+#             count = count + 1
+#
+#     #Get number of modules
+#     labels_flat = np.array(labels_df)
+#     labels_flat = [item for sublist in labels_flat for item in sublist]
+#     modules = np.unique(labels_flat)
+#     n_modules = len(modules)
+#     return labels_df
+#
+# def label_counter_subgroups(config, start, stop, selected_subgroups="all"):
+#     """
+#     Generates a Pandas dataframe containing the labels for every frame in the specified time range for the video paths in defined groups.
+#
+#     :param config: the config
+#     :param start: time in seconds to start dataframe from.
+#     :param stop: time in seconds to stop dataframe at.
+#     :param fps: frames per second of recording.
+#     :param selected_subgroups: frames per second of recording.
+#     :return:
+#     """
+#     fps = config["fps"]
+#     start_frame = start * int(fps)
+#     stop_frame = stop * int(fps)
+#     if selected_subgroups=="all":
+#         selected_subgroups=list(config["subgroups"].keys())
+#     n_groups = len(selected_subgroups)
+#     count = 0
+#     header1 = []
+#     header2 = []
+#     if config["data_source"]=="B-SOiD":
+#         for g in range(n_groups):
+#             label_paths_g = [i for i in config["subgroups"][selected_subgroups[g]] if "labels_" in i]
+#             for i in range(len(label_paths_g)):
+#                 header = label_paths_g[i]
+#                 header2.append(header)
+#                 header1.append(selected_subgroups[g])
+#                 labels_i = np.loadtxt(
+#                     str(config["data_directory"] + "/" + label_paths_g[i]),
+#                     delimiter=",", skiprows=3, usecols=1)[start_frame:stop_frame]
+#                 if i == 0 and g == 0:
+#                     labels_df = pd.DataFrame(labels_i, columns=[header])
+#                 else:
+#                     labels_df.insert(loc=count, value=labels_i, column=header)
+#                     labels_df = labels_df.copy()
+#                 count = count + 1
+#         labels_df.columns = [header1, header2]
+#     elif config["data_source"]=="Keypoint-MoSeq":
+#         for g in range(n_groups):
+#             label_paths_g = config["subgroups"][selected_subgroups[g]]
+#             for i in range(len(label_paths_g)):
+#                 header = label_paths_g[i]
+#                 header2.append(header)
+#                 header1.append(selected_subgroups[g])
+#                 labels_i = np.loadtxt(
+#                     str(config["data_directory"] + "/" + label_paths_g[i]),
+#                     delimiter=",", skiprows=1, usecols=0)[start_frame:stop_frame]
+#                 if i == 0 and g == 0:
+#                     labels_df = pd.DataFrame(labels_i, columns=[header])
+#                 else:
+#                     labels_df.insert(loc=count, value=labels_i, column=header)
+#                     labels_df = labels_df.copy()
+#                 count = count + 1
+#         labels_df.columns = [header1, header2]
+#     elif config["data_source"]=="VAME":
+#         data_directory = config["data_directory"]
+#         model_path = ""
+#         model_path = model_path + "/" + os.listdir(data_directory + "/" + os.listdir(data_directory)[0])[0]
+#         model_path = model_path + "/" + os.listdir(data_directory + "/" + os.listdir(data_directory)[0] + model_path)[
+#             0] + "/"
+#         for g in range(n_groups):
+#             label_paths_g = config["subgroups"][selected_subgroups[g]]
+#             for f in range(len(label_paths_g)):
+#                 header = label_paths_g[f]
+#                 header2.append(header)
+#                 header1.append(selected_subgroups[g])
+#                 datstr = [i for i in os.listdir(data_directory + "/" + label_paths_g[f] + model_path) if "_label_" in i][0]
+#                 labels_i = np.load(data_directory + "/" + label_paths_g[f] + model_path + datstr)[
+#                            start_frame:stop_frame]
+#                 if f == 0 and g == 0:
+#                     labels_df = pd.DataFrame(labels_i, columns=[header])
+#                 else:
+#                     labels_df.insert(loc=count, value=labels_i, column=header)
+#                     labels_df = labels_df.copy()
+#                 count = count + 1
+#         labels_df.columns = [header1, header2]
+#     elif config["data_source"]=="MotionMapper":
+#         for g in range(n_groups):
+#             label_paths_g = config["subgroups"][selected_subgroups[g]]
+#             for i in range(len(label_paths_g)):
+#                 header = label_paths_g[i]
+#                 header2.append(header)
+#                 header1.append(selected_subgroups[g])
+#                 labels_i = scipy.io.loadmat(config["data_directory"]+"/"+label_paths_g[i])["ethogram_data"]
+#                 labels_i = np.sum(labels_i,axis=1)
+#                 if i == 0 and g == 0:
+#                     labels_df = pd.DataFrame(labels_i, columns=[header])
+#                 else:
+#                     labels_df.insert(loc=count, value=labels_i, column=header)
+#                 count = count + 1
+#         labels_df.columns = [header1, header2]
+#
+#     #Get number of modules
+#     labels_flat = np.array(labels_df)
+#     labels_flat = [item for sublist in labels_flat for item in sublist]
+#     modules = np.unique(labels_flat)
+#     n_modules = len(modules)
+#     return labels_df
+def is_nonnum(value):
+    try:
+        int(value)
+        return False
+    except (ValueError, TypeError):
+        return True
+
+def get_module_labels(config, start, stop, subgroups = None):
     """
     Generates a Pandas dataframe containing the labels for every frame in the specified time range for the video paths in defined groups.
 
@@ -19,176 +202,152 @@ def label_counter_nosubgroups(config, start, stop):
     :param start: time in seconds to start dataframe from.
     :param stop: time in seconds to stop dataframe at.
     :param fps: frames per second of recording.
+    :param subgroups: subgroups to include; by default, None will result in an object without data subgrouped; could alternatively be a list of subgroup names from config or "all" (to include all subgroups present in config)
     :return:
     """
     fps = config["fps"]
     start_frame = start * int(fps)
     stop_frame = stop * int(fps)
-    count = 0
-    header = []
-    if config["data_source"]=="B-SOiD":
-        label_paths=[i for i in config["project_files"] if "labels_" in i]
-        for i in range(len(label_paths)):
-            header.append(label_paths[i])
-            labels_i = np.loadtxt(
-                str(config["data_directory"] + "/" + label_paths[i]),
-                delimiter=",", skiprows=3, usecols=1)[start_frame:stop_frame]
-            if i == 0:
-                labels_df = pd.DataFrame(labels_i, columns=[header])
-            else:
-                labels_df = labels_df.copy()
-                labels_df.insert(loc=count, value=labels_i, column=label_paths[i])
-            count = count + 1
-    elif config["data_source"]=="Keypoint-MoSeq":
-        label_paths=config["project_files"]
-        for i in range(len(label_paths)):
-            header.append(label_paths[i])
-            labels_i = np.loadtxt(
-                str(config["data_directory"] + "/" + label_paths[i]),
-                delimiter=",", skiprows=1, usecols=0)[start_frame:stop_frame]
-            if i == 0:
-                labels_df = pd.DataFrame(labels_i, columns=[header])
-            else:
-                labels_df.insert(loc=count, value=labels_i, column=label_paths[i])
-                labels_df = labels_df.copy()
-            count = count + 1
-    elif config["data_source"]=="VAME":
-        data_directory = config["data_directory"]
-        model_path = ""
-        model_path = model_path + "/" + os.listdir(data_directory + "/" + os.listdir(data_directory)[0])[0]
-        model_path = model_path + "/" + os.listdir(data_directory + "/" + os.listdir(data_directory)[0] + model_path)[
-            0] + "/"
-        for f in range(len(config["project_files"])):
-            header.append(config["project_files"][f])
-            datstr = [i for i in os.listdir(data_directory + "/" + config["project_files"][f] + model_path) if "_label_" in i][0]
-            labels_i = np.load(data_directory + "/" + config["project_files"][f] + model_path + datstr)[
-                       start_frame:stop_frame]
-            if f == 0:
-                labels_df = pd.DataFrame(labels_i, columns=[header])
-            else:
-                labels_df.insert(loc=count, value=labels_i, column=config["project_files"][f])
-                labels_df = labels_df.copy()
-            count = count + 1
-    elif config["data_source"]=="MotionMapper":
-        label_paths=config["project_files"]
-        for i in range(len(label_paths)):
-            header.append(label_paths[i])
-            labels_i = scipy.io.loadmat(config["data_directory"]+"/"+label_paths[i])["ethogram_data"]
-            labels_i = np.sum(labels_i,axis=1)
-            if i == 0:
-                labels_df = pd.DataFrame(labels_i, columns=[header])
-            else:
-                labels_df.insert(loc=count, value=labels_i, column=label_paths[i])
-                labels_df = labels_df.copy()
-            count = count + 1
-
-    #Get number of modules
-    labels_flat = np.array(labels_df)
-    labels_flat = [item for sublist in labels_flat for item in sublist]
-    modules = np.unique(labels_flat)
-    n_modules = len(modules)
-    return labels_df, n_modules
-
-def label_counter_subgroups(config, start, stop, selected_subgroups="all"):
-    """
-    Generates a Pandas dataframe containing the labels for every frame in the specified time range for the video paths in defined groups.
-
-    :param config: the config
-    :param start: time in seconds to start dataframe from.
-    :param stop: time in seconds to stop dataframe at.
-    :param fps: frames per second of recording.
-    :param selected_subgroups: frames per second of recording.
-    :return:
-    """
-    fps = config["fps"]
-    start_frame = start * int(fps)
-    stop_frame = stop * int(fps)
-    if selected_subgroups=="all":
-        selected_subgroups=list(config["subgroups"].keys())
-    n_groups = len(selected_subgroups)
-    count = 0
-    header1 = []
-    header2 = []
-    if config["data_source"]=="B-SOiD":
-        for g in range(n_groups):
-            label_paths_g = [i for i in config["subgroups"][selected_subgroups[g]] if "labels_" in i]
-            for i in range(len(label_paths_g)):
-                header = label_paths_g[i]
-                header2.append(header)
-                header1.append(selected_subgroups[g])
+    if subgroups==None:
+        count = 0
+        header = []
+        if config["data_source"]=="B-SOiD":
+            label_paths=[i for i in config["project_files"] if "labels_" in i]
+            for i in range(len(label_paths)):
+                header.append(label_paths[i])
                 labels_i = np.loadtxt(
-                    str(config["data_directory"] + "/" + label_paths_g[i]),
+                    str(config["data_directory"] + "/" + label_paths[i]),
                     delimiter=",", skiprows=3, usecols=1)[start_frame:stop_frame]
-                if i == 0 and g == 0:
+                if i == 0:
                     labels_df = pd.DataFrame(labels_i, columns=[header])
                 else:
-                    labels_df.insert(loc=count, value=labels_i, column=header)
                     labels_df = labels_df.copy()
+                    labels_df.insert(loc=count, value=labels_i, column=label_paths[i])
                 count = count + 1
-        labels_df.columns = [header1, header2]
-    elif config["data_source"]=="Keypoint-MoSeq":
-        for g in range(n_groups):
-            label_paths_g = config["subgroups"][selected_subgroups[g]]
-            for i in range(len(label_paths_g)):
-                header = label_paths_g[i]
-                header2.append(header)
-                header1.append(selected_subgroups[g])
+        elif config["data_source"]=="Keypoint-MoSeq":
+            label_paths=config["project_files"]
+            for i in range(len(label_paths)):
+                header.append(label_paths[i])
                 labels_i = np.loadtxt(
-                    str(config["data_directory"] + "/" + label_paths_g[i]),
+                    str(config["data_directory"] + "/" + label_paths[i]),
                     delimiter=",", skiprows=1, usecols=0)[start_frame:stop_frame]
-                if i == 0 and g == 0:
+                if i == 0:
                     labels_df = pd.DataFrame(labels_i, columns=[header])
                 else:
-                    labels_df.insert(loc=count, value=labels_i, column=header)
+                    labels_df.insert(loc=count, value=labels_i, column=label_paths[i])
                     labels_df = labels_df.copy()
                 count = count + 1
-        labels_df.columns = [header1, header2]
-    elif config["data_source"]=="VAME":
-        data_directory = config["data_directory"]
-        model_path = ""
-        model_path = model_path + "/" + os.listdir(data_directory + "/" + os.listdir(data_directory)[0])[0]
-        model_path = model_path + "/" + os.listdir(data_directory + "/" + os.listdir(data_directory)[0] + model_path)[
-            0] + "/"
-        for g in range(n_groups):
-            label_paths_g = config["subgroups"][selected_subgroups[g]]
-            for f in range(len(label_paths_g)):
-                header = label_paths_g[f]
-                header2.append(header)
-                header1.append(selected_subgroups[g])
-                datstr = [i for i in os.listdir(data_directory + "/" + label_paths_g[f] + model_path) if "_label_" in i][0]
-                labels_i = np.load(data_directory + "/" + label_paths_g[f] + model_path + datstr)[
+        elif config["data_source"]=="VAME":
+            data_directory = config["data_directory"]
+            model_path = ""
+            model_path = model_path + "/" + os.listdir(data_directory + "/" + os.listdir(data_directory)[0])[0]
+            model_path = model_path + "/" + os.listdir(data_directory + "/" + os.listdir(data_directory)[0] + model_path)[
+                0] + "/"
+            for f in range(len(config["project_files"])):
+                header.append(config["project_files"][f])
+                datstr = [i for i in os.listdir(data_directory + "/" + config["project_files"][f] + model_path) if "_label_" in i][0]
+                labels_i = np.load(data_directory + "/" + config["project_files"][f] + model_path + datstr)[
                            start_frame:stop_frame]
-                if f == 0 and g == 0:
+                if f == 0:
                     labels_df = pd.DataFrame(labels_i, columns=[header])
                 else:
-                    labels_df.insert(loc=count, value=labels_i, column=header)
+                    labels_df.insert(loc=count, value=labels_i, column=config["project_files"][f])
                     labels_df = labels_df.copy()
                 count = count + 1
-        labels_df.columns = [header1, header2]
-    elif config["data_source"]=="MotionMapper":
-        for g in range(n_groups):
-            label_paths_g = config["subgroups"][selected_subgroups[g]]
-            for i in range(len(label_paths_g)):
-                header = label_paths_g[i]
-                header2.append(header)
-                header1.append(selected_subgroups[g])
-                labels_i = scipy.io.loadmat(config["data_directory"]+"/"+label_paths_g[i])["ethogram_data"]
+        elif config["data_source"]=="MotionMapper":
+            label_paths=config["project_files"]
+            for i in range(len(label_paths)):
+                header.append(label_paths[i])
+                labels_i = scipy.io.loadmat(config["data_directory"]+"/"+label_paths[i])["ethogram_data"]
                 labels_i = np.sum(labels_i,axis=1)
-                if i == 0 and g == 0:
+                if i == 0:
                     labels_df = pd.DataFrame(labels_i, columns=[header])
                 else:
-                    labels_df.insert(loc=count, value=labels_i, column=header)
+                    labels_df.insert(loc=count, value=labels_i, column=label_paths[i])
+                    labels_df = labels_df.copy()
                 count = count + 1
-        labels_df.columns = [header1, header2]
 
-    #Get number of modules
-    labels_flat = np.array(labels_df)
-    labels_flat = [item for sublist in labels_flat for item in sublist]
-    modules = np.unique(labels_flat)
-    n_modules = len(modules)
-    return labels_df, n_modules
+    else:
+        if subgroups=="all":
+            subgroups=list(config["subgroups"].keys())
+        n_groups = len(subgroups)
+        count = 0
+        header1 = []
+        header2 = []
+        if config["data_source"]=="B-SOiD":
+            for g in range(n_groups):
+                label_paths_g = [i for i in config["subgroups"][subgroups[g]] if "labels_" in i]
+                for i in range(len(label_paths_g)):
+                    header = label_paths_g[i]
+                    header2.append(header)
+                    header1.append(subgroups[g])
+                    labels_i = np.loadtxt(
+                        str(config["data_directory"] + "/" + label_paths_g[i]),
+                        delimiter=",", skiprows=3, usecols=1)[start_frame:stop_frame]
+                    if i == 0 and g == 0:
+                        labels_df = pd.DataFrame(labels_i, columns=[header])
+                    else:
+                        labels_df.insert(loc=count, value=labels_i, column=header)
+                        labels_df = labels_df.copy()
+                    count = count + 1
+            labels_df.columns = [header1, header2]
+        elif config["data_source"]=="Keypoint-MoSeq":
+            for g in range(n_groups):
+                label_paths_g = config["subgroups"][subgroups[g]]
+                for i in range(len(label_paths_g)):
+                    header = label_paths_g[i]
+                    header2.append(header)
+                    header1.append(subgroups[g])
+                    labels_i = np.loadtxt(
+                        str(config["data_directory"] + "/" + label_paths_g[i]),
+                        delimiter=",", skiprows=1, usecols=0)[start_frame:stop_frame]
+                    if i == 0 and g == 0:
+                        labels_df = pd.DataFrame(labels_i, columns=[header])
+                    else:
+                        labels_df.insert(loc=count, value=labels_i, column=header)
+                        labels_df = labels_df.copy()
+                    count = count + 1
+            labels_df.columns = [header1, header2]
+        elif config["data_source"]=="VAME":
+            data_directory = config["data_directory"]
+            model_path = ""
+            model_path = model_path + "/" + os.listdir(data_directory + "/" + os.listdir(data_directory)[0])[0]
+            model_path = model_path + "/" + os.listdir(data_directory + "/" + os.listdir(data_directory)[0] + model_path)[
+                0] + "/"
+            for g in range(n_groups):
+                label_paths_g = config["subgroups"][subgroups[g]]
+                for f in range(len(label_paths_g)):
+                    header = label_paths_g[f]
+                    header2.append(header)
+                    header1.append(subgroups[g])
+                    datstr = [i for i in os.listdir(data_directory + "/" + label_paths_g[f] + model_path) if "_label_" in i][0]
+                    labels_i = np.load(data_directory + "/" + label_paths_g[f] + model_path + datstr)[
+                               start_frame:stop_frame]
+                    if f == 0 and g == 0:
+                        labels_df = pd.DataFrame(labels_i, columns=[header])
+                    else:
+                        labels_df.insert(loc=count, value=labels_i, column=header)
+                        labels_df = labels_df.copy()
+                    count = count + 1
+            labels_df.columns = [header1, header2]
+        elif config["data_source"]=="MotionMapper":
+            for g in range(n_groups):
+                label_paths_g = config["subgroups"][subgroups[g]]
+                for i in range(len(label_paths_g)):
+                    header = label_paths_g[i]
+                    header2.append(header)
+                    header1.append(subgroups[g])
+                    labels_i = scipy.io.loadmat(config["data_directory"]+"/"+label_paths_g[i])["ethogram_data"]
+                    labels_i = np.sum(labels_i,axis=1)
+                    if i == 0 and g == 0:
+                        labels_df = pd.DataFrame(labels_i, columns=[header])
+                    else:
+                        labels_df.insert(loc=count, value=labels_i, column=header)
+                    count = count + 1
+            labels_df.columns = [header1, header2]
+    return labels_df
 
-def get_distance_timebins(DLC_config,filepath,binsize,start,end,bodypart,thresh=70):
+def get_distance_timebins(PE_config,filepath,binsize,start,end,bodypart,thresh=70):
     """
     Get distance/locomotion for a body part from a DLC file
 
@@ -205,8 +364,8 @@ def get_distance_timebins(DLC_config,filepath,binsize,start,end,bodypart,thresh=
     nbins=int((end-start)/binsize)
     dist=np.zeros(nbins)
     for b in range(nbins):
-        x = np.array(data[bodypart]['x'])[(start+b*binsize)*DLC_config["fps"]:(start+(b+1)*binsize)*DLC_config["fps"]]
-        y = np.array(data[bodypart]['y'])[(start+b*binsize)*DLC_config["fps"]:(start+(b+1)*binsize)*DLC_config["fps"]]
+        x = np.array(data[bodypart]['x'])[(start+b*binsize)*PE_config["fps"]:(start+(b+1)*binsize)*PE_config["fps"]]
+        y = np.array(data[bodypart]['y'])[(start+b*binsize)*PE_config["fps"]:(start+(b+1)*binsize)*PE_config["fps"]]
         for i in range(len(x)-1):
             if np.absolute(x[i+1]-x[i])>thresh:
                 x[i+1]=x[i]
@@ -215,20 +374,20 @@ def get_distance_timebins(DLC_config,filepath,binsize,start,end,bodypart,thresh=
             dist[b]=dist[b]+np.sqrt((x[i+1]-x[i])**2+(y[i+1]-y[i])**2)
     return dist
 
-def dist_df_subgroups(DLC_config, binsize, start, end, thresh=70, selected_subgroups="all"):
+def dist_df_subgroups(PE_config, binsize, start, end, thresh=70, selected_subgroups="all"):
     if selected_subgroups=="all":
-        selected_subgroups=DLC_config["subgroups"].keys()
+        selected_subgroups=PE_config["subgroups"].keys()
     count = 0
     header1 = []
     header2 = []
     for g, group in enumerate(selected_subgroups):
         group_data=[]
-        for s, sess in enumerate(DLC_config["subgroups"][group]):
+        for s, sess in enumerate(PE_config["subgroups"][group]):
             header = sess
             header2.append(header)
             header1.append(group)
-            path = DLC_config["path"]+sess
-            dist_i = get_distance_timebins(DLC_config,path,binsize,start,end,"tailbase",thresh=thresh)
+            path = PE_config["path"]+sess
+            dist_i = get_distance_timebins(PE_config,path,binsize,start,end,"tailbase",thresh=thresh)
             if s == 0 and g == 0:
                 dist_df = pd.DataFrame(dist_i, columns=[header])
             else:
@@ -246,12 +405,17 @@ def BORIS_to_pose(config):
     :param config: the config
     :return:
     """
+    # TODO: Make possible inputs include aggregate table
     boris_directory = config["boris_directory"]
     boris_to_pose_pairings = config["boris_to_pose_pairings"]
     results=None
     config_modulo = copy.deepcopy(config)
     config_modulo["project_files"]=[pairing[1] for pairing in boris_to_pose_pairings if pairing[0] is not None]
-    labels_df, n_modules = label_counter_nosubgroups(config_modulo, 0, 1200)
+    labels_df = get_module_labels(config_modulo, 0, 1200)
+    labels_flat = np.array(labels_df)
+    labels_flat = [item for sublist in labels_flat for item in sublist]
+    modules = np.unique(labels_flat)
+    n_modules = len(modules)
     modules = np.unique(labels_df.values.flatten())
     for pairing in boris_to_pose_pairings:
         if pairing[0]==None:
@@ -259,7 +423,7 @@ def BORIS_to_pose(config):
         else:
             config_modulo = copy.deepcopy(config)
             config_modulo["project_files"]=[pairing[1]]
-            labels_df, _ = label_counter_nosubgroups(config_modulo,0,1200)
+            labels_df = get_module_labels(config_modulo,0,1200)
             boris_i = pd.read_csv(boris_directory + "/" + pairing[0])
             boris_i["frame"] = np.round(boris_i["time"] / (1 / int(config["fps"])))
             boris_i = boris_i.drop_duplicates(subset='frame', keep='first')
@@ -327,10 +491,122 @@ def make_remappings_from_BORIS(config, labels_df=None, BORIS_to_pose_mat=None):
     else:
         return config
 
-class UsageFeats:
-    def __init__(self, label_counts, group_labels, feat_names, group_dict):
+# class UsageFeats:
+#     def __init__(self, label_counts, group_labels, feat_names, group_dict):
+#         self.label_counts = label_counts
+#         self.group_labels = group_labels
+#         self.feat_names = feat_names
+#         self.group_dict = group_dict
+#         mean_check = np.allclose(np.mean(label_counts, axis=0), 0, atol=0.1)
+#         std_check = np.allclose(np.std(label_counts, axis=0), 1, atol=0.1)
+#         self.scaled = mean_check and std_check
+#
+#     def to_df(self):
+#         colnames=[]
+#         flip_group_dict = {v: k for k, v in self.group_dict.items()}
+#         for i in self.group_labels:
+#             colnames.append(flip_group_dict[i])
+#         df = pd.DataFrame(self.label_counts, columns=self.feat_names, index=colnames)
+#         return df
+#
+#     def collapse_timebins(self):
+#         colnames=[]
+#         flip_group_dict = {v: k for k, v in self.group_dict.items()}
+#         for i in self.group_labels:
+#             colnames.append(flip_group_dict[i])
+#         df = pd.DataFrame(self.label_counts, columns=self.feat_names, index=colnames)
+#         extracted = [i.split("_")[0] for i in df.columns]
+#         modules = pd.Series(extracted).unique()
+#
+#         df_notimebins = pd.DataFrame(index=df.index, columns=modules)
+#         for module in modules:
+#             df_notimebins[module] = df.filter(like=module + "_").mean(axis=1)
+#
+#         return UsageFeats(np.array(df_notimebins), self.group_labels, df_notimebins.columns, self.group_dict)
+#
+#     def apply_picks(self,pick_names):
+#         feats = self.to_df().columns
+#         if set(pick_names)<=set(feats):
+#             colnames=[]
+#             flip_group_dict = {v: k for k, v in self.group_dict.items()}
+#             for i in self.group_labels:
+#                 colnames.append(flip_group_dict[i])
+#             df = pd.DataFrame(self.label_counts, columns=self.feat_names, index=colnames)
+#             df_sub = df[pick_names]
+#             return UsageFeats(np.array(df_sub), self.group_labels, df_sub.columns, self.group_dict)
+#         else:
+#             print("Picks not found in features, presuming that you are applying no-bin picks to binned data and adjusting accordingly...")
+#             print("Input picks: {}".format(pick_names))
+#             new_picks = []
+#             for pick in pick_names:
+#                 new_picks.extend([i for i in feats if pick+"_" in i])
+#             print("Applied picks: {}".format(new_picks))
+#             picked_feats = self.apply_picks(new_picks)
+#             return picked_feats
+#
+#     def scale(self):
+#         scaler = StandardScaler()
+#         label_counts_scaled = scaler.fit_transform(self.label_counts)
+#         return UsageFeats(label_counts_scaled, self.group_labels, self.feat_names, self.group_dict)
+#
+#
+# def get_usage_feats(config,
+#                     labels_df,
+#                     binsize,
+#                     selected_subgroups="all"):
+#     """
+#     Reshape labels dataframe from label_counter_subgroups to be an array of features
+#
+#     :param config: config object
+#     :param labels_df: labels dataframe from label_counter_subgroups
+#     :param binsize: width of bins in seconds
+#     :param selected_subgroups:
+#     :return:
+#     """
+#     if selected_subgroups=="all":
+#         selected_subgroups=list(config["subgroups"].keys())
+#     n_groups = len(selected_subgroups)
+#     fps = int(config["fps"])
+#     group_dict = {selected_subgroups[i]: i for i in range(len(selected_subgroups))}
+#     labels_flat = np.array(labels_df)
+#     labels_flat = [item for sublist in labels_flat for item in sublist]
+#     clusts = np.unique(labels_flat)
+#     n_clust = len(clusts)
+#
+#     label_counts = []
+#
+#     nbins = int(labels_df.shape[0] / (binsize * fps))
+#     feat_names_made=False
+#     feat_names=[]
+#
+#     group_labels = []
+#     for g in range(n_groups):
+#         for i in range(len(labels_df[selected_subgroups[g]].columns)):
+#             label_counts_i = np.zeros(n_clust * nbins)
+#             for b in range(nbins):
+#                 binstart = int(b * (binsize * fps))
+#                 binstop = int((b + 1) * (binsize * fps))
+#                 labels_df_sub = labels_df[binstart:binstop]
+#                 for c in range(n_clust):
+#                     label_counts_i[c + n_clust * b] = np.count_nonzero(
+#                         labels_df_sub[selected_subgroups[g]][[labels_df_sub[selected_subgroups[g]].columns[i]]] == c) / (binsize * fps)
+#                     if feat_names_made==False:
+#                         if nbins>1:
+#                             feat_names.append(f"module{c}_t{int(binstart/fps)}-{int(binstop/fps)}")
+#                         else:
+#                             feat_names.append(f"module{c}")
+#             label_counts.append(label_counts_i)
+#             group_labels.append(g)
+#             feat_names_made=True
+#     label_counts = np.array(label_counts)
+#
+#     return UsageFeats(label_counts, group_labels, feat_names, group_dict)
+
+class ModuleUsage:
+    def __init__(self, label_counts, group_labels, observation_labels, feat_names, group_dict):
         self.label_counts = label_counts
         self.group_labels = group_labels
+        self.observation_labels = observation_labels
         self.feat_names = feat_names
         self.group_dict = group_dict
         mean_check = np.allclose(np.mean(label_counts, axis=0), 0, atol=0.1)
@@ -338,15 +614,16 @@ class UsageFeats:
         self.scaled = mean_check and std_check
 
     def to_df(self):
-        colnames=[]
+        colnames = []
         flip_group_dict = {v: k for k, v in self.group_dict.items()}
         for i in self.group_labels:
             colnames.append(flip_group_dict[i])
-        df = pd.DataFrame(self.label_counts, columns=self.feat_names, index=colnames)
+        df = pd.DataFrame(self.label_counts, columns=self.feat_names, index=self.observation_labels)
+        df["group"] = colnames
         return df
 
     def collapse_timebins(self):
-        colnames=[]
+        colnames = []
         flip_group_dict = {v: k for k, v in self.group_dict.items()}
         for i in self.group_labels:
             colnames.append(flip_group_dict[i])
@@ -358,24 +635,27 @@ class UsageFeats:
         for module in modules:
             df_notimebins[module] = df.filter(like=module + "_").mean(axis=1)
 
-        return UsageFeats(np.array(df_notimebins), self.group_labels, df_notimebins.columns, self.group_dict)
+        return ModuleUsage(np.array(df_notimebins), self.group_labels, self.observation_labels, df_notimebins.columns,
+                           self.group_dict)
 
-    def apply_picks(self,pick_names):
+    def apply_picks(self, pick_names):
         feats = self.to_df().columns
-        if set(pick_names)<=set(feats):
-            colnames=[]
+        if set(pick_names) <= set(feats):
+            colnames = []
             flip_group_dict = {v: k for k, v in self.group_dict.items()}
             for i in self.group_labels:
                 colnames.append(flip_group_dict[i])
             df = pd.DataFrame(self.label_counts, columns=self.feat_names, index=colnames)
             df_sub = df[pick_names]
-            return UsageFeats(np.array(df_sub), self.group_labels, df_sub.columns, self.group_dict)
+            return ModuleUsage(np.array(df_sub), self.group_labels, self.observation_labels, df_sub.columns,
+                               self.group_dict)
         else:
-            print("Picks not found in features, presuming that you are applying no-bin picks to binned data and adjusting accordingly...")
+            print(
+                "Picks not found in features, presuming that you are applying no-bin picks to binned data and adjusting accordingly...")
             print("Input picks: {}".format(pick_names))
             new_picks = []
             for pick in pick_names:
-                new_picks.extend([i for i in feats if pick+"_" in i])
+                new_picks.extend([i for i in feats if pick + "_" in i])
             print("Applied picks: {}".format(new_picks))
             picked_feats = self.apply_picks(new_picks)
             return picked_feats
@@ -383,60 +663,81 @@ class UsageFeats:
     def scale(self):
         scaler = StandardScaler()
         label_counts_scaled = scaler.fit_transform(self.label_counts)
-        return UsageFeats(label_counts_scaled, self.group_labels, self.feat_names, self.group_dict)
+        return ModuleUsage(label_counts_scaled, self.group_labels, self.observation_labels, self.feat_names,
+                           self.group_dict)
 
 
-def get_usage_feats(config,
-                    labels_df,
-                    binsize,
-                    selected_subgroups="all"):
+def get_module_usage(config, labels_df, binsize=None):
     """
     Reshape labels dataframe from label_counter_subgroups to be an array of features
 
     :param config: config object
     :param labels_df: labels dataframe from label_counter_subgroups
-    :param binsize: width of bins in seconds
+    :param binsize: width of bins in seconds; if None, no binning is performed
     :param selected_subgroups:
     :return:
     """
-    if selected_subgroups=="all":
-        selected_subgroups=list(config["subgroups"].keys())
-    n_groups = len(selected_subgroups)
+    data_subgrouped = False
+    try:
+        list(labels_df.columns.get_level_values(1).unique())
+        subgroups = list(labels_df.columns.get_level_values(0).unique())
+        group_dict = {subgroups[i]: i for i in range(len(subgroups))}
+        data_subgrouped = True
+    except IndexError:
+        subgroups = list(labels_df.columns.get_level_values(0).unique())
+        group_dict = {"no_assigned_subgroup": 0}
+        data_subgrouped = False
+
+    n_groups = len(subgroups)
     fps = int(config["fps"])
-    group_dict = {selected_subgroups[i]: i for i in range(len(selected_subgroups))}
     labels_flat = np.array(labels_df)
     labels_flat = [item for sublist in labels_flat for item in sublist]
-    clusts = np.unique(labels_flat)
-    n_clust = len(clusts)
+    modules = np.unique(labels_flat)
+    n_modules = len(modules)
 
     label_counts = []
 
+    if binsize == None:
+        binsize = (labels_df.index.stop - labels_df.index.start) / int(config["fps"])
+
     nbins = int(labels_df.shape[0] / (binsize * fps))
-    feat_names_made=False
-    feat_names=[]
+    feat_names_made = False
+    feat_names = []
 
     group_labels = []
+    observation_labels = []
+
     for g in range(n_groups):
-        for i in range(len(labels_df[selected_subgroups[g]].columns)):
-            label_counts_i = np.zeros(n_clust * nbins)
+        for i in range(len(labels_df[subgroups[g]].columns)):
+            label_counts_i = np.zeros(n_modules * nbins)
             for b in range(nbins):
                 binstart = int(b * (binsize * fps))
                 binstop = int((b + 1) * (binsize * fps))
                 labels_df_sub = labels_df[binstart:binstop]
-                for c in range(n_clust):
-                    label_counts_i[c + n_clust * b] = np.count_nonzero(
-                        labels_df_sub[selected_subgroups[g]][[labels_df_sub[selected_subgroups[g]].columns[i]]] == c) / (binsize * fps)
-                    if feat_names_made==False:
-                        if nbins>1:
-                            feat_names.append(f"module{c}_t{int(binstart/fps)}-{int(binstop/fps)}")
+                for m,mod in enumerate(modules):
+                    label_counts_i[m + n_modules * b] = np.count_nonzero(
+                        labels_df_sub[subgroups[g]][[labels_df_sub[subgroups[g]].columns[i]]] == mod) / (binsize * fps)
+                    if feat_names_made == False:
+                        if is_nonnum(mod):
+                            modname=mod
                         else:
-                            feat_names.append(f"module{c}")
+                            modname=str(int(mod))
+                        if nbins > 1:
+                            feat_names.append(f"module{modname}_t{int(binstart / fps)}-{int(binstop / fps)}")
+                        else:
+                            feat_names.append(f"module{modname}")
             label_counts.append(label_counts_i)
-            group_labels.append(g)
-            feat_names_made=True
+            if data_subgrouped:
+                group_labels.append(g)
+                observation_labels.append(labels_df[subgroups[g]].columns[i])
+            else:
+                group_labels.append(0)
+                observation_labels.append(labels_df[subgroups[g]].columns[i][0])
+            feat_names_made = True
     label_counts = np.array(label_counts)
 
-    return UsageFeats(label_counts, group_labels, feat_names, group_dict)
+    return ModuleUsage(label_counts, group_labels, observation_labels, feat_names, group_dict)
+
 
 def feat_select(usage_feats, method="f", n_feats=10, verbose=True):
     """

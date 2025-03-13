@@ -2,222 +2,13 @@ import scipy.io
 from scipy import stats
 import matplotlib.pyplot as plt
 from matplotlib import rcParams, gridspec
-from matplotlib.patches import Rectangle
 import numpy as np
 import pandas as pd
 import networkx as nx
 rcParams['font.family'] = 'sans-serif'
 rcParams['font.sans-serif'] = ['Arial']
-from matplotlib.patches import Patch, Ellipse
+from matplotlib.patches import Patch, Ellipse, Rectangle
 from utils import analysis
-import textwrap
-
-def plot_module_usage(config,labels_df,start,stop,figW=4,figH=2,style="bar_scatter",cmap="jet"):
-    """
-    Plots the frequency of the pose modules occurring by group in the labels dataframe output by the label_counter function.
-
-    :param labels_df: dataframe output from analysis.label_counter
-    :param start: time in seconds to start dataframe from.
-    :param stop: time in seconds to stop dataframe at.
-    :param fps: frames per second of recording.
-    :param figW: figure width
-    :param figH: figure height
-    :param style: "bar_scatter", "bar_error", or "points"
-    :return:
-    """
-    fps = int(config["fps"])
-    start_frame = start*fps
-    stop_frame = stop*fps
-    labels_df=labels_df[start_frame:stop_frame]
-    total_frames = stop_frame-start_frame
-    labels_flat = np.array(labels_df)
-    labels_flat = [item for sublist in labels_flat for item in sublist]
-    modules = np.unique(labels_flat)
-    n_modules = len(modules)
-
-    label_counts = np.zeros([labels_df.shape[1], n_modules])
-    for i in range(labels_df.shape[1]):
-        for m in range(n_modules):
-            module = modules[m]
-            try:
-                module = np.int64(module)
-            except ValueError:
-                pass
-            label_counts[i,m] = np.count_nonzero \
-                (labels_df[[labels_df.columns[i]]] == module) /total_frames
-    bar_heights = np.mean(label_counts,axis=0)
-    bar_sems = np.std(label_counts,axis=0)/np.sqrt(labels_df.shape[1])
-
-    fig, ax = plt.subplots(figsize=(figW,figH),dpi=100)
-    cmap = plt.get_cmap(cmap)
-    if ((style=="bar_scatter") or (style=="bar_error")):
-        ax.bar(
-            x=np.arange(0, n_modules, 1),
-            height=bar_heights,
-            width=0.8,
-            alpha=0.5,
-            color=cmap([0.1])
-        )
-        if style=="bar_scatter":
-            for i in range(len(label_counts)):
-                ax.scatter(np.arange(0, n_modules, 1) + np.random.normal(0, 0.01, n_modules),
-                           label_counts[i],
-                           color="black",
-                           s=0.5
-                           )
-        elif style=="bar_error":
-            ax.errorbar(
-                x=np.arange(0, n_modules, 1),
-                y=bar_heights,
-                yerr=bar_sems,
-                linestyle="none",linewidth=0.6,
-                color="black",capsize=1,markeredgewidth=0.75
-            )
-    elif style=="points":
-        ax.errorbar(
-            x=np.arange(0, n_modules, 1),
-            y=bar_heights,
-            yerr=bar_sems,
-            color=cmap([0.1]),
-            linestyle="none",
-            marker="o",markersize=2.5,linewidth=0.75,
-            capsize=2,markeredgewidth=0.75
-        )
-    ax.set_xlabel(config["data_source"] + ' Pose Label')
-    ax.set_ylabel('Frequency')
-    ax.set_xticks(np.arange(0, n_modules, 1))
-    ax.tick_params(axis='x', rotation=90, labelsize=plt.rcParams['font.size'] * 0.5, pad=2)
-    plt.tight_layout()
-    return fig
-
-def plot_module_usage_subgroups(config, labels_df, start, stop, figW=6, figH=3,
-                                style="bar_scatter",legend_pos="inside", cmap="viridis_r"):
-    """
-    Plots the frequency of the pose modules occurring by group in the labels dataframe output by the label_counter function.
-
-    :param labels_df: dataframe output from analysis.label_counter
-    :param start: time in seconds to start dataframe from.
-    :param stop: time in seconds to stop dataframe at.
-    :param fps: frames per second of recording.
-    :param figW: figure width
-    :param figH:
-    :param style:
-    :return:
-    """
-    #To get groupnames in order
-    fps = int(config["fps"])
-    groupnames = []
-    added_groupnames = set()
-    for item in [header[0] for header in labels_df.columns]:
-        if item not in added_groupnames:
-            groupnames.append(item)
-            added_groupnames.add(item)
-    n_groups=len(groupnames)
-
-    # Frames
-    start_frame = start * fps
-    stop_frame = stop * fps
-    labels_df = labels_df[start_frame:stop_frame]
-    total_frames = stop_frame - start_frame
-    labels_flat = np.array(labels_df)
-    labels_flat = [item for sublist in labels_flat for item in sublist]
-    modules = np.unique(labels_flat)
-    modules_int=[]
-    for module in modules:
-        if isinstance(module, str):
-            modules_int.append(module)
-        else:
-            modules_int.append(int(module))
-    modules=np.array(modules_int)
-    n_modules = len(modules)
-
-    # Label counting
-    label_counts = []
-    for g in range(n_groups):
-        group_g_n=np.sum([item[0]==groupnames[g] for item in labels_df.columns])
-        label_counts_i = np.zeros([group_g_n, n_modules])
-        for i in range(group_g_n):
-            for m in range(n_modules):
-                module = modules[m]
-                try:
-                    module = np.int64(module)
-                except ValueError:
-                    pass
-                label_counts_i[i, m] = np.count_nonzero \
-                                           (labels_df[groupnames[g]][
-                                                [labels_df[groupnames[g]].columns[i]]] == module) / total_frames
-        label_counts.append(label_counts_i)
-
-    bar_heights = np.zeros([n_groups, n_modules])
-    bar_sems = np.zeros([n_groups, n_modules])
-
-    for g in range(n_groups):
-        bar_heights[g, :] = np.mean(label_counts[g], axis=0)
-        bar_sems[g, :] = np.std(label_counts[g], axis=0)/np.sqrt(label_counts[g].shape[0])
-    fig, ax = plt.subplots(figsize=(figW, figH), dpi=100)
-    scale = 1 / (n_groups + .7)
-    cmap = plt.get_cmap(cmap)
-    colors = [cmap([i]) for i in np.linspace(0,1,n_groups)]
-    if ((style=="bar_scatter") or (style=="bar_error")):
-        if style=="bar_scatter":
-            for g in range(n_groups):
-                for i in range(len(label_counts[g])):
-                    ax.scatter(
-                        np.arange(0 + scale * g, n_modules + scale * g, 1) + np.random.normal(0, 0.1 * scale, n_modules),
-                        label_counts[g][i],
-                        color="black",
-                        s=0.5
-                        )
-            bar_alpha=0.5
-        elif style=="bar_error":
-            for g in range(n_groups):
-                ax.errorbar(
-                    x=np.arange(0 + scale * g, n_modules + scale * g, 1),
-                    y=bar_heights[g],
-                    yerr=bar_sems[g],
-                    linestyle="none",linewidth=0.6,
-                    color="black",capsize=0.3,markeredgewidth=0.75,alpha=0.8
-                )
-            bar_alpha=0.85
-        for g in range(n_groups):
-            ax.bar(
-                x=np.arange(0 + scale * g, n_modules + scale * g, 1),
-                height=bar_heights[g],
-                width=scale,
-                alpha=bar_alpha,
-                color=colors[g],
-                label=groupnames[g]
-            )
-    elif style=="points":
-        for g in range(n_groups):
-            ax.errorbar(
-                x=np.arange(0, n_modules, 1),
-                y=bar_heights[g],
-                yerr=bar_sems[g],
-                color=colors[g],
-                label=groupnames[g],
-                linestyle="none",
-                marker="o",markersize=4,linewidth=0.75,
-                capsize=2,markeredgewidth=0.75
-            )
-    if legend_pos == "inside":
-        ax.legend()
-    elif legend_pos == "outside":
-        ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
-
-    ax.set_xlabel(config["data_source"] + ' Pose Label')
-    ax.set_ylabel('Frequency')
-    all_num_modules = np.sum([isinstance(module,str) for module in modules])==0
-    if ((all_num_modules) and (n_modules>=20)):
-        xticks=np.arange(0, n_modules, 5, dtype=int)
-        ax.set_xticks(xticks)
-        ax.set_xticklabels(modules[xticks])
-    else:
-        ax.set_xticks(np.arange(0, n_modules, 1))
-        ax.set_xticklabels(modules)
-    ax.tick_params(axis='x', rotation=90, labelsize=plt.rcParams['font.size'] * 0.2 * n_groups, pad=2)
-    plt.tight_layout()
-    return fig
 
 def is_nonnum(value):
     try:
@@ -226,143 +17,593 @@ def is_nonnum(value):
     except (ValueError, TypeError):
         return True
 
-def plot_module_usage_stacked(config, labels_df, start, stop, figW=6, figH=3, BORIS_to_pose_mat=None, title=None, alt_xticks=None,legend=True,long_legend=True):
+def plot_module_usage(config, usage_feats, figW=4, figH=2, style="bar_scatter", cmap="jet", legend_pos="outside",
+                      BORIS_to_pose_mat=None, legend=True, long_legend=False, alt_xticks=None, title=None):
     """
     Plots the frequency of the pose modules occurring by group in the labels dataframe output by the label_counter function.
 
-    :param labels_df: dataframe output from analysis.label_counter
-    :param start: time in seconds to start dataframe from.
-    :param stop: time in seconds to stop dataframe at.
+    :param usage_df: dataframe output from analysis.label_counter
     :param fps: frames per second of recording.
     :param figW: figure width
-    :param figH:
+    :param figH: figure height
+    :param style: "bar_scatter", "bar_error", "points", or "stacked"
+    :param cmap:
+    :param legend_pos:
     :param BORIS_to_pose_mat:
-    :param title:
+    :param legend_pos:
     :param alt_xticks:
-    :param legend:
-    :param long_legend: for boris re-colored stacked plot only - whether or not to have the pose module numbers in the legend
+    :param title:
     :return:
     """
-    #To get groupnames in order
-    fps = int(config["fps"])
-    groupnames = []
-    added_groupnames = set()
-    for item in [header[0] for header in labels_df.columns]:
-        if item not in added_groupnames:
-            groupnames.append(item)
-            added_groupnames.add(item)
-    n_groups=len(groupnames)
+    if ((style!="bar_scatter") and (style!="bar_error") and (style!="stacked") and (style!="points")):
+        raise ValueError(f'style must be one of "bar_scatter", "bar_error", "stacked", or "points", not {style}')
 
-    # Frames
-    start_frame = start * fps
-    stop_frame = stop * fps
-    labels_df = labels_df[start_frame:stop_frame]
-    total_frames = stop_frame - start_frame
-    labels_flat = np.array(labels_df)
-    labels_flat = [item for sublist in labels_flat for item in sublist]
-    modules = np.unique(labels_flat)
-    any_nonint = np.sum([is_nonnum(i) for i in modules])
-    if any_nonint:
+    if len(np.unique(usage_feats.group_labels)) == 1:
+        data_subgrouped = False
+    else:
+        data_subgrouped = True
+
+    if not data_subgrouped:
+        usage_df = usage_feats.to_df()
+        usage_df.drop("group", axis=1, inplace=True)
+        modules = usage_feats.feat_names
         n_modules = len(modules)
+        bar_heights = np.mean(usage_df, axis=0)
+        bar_sems = np.std(usage_df, axis=0) / np.sqrt(usage_df.shape[1])
+
+        fig, ax = plt.subplots(figsize=(figW, figH), dpi=100)
+        cmap = plt.get_cmap(cmap)
+        if ((style == "bar_scatter") or (style == "bar_error")):
+            ax.bar(
+                x=np.arange(0, n_modules, 1),
+                height=bar_heights,
+                width=0.8,
+                alpha=0.5,
+                color=cmap([0.1])
+            )
+            if style == "bar_scatter":
+                for i in range(len(usage_df.index)):
+                    ax.scatter(np.arange(0, n_modules, 1) + np.random.normal(0, 0.01, n_modules),
+                               usage_df.iloc[i],
+                               color="black",
+                               s=0.5
+                               )
+            elif style == "bar_error":
+                ax.errorbar(
+                    x=np.arange(0, n_modules, 1),
+                    y=bar_heights,
+                    yerr=bar_sems,
+                    linestyle="none", linewidth=0.6,
+                    color="black", capsize=1, markeredgewidth=0.75
+                )
+        elif style == "points":
+            ax.errorbar(
+                x=np.arange(0, n_modules, 1),
+                y=bar_heights,
+                yerr=bar_sems,
+                color=cmap([0.1]),
+                linestyle="none",
+                marker="o", markersize=2.5, linewidth=0.75,
+                capsize=2, markeredgewidth=0.75
+            )
+        ax.set_xlabel(config["data_source"] + ' Pose Label')
+        ax.set_ylabel('Frequency')
+        ax.set_xticks(np.arange(0, n_modules, 1), labels=[i.split("module")[1] for i in modules])
+        ax.tick_params(axis='x', rotation=90, labelsize=plt.rcParams['font.size'] * 0.5, pad=2)
+        plt.tight_layout()
+
     else:
-        n_modules = int(np.max(modules)+1)
-        modules = np.arange(0,n_modules,1)
+        # To get groupnames in order
+        groupnames = list(usage_feats.group_dict.keys())
+        n_groups = len(groupnames)
 
-    # Label counting
-    label_counts = []
-    for g in range(n_groups):
-        group_g_n=np.sum([item[0]==groupnames[g] for item in labels_df.columns])
-        label_counts_i = np.zeros([group_g_n, n_modules])
-        for i in range(group_g_n):
-            for m in range(n_modules):
-                module = modules[m]
-                try:
-                    module = np.int64(module)
-                except ValueError:
-                    pass
-                label_counts_i[i, m] = np.count_nonzero \
-                                           (labels_df[groupnames[g]][
-                                                [labels_df[groupnames[g]].columns[i]]] == module) / total_frames
-        label_counts.append(label_counts_i)
+        usage_df = usage_feats.to_df()
+        modules = usage_feats.feat_names
+        n_modules = len(modules)
 
-    bar_heights = np.zeros([n_groups, n_modules])
-    bar_sems = np.zeros([n_groups, n_modules])
+        bar_heights = np.zeros([n_groups, n_modules])
+        bar_sems = np.zeros([n_groups, n_modules])
 
-    for g in range(n_groups):
-        bar_heights[g, :] = np.mean(label_counts[g], axis=0)
-        bar_sems[g, :] = np.std(label_counts[g], axis=0)/np.sqrt(label_counts[g].shape[0])
-    fig, ax = plt.subplots(figsize=(figW, figH), dpi=100)
-    if BORIS_to_pose_mat is None:
-        for m, module in enumerate(modules):
-            if any_nonint:
-                module = m
-            if module == 0:
-                bar_bottom = np.zeros(n_groups)
-            ax.bar(np.arange(0, n_groups, 1), bar_heights[:, module], bottom=bar_bottom, align='center', width=0.99)
-            ax.spines['top'].set_visible(False)
-            bar_bottom += bar_heights[:, module]
-            ax.spines['right'].set_visible(False)
-            ax.spines['top'].set_visible(False)
-    else:
-        behaviors=list(BORIS_to_pose_mat.index)+["other"]
-        n_behaviors=len(behaviors)
-        leg_handles_col0=[]
-        leg_handles_col1=[]
-        leg_labels=[""]*n_behaviors
-        bottom=True
-        cm_list = ['Greys', 'YlOrBr', 'magma', 'Blues', 'Reds', 'Purples','copper', 'BuGn', 'bone', 'YlGn', 'YlGnBu', 'YlOrRd']
-        for remap in range(n_behaviors):
-            sub_modules=[int(i[0][0]) for i in config["remappings"] if i[1]==behaviors[remap]]
-            cmap=plt.get_cmap(cm_list[remap])
-            colors=[cmap([0.4]),cmap([0.5])]
-            leg_handles_col0.extend([Patch(facecolor=colors[0], edgecolor='none')])
-            leg_handles_col1.extend([Patch(facecolor=colors[1], edgecolor='none')])
-            if long_legend:
-                leg_labels.append(behaviors[remap]+"   ("+str(len(sub_modules))+" modules)")
+        for g, group in enumerate(groupnames):
+            subgroup_usage = usage_df[usage_df["group"] == group].copy()
+            subgroup_usage.drop("group", axis=1, inplace=True)
+            bar_heights[g, :] = subgroup_usage.mean(axis=0)
+            bar_sems[g, :] = subgroup_usage.std(axis=0) / np.sqrt(subgroup_usage.shape[0])
+        fig, ax = plt.subplots(figsize=(figW, figH), dpi=100)
+        scale = 1 / (n_groups + .7)
+        cmap = plt.get_cmap(cmap)
+        colors = [cmap([i]) for i in np.linspace(0, 1, n_groups)]
+        if ((style == "bar_scatter") or (style == "bar_error")):
+            if style == "bar_scatter":
+                for g, group in enumerate(groupnames):
+                    subgroup_usage = usage_df[usage_df["group"] == group].copy()
+                    subgroup_usage.drop("group", axis=1, inplace=True)
+                    for i in subgroup_usage.index:
+                        ax.scatter(
+                            np.arange(0 + scale * g, n_modules + scale * g, 1) + np.random.normal(0, 0.1 * scale,
+                                                                                                  n_modules),
+                            subgroup_usage.loc[i],
+                            color="black",
+                            s=0.5
+                        )
+                bar_alpha = 0.5
+            elif style == "bar_error":
+                for g in range(n_groups):
+                    ax.errorbar(
+                        x=np.arange(0 + scale * g, n_modules + scale * g, 1),
+                        y=bar_heights[g],
+                        yerr=bar_sems[g],
+                        linestyle="none", linewidth=0.6,
+                        color="black", capsize=0.3, markeredgewidth=0.75, alpha=0.8
+                    )
+                bar_alpha = 0.85
+            for g in range(n_groups):
+                ax.bar(
+                    x=np.arange(0 + scale * g, n_modules + scale * g, 1),
+                    height=bar_heights[g],
+                    width=scale,
+                    alpha=bar_alpha,
+                    color=colors[g],
+                    label=groupnames[g]
+                )
+        elif style == "points":
+            for g in range(n_groups):
+                ax.errorbar(
+                    x=np.arange(0, n_modules, 1),
+                    y=bar_heights[g],
+                    yerr=bar_sems[g],
+                    color=colors[g],
+                    label=groupnames[g],
+                    linestyle="none",
+                    marker="o", markersize=4, linewidth=0.75,
+                    capsize=2, markeredgewidth=0.75
+                )
+        if style != "stacked":
+            if legend_pos == "inside":
+                ax.legend()
+            elif legend_pos == "outside":
+                ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+
+            ax.set_xlabel(config["data_source"] + ' Pose Label')
+            ax.set_ylabel('Frequency')
+            all_num_modules = np.sum([isinstance(module, str) for module in modules]) == 0
+            if ((all_num_modules) and (n_modules >= 20)):
+                xticks = np.arange(0, n_modules, 5, dtype=int)
+                ax.set_xticks(xticks)
+                ax.set_xticklabels(modules[xticks])
             else:
-                leg_labels.append(behaviors[remap])#+" "+str(sub_modules))
-            if len(sub_modules)>0:
-                for c in sub_modules:
-                    if c in modules:
-                        if bottom==True:
-                            bar_bottom = np.zeros(n_groups)
-                            bottom=False
-                        ax.bar(np.arange(0, n_groups, 1), bar_heights[:, c], bottom=bar_bottom, align='center',
-                               width=0.99,color=colors[c%2])
-                        ax.spines['top'].set_visible(False)
-                        bar_bottom += bar_heights[:, c]
-                        ax.spines['right'].set_visible(False)
-                        ax.spines['top'].set_visible(False)
-    ax.set_ylabel("Proportion of Time \nSpent in Pose Module")
-    ax.set_yticks([0,0.2,0.4,0.6,0.8,1])
-    ax.set_xlim([-0.5, n_groups - 0.5])
-    ax.set_xticks(np.arange(n_groups))
-    if alt_xticks is None:
-        ax.set_xticklabels(groupnames)
-    else:
-        ax.set_xticklabels(alt_xticks)
-    if title is not None:
-        ax.set_title(title)
-    if legend==True:
-        if BORIS_to_pose_mat is None:
-            if len(modules>10):
-                leg_modules = []
-                for col in range(10):
-                    items = [i for i in modules if int(i % 10) == col]
-                    if len(items)>1:
-                        leg_modules.append("Modules "+', '.join(map(str, items)))
-                    else:
-                        leg_modules.append("Module " + str(items[0]))
-            else:
-                leg_modules=modules
-            plt.legend(leg_modules,bbox_to_anchor=(1.05, 1))
+                ax.set_xticks(np.arange(0, n_modules, 1))
+                ax.set_xticklabels(modules)
+            ax.tick_params(axis='x', rotation=90, labelsize=plt.rcParams['font.size'] * 0.2 * n_groups, pad=2)
+            plt.tight_layout()
         else:
-            leg_handles=leg_handles_col0+leg_handles_col1
-            ax.legend(handles=leg_handles,
-                labels=leg_labels,
-                ncol=2, handletextpad=0.5, handlelength=1.0, columnspacing=-0.5,bbox_to_anchor=(1.05, 1))
-    plt.tight_layout()
+            any_nonint = False
+            if BORIS_to_pose_mat is None:
+                for m, module in enumerate(modules):
+                    if any_nonint:
+                        module = m
+                    if module == 0:
+                        bar_bottom = np.zeros(n_groups)
+                    ax.bar(np.arange(0, n_groups, 1), bar_heights[:, module], bottom=bar_bottom, align='center',
+                           width=0.99)
+                    ax.spines['top'].set_visible(False)
+                    bar_bottom += bar_heights[:, module]
+                    ax.spines['right'].set_visible(False)
+                    ax.spines['top'].set_visible(False)
+            else:
+                modules = [int(i.split("module")[1]) for i in modules]
+                behaviors = list(BORIS_to_pose_mat.index)
+                if "other" not in behaviors:
+                    behaviors = behaviors + ["other"]
+                n_behaviors = len(behaviors)
+                leg_handles_col0 = []
+                leg_handles_col1 = []
+                leg_labels = [""] * n_behaviors
+                bottom = True
+                cm_list = ['Greys', 'YlOrBr', 'magma', 'Blues', 'Reds', 'Purples', 'copper', 'BuGn', 'bone', 'YlGn',
+                           'YlGnBu', 'YlOrRd']
+                modules_plotted=[] #To account for modules not seen in remapping
+                for remap in range(n_behaviors):
+                    sub_modules = [int(i[0][0]) for i in config["remappings"] if i[1] == behaviors[remap]]
+                    if (behaviors[remap]=="other"):
+                        print([mod for mod in modules if ((mod not in modules_plotted) and (mod not in sub_modules))])
+                    cmap = plt.get_cmap(cm_list[remap])
+                    colors = [cmap([0.4]), cmap([0.5])]
+                    leg_handles_col0.extend([Patch(facecolor=colors[0], edgecolor='none')])
+                    leg_handles_col1.extend([Patch(facecolor=colors[1], edgecolor='none')])
+                    if long_legend:
+                        leg_labels.append(behaviors[remap] + "   (" + str(len(sub_modules)) + " modules)")
+                    else:
+                        leg_labels.append(behaviors[remap])  # +" "+str(sub_modules))
+                    if len(sub_modules) > 0:
+                        for c in sub_modules:
+                            if c in modules:
+                                if bottom == True:
+                                    bar_bottom = np.zeros(n_groups)
+                                    bottom = False
+                                ax.bar(np.arange(0, n_groups, 1), bar_heights[:, modules.index(c)], bottom=bar_bottom, align='center',
+                                       width=0.99, color=colors[c % 2])
+                                ax.spines['top'].set_visible(False)
+                                bar_bottom += bar_heights[:, modules.index(c)]
+                                ax.spines['right'].set_visible(False)
+                                ax.spines['top'].set_visible(False)
+                                modules_plotted.append(c)
+            ax.set_ylabel("Proportion of Time \nSpent in Pose Module")
+            ax.set_yticks([0, 0.2, 0.4, 0.6, 0.8, 1])
+            ax.set_xlim([-0.5, n_groups - 0.5])
+            ax.set_xticks(np.arange(n_groups))
+            if alt_xticks is None:
+                ax.set_xticklabels(groupnames)
+            else:
+                ax.set_xticklabels(alt_xticks)
+            if title is not None:
+                ax.set_title(title)
+            if legend == True:
+                if BORIS_to_pose_mat is None:
+                    if len(modules) > 10:
+                        leg_modules = []
+                        for col in range(10):
+                            items = [i for i in modules if int(i % 10) == col]
+                            if len(items) > 1:
+                                leg_modules.append("Modules " + ', '.join(map(str, items)))
+                            else:
+                                leg_modules.append("Module " + str(items[0]))
+                    else:
+                        leg_modules = modules
+                    plt.legend(leg_modules, bbox_to_anchor=(1.05, 1))
+                else:
+                    leg_handles = leg_handles_col0 + leg_handles_col1
+                    ax.legend(handles=leg_handles,
+                              labels=leg_labels,
+                              ncol=2, handletextpad=0.5, handlelength=1.0, columnspacing=-0.5, bbox_to_anchor=(1.05, 1))
+            plt.tight_layout()
     return fig
+
+# def plot_module_usage(config,labels_df,start,stop,figW=4,figH=2,style="bar_scatter",cmap="jet"):
+#     """
+#     Plots the frequency of the pose modules occurring by group in the labels dataframe output by the label_counter function.
+#
+#     :param labels_df: dataframe output from analysis.label_counter
+#     :param start: time in seconds to start dataframe from.
+#     :param stop: time in seconds to stop dataframe at.
+#     :param fps: frames per second of recording.
+#     :param figW: figure width
+#     :param figH: figure height
+#     :param style: "bar_scatter", "bar_error", or "points"
+#     :return:
+#     """
+#     fps = int(config["fps"])
+#     start_frame = start*fps
+#     stop_frame = stop*fps
+#     labels_df=labels_df[start_frame:stop_frame]
+#     total_frames = stop_frame-start_frame
+#     labels_flat = np.array(labels_df)
+#     labels_flat = [item for sublist in labels_flat for item in sublist]
+#     modules = np.unique(labels_flat)
+#     n_modules = len(modules)
+#
+#     label_counts = np.zeros([labels_df.shape[1], n_modules])
+#     for i in range(labels_df.shape[1]):
+#         for m in range(n_modules):
+#             module = modules[m]
+#             try:
+#                 module = np.int64(module)
+#             except ValueError:
+#                 pass
+#             label_counts[i,m] = np.count_nonzero \
+#                 (labels_df[[labels_df.columns[i]]] == module) /total_frames
+#     bar_heights = np.mean(label_counts,axis=0)
+#     bar_sems = np.std(label_counts,axis=0)/np.sqrt(labels_df.shape[1])
+#
+#     fig, ax = plt.subplots(figsize=(figW,figH),dpi=100)
+#     cmap = plt.get_cmap(cmap)
+#     if ((style=="bar_scatter") or (style=="bar_error")):
+#         ax.bar(
+#             x=np.arange(0, n_modules, 1),
+#             height=bar_heights,
+#             width=0.8,
+#             alpha=0.5,
+#             color=cmap([0.1])
+#         )
+#         if style=="bar_scatter":
+#             for i in range(len(label_counts)):
+#                 ax.scatter(np.arange(0, n_modules, 1) + np.random.normal(0, 0.01, n_modules),
+#                            label_counts[i],
+#                            color="black",
+#                            s=0.5
+#                            )
+#         elif style=="bar_error":
+#             ax.errorbar(
+#                 x=np.arange(0, n_modules, 1),
+#                 y=bar_heights,
+#                 yerr=bar_sems,
+#                 linestyle="none",linewidth=0.6,
+#                 color="black",capsize=1,markeredgewidth=0.75
+#             )
+#     elif style=="points":
+#         ax.errorbar(
+#             x=np.arange(0, n_modules, 1),
+#             y=bar_heights,
+#             yerr=bar_sems,
+#             color=cmap([0.1]),
+#             linestyle="none",
+#             marker="o",markersize=2.5,linewidth=0.75,
+#             capsize=2,markeredgewidth=0.75
+#         )
+#     ax.set_xlabel(config["data_source"] + ' Pose Label')
+#     ax.set_ylabel('Frequency')
+#     ax.set_xticks(np.arange(0, n_modules, 1))
+#     ax.tick_params(axis='x', rotation=90, labelsize=plt.rcParams['font.size'] * 0.5, pad=2)
+#     plt.tight_layout()
+#     return fig
+#
+# def plot_module_usage_subgroups(config, labels_df, start, stop, figW=6, figH=3,
+#                                 style="bar_scatter",legend_pos="inside", cmap="viridis_r"):
+#     """
+#     Plots the frequency of the pose modules occurring by group in the labels dataframe output by the label_counter function.
+#
+#     :param labels_df: dataframe output from analysis.label_counter
+#     :param start: time in seconds to start dataframe from.
+#     :param stop: time in seconds to stop dataframe at.
+#     :param fps: frames per second of recording.
+#     :param figW: figure width
+#     :param figH:
+#     :param style:
+#     :return:
+#     """
+#     #To get groupnames in order
+#     fps = int(config["fps"])
+#     groupnames = []
+#     added_groupnames = set()
+#     for item in [header[0] for header in labels_df.columns]:
+#         if item not in added_groupnames:
+#             groupnames.append(item)
+#             added_groupnames.add(item)
+#     n_groups=len(groupnames)
+#
+#     # Frames
+#     start_frame = start * fps
+#     stop_frame = stop * fps
+#     labels_df = labels_df[start_frame:stop_frame]
+#     total_frames = stop_frame - start_frame
+#     labels_flat = np.array(labels_df)
+#     labels_flat = [item for sublist in labels_flat for item in sublist]
+#     modules = np.unique(labels_flat)
+#     modules_int=[]
+#     for module in modules:
+#         if isinstance(module, str):
+#             modules_int.append(module)
+#         else:
+#             modules_int.append(int(module))
+#     modules=np.array(modules_int)
+#     n_modules = len(modules)
+#
+#     # Label counting
+#     label_counts = []
+#     for g in range(n_groups):
+#         group_g_n=np.sum([item[0]==groupnames[g] for item in labels_df.columns])
+#         label_counts_i = np.zeros([group_g_n, n_modules])
+#         for i in range(group_g_n):
+#             for m in range(n_modules):
+#                 module = modules[m]
+#                 try:
+#                     module = np.int64(module)
+#                 except ValueError:
+#                     pass
+#                 label_counts_i[i, m] = np.count_nonzero \
+#                                            (labels_df[groupnames[g]][
+#                                                 [labels_df[groupnames[g]].columns[i]]] == module) / total_frames
+#         label_counts.append(label_counts_i)
+#
+#     bar_heights = np.zeros([n_groups, n_modules])
+#     bar_sems = np.zeros([n_groups, n_modules])
+#
+#     for g in range(n_groups):
+#         bar_heights[g, :] = np.mean(label_counts[g], axis=0)
+#         bar_sems[g, :] = np.std(label_counts[g], axis=0)/np.sqrt(label_counts[g].shape[0])
+#     fig, ax = plt.subplots(figsize=(figW, figH), dpi=100)
+#     scale = 1 / (n_groups + .7)
+#     cmap = plt.get_cmap(cmap)
+#     colors = [cmap([i]) for i in np.linspace(0,1,n_groups)]
+#     if ((style=="bar_scatter") or (style=="bar_error")):
+#         if style=="bar_scatter":
+#             for g in range(n_groups):
+#                 for i in range(len(label_counts[g])):
+#                     ax.scatter(
+#                         np.arange(0 + scale * g, n_modules + scale * g, 1) + np.random.normal(0, 0.1 * scale, n_modules),
+#                         label_counts[g][i],
+#                         color="black",
+#                         s=0.5
+#                         )
+#             bar_alpha=0.5
+#         elif style=="bar_error":
+#             for g in range(n_groups):
+#                 ax.errorbar(
+#                     x=np.arange(0 + scale * g, n_modules + scale * g, 1),
+#                     y=bar_heights[g],
+#                     yerr=bar_sems[g],
+#                     linestyle="none",linewidth=0.6,
+#                     color="black",capsize=0.3,markeredgewidth=0.75,alpha=0.8
+#                 )
+#             bar_alpha=0.85
+#         for g in range(n_groups):
+#             ax.bar(
+#                 x=np.arange(0 + scale * g, n_modules + scale * g, 1),
+#                 height=bar_heights[g],
+#                 width=scale,
+#                 alpha=bar_alpha,
+#                 color=colors[g],
+#                 label=groupnames[g]
+#             )
+#     elif style=="points":
+#         for g in range(n_groups):
+#             ax.errorbar(
+#                 x=np.arange(0, n_modules, 1),
+#                 y=bar_heights[g],
+#                 yerr=bar_sems[g],
+#                 color=colors[g],
+#                 label=groupnames[g],
+#                 linestyle="none",
+#                 marker="o",markersize=4,linewidth=0.75,
+#                 capsize=2,markeredgewidth=0.75
+#             )
+#     if legend_pos == "inside":
+#         ax.legend()
+#     elif legend_pos == "outside":
+#         ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+#
+#     ax.set_xlabel(config["data_source"] + ' Pose Label')
+#     ax.set_ylabel('Frequency')
+#     all_num_modules = np.sum([isinstance(module,str) for module in modules])==0
+#     if ((all_num_modules) and (n_modules>=20)):
+#         xticks=np.arange(0, n_modules, 5, dtype=int)
+#         ax.set_xticks(xticks)
+#         ax.set_xticklabels(modules[xticks])
+#     else:
+#         ax.set_xticks(np.arange(0, n_modules, 1))
+#         ax.set_xticklabels(modules)
+#     ax.tick_params(axis='x', rotation=90, labelsize=plt.rcParams['font.size'] * 0.2 * n_groups, pad=2)
+#     plt.tight_layout()
+#     return fig
+#
+#
+# def plot_module_usage_stacked(config, labels_df, start, stop, figW=6, figH=3, BORIS_to_pose_mat=None, title=None, alt_xticks=None,legend=True,long_legend=True):
+#     """
+#     Plots the frequency of the pose modules occurring by group in the labels dataframe output by the label_counter function.
+#
+#     :param labels_df: dataframe output from analysis.label_counter
+#     :param start: time in seconds to start dataframe from.
+#     :param stop: time in seconds to stop dataframe at.
+#     :param fps: frames per second of recording.
+#     :param figW: figure width
+#     :param figH:
+#     :param BORIS_to_pose_mat:
+#     :param title:
+#     :param alt_xticks:
+#     :param legend:
+#     :param long_legend: for boris re-colored stacked plot only - whether or not to have the pose module numbers in the legend
+#     :return:
+#     """
+#     #To get groupnames in order
+#     fps = int(config["fps"])
+#     groupnames = []
+#     added_groupnames = set()
+#     for item in [header[0] for header in labels_df.columns]:
+#         if item not in added_groupnames:
+#             groupnames.append(item)
+#             added_groupnames.add(item)
+#     n_groups=len(groupnames)
+#
+#     # Frames
+#     start_frame = start * fps
+#     stop_frame = stop * fps
+#     labels_df = labels_df[start_frame:stop_frame]
+#     total_frames = stop_frame - start_frame
+#     labels_flat = np.array(labels_df)
+#     labels_flat = [item for sublist in labels_flat for item in sublist]
+#     modules = np.unique(labels_flat)
+#     any_nonint = np.sum([is_nonnum(i) for i in modules])
+#     if any_nonint:
+#         n_modules = len(modules)
+#     else:
+#         n_modules = int(np.max(modules)+1)
+#         modules = np.arange(0,n_modules,1)
+#
+#     # Label counting
+#     label_counts = []
+#     for g in range(n_groups):
+#         group_g_n=np.sum([item[0]==groupnames[g] for item in labels_df.columns])
+#         label_counts_i = np.zeros([group_g_n, n_modules])
+#         for i in range(group_g_n):
+#             for m in range(n_modules):
+#                 module = modules[m]
+#                 try:
+#                     module = np.int64(module)
+#                 except ValueError:
+#                     pass
+#                 label_counts_i[i, m] = np.count_nonzero \
+#                                            (labels_df[groupnames[g]][
+#                                                 [labels_df[groupnames[g]].columns[i]]] == module) / total_frames
+#         label_counts.append(label_counts_i)
+#
+#     bar_heights = np.zeros([n_groups, n_modules])
+#     bar_sems = np.zeros([n_groups, n_modules])
+#
+#     for g in range(n_groups):
+#         bar_heights[g, :] = np.mean(label_counts[g], axis=0)
+#         bar_sems[g, :] = np.std(label_counts[g], axis=0)/np.sqrt(label_counts[g].shape[0])
+#     fig, ax = plt.subplots(figsize=(figW, figH), dpi=100)
+#     if BORIS_to_pose_mat is None:
+#         for m, module in enumerate(modules):
+#             if any_nonint:
+#                 module = m
+#             if module == 0:
+#                 bar_bottom = np.zeros(n_groups)
+#             ax.bar(np.arange(0, n_groups, 1), bar_heights[:, module], bottom=bar_bottom, align='center', width=0.99)
+#             ax.spines['top'].set_visible(False)
+#             bar_bottom += bar_heights[:, module]
+#             ax.spines['right'].set_visible(False)
+#             ax.spines['top'].set_visible(False)
+#     else:
+#         behaviors=list(BORIS_to_pose_mat.index)+["other"]
+#         n_behaviors=len(behaviors)
+#         leg_handles_col0=[]
+#         leg_handles_col1=[]
+#         leg_labels=[""]*n_behaviors
+#         bottom=True
+#         cm_list = ['Greys', 'YlOrBr', 'magma', 'Blues', 'Reds', 'Purples','copper', 'BuGn', 'bone', 'YlGn', 'YlGnBu', 'YlOrRd']
+#         for remap in range(n_behaviors):
+#             sub_modules=[int(i[0][0]) for i in config["remappings"] if i[1]==behaviors[remap]]
+#             cmap=plt.get_cmap(cm_list[remap])
+#             colors=[cmap([0.4]),cmap([0.5])]
+#             leg_handles_col0.extend([Patch(facecolor=colors[0], edgecolor='none')])
+#             leg_handles_col1.extend([Patch(facecolor=colors[1], edgecolor='none')])
+#             if long_legend:
+#                 leg_labels.append(behaviors[remap]+"   ("+str(len(sub_modules))+" modules)")
+#             else:
+#                 leg_labels.append(behaviors[remap])#+" "+str(sub_modules))
+#             if len(sub_modules)>0:
+#                 for c in sub_modules:
+#                     if c in modules:
+#                         if bottom==True:
+#                             bar_bottom = np.zeros(n_groups)
+#                             bottom=False
+#                         ax.bar(np.arange(0, n_groups, 1), bar_heights[:, c], bottom=bar_bottom, align='center',
+#                                width=0.99,color=colors[c%2])
+#                         ax.spines['top'].set_visible(False)
+#                         bar_bottom += bar_heights[:, c]
+#                         ax.spines['right'].set_visible(False)
+#                         ax.spines['top'].set_visible(False)
+#     ax.set_ylabel("Proportion of Time \nSpent in Pose Module")
+#     ax.set_yticks([0,0.2,0.4,0.6,0.8,1])
+#     ax.set_xlim([-0.5, n_groups - 0.5])
+#     ax.set_xticks(np.arange(n_groups))
+#     if alt_xticks is None:
+#         ax.set_xticklabels(groupnames)
+#     else:
+#         ax.set_xticklabels(alt_xticks)
+#     if title is not None:
+#         ax.set_title(title)
+#     if legend==True:
+#         if BORIS_to_pose_mat is None:
+#             if len(modules>10):
+#                 leg_modules = []
+#                 for col in range(10):
+#                     items = [i for i in modules if int(i % 10) == col]
+#                     if len(items)>1:
+#                         leg_modules.append("Modules "+', '.join(map(str, items)))
+#                     else:
+#                         leg_modules.append("Module " + str(items[0]))
+#             else:
+#                 leg_modules=modules
+#             plt.legend(leg_modules,bbox_to_anchor=(1.05, 1))
+#         else:
+#             leg_handles=leg_handles_col0+leg_handles_col1
+#             ax.legend(handles=leg_handles,
+#                 labels=leg_labels,
+#                 ncol=2, handletextpad=0.5, handlelength=1.0, columnspacing=-0.5,bbox_to_anchor=(1.05, 1))
+#     plt.tight_layout()
+#     return fig
 
 
 def network_pairwise_comparison(config, labels_df, start, end, groupnames, scaling=1,include_labels=True,cmap="bwr",tscale=3):

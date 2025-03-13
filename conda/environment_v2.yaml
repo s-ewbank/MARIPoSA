@@ -7,7 +7,7 @@ dependencies:
   - python=3.8
   - python-dateutil
   - pip:
-    - customtkinter==5.2.2
+    - customtkinter
     - darkdetect
     - joblib
     - networkx

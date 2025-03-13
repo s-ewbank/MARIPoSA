@@ -20,7 +20,6 @@ class Application(customtkinter.CTk):
         self.after(200, lambda: self.iconphoto(False, PhotoImage(file="other/MARIPoSA_icon.png")))
         customtkinter.set_appearance_mode("dark")
         customtkinter.set_default_color_theme("blue")
-        # Set window style
         screen_width = self.winfo_screenwidth()
         screen_height = self.winfo_screenheight()
         factor = 0.6
@@ -29,8 +28,8 @@ class Application(customtkinter.CTk):
         x = (screen_width - self.width) // 2
         y = (screen_height - self.height) // 2
         self.geometry(f'{self.width}x{self.height}+{x}+{y}')
-        self.projectstart_choice = customtkinter.StringVar(value="New project")  # Default choice
-        self.datatype = customtkinter.StringVar(value="B-SOiD")  # Default choice
+        self.projectstart_choice = customtkinter.StringVar(value="New project")
+        self.datatype = customtkinter.StringVar(value="B-SOiD")
         self.config = None
         self.config_path = None
         self.project_name = None
@@ -56,7 +55,7 @@ class Application(customtkinter.CTk):
         :param columnspan:
         :return:
         """
-        print('error')
+        print(datetime.now().strftime("[%Y-%m-%d %H:%M:%S]")+' Error: '+message)
         self.error_label = customtkinter.CTkLabel(self, text=message, text_color="red", bg_color="#ffe5e3",anchor=tk.CENTER)
         self.error_label.place(x=x,y=y,anchor=tk.CENTER)
         self.after(3000, lambda: self.error_label.configure(text="",bg_color="gray16"))
@@ -88,6 +87,7 @@ class Application(customtkinter.CTk):
         customtkinter.CTkLabel(self, text="",image=logo_img).place(x=int(self.width*0.5), y=int(self.height*0.25),anchor=tk.CENTER)
         customtkinter.CTkLabel(self, text="Would you like to start a new project or load a previous project?",
                                font=('Helvetica', 16)).place(x=int(self.width*0.5), y=int(self.height*0.4),anchor=tk.CENTER)
+
         # Radio buttons for starting new project or loading old project
         projectstart_options = ["New project","Load previous"]
         grid_last = 0
@@ -131,7 +131,7 @@ class Application(customtkinter.CTk):
         customtkinter.CTkLabel(self, text="Will the data type for this new dataset be pose estimation or pose segmentation?",
                                font=('Helvetica', 16)).place(x=int(self.width*0.5), y=int(self.height*0.3),anchor=tk.CENTER)
 
-        customtkinter.CTkButton(self, text="Pose estimation\n\n(DeepLabCut or SLEAP)",
+        customtkinter.CTkButton(self, text="Pose estimation\n\n(DeepLabCut, SLEAP, or OpenFace)",
                                 command=lambda: self.window2_makeproject("pose_estimation"),height=int(self.height*0.25),width=int(self.width*0.35),
                                 font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.6),anchor=tk.CENTER)
         customtkinter.CTkButton(self, text="Pose segmentation\n\n(B-SOiD, VAME, or Keypoint-MoSeq)",
@@ -167,7 +167,7 @@ class Application(customtkinter.CTk):
                                    font=('Helvetica', 16)).place(x=int(self.width*0.2), y=int(self.height*0.4))
 
             # Radio buttons for starting new project or loading old project
-            datatype_options = ["DeepLabCut", "SLEAP"]
+            datatype_options = ["DeepLabCut", "SLEAP", "OpenFace"]
             for r, option in enumerate(datatype_options):
                 radio_btn = customtkinter.CTkRadioButton(self, text=option, variable=self.datatype, value=option,
                                                          font=('Helvetica', 16))
@@ -275,7 +275,10 @@ class Application(customtkinter.CTk):
         self.clear_window()
         config = metadata.load_project(self.config_path)
         self.config = config
-        self.window3b_PS_menu()
+        if self.config["data_type"]=="Pose estimation":
+            self.window3a_PE_menu()
+        elif self.config["data_type"]=="Pose segmentation":
+            self.window3b_PS_menu()
 
     def load_project_BORIS(self):
         self.clear_window()
@@ -602,54 +605,73 @@ class Application(customtkinter.CTk):
     def window4f_usage_overtime(self, session_option):
         self.clear_window()
         self.create_sidebar_widget()
-        # Title
-        if session_option=="within_session":
-            title_string="Time Series of Pose Module Usage Within Session"
-        elif session_option=="across_sessions":
-            title_string="Pose Module Usage Across Sessions"
-        self.create_header(title_string,header_path="Viz & Analyze ▶ Usage Analysis ▶ Within-Session Over Time")
 
         customtkinter.CTkLabel(self, text="Choose the parameters for your plot.",
                                font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.25))
 
+        if session_option=="within_session":
+            title_string="Time Series of Pose Module Usage Within Session"
+            self.create_header(title_string, header_path="Viz & Analyze ▶ Usage Analysis ▶ Within-Session Over Time")
 
-        # Plot
-        # Set group
-        customtkinter.CTkLabel(self, text="Subgroup",
-                               font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.35))
-        group = customtkinter.CTkComboBox(self, values=list(self.config["subgroups"].keys()))
-        group.place(x=int(self.width*0.45), y=int(self.height*0.35))
-        # Choose start and end time
-        customtkinter.CTkLabel(self, text="Start time\n(seconds)",
-                               font=('Helvetica', 16)).place(x=int(self.width*0.65), y=int(self.height*0.35))
-        start = customtkinter.CTkEntry(self)
-        start.place(x=int(self.width*0.8), y=int(self.height*0.35))
-        customtkinter.CTkLabel(self, text="Time per block\n(seconds)",
-                               font=('Helvetica', 16)).place(x=int(self.width*0.65), y=int(self.height*0.45))
-        time_per_block = customtkinter.CTkEntry(self)
-        time_per_block.place(x=int(self.width*0.8), y=int(self.height*0.45))
-        customtkinter.CTkLabel(self, text="Number of blocks",
-                               font=('Helvetica', 16)).place(x=int(self.width*0.65), y=int(self.height*0.55))
-        n_blocks = customtkinter.CTkEntry(self)
-        n_blocks.place(x=int(self.width*0.8), y=int(self.height*0.55))
-        # Choose style for plot
-        customtkinter.CTkLabel(self, text="What should the \nplot style be?",
-                               font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.45))
-        style = customtkinter.StringVar(value="scatter")
-        style_options = ["Area","Line"]
-        style_vars = ["area", "line"]
-        for s in range(len(style_vars)):
-            radio_btn = customtkinter.CTkRadioButton(self, text=style_options[s],
-                                                     variable=style, value=style_vars[s],
-                                                     font=('Helvetica', 16))
-            radio_btn.place(x=int(self.width*0.3), y=int(self.height*(0.55+0.1*s)))
-        customtkinter.CTkButton(self, text="Plot it!",
-                                command=lambda: self.plot_usage_overtime(group.get(),
-                                                                         session_option,
-                                                                         start=int(start.get()),
-                                                                         time_per_block=int(time_per_block.get()),
-                                                                         n_blocks=int(n_blocks.get())),
-                                font=('Helvetica', 16)).place(x=int(self.width*0.8), y=int(self.height*0.9))
+            customtkinter.CTkLabel(self, text="Subgroup",
+                                   font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.35))
+            group = customtkinter.CTkComboBox(self, values=list(self.config["subgroups"].keys()))
+            group.place(x=int(self.width*0.45), y=int(self.height*0.35))
+            # Choose start and end time
+            customtkinter.CTkLabel(self, text="Start time\n(seconds)",
+                                   font=('Helvetica', 16)).place(x=int(self.width*0.65), y=int(self.height*0.35))
+            start = customtkinter.CTkEntry(self)
+            start.place(x=int(self.width*0.8), y=int(self.height*0.35))
+            customtkinter.CTkLabel(self, text="Time per block\n(seconds)",
+                                   font=('Helvetica', 16)).place(x=int(self.width*0.65), y=int(self.height*0.45))
+            time_per_block = customtkinter.CTkEntry(self)
+            time_per_block.place(x=int(self.width*0.8), y=int(self.height*0.45))
+            customtkinter.CTkLabel(self, text="Number of blocks",
+                                   font=('Helvetica', 16)).place(x=int(self.width*0.65), y=int(self.height*0.55))
+            n_blocks = customtkinter.CTkEntry(self)
+            n_blocks.place(x=int(self.width*0.8), y=int(self.height*0.55))
+            # Choose style for plot
+            customtkinter.CTkLabel(self, text="What should the \nplot style be?",
+                                   font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.45))
+            style = customtkinter.StringVar(value="scatter")
+            style_options = ["Area","Line"]
+            style_vars = ["area", "line"]
+            for s in range(len(style_vars)):
+                radio_btn = customtkinter.CTkRadioButton(self, text=style_options[s],
+                                                         variable=style, value=style_vars[s],
+                                                         font=('Helvetica', 16))
+                radio_btn.place(x=int(self.width*0.3), y=int(self.height*(0.55+0.1*s)))
+            customtkinter.CTkButton(self, text="Plot it!",
+                                    command=lambda: self.plot_usage_overtime(group.get(),
+                                                                             session_option,
+                                                                             start=int(start.get()),
+                                                                             time_per_block=int(time_per_block.get()),
+                                                                             n_blocks=int(n_blocks.get())),
+                                    font=('Helvetica', 16)).place(x=int(self.width*0.8), y=int(self.height*0.9))
+        elif session_option=="across_sessions":
+            title_string="Pose Module Usage Across Sessions"
+            self.create_header(title_string,header_path="Viz & Analyze ▶ Usage Analysis ▶ Across Sessions")
+
+            customtkinter.CTkLabel(self, text="Subgroups",
+                                   font=('Helvetica', 16)).place(x=int(self.width * 0.3), y=int(self.height * 0.35))
+            dropdown = MultiDropDown(self,options=list(self.config["subgroups"].keys()))
+            dropdown.place(x=int(self.width * 0.45), y=int(self.height * 0.35))
+
+            # Choose start and end time
+            customtkinter.CTkLabel(self, text="Start time\n(seconds)",
+                                   font=('Helvetica', 16)).place(x=int(self.width * 0.65), y=int(self.height * 0.35))
+            start = customtkinter.CTkEntry(self)
+            start.place(x=int(self.width * 0.8), y=int(self.height * 0.35))
+            customtkinter.CTkLabel(self, text="End time\n(seconds)",
+                                   font=('Helvetica', 16)).place(x=int(self.width * 0.65), y=int(self.height * 0.45))
+            end = customtkinter.CTkEntry(self)
+            end.place(x=int(self.width * 0.8), y=int(self.height * 0.45))
+            customtkinter.CTkButton(self, text="Plot it!",
+                                    command=lambda: self.plot_usage_overtime(dropdown.get_selected_values(),
+                                                                             session_option,
+                                                                             start=int(start.get()),
+                                                                             end=int(end.get())),
+                                    font=('Helvetica', 16)).place(x=int(self.width * 0.8), y=int(self.height * 0.9))
         # Bottom back buttons
         customtkinter.CTkButton(self, text="◀ back to analysis menu", command=self.window3b_PS_menu,
                                 font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.83))
@@ -882,7 +904,6 @@ class Application(customtkinter.CTk):
                                 font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.83))
         customtkinter.CTkButton(self, text="◀◀ back to start", command=self.window1_start,
                                 font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.9))
-        # TODO:: update LDA classifier window to connect to real functions
 
     def window4g_nlp_classify(self):
         self.clear_window()
@@ -907,7 +928,6 @@ class Application(customtkinter.CTk):
                                 font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.83))
         customtkinter.CTkButton(self, text="◀◀ back to start", command=self.window1_start,
                                 font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.9))
-        # TODO:: update NLP classifier window to connect to real functions
 
     def window4h_pose_vs_BORIS(self):
         self.clear_window()
@@ -994,7 +1014,7 @@ class Application(customtkinter.CTk):
             self.plot_window = PlotWindow(fig = fig, plot_number = self.plots_generated, master = self)
             self.plot_window.mainloop()
 
-    def plot_usage_overtime(self, group, session_option, start=None, time_per_block=None, n_blocks=None):
+    def plot_usage_overtime(self, group, session_option, start=None, time_per_block=None, n_blocks=None, end=None):
         if session_option=="within_session":
             print(group)
             labels_df, n_modules = analysis.label_counter_subgroups(self.config, start,
@@ -1006,7 +1026,11 @@ class Application(customtkinter.CTk):
             self.plot_window = PlotWindow(fig = fig, plot_number = self.plots_generated, master = self)
             self.plot_window.mainloop()
         elif session_option=="across_sessions":
-            labels_df, n_modules = analysis.label_counter_subgroups(self.config, start, end)
+            labels_df, n_modules = analysis.label_counter_subgroups(self.config, start, end,selected_subgroups=group)
+            fig = plot.plot_module_usage_stacked(self.config, labels_df, start, end)
+            self.plots_generated = self.plots_generated + 1
+            self.plot_window = PlotWindow(fig = fig, plot_number = self.plots_generated, master = self)
+            self.plot_window.mainloop()
             #plot.plot_module_usage_subgroups(labels_df, start, end, int(self.config["fps"]), style=style, cmap=color)
 
     def plot_pose_vs_BORIS(self):
@@ -1033,6 +1057,7 @@ class Application(customtkinter.CTk):
             self.plot_window.mainloop()
         elif do=="save":
             print("Saving LDA classifier")
+            #TODO: add in option to save LDA classifier
             lda_result = analysis.lda_labels_timebins(self.config, labels_df, binsize, selected_subgroups=subgroups)
             fig = plot.plot_lda(self.config, lda_result, cmap=cmap)
             self.plots_generated = self.plots_generated + 1

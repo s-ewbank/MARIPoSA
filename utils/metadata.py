@@ -13,7 +13,6 @@ def create_PS_project(project_name,data_directory,data_source,output_directory,f
     :param data_source: B-SOiD, VAME, or Keypoint-MoSeq
     :param output_directory: path where output directory and config file should be created
     """
-
     if data_source == "B-SOiD":
         project_files = sorted(os.listdir(data_directory))
     elif data_source == "VAME":
@@ -64,6 +63,8 @@ def create_PE_project(project_name,data_directory,data_source,output_directory,f
         project_files=[i for i in sorted(os.listdir(data_directory)) if i.endswith(".csv")]
     elif data_source=="SLEAP":
         project_files=sorted(os.listdir(data_directory))
+    elif data_source=="OpenFace":
+        project_files=[i for i in sorted(os.listdir(data_directory)) if i.endswith(".csv")]
     project_directory=str(output_directory+"/"+datetime.now().strftime('%y%m%d_')+project_name)
     os.mkdir(project_directory)
 
