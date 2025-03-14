@@ -738,86 +738,175 @@ def get_module_usage(config, labels_df, binsize=None):
 
     return ModuleUsage(label_counts, group_labels, observation_labels, feat_names, group_dict)
 
+class ModuleTransitions:
+    def __init__(self, transition_counts, group_labels, observation_labels, feat_names, group_dict):
+        self.transition_counts = transition_counts
+        self.group_labels = group_labels
+        self.observation_labels = observation_labels
+        self.feat_names = feat_names
+        self.group_dict = group_dict
+        mean_check = np.allclose(np.mean(transition_counts, axis=0), 0, atol=0.1)
+        std_check = np.allclose(np.std(transition_counts, axis=0), 1, atol=0.1)
+        self.scaled = mean_check and std_check
 
-def feat_select(usage_feats, method="f", n_feats=10, verbose=True):
+    def to_df(self):
+        colnames = []
+        flip_group_dict = {v: k for k, v in self.group_dict.items()}
+        for i in self.group_labels:
+            colnames.append(flip_group_dict[i])
+        df = pd.DataFrame(self.transition_counts, columns=self.feat_names, index=self.observation_labels)
+        df["group"] = colnames
+        return df
+
+    def scale(self):
+        scaler = StandardScaler()
+        transition_counts_scaled = scaler.fit_transform(self.transition_counts)
+        return ModuleTransitions(transition_counts_scaled, self.group_labels, self.observation_labels, self.feat_names,
+                           self.group_dict)
+
+def get_module_transitions(config, labels_df):
     """
-    A function for subselecting features that may be most relevant for classification
+    Reshape labels dataframe from label_counter_subgroups to be an array of features
 
-    :param label_counts: label_counts array returned by analysis.get_usage_feats
-    :param group_labels: group_labels list returned by analysis.get_usage_feats
-    :param feat_names: feat_names list returned by analysis.get_usage_feats
-    :param method: Method for feature selection ("f", "pca")
-    :param n_feats: Number of features to select
-    :param verbose: Print output or not
+    :param config: config object
+    :param labels_df: labels dataframe from label_counter_subgroups
+    :param binsize: width of bins in seconds; if None, no binning is performed
+    :param selected_subgroups:
     :return:
     """
-    n_groups=len(np.unique(usage_feats.group_labels))
-    picks=[]
-    if method=="pca":
-        if usage_feats.scaled == False:
-            usage_feats = usage_feats.scale()
-        pca = PCA(n_components=1)
-        pca.fit(usage_feats.label_counts)
-        picks = pca.components_.argsort()[0][0:n_feats]
-        text="Features selected by PCA were: "
-    elif method=="f":
-        group_data = []
-        for g in range(n_groups):
-            group_data.append(usage_feats.label_counts[np.array(usage_feats.group_labels) == g, :])
-        result = scipy.stats.f_oneway(*group_data)
-        stats = np.nan_to_num(result[0], nan=0)
-        ranked_stats = sorted(stats)
-        ranked_stats.reverse()
-        if n_feats>=len(ranked_stats):
-            picks=result[0]>-np.inf
-        else:
-            picks=result[0]>=ranked_stats[n_feats]
-        text="Features selected by f-stat were: "
+    data_subgrouped = False
+    try:
+        list(labels_df.columns.get_level_values(1).unique())
+        subgroups = list(labels_df.columns.get_level_values(0).unique())
+        group_dict = {subgroups[i]: i for i in range(len(subgroups))}
+        data_subgrouped = True
+    except IndexError:
+        subgroups = list(labels_df.columns.get_level_values(0).unique())
+        group_dict = {"no_assigned_subgroup": 0}
+        data_subgrouped = False
 
-    n_picks=0
-    pick_names=[]
-    for p, pick in enumerate(picks):
-        if pick:
-            pick_names.append(usage_feats.feat_names[p])
-            n_picks=n_picks+1
-            if n_picks!=np.sum(picks):
-                text+=str(usage_feats.feat_names[p])+", "
+    n_groups = len(subgroups)
+    fps = int(config["fps"])
+    labels_flat = np.array(labels_df)
+    labels_flat = [item for sublist in labels_flat for item in sublist]
+    modules = np.unique(labels_flat)
+    n_modules = len(modules)
+
+    transition_counts = []
+
+    feat_names_made = False
+    feat_names = []
+
+    group_labels = []
+    observation_labels = []
+
+    for g in range(n_groups):
+        for i in range(len(labels_df[subgroups[g]].columns)):
+            transition_counts_i = np.zeros(n_modules * n_modules)
+            comparison_idx=0
+            for m_i, mod_i in enumerate(modules):
+                for m_j, mod_j in enumerate(modules):
+                    if m_j<m_i:
+                        comparison_idx+=1
+                        arr = np.array(labels_df[subgroups[g]][labels_df[subgroups[g]].columns[i]])
+                        transition_counts_i[comparison_idx] = np.sum((arr[:-1] == mod_i) & (arr[1:] == mod_j))
+                        if feat_names_made == False:
+                            if is_nonnum(mod_i):
+                                modname=f'{mod_i}_to_{mod_j}'
+                            else:
+                                modname=f'{str(int(mod_i))}_to_{str(int(mod_j))}'
+                            feat_names.append(f"{modname}")
+            transition_counts.append(transition_counts_i)
+            if data_subgrouped:
+                group_labels.append(g)
+                observation_labels.append(labels_df[subgroups[g]].columns[i])
             else:
-                text+=str(usage_feats.feat_names[p])+"."
+                group_labels.append(0)
+                observation_labels.append(labels_df[subgroups[g]].columns[i][0])
+            feat_names_made = True
+    transition_counts = np.array(transition_counts)
 
+    return ModuleTransitions(transition_counts, group_labels, observation_labels, feat_names, group_dict)
 
-    if verbose==True:
-        print(text)
-
-    return picks, pick_names
-
-
-def get_usage_ssd(control_usage_feats, exp_usage_feats):
-    """
-    Get the time-resolved sum squared difference in module usage relative to a control distribution of usage.
-    :param control_usage_feats: output from analysis.get_usage_feats for the control group ONLY
-    :param exp_usage_feats:
-    :return:
-    """
-    control_usage_feats_df = control_usage_feats.to_df()
-    exp_usage_df = exp_usage_feats.to_df()
-    control_usage = control_usage_feats_df.mean(axis=0)
-
-    exp_usage_df_sqdiff = exp_usage_df.copy()
-
-    for module in control_usage.index:
-        mod_cols = [i for i in exp_usage_df.columns if module + '_' in i]
-        exp_usage_df_sqdiff[mod_cols] = np.square(exp_usage_df_sqdiff[mod_cols] - control_usage[module])
-
-    extracted = [col.split("_t")[1].split("-")[0] for col in exp_usage_df.columns]
-    binstarts = pd.Series(extracted).unique()
-    exp_usage_df_ssd = pd.DataFrame(index=exp_usage_df.index, columns=binstarts)
-
-    for i in range(len(exp_usage_df_ssd.index)):
-        for bin in binstarts:
-            exp_usage_df_ssd.iloc[i][bin] = np.sum(exp_usage_df_sqdiff.iloc[i].filter(like="_t" + bin + "-"))
-
-    return exp_usage_df_ssd
+# def feat_select(usage_feats, method="f", n_feats=10, verbose=True):
+#     """
+#     A function for subselecting features that may be most relevant for classification
+#
+#     :param label_counts: label_counts array returned by analysis.get_usage_feats
+#     :param group_labels: group_labels list returned by analysis.get_usage_feats
+#     :param feat_names: feat_names list returned by analysis.get_usage_feats
+#     :param method: Method for feature selection ("f", "pca")
+#     :param n_feats: Number of features to select
+#     :param verbose: Print output or not
+#     :return:
+#     """
+#     n_groups=len(np.unique(usage_feats.group_labels))
+#     picks=[]
+#     if method=="pca":
+#         if usage_feats.scaled == False:
+#             usage_feats = usage_feats.scale()
+#         pca = PCA(n_components=1)
+#         pca.fit(usage_feats.label_counts)
+#         picks = pca.components_.argsort()[0][0:n_feats]
+#         text="Features selected by PCA were: "
+#     elif method=="f":
+#         group_data = []
+#         for g in range(n_groups):
+#             group_data.append(usage_feats.label_counts[np.array(usage_feats.group_labels) == g, :])
+#         result = scipy.stats.f_oneway(*group_data)
+#         stats = np.nan_to_num(result[0], nan=0)
+#         ranked_stats = sorted(stats)
+#         ranked_stats.reverse()
+#         if n_feats>=len(ranked_stats):
+#             picks=result[0]>-np.inf
+#         else:
+#             picks=result[0]>=ranked_stats[n_feats]
+#         text="Features selected by f-stat were: "
+#
+#     n_picks=0
+#     pick_names=[]
+#     for p, pick in enumerate(picks):
+#         if pick:
+#             pick_names.append(usage_feats.feat_names[p])
+#             n_picks=n_picks+1
+#             if n_picks!=np.sum(picks):
+#                 text+=str(usage_feats.feat_names[p])+", "
+#             else:
+#                 text+=str(usage_feats.feat_names[p])+"."
+#
+#
+#     if verbose==True:
+#         print(text)
+#
+#     return picks, pick_names
+#
+#
+# def get_usage_ssd(control_usage_feats, exp_usage_feats):
+#     """
+#     Get the time-resolved sum squared difference in module usage relative to a control distribution of usage.
+#     :param control_usage_feats: output from analysis.get_usage_feats for the control group ONLY
+#     :param exp_usage_feats:
+#     :return:
+#     """
+#     control_usage_feats_df = control_usage_feats.to_df()
+#     exp_usage_df = exp_usage_feats.to_df()
+#     control_usage = control_usage_feats_df.mean(axis=0)
+#
+#     exp_usage_df_sqdiff = exp_usage_df.copy()
+#
+#     for module in control_usage.index:
+#         mod_cols = [i for i in exp_usage_df.columns if module + '_' in i]
+#         exp_usage_df_sqdiff[mod_cols] = np.square(exp_usage_df_sqdiff[mod_cols] - control_usage[module])
+#
+#     extracted = [col.split("_t")[1].split("-")[0] for col in exp_usage_df.columns]
+#     binstarts = pd.Series(extracted).unique()
+#     exp_usage_df_ssd = pd.DataFrame(index=exp_usage_df.index, columns=binstarts)
+#
+#     for i in range(len(exp_usage_df_ssd.index)):
+#         for bin in binstarts:
+#             exp_usage_df_ssd.iloc[i][bin] = np.sum(exp_usage_df_sqdiff.iloc[i].filter(like="_t" + bin + "-"))
+#
+#     return exp_usage_df_ssd
 
 class LdaResult:
     def __init__(self, lda, lda_embeddings, label_counts, group_labels, feat_picks, feat_names, group_dict, nbins, binsize,
@@ -903,6 +992,7 @@ class LdaResult:
 
         return dists
 
+
 def lda_labels_timebins(config,
                         labels_df,
                         binsize,
@@ -928,20 +1018,20 @@ def lda_labels_timebins(config,
     fps = int(config["fps"])
     group_dict = {selected_subgroups[i]: i for i in range(len(selected_subgroups))}
     nbins = int(labels_df.shape[0] / (binsize * fps))
-    usage_feats = get_usage_feats(config,labels_df,binsize,selected_subgroups=selected_subgroups)
+    module_usage = get_module_usage(config,labels_df,binsize,selected_subgroups=selected_subgroups)
     if scale==True:
-        usage_feats = usage_feats.scale()
-    label_counts_full = usage_feats.label_counts.copy()
-    group_labels_full = usage_feats.group_labels.copy()
+        usage_feats = module_usage.scale()
+    label_counts_full = module_usage.label_counts.copy()
+    group_labels_full = module_usage.group_labels.copy()
     if feature_selection is not None:
-        feat_picks, feat_names = feat_select(usage_feats, method=feature_selection[0], n_feats=feature_selection[1])
-        label_counts = usage_feats.label_counts[:, feat_picks]
+        feat_picks, feat_names = feat_select(module_usage, method=feature_selection[0], n_feats=feature_selection[1])
+        label_counts = module_usage.label_counts[:, feat_picks]
     else:
-        feat_names = usage_feats.feat_names
+        feat_names = module_usage.feat_names
         feat_picks = [True for feat in feat_names]
-        label_counts = usage_feats.label_counts
+        label_counts = module_usage.label_counts
     lda = LDA(n_components=ncomponents,store_covariance=True)
-    lda_embeddings = lda.fit_transform(label_counts, usage_feats.group_labels)
+    lda_embeddings = lda.fit_transform(label_counts, module_usage.group_labels)
 
     if loocv==True:
         predictions=[]
@@ -952,7 +1042,7 @@ def lda_labels_timebins(config,
             group_labels_sub=group_labels_full.copy()
             label_i=group_labels_sub.pop(sample_i)
             if feature_selection is not None:
-                picks, _ = feat_select(usage_feats, method=feature_selection[0], n_feats=feature_selection[1], verbose=False)
+                picks, _ = feat_select(module_usage, method=feature_selection[0], n_feats=feature_selection[1], verbose=False)
                 label_counts_sub = label_counts_sub[:, picks]
                 label_counts_i = label_counts_i[picks]
             lda_sub = LDA(n_components=ncomponents)
@@ -972,93 +1062,165 @@ def lda_labels_timebins(config,
         loocv_accuracy="Cross-validation not completed"
         loocv_confmat="Cross-validation not completed"
 
-    return LdaResult(lda, lda_embeddings, usage_feats.label_counts, usage_feats.group_labels, feat_picks, feat_names,
+    return LdaResult(lda, lda_embeddings, module_usage.label_counts, module_usage.group_labels, feat_picks, feat_names,
                      group_dict, nbins, binsize, loocv_accuracy, loocv_confmat)
 
-def lda_loco_labels_timebins(config, dist_df, ncomponents=2):
-    """
-    Function to compute LDA for loco/kepoint position data in timebins
-
-    :param config:
-    :param labels_df:
-    :param binsize:
-    :param selected_subgroups:
-    :param ncomponents:
-    :return:
-    """
-    selected_subgroups = pd.Series([i[0] for i in dist_df.columns]).unique()
-    n_groups = len(selected_subgroups)
-    fps = int(config["fps"])
-    group_dict = {selected_subgroups[i]: i for i in range(len(selected_subgroups))}
-
-    dist_counts = []
-    for g in range(n_groups):
-        for i in range(len(dist_df[selected_subgroups[g]].columns)):
-            sub_df=dist_df[selected_subgroups[g]]
-            dist_counts.append(sub_df[sub_df.columns[i]])
-    dist_counts = np.array(dist_counts)
-
-    group_labels = []
-    for g in range(n_groups):
-        group_labels.extend([g] * len(dist_df[selected_subgroups[g]].columns))
-
-    lda = LDA(n_components=ncomponents)
-    lda_embeddings = lda.fit_transform(dist_counts, group_labels)
-    nbins=dist_df.shape[0]
-    return lda, lda_embeddings, dist_counts, group_labels, group_dict, nbins
-
-
-def lr_labels_timebins(config, labels_df, binsize, selected_subgroups="all"):
-    """
-    Function to compute LDA for data in timebins
-
-    :param config:
-    :param labels_df:
-    :param binsize:
-    :param selected_subgroups:
-    :param ncomponents:
-    :return:
-    """
-    # TODO:: build out logistic regression classification function
-    # if groupnames == None:
-    #     groupnames = list(np.unique([item[0] for item in labels_df.columns]))
-    if selected_subgroups=="all":
-        selected_subgroups=list(config["subgroups"].keys())
-    n_groups = len(selected_subgroups)
-    # n_groups = len(list(np.unique([item[0] for item in labels_df.columns])))
-    fps = int(config["fps"])
-    # start_frame = start * fps
-    # stop_frame = stop * fps
-    # labels_df = labels_df[start_frame:stop_frame]
-    # total_frames = stop_frame - start_frame
-    group_dict = {selected_subgroups[i]: i for i in range(len(selected_subgroups))}
-    labels_flat = np.array(labels_df)
-    labels_flat = [item for sublist in labels_flat for item in sublist]
-    clusts = np.unique(labels_flat)
-    n_clust = len(clusts)
-
-    label_counts = []
-    nbins = int(labels_df.shape[0] / (binsize * fps))
-    for g in range(n_groups):
-        for i in range(len(labels_df[selected_subgroups[g]].columns)):
-            label_counts_i = np.zeros(n_clust * nbins)
-            for b in range(nbins):
-                binstart = int(b * (binsize * fps))
-                binstop = int((b + 1) * (binsize * fps))
-                labels_df_sub = labels_df[binstart:binstop]
-                for c in range(n_clust):
-                    label_counts_i[c + n_clust * b] = np.count_nonzero(
-                        labels_df_sub[selected_subgroups[g]][[labels_df[selected_subgroups[g]].columns[i]]] == c) / (5 * 60 * fps)
-            label_counts.append(label_counts_i)
-    label_counts = np.array(label_counts)
-
-    group_labels = []
-    for g in range(n_groups):
-        group_labels.extend([g] * len(labels_df[selected_subgroups[g]].columns))
-
-    lr = LR().fit(label_counts, group_labels)
-    return lr, group_labels, label_counts, group_dict, nbins
-
-def nlp_classification(config, labels_df):
-    print("Coming soon!")
-    # TODO:: add NLP classification function
+# def lda_labels_timebins(config,
+#                         labels_df,
+#                         binsize,
+#                         selected_subgroups="all",
+#                         ncomponents=2,
+#                         feature_selection=None,
+#                         loocv=False, scale=True):
+#     """
+#     Function to compute LDA for data in timebins
+#
+#     :param config: config object
+#     :param labels_df: labels_df object
+#     :param binsize: bin width in seconds
+#     :param selected_subgroups:
+#     :param ncomponents: number of linear discriminants
+#     :param feature_selection: None for no feature selection or tuple of method "pca","f" and number of features
+#     :param loocv: do leave-one-out cross-validation
+#     :return:
+#     """
+#     if selected_subgroups=="all":
+#         selected_subgroups=list(config["subgroups"].keys())
+#     n_groups = len(selected_subgroups)
+#     fps = int(config["fps"])
+#     group_dict = {selected_subgroups[i]: i for i in range(len(selected_subgroups))}
+#     nbins = int(labels_df.shape[0] / (binsize * fps))
+#     module_usage = get_module_usage(config,labels_df,binsize,selected_subgroups=selected_subgroups)
+#     if scale==True:
+#         usage_feats = module_usage.scale()
+#     label_counts_full = module_usage.label_counts.copy()
+#     group_labels_full = module_usage.group_labels.copy()
+#     if feature_selection is not None:
+#         feat_picks, feat_names = feat_select(module_usage, method=feature_selection[0], n_feats=feature_selection[1])
+#         label_counts = module_usage.label_counts[:, feat_picks]
+#     else:
+#         feat_names = module_usage.feat_names
+#         feat_picks = [True for feat in feat_names]
+#         label_counts = module_usage.label_counts
+#     lda = LDA(n_components=ncomponents,store_covariance=True)
+#     lda_embeddings = lda.fit_transform(label_counts, module_usage.group_labels)
+#
+#     if loocv==True:
+#         predictions=[]
+#         true_class=[]
+#         for sample_i in range(label_counts_full.shape[0]):
+#             label_counts_sub=np.delete(label_counts_full,sample_i,axis=0)
+#             label_counts_i=label_counts_full[sample_i,:]
+#             group_labels_sub=group_labels_full.copy()
+#             label_i=group_labels_sub.pop(sample_i)
+#             if feature_selection is not None:
+#                 picks, _ = feat_select(module_usage, method=feature_selection[0], n_feats=feature_selection[1], verbose=False)
+#                 label_counts_sub = label_counts_sub[:, picks]
+#                 label_counts_i = label_counts_i[picks]
+#             lda_sub = LDA(n_components=ncomponents)
+#             lda_sub.fit(label_counts_sub, group_labels_sub)
+#
+#             pred=lda_sub.predict(label_counts_i.reshape(1, -1))[0]
+#             predictions.append(pred)
+#             true_class.append(label_i)
+#         predictions=np.array(predictions)
+#         true_class=np.array(true_class)
+#         classes=np.unique(true_class)
+#         loocv_confmat=np.zeros([len(classes),len(classes)])
+#         for pred_i in range(len(predictions)):
+#             loocv_confmat[predictions[pred_i],true_class[pred_i]]+=1
+#         loocv_accuracy=np.mean(predictions==true_class)
+#     else:
+#         loocv_accuracy="Cross-validation not completed"
+#         loocv_confmat="Cross-validation not completed"
+#
+#     return LdaResult(lda, lda_embeddings, module_usage.label_counts, module_usage.group_labels, feat_picks, feat_names,
+#                      group_dict, nbins, binsize, loocv_accuracy, loocv_confmat)
+#
+# def lda_loco_labels_timebins(config, dist_df, ncomponents=2):
+#     """
+#     Function to compute LDA for loco/kepoint position data in timebins
+#
+#     :param config:
+#     :param labels_df:
+#     :param binsize:
+#     :param selected_subgroups:
+#     :param ncomponents:
+#     :return:
+#     """
+#     selected_subgroups = pd.Series([i[0] for i in dist_df.columns]).unique()
+#     n_groups = len(selected_subgroups)
+#     fps = int(config["fps"])
+#     group_dict = {selected_subgroups[i]: i for i in range(len(selected_subgroups))}
+#
+#     dist_counts = []
+#     for g in range(n_groups):
+#         for i in range(len(dist_df[selected_subgroups[g]].columns)):
+#             sub_df=dist_df[selected_subgroups[g]]
+#             dist_counts.append(sub_df[sub_df.columns[i]])
+#     dist_counts = np.array(dist_counts)
+#
+#     group_labels = []
+#     for g in range(n_groups):
+#         group_labels.extend([g] * len(dist_df[selected_subgroups[g]].columns))
+#
+#     lda = LDA(n_components=ncomponents)
+#     lda_embeddings = lda.fit_transform(dist_counts, group_labels)
+#     nbins=dist_df.shape[0]
+#     return lda, lda_embeddings, dist_counts, group_labels, group_dict, nbins
+#
+#
+# def lr_labels_timebins(config, labels_df, binsize, selected_subgroups="all"):
+#     """
+#     Function to compute LDA for data in timebins
+#
+#     :param config:
+#     :param labels_df:
+#     :param binsize:
+#     :param selected_subgroups:
+#     :param ncomponents:
+#     :return:
+#     """
+#     # TODO:: build out logistic regression classification function
+#     # if groupnames == None:
+#     #     groupnames = list(np.unique([item[0] for item in labels_df.columns]))
+#     if selected_subgroups=="all":
+#         selected_subgroups=list(config["subgroups"].keys())
+#     n_groups = len(selected_subgroups)
+#     # n_groups = len(list(np.unique([item[0] for item in labels_df.columns])))
+#     fps = int(config["fps"])
+#     # start_frame = start * fps
+#     # stop_frame = stop * fps
+#     # labels_df = labels_df[start_frame:stop_frame]
+#     # total_frames = stop_frame - start_frame
+#     group_dict = {selected_subgroups[i]: i for i in range(len(selected_subgroups))}
+#     labels_flat = np.array(labels_df)
+#     labels_flat = [item for sublist in labels_flat for item in sublist]
+#     clusts = np.unique(labels_flat)
+#     n_clust = len(clusts)
+#
+#     label_counts = []
+#     nbins = int(labels_df.shape[0] / (binsize * fps))
+#     for g in range(n_groups):
+#         for i in range(len(labels_df[selected_subgroups[g]].columns)):
+#             label_counts_i = np.zeros(n_clust * nbins)
+#             for b in range(nbins):
+#                 binstart = int(b * (binsize * fps))
+#                 binstop = int((b + 1) * (binsize * fps))
+#                 labels_df_sub = labels_df[binstart:binstop]
+#                 for c in range(n_clust):
+#                     label_counts_i[c + n_clust * b] = np.count_nonzero(
+#                         labels_df_sub[selected_subgroups[g]][[labels_df[selected_subgroups[g]].columns[i]]] == c) / (5 * 60 * fps)
+#             label_counts.append(label_counts_i)
+#     label_counts = np.array(label_counts)
+#
+#     group_labels = []
+#     for g in range(n_groups):
+#         group_labels.extend([g] * len(labels_df[selected_subgroups[g]].columns))
+#
+#     lr = LR().fit(label_counts, group_labels)
+#     return lr, group_labels, label_counts, group_dict, nbins
+#
+# def nlp_classification(config, labels_df):
+#     print("Coming soon!")
+#     # TODO:: add NLP classification function

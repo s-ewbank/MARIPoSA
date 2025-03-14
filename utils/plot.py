@@ -182,12 +182,12 @@ def plot_module_usage(config, usage_feats, figW=4, figH=2, style="bar_scatter", 
                 for m, module in enumerate(modules):
                     if any_nonint:
                         module = m
-                    if module == 0:
+                    if m == 0:
                         bar_bottom = np.zeros(n_groups)
-                    ax.bar(np.arange(0, n_groups, 1), bar_heights[:, module], bottom=bar_bottom, align='center',
+                    ax.bar(np.arange(0, n_groups, 1), bar_heights[:, modules.index(module)], bottom=bar_bottom, align='center',
                            width=0.99)
                     ax.spines['top'].set_visible(False)
-                    bar_bottom += bar_heights[:, module]
+                    bar_bottom += bar_heights[:, modules.index(module)]
                     ax.spines['right'].set_visible(False)
                     ax.spines['top'].set_visible(False)
             else:
@@ -240,6 +240,7 @@ def plot_module_usage(config, usage_feats, figW=4, figH=2, style="bar_scatter", 
                 ax.set_title(title)
             if legend == True:
                 if BORIS_to_pose_mat is None:
+                    modules = [int(i.split("module")[1]) for i in modules]
                     if len(modules) > 10:
                         leg_modules = []
                         for col in range(10):
