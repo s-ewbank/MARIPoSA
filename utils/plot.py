@@ -2,6 +2,7 @@ import scipy.io
 from scipy import stats
 import matplotlib.pyplot as plt
 from matplotlib import rcParams, gridspec
+from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 import numpy as np
 import pandas as pd
 import networkx as nx
@@ -9,6 +10,8 @@ rcParams['font.family'] = 'sans-serif'
 rcParams['font.sans-serif'] = ['Arial']
 from matplotlib.patches import Patch, Ellipse, Rectangle
 from utils import analysis
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
+from sklearn.decomposition import PCA
 
 def is_nonnum(value):
     try:
@@ -16,6 +19,14 @@ def is_nonnum(value):
         return False
     except (ValueError, TypeError):
         return True
+
+def fig_to_array(fig):
+    canvas = FigureCanvas(fig)
+    canvas.draw()
+    width, height = canvas.get_width_height()
+    image = np.frombuffer(canvas.tostring_rgb(), dtype='uint8')
+    image = image.reshape(height, width, 3)
+    return image
 
 def plot_module_usage(config, usage_feats, figW=4, figH=2, style="bar_scatter", cmap="jet", legend_pos="outside",
                       BORIS_to_pose_mat=None, legend=True, long_legend=False, alt_xticks=None, title=None):
@@ -258,6 +269,47 @@ def plot_module_usage(config, usage_feats, figW=4, figH=2, style="bar_scatter", 
                               labels=leg_labels,
                               ncol=2, handletextpad=0.5, handlelength=1.0, columnspacing=-0.5, bbox_to_anchor=(1.05, 1))
             plt.tight_layout()
+    return fig
+
+
+def plot_distance_results(module_feature_object, distance_results, figW=3, figH=3, cmap="Blues", title=None):
+    """
+    Plot results from distance computation
+    :param module_feature_object:
+    :param distance_results:
+    :param figW:
+    :param figH:
+    :param cmap:
+    :param title:
+    :return:
+    """
+    fig = plt.figure(figsize=(figW, figH))
+    dst = {}
+    for grp in sorted(np.unique(module_feature_object.group_labels)):
+        dst[grp] = distance_results[(((distance_results["grp_i"] == 0) & (distance_results["grp_j"] == grp)) | (
+                (distance_results["grp_i"] == grp) & (distance_results["grp_j"] == 0)))]["distance_ij"].values
+
+    cmap = plt.get_cmap(cmap)
+    bplot = plt.boxplot([dst[i] for i in sorted(np.unique(module_feature_object.group_labels))],
+                        positions=sorted(np.unique(module_feature_object.group_labels)),
+                        patch_artist=True,
+                        medianprops={'color': cmap([0.7]), 'linewidth': 2},
+                        boxprops={'color': cmap([0.7])},
+                        whiskerprops={'color': cmap([0.7]), 'linewidth': 2},
+                        capprops={'color': cmap([0.7]), 'linewidth': 2},
+                        flierprops={'markeredgecolor': cmap([0.7]), 'marker': 'o'})
+
+    for patch in bplot['boxes']:
+        patch.set_facecolor(cmap([0.2]))
+
+    reverse_grp_dict = {v: k for k, v in module_feature_object.group_dict.items()}
+    plt.xticks(sorted(np.unique(module_feature_object.group_labels)),
+               labels=[reverse_grp_dict[i] for i in sorted(np.unique(module_feature_object.group_labels))])
+    if title is not None:
+        plt.title(title)
+
+    plt.ylabel("Distance")
+    plt.tight_layout()
     return fig
 
 # def plot_module_usage(config,labels_df,start,stop,figW=4,figH=2,style="bar_scatter",cmap="jet"):
@@ -966,80 +1018,126 @@ def make_and_plot_ellipse(mean, cov, color, label=None):
                    angle=angle, facecolor=color, alpha=0.25, label=label,edgecolor="none")
     plt.gca().add_patch(ell)
 
-def plot_lda(config, lda_result, figW=4, figH=3, titletype="informative", cmap="jet", marker_dict=None,
-             draw_ellipse=False,alt_labels=None):
-    """
-    Plot LDA embeddings
+# def plot_lda(config, lda_result, figW=4, figH=3, titletype="informative", cmap="jet", marker_dict=None,
+#              draw_ellipse=False,alt_labels=None):
+#     """
+#     Plot LDA embeddings
+#
+#     :param config: config file
+#     :param lda: lda from lda_labels_timebins()
+#     :param lda_embeddings: embeddings from lda_labels_timebins()
+#     :param group_labels: group_labels from lda_labels_timebins()
+#     :param nbins: number of bins from lda_labels_timebins()
+#     :param binsize: binsize
+#     :param figW: width of the figure
+#     :param figH: height of the figure
+#     :param titletype: type of title - options are "informative", "uninformative"
+#     :param cmap: matplotlib colormap OR a dictionary with keys corresponding to group names and values corresponding to colors
+#     :param marker_dict: dictionary with keys corresponding to group names and values corresponding to colors
+#     :param draw_ellipse: whether to simulate data and draw an ellipse fitted to the class of the data or not
+#     :param alt_labels: dictionary giving alternate labels for each subgroup key
+#     :return: figure
+#     """
+#     selected_subgroups=list(lda_result.group_dict.keys())
+#     n_groups=len(selected_subgroups)
+#     flip_group_dict = {v: k for k, v in lda_result.group_dict.items()}
+#     if type(cmap) != dict:
+#         cmap = plt.get_cmap(cmap)
+#         colors = [cmap([i]) for i in np.linspace(0,1,len(selected_subgroups))]
+#     else:
+#         colors = []
+#         for r in range(n_groups):
+#             group = flip_group_dict[r]
+#             colors.append(cmap[group])
+#     if marker_dict is not None:
+#         markers = []
+#         for r in range(n_groups):
+#             group = flip_group_dict[r]
+#             markers.append(marker_dict[group])
+#     else:
+#         markers = ["o"]*n_groups
+#     LD1 = lda_result.lda_embeddings[:, 0]
+#     LD2 = lda_result.lda_embeddings[:, 1]
+#     fig = plt.figure(figsize=(figW, figH), dpi=100)
+#     for r in range(n_groups):
+#         label_in_legend = False
+#         for i in range(len(lda_result.group_labels)):
+#             if lda_result.group_labels[i] == r:
+#                 LD1_i = LD1[i]
+#                 LD2_i = LD2[i]
+#                 if alt_labels is None:
+#                     label = flip_group_dict[r]
+#                 else:
+#                     label = alt_labels[flip_group_dict[r]]
+#                 if label_in_legend==True:
+#                     plt.scatter(LD1_i, LD2_i, c=colors[r], s=23, marker=markers[r])
+#                 else:
+#                     plt.scatter(LD1_i, LD2_i, c=colors[r], s=23, marker=markers[r],label=label)
+#                     label_in_legend=True
+#     plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+#     plt.xlabel("LD1 (" + str(int(1000 * lda_result.lda.explained_variance_ratio_[0]) / 10) + "% Variance Explained)")
+#     plt.ylabel("LD2 (" + str(int(1000 * lda_result.lda.explained_variance_ratio_[1]) / 10) + "% Variance Explained)")
+#     if titletype == "uninformative":
+#         plt.title("Linear Discriminant Analysis\n with Time Bins", fontweight="bold")
+#     elif titletype == "informative":
+#         plt.title(str("Linear Discriminant Analysis\n with " + str(lda_result.nbins) + " " + str(lda_result.binsize / 60) + "-min time bins"),
+#                   fontweight="bold")
+#     if draw_ellipse==True:
+#         for r in range(n_groups):
+#             class_dat = lda_result.label_counts[[i == r for i in lda_result.group_labels], :]
+#             emb = lda_result.lda.transform(class_dat[:,lda_result.feat_picks])
+#             mean = np.mean(emb, axis=0)
+#             cov = np.cov(emb, rowvar=False)
+#             make_and_plot_ellipse(mean, cov, color=colors[r], label=flip_group_dict[r])
+#     plt.tight_layout()
+#     return fig
 
-    :param config: config file
-    :param lda: lda from lda_labels_timebins()
-    :param lda_embeddings: embeddings from lda_labels_timebins()
-    :param group_labels: group_labels from lda_labels_timebins()
-    :param nbins: number of bins from lda_labels_timebins()
-    :param binsize: binsize
-    :param figW: width of the figure
-    :param figH: height of the figure
-    :param titletype: type of title - options are "informative", "uninformative"
-    :param cmap: matplotlib colormap OR a dictionary with keys corresponding to group names and values corresponding to colors
-    :param marker_dict: dictionary with keys corresponding to group names and values corresponding to colors
-    :param draw_ellipse: whether to simulate data and draw an ellipse fitted to the class of the data or not
-    :param alt_labels: dictionary giving alternate labels for each subgroup key
-    :return: figure
+def plot_embeddings(module_feature_object, embeddings_object, figW=3, figH=3, cmap="viridis",title=None,legend=False):
     """
-    selected_subgroups=list(lda_result.group_dict.keys())
-    n_groups=len(selected_subgroups)
-    flip_group_dict = {v: k for k, v in lda_result.group_dict.items()}
-    if type(cmap) != dict:
-        cmap = plt.get_cmap(cmap)
-        colors = [cmap([i]) for i in np.linspace(0,1,len(selected_subgroups))]
-    else:
-        colors = []
-        for r in range(n_groups):
-            group = flip_group_dict[r]
-            colors.append(cmap[group])
-    if marker_dict is not None:
-        markers = []
-        for r in range(n_groups):
-            group = flip_group_dict[r]
-            markers.append(marker_dict[group])
-    else:
-        markers = ["o"]*n_groups
-    LD1 = lda_result.lda_embeddings[:, 0]
-    LD2 = lda_result.lda_embeddings[:, 1]
-    fig = plt.figure(figsize=(figW, figH), dpi=100)
-    for r in range(n_groups):
-        label_in_legend = False
-        for i in range(len(lda_result.group_labels)):
-            if lda_result.group_labels[i] == r:
-                LD1_i = LD1[i]
-                LD2_i = LD2[i]
-                if alt_labels is None:
-                    label = flip_group_dict[r]
-                else:
-                    label = alt_labels[flip_group_dict[r]]
-                if label_in_legend==True:
-                    plt.scatter(LD1_i, LD2_i, c=colors[r], s=23, marker=markers[r])
-                else:
-                    plt.scatter(LD1_i, LD2_i, c=colors[r], s=23, marker=markers[r],label=label)
-                    label_in_legend=True
-    plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
-    plt.xlabel("LD1 (" + str(int(1000 * lda_result.lda.explained_variance_ratio_[0]) / 10) + "% Variance Explained)")
-    plt.ylabel("LD2 (" + str(int(1000 * lda_result.lda.explained_variance_ratio_[1]) / 10) + "% Variance Explained)")
-    if titletype == "uninformative":
-        plt.title("Linear Discriminant Analysis\n with Time Bins", fontweight="bold")
-    elif titletype == "informative":
-        plt.title(str("Linear Discriminant Analysis\n with " + str(lda_result.nbins) + " " + str(lda_result.binsize / 60) + "-min time bins"),
-                  fontweight="bold")
-    if draw_ellipse==True:
-        for r in range(n_groups):
-            class_dat = lda_result.label_counts[[i == r for i in lda_result.group_labels], :]
-            emb = lda_result.lda.transform(class_dat[:,lda_result.feat_picks])
-            mean = np.mean(emb, axis=0)
-            cov = np.cov(emb, rowvar=False)
-            make_and_plot_ellipse(mean, cov, color=colors[r], label=flip_group_dict[r])
-    plt.tight_layout()
+    Plot embeddings
+
+    :param module_feature_object: module feature object (ModuleUsage or ModuleTransitions) from analysis.get_module_{xx}
+    :param embeddings_object: embeddings object (LDA or PCA) from analysis.embed
+    :param figW: figure width
+    :param figH: figure height
+    :param cmap: matplotlib colormap
+    :param title: title string, or None
+    :param legend: True or False
+    :return: fig
+
+    """
+    if module_feature_object.__class__.__name__=="ModuleUsage":
+        X_tfm = embeddings_object.transform(module_feature_object.label_counts)
+    elif module_feature_object.__class__.__name__=="ModuleTransitions":
+        X_tfm = embeddings_object.transform(module_feature_object.transition_counts)
+    y=module_feature_object.group_labels
+    cmap = plt.get_cmap(cmap)
+    colors=[cmap([i]) for i in np.arange(0,len(np.unique(y)),1/(len(np.unique(y))-0.9))]
+    fig = plt.figure(figsize=(figW,figH))
+    if embeddings_object.__class__==LDA:
+        explained_variance = embeddings_object.explained_variance_ratio_
+        plt.xlabel(f'LD1 ({explained_variance[0]*100:.2f}% variance explained)')
+        plt.ylabel(f'LD2 ({explained_variance[1]*100:.2f}% variance explained)')
+    if embeddings_object.__class__==PCA:
+        explained_variance = embeddings_object.explained_variance_ratio_
+        plt.xlabel(f'PC1 ({explained_variance[0]*100:.2f}% variance explained)')
+        plt.ylabel(f'PC2 ({explained_variance[1]*100:.2f}% variance explained)')
+    if title is not None:
+        plt.title(title)
+    legend_elements = {}
+    for g in np.unique(y):
+        legend_elements[g]=0
+    reverse_group_dict = {v: k for k, v in module_feature_object.group_dict.items()}
+    for obs in range(X_tfm.shape[0]):
+        if legend_elements[module_feature_object.group_labels[obs]]==0:
+            plt.scatter(X_tfm[obs,0],X_tfm[obs,1],color=colors[module_feature_object.group_labels[obs]],
+                        label=reverse_group_dict[module_feature_object.group_labels[obs]])
+            legend_elements[module_feature_object.group_labels[obs]]=1
+        else:
+            plt.scatter(X_tfm[obs,0],X_tfm[obs,1],color=colors[module_feature_object.group_labels[obs]])
+    if legend:
+        plt.legend()
     return fig
-
 
 def plot_lda_weights(config, lda_result, n_modules, hide_nofeat_mods=False, remap=False, figW=6, figH=4):
     """

@@ -9,7 +9,13 @@ from sklearn.metrics import accuracy_score, confusion_matrix
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
 from sklearn.linear_model import LogisticRegression as LR
 from sklearn.preprocessing import StandardScaler
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.naive_bayes import GaussianNB
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.neural_network import MLPClassifier
+
 import scipy
+from scipy.spatial.distance import euclidean, mahalanobis, cityblock
 
 # def label_counter_nosubgroups(config, start, stop):
 #     """
@@ -828,7 +834,274 @@ def get_module_transitions(config, labels_df):
 
     return ModuleTransitions(transition_counts, group_labels, observation_labels, feat_names, group_dict)
 
-# def feat_select(usage_feats, method="f", n_feats=10, verbose=True):
+def embed(module_feature_object,method="lda",n_components=2):
+    """
+    Get dimensionally reduced space embeddings of the data with LDA or PCA
+    :param module_feature_object: module feature object
+    :param method: LDA or PCA; default LDA
+    :param n_components: number of components
+    :return:
+    """
+    if module_feature_object.__class__.__name__=="ModuleUsage":
+        X=module_feature_object.label_counts
+        y=module_feature_object.group_labels
+        obj_type="module usage"
+    elif module_feature_object.__class__.__name__=="ModuleTransitions":
+        X=module_feature_object.transition_counts
+        y=module_feature_object.group_labels
+        obj_type="module transitions"
+    else:
+        raise ValueError(f'module_feature_object class must be ModuleUsage or ModuleTransitions, not {module_feature_object.__class__}')
+
+    if ((method == "lda") or (method == "LDA") or (method == "lineardiscriminantanalysis") or (method == "LinearDiscriminantAnalysis")):
+        emb = LDA(n_components=n_components,store_covariance=True)
+        emb.fit(X,y)
+    elif ((method == "pca") or (method == "PCA")):
+        emb = PCA(n_components=n_components)
+        emb.fit(X)
+    return emb
+
+def classify(module_feature_object, method="lda"):
+    """
+    Classify pose segmentation data using either module usage or transitions
+    :param module_feature_object: ModuleUsage or ModuleTransitions object
+    :param method: classification method to use; options include "lda", "logisticregression", "mlp", "naivebayes", "knn", or "randomforest"
+    :return: classifier
+
+    """
+    if module_feature_object.__class__.__name__=="ModuleUsage":
+        X = module_feature_object.label_counts
+        y = module_feature_object.group_labels
+        obj_type = "module usage"
+    elif module_feature_object.__class__.__name__ == "ModuleTransitions":
+        X = module_feature_object.transition_counts
+        y = module_feature_object.group_labels
+        obj_type = "module transitions"
+    else:
+        raise ValueError(
+            f'module_feature_object class must be ModuleUsage or ModuleTransitions, not {module_feature_object.__class__}')
+
+    if ((method == "lda") or (method == "LDA") or (method == "lineardiscriminantanalysis") or (
+            method == "LinearDiscriminantAnalysis")):
+        clf = LDA()
+    elif ((method == "lr") or (method == "LR") or (method == "LogisticRegression") or (
+            method == "logisticregression")):
+        clf = LR()
+    elif ((method == "mlp") or (method == "MLP") or (method == "nn") or (method == "NN")):
+        clf = MLPClassifier(max_iter=1000)
+    elif ((method == "naivebayes") or (method == "NaiveBayes") or (method == "nb") or (method == "NB")):
+        clf = GaussianNB()
+    elif ((method == "k") or (method == "knn") or (method == "KNN")):
+        clf = KNeighborsClassifier()
+    elif ((method == "rf") or (method == "randomforest") or (method == "RF") or (method == "RandomForest")):
+        clf = RandomForestClassifier()
+    else:
+        raise ValueError(
+            f'Invalid method "{method}"; must be one of: lda, lr, mlp, nb, knn, or rf (or one of various alternative spellings)')
+    clf.fit(X, y)
+    return clf
+
+def loocv(module_feature_object, method="lda"):
+    """
+    Perform leave-one-out cross-validation for a method of classifying pose segmentation data using either module usage or transitions
+    :param module_feature_object: ModuleUsage or ModuleTransitions object
+    :param method: classification method to use; options include "lda", "logisticregression", "mlp", "naivebayes", "knn", or "randomforest"
+    :return: accuracy, conf_mat
+
+    """
+    loocv_preds = []
+    if module_feature_object.__class__.__name__=="ModuleUsage":
+        X = module_feature_object.label_counts
+        y = module_feature_object.group_labels
+    elif module_feature_object.__class__.__name__ == "ModuleTransitions":
+        X = module_feature_object.transition_counts
+        y = module_feature_object.group_labels
+    else:
+        raise ValueError(
+            f'module_feature_object class must be ModuleUsage or ModuleTransitions, not {module_feature_object.__class__}')
+    for obs in range(len(y)):
+        sub_X = np.delete(X, obs, axis=0)
+        sub_y = y[:obs] + y[obs + 1:]
+        X_i = X[obs, :]
+        y_i = y[obs]
+        if ((method == "lda") or (method == "LDA") or (method == "lineardiscriminantanalysis") or (
+                method == "LinearDiscriminantAnalysis")):
+            clf = LDA()
+        elif ((method == "lr") or (method == "LR") or (method == "LogisticRegression") or (
+                method == "logisticregression")):
+            clf = LR()
+        elif ((method == "mlp") or (method == "MLP") or (method == "nn") or (method == "NN")):
+            clf = MLPClassifier(max_iter=1000)
+        elif ((method == "naivebayes") or (method == "NaiveBayes") or (method == "nb") or (method == "NB")):
+            clf = GaussianNB()
+        elif ((method == "k") or (method == "knn") or (method == "KNN")):
+            clf = KNeighborsClassifier()
+        elif ((method == "rf") or (method == "randomforest") or (method == "RF") or (method == "RandomForest")):
+            clf = RandomForestClassifier()
+        else:
+            raise ValueError(
+                f'Invalid method "{method}"; must be one of: lda, lr, mlp, nb, knn, or rf (or one of various alternative spellings)')
+        clf.fit(sub_X, sub_y)
+        loocv_preds.append(clf.predict(X_i.reshape(1, -1))[0])
+    loocv_preds = np.array(loocv_preds)
+    y = np.array(y)
+    accuracy = np.mean(loocv_preds == y)
+    classes = sorted(np.unique(y))
+    conf_mat = np.zeros([len(classes), len(classes)])
+    for i in range(len(classes)):
+        for j in range(len(classes)):
+            conf_mat[i, j] = np.sum(loocv_preds[y == i] == j)
+    return accuracy, conf_mat
+
+def get_distance(module_feature_object, metric="euclidean", method="centroid", embedding=None, hold_out=False,
+                 n_components=2):
+    """
+    Get distance in some method between
+    :param module_feature_object: ModuleUsage or ModuleTransitions object
+    :param metric: distance metric to use; options are "euclidean","cityblock","mahalanobis"
+    :param method: what distance to calculate; options are "pairwise" for between every pair of points or "centroid" for between points to group centroids
+    :param hold_out: whether to hold out each sample when computing distance (only relevant if embedding is not None)
+    :param embedding: compute distance in some embedded space or not; options are "pca", "lda", or None
+    :return: distance
+
+    """
+    if module_feature_object.__class__.__name__ == "ModuleUsage":
+        X = module_feature_object.label_counts
+        obj_type = "module usage"
+    elif module_feature_object.__class__.__name__ == "ModuleTransitions":
+        X = module_feature_object.transition_counts
+        obj_type = "module transitions"
+    else:
+        raise ValueError(
+            f'module_feature_object class must be ModuleUsage or ModuleTransitions, not {module_feature_object.__class__}')
+
+    distance_results = []
+
+    if metric == "mahalanobis":
+        lda = embed(module_feature_object, method="lda")
+        cov = lda.covariance_
+
+    if embedding == None:
+        if hold_out:
+            hold_out = False
+            print("Ignoring hold_out=True because embedding is None")
+
+    if not hold_out:
+        if embedding != None:
+            print(f"Warning - embedding (embedding={embedding}) without hold_out")
+            if ((embedding == "lda") or (embedding == "LDA") or (embedding == "lineardiscriminantanalysis") or (
+                    embedding == "LinearDiscriminantAnalysis")):
+                emb = LDA(n_components=n_components, store_covariance=True)
+                emb.fit(X, module_feature_object.group_labels)
+                X = emb.transform(X)
+            elif ((embedding == "pca") or (embedding == "PCA")):
+                emb = PCA(n_components=n_components)
+                emb.fit(X)
+                X = emb.transform(X)
+
+        if method == "pairwise":
+            for i in range(X.shape[0]):
+                for j in range(X.shape[0]):
+                    if i < j:
+                        grp_i = module_feature_object.group_labels[i]
+                        grp_j = module_feature_object.group_labels[j]
+                        obs_i = module_feature_object.observation_labels[i]
+                        obs_j = module_feature_object.observation_labels[j]
+                        if metric == "euclidean":
+                            distance_ij = euclidean(X[i, :], X[j, :])
+                        elif metric == "cityblock":
+                            distance_ij = cityblock(X[i, :], X[j, :])
+                        elif metric == "mahalanobis":
+                            distance_ij = mahalanobis(X[i, :], X[j, :], cov)
+                        else:
+                            raise ValueError(f'metric must be euclidean, cityblock, or mahalanobis, not {metric}')
+                        distance_results.append(pd.DataFrame(
+                            {"grp_i": grp_i, "grp_j": grp_j, "obs_i": obs_i, "obs_j": obs_j,
+                             "distance_ij": distance_ij},
+                            index=[f'{grp_i}_{grp_j}']))
+        elif method == "centroid":
+            for group in sorted(np.unique(module_feature_object.group_labels)):
+                centroid = np.mean(X[np.array(module_feature_object.group_labels) == group, :], axis=0)
+                for i in range(X.shape[0]):
+                    grp_i = module_feature_object.group_labels[i]
+                    grp_j = group
+                    obs_i = module_feature_object.observation_labels[i]
+                    obs_j = f'centroid_{group}'
+                    if metric == "euclidean":
+                        distance_ij = euclidean(X[i, :], centroid)
+                    elif metric == "cityblock":
+                        distance_ij = cityblock(X[i, :], centroid)
+                    elif metric == "mahalanobis":
+                        distance_ij = mahalanobis(X[i, :], centroid, cov)
+                    else:
+                        raise ValueError(f'metric must be euclidean, cityblock, or mahalanobis, not {metric}')
+                    distance_results.append(pd.DataFrame(
+                        {"grp_i": grp_i, "grp_j": grp_j, "obs_i": obs_i, "obs_j": obs_j,
+                         "distance_ij": distance_ij}, index=[f'{grp_i}_{grp_j}']))
+        distance_results = pd.concat(distance_results, axis=0)
+    else:
+        for obs in range(len(module_feature_object.group_labels)):
+            sub_X = np.delete(X, obs, axis=0)
+            sub_y = module_feature_object.group_labels[:obs] + module_feature_object.group_labels[obs + 1:]
+            X_i = X[obs, :]
+            y_i = module_feature_object.group_labels[obs]
+            if embedding != None:
+                if ((embedding == "lda") or (embedding == "LDA") or (embedding == "lineardiscriminantanalysis") or (
+                        embedding == "LinearDiscriminantAnalysis")):
+                    emb = LDA(n_components=n_components, store_covariance=True)
+                    emb.fit(sub_X, sub_y)
+                    X = emb.transform(X)
+                elif ((embedding == "pca") or (embedding == "PCA")):
+                    emb = PCA(n_components=n_components)
+                    emb.fit(sub_X)
+                    X = emb.transform(X)
+
+            if method == "pairwise":
+                for i in range(X.shape[0]):
+                    for j in range(X.shape[0]):
+                        if i < j:
+                            if ((j == obs) or (i == obs)):
+                                grp_i = module_feature_object.group_labels[i]
+                                grp_j = module_feature_object.group_labels[j]
+                                obs_i = module_feature_object.observation_labels[i]
+                                obs_j = module_feature_object.observation_labels[j]
+                                if metric == "euclidean":
+                                    distance_ij = euclidean(X[i, :], X[j, :])
+                                elif metric == "cityblock":
+                                    distance_ij = cityblock(X[i, :], X[j, :])
+                                elif metric == "mahalanobis":
+                                    distance_ij = mahalanobis(X[i, :], X[j, :], cov)
+                                else:
+                                    raise ValueError(
+                                        f'metric must be euclidean, cityblock, or mahalanobis, not {metric}')
+                                distance_results.append(pd.DataFrame(
+                                    {"grp_i": grp_i, "grp_j": grp_j, "obs_i": obs_i, "obs_j": obs_j,
+                                     "distance_ij": distance_ij}, index=[f'{grp_i}_{grp_j}']))
+            elif method == "centroid":
+                for group in sorted(np.unique(module_feature_object.group_labels)):
+                    centroid = np.mean(X[np.array(module_feature_object.group_labels) == group, :], axis=0)
+                    for i in range(X.shape[0]):
+                        if i == obs:
+                            grp_i = module_feature_object.group_labels[i]
+                            grp_j = group
+                            obs_i = module_feature_object.observation_labels[i]
+                            obs_j = f'centroid_{group}'
+                            if metric == "euclidean":
+                                distance_ij = euclidean(X[i, :], centroid)
+                            elif metric == "cityblock":
+                                distance_ij = cityblock(X[i, :], centroid)
+                            elif metric == "mahalanobis":
+                                distance_ij = mahalanobis(X[i, :], centroid, cov)
+                            else:
+                                raise ValueError(
+                                    f'metric must be euclidean, cityblock, or mahalanobis, not {metric}')
+                            distance_results.append(pd.DataFrame(
+                                {"grp_i": grp_i, "grp_j": grp_j, "obs_i": obs_i, "obs_j": obs_j,
+                                 "distance_ij": distance_ij}, index=[f'{grp_i}_{grp_j}']))
+        distance_results = pd.concat(distance_results, axis=0)
+    return distance_results
+
+    # def feat_select(usage_feats, method="f", n_feats=10, verbose=True):
 #     """
 #     A function for subselecting features that may be most relevant for classification
 #
@@ -908,162 +1181,162 @@ def get_module_transitions(config, labels_df):
 #
 #     return exp_usage_df_ssd
 
-class LdaResult:
-    def __init__(self, lda, lda_embeddings, label_counts, group_labels, feat_picks, feat_names, group_dict, nbins, binsize,
-                 loocv_accuracy,loocv_confmat):
-        self.lda = lda
-        self.lda_embeddings = lda_embeddings
-        self.label_counts = label_counts
-        self.group_labels = group_labels
-        self.feat_picks = feat_picks
-        self.feat_names = feat_names
-        self.group_dict = group_dict
-        self.nbins = nbins
-        self.binsize = binsize
-        self.loocv_accuracy = loocv_accuracy
-        self.loocv_confmat = loocv_confmat
-
-    def get_discriminant_weights(self):
-        n_feats = np.sum(self.feat_picks)
-        n_components = len(self.lda.explained_variance_ratio_)
-        LD_weightings = np.zeros([n_feats,n_components])
-        for feat in range(n_feats):
-            test=np.zeros(n_feats)
-            test[feat]=1
-            LD_weightings[feat,:] = self.lda.transform([test])[0]
-        LD_names=[f"LD{i+1}" for i in range(n_components)]
-        LD_weightings = pd.DataFrame(LD_weightings,index=self.feat_names,columns=LD_names)
-
-        # Test function, no longer needed
-        # cmap = plt.get_cmap("viridis_r")
-        # colors = [cmap([i]) for i in np.linspace(0,1,len(selected_subgroups))]
-        #
-        # data = lda_result.label_counts[:,lda_result.feat_picks]
-        # for d in range(data.shape[0]):
-        #     x=np.sum(LD_weightings[:,0]*data[d,:])
-        #     y=np.sum(LD_weightings[:,1]*data[d,:])
-        #     plt.scatter(x,y,color = colors[lda_result.group_labels[d]])
-
-        return(LD_weightings)
-
-
-    def get_mahalanobis_distance(self,type="point_to_point"):
-        """
-        Calculates Mahalanobis distance between groups
-
-        :param type: Whether to do pairwise point to point ("point_to_point") distances or point to centroid ("point_to_centroid") distances
-        :return: a dictionary of pairwise distances
-        """
-        dists = {}
-        for k1_ind, k1 in enumerate(list(self.group_dict.keys())):
-            for k2_ind, k2 in enumerate(list(self.group_dict.keys())):
-                if k1_ind >= k2_ind and type=="point_to_point":
-                    continue
-                else:
-                    mas = [i == self.group_dict[k1] for i in self.group_labels]
-                    g1 = self.label_counts[:, self.feat_picks][mas, :]
-                    m1 = np.mean(g1, axis=0)
-                    mas = [i == self.group_dict[k2] for i in self.group_labels]
-                    g2 = self.label_counts[:, self.feat_picks][mas, :]
-
-                    if type=="point_to_point":
-                        dists_k1k2 = []
-                        if k1 != k2:
-                            for i in range(g1.shape[0]):
-                                for j in range(g2.shape[0]):
-                                    dists_k1k2.append(scipy.spatial.distance.mahalanobis(g1[i], g2[j], self.lda.covariance_))
-                        else:
-                            for i in range(g1.shape[0]):
-                                for j in range(g2.shape[0]):
-                                    if j > i:
-                                        dists_k1k2.append(scipy.spatial.distance.mahalanobis(g1[i], g2[j], self.lda.covariance_))
-                        dists[k1 + "____vs____" + k2] = dists_k1k2
-                    elif type=="point_to_centroid":
-                        dists_k1k2 = []
-                        if k1 != k2:
-                            for j in range(g2.shape[0]):
-                                dists_k1k2.append(scipy.spatial.distance.mahalanobis(m1, g2[j], self.lda.covariance_))
-                        else:
-                            for j in range(g2.shape[0]):
-                                    dists_k1k2.append(scipy.spatial.distance.mahalanobis(m1, g2[j], self.lda.covariance_))
-                        dists[k1 + "-CENTROID____vs____" + k2] = dists_k1k2
-                    else:
-                        raise ValueError("Invalid comparison type! Comparison must be 'point_to_point' or 'point_to_centroid'.")
-
-        return dists
+# class LdaResult:
+#     def __init__(self, lda, lda_embeddings, label_counts, group_labels, feat_picks, feat_names, group_dict, nbins, binsize,
+#                  loocv_accuracy,loocv_confmat):
+#         self.lda = lda
+#         self.lda_embeddings = lda_embeddings
+#         self.label_counts = label_counts
+#         self.group_labels = group_labels
+#         self.feat_picks = feat_picks
+#         self.feat_names = feat_names
+#         self.group_dict = group_dict
+#         self.nbins = nbins
+#         self.binsize = binsize
+#         self.loocv_accuracy = loocv_accuracy
+#         self.loocv_confmat = loocv_confmat
+#
+#     def get_discriminant_weights(self):
+#         n_feats = np.sum(self.feat_picks)
+#         n_components = len(self.lda.explained_variance_ratio_)
+#         LD_weightings = np.zeros([n_feats,n_components])
+#         for feat in range(n_feats):
+#             test=np.zeros(n_feats)
+#             test[feat]=1
+#             LD_weightings[feat,:] = self.lda.transform([test])[0]
+#         LD_names=[f"LD{i+1}" for i in range(n_components)]
+#         LD_weightings = pd.DataFrame(LD_weightings,index=self.feat_names,columns=LD_names)
+#
+#         # Test function, no longer needed
+#         # cmap = plt.get_cmap("viridis_r")
+#         # colors = [cmap([i]) for i in np.linspace(0,1,len(selected_subgroups))]
+#         #
+#         # data = lda_result.label_counts[:,lda_result.feat_picks]
+#         # for d in range(data.shape[0]):
+#         #     x=np.sum(LD_weightings[:,0]*data[d,:])
+#         #     y=np.sum(LD_weightings[:,1]*data[d,:])
+#         #     plt.scatter(x,y,color = colors[lda_result.group_labels[d]])
+#
+#         return(LD_weightings)
 
 
-def lda_labels_timebins(config,
-                        labels_df,
-                        binsize,
-                        selected_subgroups="all",
-                        ncomponents=2,
-                        feature_selection=None,
-                        loocv=False, scale=True):
-    """
-    Function to compute LDA for data in timebins
+    # def get_mahalanobis_distance(self,type="point_to_point"):
+    #     """
+    #     Calculates Mahalanobis distance between groups
+    #
+    #     :param type: Whether to do pairwise point to point ("point_to_point") distances or point to centroid ("point_to_centroid") distances
+    #     :return: a dictionary of pairwise distances
+    #     """
+    #     dists = {}
+    #     for k1_ind, k1 in enumerate(list(self.group_dict.keys())):
+    #         for k2_ind, k2 in enumerate(list(self.group_dict.keys())):
+    #             if k1_ind >= k2_ind and type=="point_to_point":
+    #                 continue
+    #             else:
+    #                 mas = [i == self.group_dict[k1] for i in self.group_labels]
+    #                 g1 = self.label_counts[:, self.feat_picks][mas, :]
+    #                 m1 = np.mean(g1, axis=0)
+    #                 mas = [i == self.group_dict[k2] for i in self.group_labels]
+    #                 g2 = self.label_counts[:, self.feat_picks][mas, :]
+    #
+    #                 if type=="point_to_point":
+    #                     dists_k1k2 = []
+    #                     if k1 != k2:
+    #                         for i in range(g1.shape[0]):
+    #                             for j in range(g2.shape[0]):
+    #                                 dists_k1k2.append(scipy.spatial.distance.mahalanobis(g1[i], g2[j], self.lda.covariance_))
+    #                     else:
+    #                         for i in range(g1.shape[0]):
+    #                             for j in range(g2.shape[0]):
+    #                                 if j > i:
+    #                                     dists_k1k2.append(scipy.spatial.distance.mahalanobis(g1[i], g2[j], self.lda.covariance_))
+    #                     dists[k1 + "____vs____" + k2] = dists_k1k2
+    #                 elif type=="point_to_centroid":
+    #                     dists_k1k2 = []
+    #                     if k1 != k2:
+    #                         for j in range(g2.shape[0]):
+    #                             dists_k1k2.append(scipy.spatial.distance.mahalanobis(m1, g2[j], self.lda.covariance_))
+    #                     else:
+    #                         for j in range(g2.shape[0]):
+    #                                 dists_k1k2.append(scipy.spatial.distance.mahalanobis(m1, g2[j], self.lda.covariance_))
+    #                     dists[k1 + "-CENTROID____vs____" + k2] = dists_k1k2
+    #                 else:
+    #                     raise ValueError("Invalid comparison type! Comparison must be 'point_to_point' or 'point_to_centroid'.")
+    #
+    #     return dists
 
-    :param config: config object
-    :param labels_df: labels_df object
-    :param binsize: bin width in seconds
-    :param selected_subgroups:
-    :param ncomponents: number of linear discriminants
-    :param feature_selection: None for no feature selection or tuple of method "pca","f" and number of features
-    :param loocv: do leave-one-out cross-validation
-    :return:
-    """
-    if selected_subgroups=="all":
-        selected_subgroups=list(config["subgroups"].keys())
-    n_groups = len(selected_subgroups)
-    fps = int(config["fps"])
-    group_dict = {selected_subgroups[i]: i for i in range(len(selected_subgroups))}
-    nbins = int(labels_df.shape[0] / (binsize * fps))
-    module_usage = get_module_usage(config,labels_df,binsize,selected_subgroups=selected_subgroups)
-    if scale==True:
-        usage_feats = module_usage.scale()
-    label_counts_full = module_usage.label_counts.copy()
-    group_labels_full = module_usage.group_labels.copy()
-    if feature_selection is not None:
-        feat_picks, feat_names = feat_select(module_usage, method=feature_selection[0], n_feats=feature_selection[1])
-        label_counts = module_usage.label_counts[:, feat_picks]
-    else:
-        feat_names = module_usage.feat_names
-        feat_picks = [True for feat in feat_names]
-        label_counts = module_usage.label_counts
-    lda = LDA(n_components=ncomponents,store_covariance=True)
-    lda_embeddings = lda.fit_transform(label_counts, module_usage.group_labels)
 
-    if loocv==True:
-        predictions=[]
-        true_class=[]
-        for sample_i in range(label_counts_full.shape[0]):
-            label_counts_sub=np.delete(label_counts_full,sample_i,axis=0)
-            label_counts_i=label_counts_full[sample_i,:]
-            group_labels_sub=group_labels_full.copy()
-            label_i=group_labels_sub.pop(sample_i)
-            if feature_selection is not None:
-                picks, _ = feat_select(module_usage, method=feature_selection[0], n_feats=feature_selection[1], verbose=False)
-                label_counts_sub = label_counts_sub[:, picks]
-                label_counts_i = label_counts_i[picks]
-            lda_sub = LDA(n_components=ncomponents)
-            lda_sub.fit(label_counts_sub, group_labels_sub)
-
-            pred=lda_sub.predict(label_counts_i.reshape(1, -1))[0]
-            predictions.append(pred)
-            true_class.append(label_i)
-        predictions=np.array(predictions)
-        true_class=np.array(true_class)
-        classes=np.unique(true_class)
-        loocv_confmat=np.zeros([len(classes),len(classes)])
-        for pred_i in range(len(predictions)):
-            loocv_confmat[predictions[pred_i],true_class[pred_i]]+=1
-        loocv_accuracy=np.mean(predictions==true_class)
-    else:
-        loocv_accuracy="Cross-validation not completed"
-        loocv_confmat="Cross-validation not completed"
-
-    return LdaResult(lda, lda_embeddings, module_usage.label_counts, module_usage.group_labels, feat_picks, feat_names,
-                     group_dict, nbins, binsize, loocv_accuracy, loocv_confmat)
+# def lda_labels_timebins(config,
+#                         labels_df,
+#                         binsize,
+#                         selected_subgroups="all",
+#                         ncomponents=2,
+#                         feature_selection=None,
+#                         loocv=False, scale=True):
+#     """
+#     Function to compute LDA for data in timebins
+#
+#     :param config: config object
+#     :param labels_df: labels_df object
+#     :param binsize: bin width in seconds
+#     :param selected_subgroups:
+#     :param ncomponents: number of linear discriminants
+#     :param feature_selection: None for no feature selection or tuple of method "pca","f" and number of features
+#     :param loocv: do leave-one-out cross-validation
+#     :return:
+#     """
+#     if selected_subgroups=="all":
+#         selected_subgroups=list(config["subgroups"].keys())
+#     n_groups = len(selected_subgroups)
+#     fps = int(config["fps"])
+#     group_dict = {selected_subgroups[i]: i for i in range(len(selected_subgroups))}
+#     nbins = int(labels_df.shape[0] / (binsize * fps))
+#     module_usage = get_module_usage(config,labels_df,binsize,selected_subgroups=selected_subgroups)
+#     if scale==True:
+#         usage_feats = module_usage.scale()
+#     label_counts_full = module_usage.label_counts.copy()
+#     group_labels_full = module_usage.group_labels.copy()
+#     if feature_selection is not None:
+#         feat_picks, feat_names = feat_select(module_usage, method=feature_selection[0], n_feats=feature_selection[1])
+#         label_counts = module_usage.label_counts[:, feat_picks]
+#     else:
+#         feat_names = module_usage.feat_names
+#         feat_picks = [True for feat in feat_names]
+#         label_counts = module_usage.label_counts
+#     lda = LDA(n_components=ncomponents,store_covariance=True)
+#     lda_embeddings = lda.fit_transform(label_counts, module_usage.group_labels)
+#
+#     if loocv==True:
+#         predictions=[]
+#         true_class=[]
+#         for sample_i in range(label_counts_full.shape[0]):
+#             label_counts_sub=np.delete(label_counts_full,sample_i,axis=0)
+#             label_counts_i=label_counts_full[sample_i,:]
+#             group_labels_sub=group_labels_full.copy()
+#             label_i=group_labels_sub.pop(sample_i)
+#             if feature_selection is not None:
+#                 picks, _ = feat_select(module_usage, method=feature_selection[0], n_feats=feature_selection[1], verbose=False)
+#                 label_counts_sub = label_counts_sub[:, picks]
+#                 label_counts_i = label_counts_i[picks]
+#             lda_sub = LDA(n_components=ncomponents)
+#             lda_sub.fit(label_counts_sub, group_labels_sub)
+#
+#             pred=lda_sub.predict(label_counts_i.reshape(1, -1))[0]
+#             predictions.append(pred)
+#             true_class.append(label_i)
+#         predictions=np.array(predictions)
+#         true_class=np.array(true_class)
+#         classes=np.unique(true_class)
+#         loocv_confmat=np.zeros([len(classes),len(classes)])
+#         for pred_i in range(len(predictions)):
+#             loocv_confmat[predictions[pred_i],true_class[pred_i]]+=1
+#         loocv_accuracy=np.mean(predictions==true_class)
+#     else:
+#         loocv_accuracy="Cross-validation not completed"
+#         loocv_confmat="Cross-validation not completed"
+#
+#     return LdaResult(lda, lda_embeddings, module_usage.label_counts, module_usage.group_labels, feat_picks, feat_names,
+#                      group_dict, nbins, binsize, loocv_accuracy, loocv_confmat)
 
 # def lda_labels_timebins(config,
 #                         labels_df,
