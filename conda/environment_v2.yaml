@@ -15,4 +15,5 @@ dependencies:
     - pyyaml
     - scikit-learn
     - scipy
+    - statsmodels
 prefix: /opt/anaconda3/envs/mariposa_v2

@@ -211,7 +211,7 @@ def plot_module_usage(config, usage_feats, figW=4, figH=2, style="bar_scatter", 
                 leg_handles_col1 = []
                 leg_labels = [""] * n_behaviors
                 bottom = True
-                cm_list = ['Greys', 'YlOrBr', 'magma', 'Blues', 'Reds', 'Purples', 'copper', 'BuGn', 'bone', 'YlGn',
+                cm_list = ['magma', 'Greys', 'YlOrBr', 'Blues', 'Purples', 'copper', 'Reds', 'BuGn', 'bone', 'YlGn',
                            'YlGnBu', 'YlOrRd']
                 modules_plotted=[] #To account for modules not seen in remapping
                 for remap in range(n_behaviors):
@@ -233,7 +233,7 @@ def plot_module_usage(config, usage_feats, figW=4, figH=2, style="bar_scatter", 
                                     bar_bottom = np.zeros(n_groups)
                                     bottom = False
                                 ax.bar(np.arange(0, n_groups, 1), bar_heights[:, modules.index(c)], bottom=bar_bottom, align='center',
-                                       width=0.99, color=colors[c % 2])
+                                       width=0.97, color=colors[c % 2])
                                 ax.spines['top'].set_visible(False)
                                 bar_bottom += bar_heights[:, modules.index(c)]
                                 ax.spines['right'].set_visible(False)
@@ -304,7 +304,8 @@ def plot_distance_results(module_feature_object, distance_results, figW=3, figH=
 
     reverse_grp_dict = {v: k for k, v in module_feature_object.group_dict.items()}
     plt.xticks(sorted(np.unique(module_feature_object.group_labels)),
-               labels=[reverse_grp_dict[i] for i in sorted(np.unique(module_feature_object.group_labels))])
+               labels=[reverse_grp_dict[i] for i in sorted(np.unique(module_feature_object.group_labels))],
+               rotation=90)
     if title is not None:
         plt.title(title)
 
@@ -808,163 +809,223 @@ def transition_counter(labels_df, groupnames):
 def moving_average(x, w):
     return np.convolve(x, np.ones(w), 'valid') / w
 
-def SandPlotClusterFrequency_OverTime(config,
-                                      labels_df,
-                                      start,
-                                      time_per_block,
-                                      n_blocks,
-                                      figW=7, figH=3,
-                                      posenames=None,
-                                      title=None,
-                                      convolve=4,
-                                      legend=True,long_legend=True,
-                                      BORIS_to_pose_mat=None,
-                                      plottype='area'):
-    """
-    Plots usage of pose modules over time within a session
 
-    :param labels_df:
-    :param start: time to start at in seconds
-    :param time_per_block: time per block in seconds
-    :param fps: frames per second
-    :param n_blocks:
-    :param figW:
-    :param figH:
-    :param posenames:
-    :param title:
+def module_usage_sandplot(config, module_usage, BORIS_to_pose_mat=None, long_legend=True, convolve=False, window=5):
+    """
+    new sandplot function
+    :param config:
+    :param module_usage:
+    :param BORIS_to_pose_mat:
+    :param long_legend:
     :param convolve:
-    :param legend:
-    :param plottype:
-    :param saveplots:
-    :param savename:
+    :param window:
     :return:
     """
-    fps = int(config["fps"])
-    n_samples = len(labels_df.columns)
-    labels_flat = np.array(labels_df)
-    labels_flat = [item for sublist in labels_flat for item in sublist]
-    modules = np.unique(labels_flat)
-    n_modules = len(modules)
-    block_labels = np.zeros([n_samples, n_modules, n_blocks])
-    block_labels_normal = np.zeros([n_samples, n_modules, n_blocks])
-    frames_per_block = int(fps * time_per_block)
-    for i in range(n_samples):
-        for b in range(n_blocks):
-            new_start = start + b * frames_per_block
-            x = labels_df[labels_df.columns[i]][new_start:new_start + frames_per_block]
-            for m, module in enumerate(modules):
-                block_labels[i, m, b] = np.count_nonzero(x == module)
-                block_labels_normal[i, m, b] = np.count_nonzero(x == module) / frames_per_block
+    data = module_usage.usage_density(convolve=convolve, window=window)
 
-    bar_heights = np.zeros([n_blocks, n_modules])
-    bar_heights_normal = np.zeros([n_blocks, n_modules])
-    bar_stds = np.zeros([n_blocks, n_modules])
-    bar_stds_normal = np.zeros([n_blocks, n_modules])
-
-    for r in range(n_blocks):
-        for q in range(n_modules):
-            bar_heights[r, q] = np.mean(block_labels[:, q, r])
-            bar_stds[r, q] = np.std(block_labels[:, q, r])
-            bar_heights_normal[r, q] = np.mean(block_labels_normal[:, q, r])
-            bar_stds_normal[r, q] = np.std(block_labels_normal[:, q, r])
-
-    if plottype == 'line':
-        fig, ax = plt.subplots(figsize=(figW, figH), dpi=100)
-        scale = 1 / (n_blocks + .7)
-        for r in range(n_modules):
-            plt.plot(moving_average(bar_heights_normal[:, r], convolve))
-            plt.fill_between(np.arange(0, n_blocks - convolve + 1, 1),
-                             moving_average(bar_heights_normal[:, r] + bar_stds_normal[:, r] / np.sqrt(n_samples),
-                                            convolve),
-                             moving_average(bar_heights_normal[:, r] - bar_stds_normal[:, r] / np.sqrt(n_samples),
-                                            convolve),
-                             alpha=0.2)
-        if legend == True:
-            if posenames == None:
-                if np.sum([type(m)!=int for m in modules])>0:
-                    posenames=modules
-                else:
-                    posenames = []
-                    for i in range(n_modules):
-                        posenames.append("Pose " + str(i))
-                ax.legend(posenames, loc="upper right", bbox_to_anchor=(1.25, 1.0))
+    data_mean = np.mean(data, axis=0).T
+    bottom = np.zeros(data_mean[:, 0].shape)
+    xpts = data[0].columns / 60
+    if BORIS_to_pose_mat is None:
+        for m in range(data_mean.shape[1]):
+            y_i = np.array(data_mean[:, m], dtype=float)
+            plt.fill_between(xpts, bottom, bottom + y_i)
+            bottom = y_i + bottom
+    else:
+        modules = list(data[0].index)
+        behaviors = list(BORIS_to_pose_mat.index)
+        if "other" not in behaviors:
+            behaviors = behaviors + ["other"]
+        n_behaviors = len(behaviors)
+        leg_handles_col0 = []
+        leg_handles_col1 = []
+        leg_labels = [""] * n_behaviors
+        cm_list = ['magma', 'Greys', 'YlOrBr', 'Blues', 'Purples', 'copper', 'Reds', 'BuGn', 'bone', 'YlGn',
+                   'YlGnBu', 'YlOrRd']
+        modules_plotted = []  # To account for modules not seen in remapping
+        for remap in range(n_behaviors):
+            sub_modules = [int(i[0][0]) for i in config["remappings"] if i[1] == behaviors[remap]]
+            # if (behaviors[remap]=="other"):
+            #     print([mod for mod in modules if ((mod not in modules_plotted) and (mod not in sub_modules))])
+            cmap = plt.get_cmap(cm_list[remap])
+            colors = [cmap([0.4]), cmap([0.5])]
+            leg_handles_col0.extend([Patch(facecolor=colors[0], edgecolor='none')])
+            leg_handles_col1.extend([Patch(facecolor=colors[1], edgecolor='none')])
+            if long_legend:
+                leg_labels.append(behaviors[remap] + "   (" + str(len(sub_modules)) + " modules)")
             else:
-                ax.legend(posenames, loc="upper right", bbox_to_anchor=(1.25, 1.0))
+                leg_labels.append(behaviors[remap])  # +" "+str(sub_modules))
+            if len(sub_modules) > 0:
+                for c in sub_modules:
+                    if c in modules:
+                        y_i = np.array(data_mean[:, c], dtype=float)
+                        plt.fill_between(xpts, bottom, bottom + y_i, color=colors[c % 2])
+                        bottom = y_i + bottom
+                        modules_plotted.append(c)
 
-        scale = 1 / (n_modules + .7)
-        ax.set_xlabel('Time (minutes)')
-        ax.set_ylabel('Moving Average Proportion of \nTime Spent in Pose')
-        ax.set_ylim([-0.03, 1.03])
+    plt.ylim([0, 1])
+    plt.xlim([xpts[0], xpts[-1]])
+    plt.xlabel("Time (m)")
+    plt.ylabel("")
 
-    elif plottype == 'area':
-        fig, ax = plt.subplots(figsize=(figW, figH), dpi=100)
-        bar_heights_moving_average = np.zeros([n_blocks - convolve + 1, n_modules])
-        for r in range(n_modules):
-            bar_heights_moving_average[:, r] = moving_average(bar_heights_normal[:, r], convolve)
-        if BORIS_to_pose_mat is None:
-            plt.stackplot(np.arange(0, bar_heights_moving_average.shape[0], 1), bar_heights_moving_average.T)
-            plt.xlim(0, n_blocks - convolve)
-            plt.ylim(0, 1)
-            plt.xlabel('Time (minutes)')
-            plt.ylabel('Moving Average Proportion \nof Time Spent in Pose')
-        else:
-            bar_heights_moving_average_rearranged=np.zeros_like(bar_heights_moving_average)
-            behaviors=list(BORIS_to_pose_mat.index)+["other"]
-            n_behaviors=len(behaviors)
-            leg_handles_col0=[]
-            leg_handles_col1=[]
-            leg_labels=[""]*n_behaviors
-            bottom=True
-            cm_list = ['Greys', 'YlOrBr', 'magma', 'Blues', 'Reds', 'Purples','copper', 'BuGn', 'bone', 'YlGn', 'YlGnBu', 'YlOrRd']
-            count=0
-            plot_colors=[]
-            for remap in range(n_behaviors):
-                sub_modules=[int(i[0][0]) for i in config["remappings"] if i[1]==behaviors[remap]]
-                cmap=plt.get_cmap(cm_list[remap])
-                colors=[cmap([0.4]),cmap([0.5])]
-                leg_handles_col0.extend([Patch(facecolor=colors[0], edgecolor='none')])
-                leg_handles_col1.extend([Patch(facecolor=colors[1], edgecolor='none')])
-                if long_legend:
-                    leg_labels.append(behaviors[remap]+"   ("+str(len(sub_modules))+" modules)")
-                else:
-                    leg_labels.append(behaviors[remap])#+" "+str(sub_modules))
-                if len(sub_modules)>0:
-                    for c in sub_modules:
-                        if c in modules:
-                            bar_heights_moving_average_rearranged[count,:]=bar_heights_moving_average[c,:]
-                            count=count+1
-                            plot_colors.append(colors[c%2])
-            plt.stackplot(np.arange(0, bar_heights_moving_average_rearranged.shape[0], 1), bar_heights_moving_average.T,
-                          colors=plot_colors)
-            plt.xlim(0, n_blocks - convolve)
-            plt.ylim(0, 1)
-            plt.xlabel('Time (minutes)')
-            plt.ylabel('Moving Average Proportion \nof Time Spent in Pose')
-
-        if legend == True:
-            if BORIS_to_pose_mat is None:
-                if posenames == None:
-                    if np.sum([type(m)!=int for m in modules])>0:
-                        posenames=modules
-                    else:
-                        posenames = []
-                        for i in range(n_modules):
-                            posenames.append("Pose " + str(i))
-                    ax.legend(posenames, loc="upper right", bbox_to_anchor=(1.25, 1.0))
-                else:
-                    ax.legend(posenames, loc="upper right", bbox_to_anchor=(1.25, 1.0))
-            else:
-                leg_handles=leg_handles_col0+leg_handles_col1
-                ax.legend(handles=leg_handles,
-                    labels=leg_labels,
-                    ncol=2, handletextpad=0.5, handlelength=1.0, columnspacing=-0.5,bbox_to_anchor=(1.55, 1))
-
-    plt.tight_layout()
-
-    if title!=None:
-        ax.set_title(title)
-
-    return fig
+# def SandPlotClusterFrequency_OverTime(config,
+#                                       labels_df,
+#                                       start,
+#                                       time_per_block,
+#                                       n_blocks,
+#                                       figW=7, figH=3,
+#                                       posenames=None,
+#                                       title=None,
+#                                       convolve=4,
+#                                       legend=True,long_legend=True,
+#                                       BORIS_to_pose_mat=None,
+#                                       plottype='area'):
+#     """
+#     Plots usage of pose modules over time within a session
+#
+#     :param labels_df:
+#     :param start: time to start at in seconds
+#     :param time_per_block: time per block in seconds
+#     :param fps: frames per second
+#     :param n_blocks:
+#     :param figW:
+#     :param figH:
+#     :param posenames:
+#     :param title:
+#     :param convolve:
+#     :param legend:
+#     :param plottype:
+#     :param saveplots:
+#     :param savename:
+#     :return:
+#     """
+#     fps = int(config["fps"])
+#     n_samples = len(labels_df.columns)
+#     labels_flat = np.array(labels_df)
+#     labels_flat = [item for sublist in labels_flat for item in sublist]
+#     modules = np.unique(labels_flat)
+#     n_modules = len(modules)
+#     block_labels = np.zeros([n_samples, n_modules, n_blocks])
+#     block_labels_normal = np.zeros([n_samples, n_modules, n_blocks])
+#     frames_per_block = int(fps * time_per_block)
+#     for i in range(n_samples):
+#         for b in range(n_blocks):
+#             new_start = start + b * frames_per_block
+#             x = labels_df[labels_df.columns[i]][new_start:new_start + frames_per_block]
+#             for m, module in enumerate(modules):
+#                 block_labels[i, m, b] = np.count_nonzero(x == module)
+#                 block_labels_normal[i, m, b] = np.count_nonzero(x == module) / frames_per_block
+#
+#     bar_heights = np.zeros([n_blocks, n_modules])
+#     bar_heights_normal = np.zeros([n_blocks, n_modules])
+#     bar_stds = np.zeros([n_blocks, n_modules])
+#     bar_stds_normal = np.zeros([n_blocks, n_modules])
+#
+#     for r in range(n_blocks):
+#         for q in range(n_modules):
+#             bar_heights[r, q] = np.mean(block_labels[:, q, r])
+#             bar_stds[r, q] = np.std(block_labels[:, q, r])
+#             bar_heights_normal[r, q] = np.mean(block_labels_normal[:, q, r])
+#             bar_stds_normal[r, q] = np.std(block_labels_normal[:, q, r])
+#
+#     if plottype == 'line':
+#         fig, ax = plt.subplots(figsize=(figW, figH), dpi=100)
+#         scale = 1 / (n_blocks + .7)
+#         for r in range(n_modules):
+#             plt.plot(moving_average(bar_heights_normal[:, r], convolve))
+#             plt.fill_between(np.arange(0, n_blocks - convolve + 1, 1),
+#                              moving_average(bar_heights_normal[:, r] + bar_stds_normal[:, r] / np.sqrt(n_samples),
+#                                             convolve),
+#                              moving_average(bar_heights_normal[:, r] - bar_stds_normal[:, r] / np.sqrt(n_samples),
+#                                             convolve),
+#                              alpha=0.2)
+#         if legend == True:
+#             if posenames == None:
+#                 if np.sum([type(m)!=int for m in modules])>0:
+#                     posenames=modules
+#                 else:
+#                     posenames = []
+#                     for i in range(n_modules):
+#                         posenames.append("Pose " + str(i))
+#                 ax.legend(posenames, loc="upper right", bbox_to_anchor=(1.25, 1.0))
+#             else:
+#                 ax.legend(posenames, loc="upper right", bbox_to_anchor=(1.25, 1.0))
+#
+#         scale = 1 / (n_modules + .7)
+#         ax.set_xlabel('Time (minutes)')
+#         ax.set_ylabel('Moving Average Proportion of \nTime Spent in Pose')
+#         ax.set_ylim([-0.03, 1.03])
+#
+#     elif plottype == 'area':
+#         fig, ax = plt.subplots(figsize=(figW, figH), dpi=100)
+#         bar_heights_moving_average = np.zeros([n_blocks - convolve + 1, n_modules])
+#         for r in range(n_modules):
+#             bar_heights_moving_average[:, r] = moving_average(bar_heights_normal[:, r], convolve)
+#         if BORIS_to_pose_mat is None:
+#             plt.stackplot(np.arange(0, bar_heights_moving_average.shape[0], 1), bar_heights_moving_average.T)
+#             plt.xlim(0, n_blocks - convolve)
+#             plt.ylim(0, 1)
+#             plt.xlabel('Time (minutes)')
+#             plt.ylabel('Moving Average Proportion \nof Time Spent in Pose')
+#         else:
+#             bar_heights_moving_average_rearranged=np.zeros_like(bar_heights_moving_average)
+#             behaviors=list(BORIS_to_pose_mat.index)+["other"]
+#             n_behaviors=len(behaviors)
+#             leg_handles_col0=[]
+#             leg_handles_col1=[]
+#             leg_labels=[""]*n_behaviors
+#             bottom=True
+#             cm_list = ['Greys', 'YlOrBr', 'magma', 'Blues', 'Reds', 'Purples','copper', 'BuGn', 'bone', 'YlGn', 'YlGnBu', 'YlOrRd']
+#             count=0
+#             plot_colors=[]
+#             for remap in range(n_behaviors):
+#                 sub_modules=[int(i[0][0]) for i in config["remappings"] if i[1]==behaviors[remap]]
+#                 cmap=plt.get_cmap(cm_list[remap])
+#                 colors=[cmap([0.4]),cmap([0.5])]
+#                 leg_handles_col0.extend([Patch(facecolor=colors[0], edgecolor='none')])
+#                 leg_handles_col1.extend([Patch(facecolor=colors[1], edgecolor='none')])
+#                 if long_legend:
+#                     leg_labels.append(behaviors[remap]+"   ("+str(len(sub_modules))+" modules)")
+#                 else:
+#                     leg_labels.append(behaviors[remap])#+" "+str(sub_modules))
+#                 if len(sub_modules)>0:
+#                     for c in sub_modules:
+#                         if c in modules:
+#                             bar_heights_moving_average_rearranged[count,:]=bar_heights_moving_average[c,:]
+#                             count=count+1
+#                             plot_colors.append(colors[c%2])
+#             print(bar_heights_moving_average.T)
+#             plt.stackplot(np.arange(0, bar_heights_moving_average_rearranged.shape[0], 1), bar_heights_moving_average.T)
+#                           #colors=plot_colors)
+#             plt.xlim(0, n_blocks - convolve)
+#             plt.ylim(0, 1)
+#             plt.xlabel('Time (minutes)')
+#             plt.ylabel('Moving Average Proportion \nof Time Spent in Pose')
+#
+#         if legend == True:
+#             if BORIS_to_pose_mat is None:
+#                 if posenames == None:
+#                     if np.sum([type(m)!=int for m in modules])>0:
+#                         posenames=modules
+#                     else:
+#                         posenames = []
+#                         for i in range(n_modules):
+#                             posenames.append("Pose " + str(i))
+#                     ax.legend(posenames, loc="upper right", bbox_to_anchor=(1.25, 1.0))
+#                 else:
+#                     ax.legend(posenames, loc="upper right", bbox_to_anchor=(1.25, 1.0))
+#             else:
+#                 leg_handles=leg_handles_col0+leg_handles_col1
+#                 ax.legend(handles=leg_handles,
+#                     labels=leg_labels,
+#                     ncol=2, handletextpad=0.5, handlelength=1.0, columnspacing=-0.5,bbox_to_anchor=(1.55, 1))
+#
+#     plt.tight_layout()
+#
+#     if title!=None:
+#         ax.set_title(title)
+#
+#     return fig
 
 
 def plot_dist_bins(dist_df, cmap="viridis", plottype="band", figW=6, figH=3):
@@ -1417,14 +1478,14 @@ def plot_pc_weights(pca,cmap="PuOr"):
 
 def BORIS_to_pose_matrix_plot(config, boris_to_pose_output, figW=4, figH=2.5, cmap="Greens",outline_top_match=True):
     fig, ax = plt.subplots(figsize=(figW, figH), dpi=100)
-    plt.imshow(boris_to_pose_output.to_numpy(dtype='float'),cmap=cmap,aspect="auto")
+    plt.imshow(boris_to_pose_output.to_numpy(dtype='float'),cmap=cmap,aspect="auto",interpolation="none")
     data = boris_to_pose_output.to_numpy(dtype='float')
     num_cols = data.shape[1]
     if outline_top_match==True:
         for col in range(num_cols):
             max_row = np.argmax(data[:, col])
             if np.sum(data[:, col]==data[max_row, col])==1:
-                rect = Rectangle((col - 0.5, max_row - 0.5), 1, 1, edgecolor='purple', facecolor='none', linewidth=0.8)
+                rect = Rectangle((col - 0.5, max_row - 0.5), 1, 1, edgecolor='purple', facecolor='none', linewidth=0.5)
                 ax.add_patch(rect)
     if len(boris_to_pose_output.columns>=20):
         xticks=np.arange(0,np.max(boris_to_pose_output.columns),5,dtype=int)

@@ -8,6 +8,7 @@ from sklearn.model_selection import LeaveOneOut, cross_val_predict
 from sklearn.metrics import accuracy_score, confusion_matrix
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
 from sklearn.linear_model import LogisticRegression as LR
+from sklearn.linear_model import LinearRegression, Lasso, Ridge
 from sklearn.preprocessing import StandardScaler
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.naive_bayes import GaussianNB
@@ -193,12 +194,24 @@ from scipy.spatial.distance import euclidean, mahalanobis, cityblock
 #     modules = np.unique(labels_flat)
 #     n_modules = len(modules)
 #     return labels_df
+
 def is_nonnum(value):
     try:
         int(value)
         return False
     except (ValueError, TypeError):
         return True
+
+def packed_moving_average(x, w):
+    x = np.asarray(x)
+    n = len(x)
+    x_new = np.zeros(n)
+
+    for i in range(n):
+        win_size = min(w, i + 1, n - i)  # Reduce window size at edges
+        x_new[i] = np.mean(x[max(0, i - win_size // 2): min(n, i + win_size // 2 + 1)])
+
+    return x_new
 
 def get_module_labels(config, start, stop, subgroups = None):
     """
@@ -446,7 +459,7 @@ def BORIS_to_pose(config):
                 mask = boris_i[behavior]>0
                 masked_labels = labels_df[mask==True]
                 for module in range(n_modules):
-                    results_i.at[module,behavior] = np.sum(masked_labels==module).to_numpy()
+                    results_i.at[module,behavior] = np.sum(masked_labels==module).to_numpy()[0]
             results=results+results_i
             print("done with " + str(pairing))
     results=results.T
@@ -609,12 +622,13 @@ def make_remappings_from_BORIS(config, labels_df=None, BORIS_to_pose_mat=None):
 #     return UsageFeats(label_counts, group_labels, feat_names, group_dict)
 
 class ModuleUsage:
-    def __init__(self, label_counts, group_labels, observation_labels, feat_names, group_dict):
+    def __init__(self, label_counts, group_labels, observation_labels, feat_names, group_dict, scaler):
         self.label_counts = label_counts
         self.group_labels = group_labels
         self.observation_labels = observation_labels
         self.feat_names = feat_names
         self.group_dict = group_dict
+        self.scaler = scaler
         mean_check = np.allclose(np.mean(label_counts, axis=0), 0, atol=0.1)
         std_check = np.allclose(np.std(label_counts, axis=0), 1, atol=0.1)
         self.scaled = mean_check and std_check
@@ -642,7 +656,26 @@ class ModuleUsage:
             df_notimebins[module] = df.filter(like=module + "_").mean(axis=1)
 
         return ModuleUsage(np.array(df_notimebins), self.group_labels, self.observation_labels, df_notimebins.columns,
-                           self.group_dict)
+                           self.group_dict, self.scaler)
+
+    def usage_density(self, convolve=False, window=5):
+        df = self.to_df()
+        modules = sorted(
+            np.unique([int(i.split("module")[1].split("_")[0]) for i in list(df.columns) if "module" in i]))
+        start_times = [int(col.split("_t")[1].split("-")[0]) for col in list(df.columns) if
+                       f"module{modules[0]}_" in col]
+        subjs = list(df.index)
+        data = []
+        for subj in subjs:
+            new_df = pd.DataFrame(columns=start_times, index=modules)
+            for module in modules:
+                subj_module_arr = np.array(df.filter(like=f"module{module}_", axis=1).loc[subj])
+                if convolve:
+                    subj_module_arr = packed_moving_average(subj_module_arr, window)
+                new_df.loc[module] = subj_module_arr
+            data.append(new_df)
+
+        return data
 
     def apply_picks(self, pick_names):
         feats = self.to_df().columns
@@ -654,7 +687,7 @@ class ModuleUsage:
             df = pd.DataFrame(self.label_counts, columns=self.feat_names, index=colnames)
             df_sub = df[pick_names]
             return ModuleUsage(np.array(df_sub), self.group_labels, self.observation_labels, df_sub.columns,
-                               self.group_dict)
+                               self.group_dict, self.scaler)
         else:
             print(
                 "Picks not found in features, presuming that you are applying no-bin picks to binned data and adjusting accordingly...")
@@ -670,7 +703,7 @@ class ModuleUsage:
         scaler = StandardScaler()
         label_counts_scaled = scaler.fit_transform(self.label_counts)
         return ModuleUsage(label_counts_scaled, self.group_labels, self.observation_labels, self.feat_names,
-                           self.group_dict)
+                           self.group_dict, scaler)
 
 
 def get_module_usage(config, labels_df, binsize=None):
@@ -742,7 +775,7 @@ def get_module_usage(config, labels_df, binsize=None):
             feat_names_made = True
     label_counts = np.array(label_counts)
 
-    return ModuleUsage(label_counts, group_labels, observation_labels, feat_names, group_dict)
+    return ModuleUsage(label_counts, group_labels, observation_labels, feat_names, group_dict, None)
 
 class ModuleTransitions:
     def __init__(self, transition_counts, group_labels, observation_labels, feat_names, group_dict):
@@ -1101,6 +1134,8 @@ def get_distance(module_feature_object, metric="euclidean", method="centroid", e
         distance_results = pd.concat(distance_results, axis=0)
     return distance_results
 
+
+
     # def feat_select(usage_feats, method="f", n_feats=10, verbose=True):
 #     """
 #     A function for subselecting features that may be most relevant for classification
@@ -1154,32 +1189,81 @@ def get_distance(module_feature_object, metric="euclidean", method="centroid", e
 #     return picks, pick_names
 #
 #
-# def get_usage_ssd(control_usage_feats, exp_usage_feats):
-#     """
-#     Get the time-resolved sum squared difference in module usage relative to a control distribution of usage.
-#     :param control_usage_feats: output from analysis.get_usage_feats for the control group ONLY
-#     :param exp_usage_feats:
-#     :return:
-#     """
-#     control_usage_feats_df = control_usage_feats.to_df()
-#     exp_usage_df = exp_usage_feats.to_df()
-#     control_usage = control_usage_feats_df.mean(axis=0)
-#
-#     exp_usage_df_sqdiff = exp_usage_df.copy()
-#
-#     for module in control_usage.index:
-#         mod_cols = [i for i in exp_usage_df.columns if module + '_' in i]
-#         exp_usage_df_sqdiff[mod_cols] = np.square(exp_usage_df_sqdiff[mod_cols] - control_usage[module])
-#
-#     extracted = [col.split("_t")[1].split("-")[0] for col in exp_usage_df.columns]
-#     binstarts = pd.Series(extracted).unique()
-#     exp_usage_df_ssd = pd.DataFrame(index=exp_usage_df.index, columns=binstarts)
-#
-#     for i in range(len(exp_usage_df_ssd.index)):
-#         for bin in binstarts:
-#             exp_usage_df_ssd.iloc[i][bin] = np.sum(exp_usage_df_sqdiff.iloc[i].filter(like="_t" + bin + "-"))
-#
-#     return exp_usage_df_ssd
+
+def regress(module_feature_object, dose_dict, method="LinearRegression", alpha = 1):
+    if module_feature_object.__class__.__name__=="ModuleUsage":
+        X=module_feature_object.label_counts
+    elif module_feature_object.__class__.__name__=="ModuleTransitions":
+        X=module_feature_object.transition_counts
+    else:
+        raise ValueError(f'module_feature_object class must be ModuleUsage or ModuleTransitions, not {module_feature_object.__class__}')
+    reverse_grp_dict = {v: k for k, v in module_feature_object.group_dict.items()}
+    dose_labels = [dose_dict[reverse_grp_dict[i]] for i in module_feature_object.group_labels]
+    if method=="LinearRegression":
+        reg = LinearRegression().fit(X, dose_labels)
+    elif method=="Lasso":
+        reg = Lasso(alpha=alpha).fit(X, dose_labels)
+    elif method=="Ridge":
+        reg = Ridge(alpha=alpha).fit(X, dose_labels)
+    return reg, dose_labels
+
+def loocv_regression(module_feature_object, dose_dict, method="LinearRegression", constrain_pos = True, alpha=1):
+    loocv_preds = []
+    if module_feature_object.__class__.__name__=="ModuleUsage":
+        X=module_feature_object.label_counts
+    elif module_feature_object.__class__.__name__=="ModuleTransitions":
+        X=module_feature_object.transition_counts
+    else:
+        raise ValueError(f'module_feature_object class must be ModuleUsage or ModuleTransitions, not {module_feature_object.__class__}')
+    reverse_grp_dict = {v: k for k, v in module_feature_object.group_dict.items()}
+    y = [dose_dict[reverse_grp_dict[i]] for i in module_feature_object.group_labels]
+    for obs in range(len(y)):
+        sub_X = np.delete(X, obs, axis=0)
+        sub_y = y[:obs] + y[obs + 1:]
+        X_i = X[obs, :]
+        y_i = y[obs]
+        if method=="LinearRegression":
+            reg = LinearRegression().fit(sub_X, sub_y)
+        elif method=="Lasso":
+            reg = Lasso(alpha=alpha).fit(sub_X, sub_y)
+        elif method=="Ridge":
+            reg = Ridge(alpha=alpha).fit(sub_X, sub_y)
+        loocv_preds.append(reg.predict(X_i.reshape(1, -1))[0])
+    loocv_preds = np.array(loocv_preds)
+    if constrain_pos:
+        loocv_preds[loocv_preds<0]=0
+    y = np.array(y)
+    sq_err = np.square(loocv_preds-y)
+    return loocv_preds, sq_err
+
+def get_usage_ssd(control_usage_feats, exp_usage_feats):
+    """
+    Get the time-resolved sum squared difference in module usage relative to a control distribution of usage.
+    :param control_usage_feats: output from analysis.get_usage_feats for the control group ONLY
+    :param exp_usage_feats:
+    :return:
+    """
+    control_usage_feats_df = control_usage_feats.to_df()
+    exp_usage_df = exp_usage_feats.to_df()
+    control_usage_feats_df.drop("group", axis=1, inplace=True)
+    exp_usage_df.drop("group", axis=1, inplace=True)
+    control_usage = control_usage_feats_df.mean(axis=0)
+
+    exp_usage_df_sqdiff = exp_usage_df.copy()
+
+    for module in control_usage.index:
+        mod_cols = [i for i in exp_usage_df.columns if module + '_' in i]
+        exp_usage_df_sqdiff[mod_cols] = np.square(exp_usage_df_sqdiff[mod_cols] - control_usage[module])
+
+    extracted = [col.split("_t")[1].split("-")[0] for col in exp_usage_df.columns]
+    binstarts = pd.Series(extracted).unique()
+    exp_usage_df_ssd = pd.DataFrame(index=exp_usage_df.index, columns=binstarts)
+
+    for i in range(len(exp_usage_df_ssd.index)):
+        for bin in binstarts:
+            exp_usage_df_ssd.iloc[i][bin] = np.sum(exp_usage_df_sqdiff.iloc[i].filter(like="_t" + bin + "-"))
+
+    return exp_usage_df_ssd
 
 # class LdaResult:
 #     def __init__(self, lda, lda_embeddings, label_counts, group_labels, feat_picks, feat_names, group_dict, nbins, binsize,
