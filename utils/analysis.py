@@ -14,6 +14,8 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.naive_bayes import GaussianNB
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.neural_network import MLPClassifier
+from scipy import stats
+from statsmodels.stats.multitest import multipletests
 
 import scipy
 from scipy.spatial.distance import euclidean, mahalanobis, cityblock
@@ -195,9 +197,10 @@ from scipy.spatial.distance import euclidean, mahalanobis, cityblock
 #     n_modules = len(modules)
 #     return labels_df
 
+
 def is_nonnum(value):
     try:
-        int(value)
+        float(value)
         return False
     except (ValueError, TypeError):
         return True
@@ -470,7 +473,7 @@ def BORIS_to_pose(config):
     print(config["data_source"] + " modules map onto scored behaviors with 'loss' of " + str(loss_score))
     return results, normalized_results, loss_score
 
-def combine_pose_modules(config, labels_df):
+def combine_pose_modules(config, labels_df, force_no_numeric=False):
     """
     Combine pose modules based on remappings key in config
 
@@ -486,10 +489,29 @@ def combine_pose_modules(config, labels_df):
             for old_val in remapping[0]:
                 for column in labels_df.columns:
                     labels_df.replace(old_val, remapping[1], inplace=True)
+    if force_no_numeric:
+        labels_flat = np.array(labels_df)
+        labels_flat = [item for sublist in labels_flat for item in sublist]
+        modules = np.unique(labels_flat)
+        nonnum_vals = [is_nonnum(i)==False for i in modules]
+        if np.sum(nonnum_vals)>0:
+            print("Warning - numeric values detected and force_no_numeric set to True. The following modules will be changed to 'other':")
+            print(modules[nonnum_vals])
+            for module in modules[nonnum_vals]:
+                for column in labels_df.columns:
+                    labels_df.replace(module, "other", inplace=True)
+                    try:
+                        labels_df.replace(int(module), "other", inplace=True)
+                    except:
+                        pass
+                    try:
+                        labels_df.replace(float(module), "other", inplace=True)
+                    except:
+                        pass
     return labels_df
 
 
-def make_remappings_from_BORIS(config, labels_df=None, BORIS_to_pose_mat=None):
+def make_remappings_from_BORIS(config, labels_df=None, BORIS_to_pose_mat=None, force_no_numeric=False):
     """
     Make remappings based on BORIS output and apply to labels_df
 
@@ -505,7 +527,7 @@ def make_remappings_from_BORIS(config, labels_df=None, BORIS_to_pose_mat=None):
     remappings = [[[old_mappings[i]],new_mappings[i]] for i in range(len(old_mappings))]
     config["remappings"] = remappings
     if labels_df is not None:
-        combine_pose_modules(config, labels_df)
+        combine_pose_modules(config, labels_df, force_no_numeric=force_no_numeric)
         return labels_df
     else:
         return config
@@ -705,6 +727,25 @@ class ModuleUsage:
         return ModuleUsage(label_counts_scaled, self.group_labels, self.observation_labels, self.feat_names,
                            self.group_dict, scaler)
 
+    def f_oneway(self):
+        df = self.to_df()
+        all_mod_usage = {}
+        module_names = [i for i in list(df.columns) if i != "group"]
+        classes = list(df[("group")].unique())
+
+        results_df = []
+        for m in module_names:
+            mod_m_usage = []
+            for class_c in classes:
+                mod_m_usage.append(df[df["group"] == class_c][m].to_numpy())
+            all_mod_usage[m] = mod_m_usage
+            result = stats.f_oneway(*all_mod_usage[m])
+            results_df.append({"module": m, "f": result.statistic, "p_uncorr": result.pvalue})
+        results_df = pd.DataFrame(results_df)
+        p_uncorr = np.array(results_df["p_uncorr"])
+        results_df["p_corr"] = multipletests(p_uncorr, method="fdr_bh")[1]
+        return results_df
+
 
 def get_module_usage(config, labels_df, binsize=None):
     """
@@ -778,8 +819,9 @@ def get_module_usage(config, labels_df, binsize=None):
     return ModuleUsage(label_counts, group_labels, observation_labels, feat_names, group_dict, None)
 
 class ModuleTransitions:
-    def __init__(self, transition_counts, group_labels, observation_labels, feat_names, group_dict):
+    def __init__(self, transition_counts, transition_count_matrices, group_labels, observation_labels, feat_names, group_dict):
         self.transition_counts = transition_counts
+        self.transition_count_matrices = transition_count_matrices
         self.group_labels = group_labels
         self.observation_labels = observation_labels
         self.feat_names = feat_names
@@ -800,7 +842,8 @@ class ModuleTransitions:
     def scale(self):
         scaler = StandardScaler()
         transition_counts_scaled = scaler.fit_transform(self.transition_counts)
-        return ModuleTransitions(transition_counts_scaled, self.group_labels, self.observation_labels, self.feat_names,
+        #transition_count_matrices_scaled = scaler.fit_transform(self.transition_count_matrices)
+        return ModuleTransitions(transition_counts_scaled, self.transition_count_matrices, self.group_labels, self.observation_labels, self.feat_names,
                            self.group_dict)
 
 def get_module_transitions(config, labels_df):
@@ -832,6 +875,7 @@ def get_module_transitions(config, labels_df):
     n_modules = len(modules)
 
     transition_counts = []
+    transition_count_matrices = []
 
     feat_names_made = False
     feat_names = []
@@ -842,20 +886,23 @@ def get_module_transitions(config, labels_df):
     for g in range(n_groups):
         for i in range(len(labels_df[subgroups[g]].columns)):
             transition_counts_i = np.zeros(n_modules * n_modules)
+            transition_counts_i_matrix = np.zeros([n_modules, n_modules])
             comparison_idx=0
             for m_i, mod_i in enumerate(modules):
                 for m_j, mod_j in enumerate(modules):
-                    if m_j<m_i:
-                        comparison_idx+=1
-                        arr = np.array(labels_df[subgroups[g]][labels_df[subgroups[g]].columns[i]])
-                        transition_counts_i[comparison_idx] = np.sum((arr[:-1] == mod_i) & (arr[1:] == mod_j))
-                        if feat_names_made == False:
-                            if is_nonnum(mod_i):
-                                modname=f'{mod_i}_to_{mod_j}'
-                            else:
-                                modname=f'{str(int(mod_i))}_to_{str(int(mod_j))}'
-                            feat_names.append(f"{modname}")
+                    if feat_names_made == False:
+                        if is_nonnum(mod_i):
+                            modname=f'{mod_i}_to_{mod_j}'
+                        else:
+                            modname=f'{str(int(mod_i))}_to_{str(int(mod_j))}'
+                        feat_names.append(f"{modname}")
+                    arr = np.array(labels_df[subgroups[g]][labels_df[subgroups[g]].columns[i]])
+                    value=np.sum((arr[:-1] == mod_i) & (arr[1:] == mod_j))
+                    transition_counts_i[comparison_idx] = value
+                    transition_counts_i_matrix[m_i,m_j] = value
+                    comparison_idx += 1
             transition_counts.append(transition_counts_i)
+            transition_count_matrices.append(transition_counts_i_matrix)
             if data_subgrouped:
                 group_labels.append(g)
                 observation_labels.append(labels_df[subgroups[g]].columns[i])
@@ -865,7 +912,7 @@ def get_module_transitions(config, labels_df):
             feat_names_made = True
     transition_counts = np.array(transition_counts)
 
-    return ModuleTransitions(transition_counts, group_labels, observation_labels, feat_names, group_dict)
+    return ModuleTransitions(transition_counts, transition_count_matrices, group_labels, observation_labels, feat_names, group_dict)
 
 def embed(module_feature_object,method="lda",n_components=2):
     """

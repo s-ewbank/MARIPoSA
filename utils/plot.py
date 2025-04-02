@@ -29,7 +29,8 @@ def fig_to_array(fig):
     return image
 
 def plot_module_usage(config, usage_feats, figW=4, figH=2, style="bar_scatter", cmap="jet", legend_pos="outside",
-                      BORIS_to_pose_mat=None, legend=True, long_legend=False, alt_xticks=None, title=None):
+                      BORIS_to_pose_mat=None, legend=True, long_legend=False, alt_labels=None, alt_xticks=None, title=None,
+                      plot_stats=False):
     """
     Plots the frequency of the pose modules occurring by group in the labels dataframe output by the label_counter function.
 
@@ -149,16 +150,24 @@ def plot_module_usage(config, usage_feats, figW=4, figH=2, style="bar_scatter", 
                     )
                 bar_alpha = 0.85
             for g in range(n_groups):
+                if alt_labels is not None:
+                    label_g = alt_labels[groupnames[g]]
+                else:
+                    label_g = groupnames[g]
                 ax.bar(
                     x=np.arange(0 + scale * g, n_modules + scale * g, 1),
                     height=bar_heights[g],
                     width=scale,
                     alpha=bar_alpha,
                     color=colors[g],
-                    label=groupnames[g]
+                    label=label_g
                 )
         elif style == "points":
             for g in range(n_groups):
+                if alt_labels is not None:
+                    label_g = alt_labels[groupnames[g]]
+                else:
+                    label_g = groupnames[g]
                 ax.errorbar(
                     x=np.arange(0, n_modules, 1),
                     y=bar_heights[g],
@@ -186,6 +195,20 @@ def plot_module_usage(config, usage_feats, figW=4, figH=2, style="bar_scatter", 
                 ax.set_xticks(np.arange(0, n_modules, 1))
                 ax.set_xticklabels(modules)
             ax.tick_params(axis='x', rotation=90, labelsize=plt.rcParams['font.size'] * 0.2 * n_groups, pad=2)
+            if plot_stats:
+                ylim = plt.ylim()
+                plt.ylim(ylim[0], ylim[1] * 1.2)
+                stat_result = usage_feats.f_oneway()
+                for m, module in enumerate(stat_result["module"]):
+                    if stat_result[stat_result["module"] == module]["p_uncorr"].values[0] < 0.001:
+                        plt.plot([m - 0.1, m + 0.7], [ylim[1] * 1.05] * 2, color="black", linewidth=0.5)
+                        plt.text(m + 0.3, ylim[1] * 1.08, "***", ha="center")
+                    elif stat_result[stat_result["module"] == module]["p_uncorr"].values[0] < 0.01:
+                        plt.plot([m - 0.1, m + 0.7], [ylim[1] * 1.05] * 2, color="black", linewidth=0.5)
+                        plt.text(m + 0.3, ylim[1] * 1.08, "**", ha="center")
+                    elif stat_result[stat_result["module"] == module]["p_uncorr"].values[0] < 0.05:
+                        plt.plot([m - 0.1, m + 0.7], [ylim[1] * 1.05] * 2, color="black", linewidth=0.5)
+                        plt.text(m + 0.3, ylim[1] * 1.08, "*", ha="center")
             plt.tight_layout()
         else:
             any_nonint = False
@@ -311,6 +334,102 @@ def plot_distance_results(module_feature_object, distance_results, figW=3, figH=
 
     plt.ylabel("Distance")
     plt.tight_layout()
+    return fig
+
+
+def network_plot(config, labels_df, cmap="bwr", include_labels=True, scaling=1, tscale=6, figW=2.8, figH=2.5, alt_labels=None):
+    """
+    Plot network comparison
+    :param config:
+    :param labels_df:
+    :param cmap:
+    :param include_labels:
+    :param scaling:
+    :param tscale:
+    :param figW:
+    :param figH:
+    :param alt_labels:
+    :return:
+    """
+    print("Getting module usage")
+    module_usage = analysis.get_module_usage(config, labels_df)
+    print("Getting module transitions")
+    module_transitions = analysis.get_module_transitions(config, labels_df)
+
+    g1 = module_usage.label_counts[np.array(module_usage.group_labels) == 0, :]
+    g2 = module_usage.label_counts[np.array(module_usage.group_labels) == 1, :]
+    n_modules = g1.shape[1]
+    usage_stats = np.zeros(n_modules)
+    for module in range(g1.shape[1]):
+        usage_stats[module] = stats.ttest_ind(g2[:, module], g1[:, module]).statistic
+    transition_stats = stats.ttest_ind(
+        np.array(module_transitions.transition_count_matrices)[np.array(module_usage.group_labels) == 1],
+        np.array(module_transitions.transition_count_matrices)[np.array(module_usage.group_labels) == 0]).statistic
+    for i in range(n_modules):
+        transition_stats[i, i] = 0
+    fig, ax = plt.subplots(figsize=(figW, figH))
+    G = nx.from_numpy_array(transition_stats, parallel_edges=True)
+    edges = G.edges()
+    pos = nx.circular_layout(G)
+    weights = [G[u][v]['weight'] for u, v in edges]
+    colormap = plt.get_cmap(cmap)
+    colors = []
+    np.min(weights)
+    np.max(weights)
+    for w in range(len(weights)):
+        if weights[w] >= 0:
+            col_w = colormap([0.95])
+        elif weights[w] < 0:
+            col_w = colormap([0.05])
+        else:
+            col_w = colormap([0])
+        colors.append(col_w)
+    G = nx.from_numpy_array(np.abs(transition_stats) * 5000, parallel_edges=True)
+    edges = G.edges()
+    pos = nx.circular_layout(G)
+    scaling = scaling / n_modules
+    weights = [G[u][v]['weight'] * scaling * 5 for u, v in edges]
+    weights = list(np.array(weights) / 4000)
+    labels = {}
+    plotx = nx.draw_circular(G,
+                             node_color=usage_stats,
+                             cmap=plt.get_cmap(cmap),
+                             vmin=-3,
+                             vmax=3,
+                             node_size=np.absolute(usage_stats) * 1000 * scaling,
+                             edge_color=colors,
+                             edgecolors=None,
+                             with_labels=True,  # Keep this as True to display node labels
+                             labels=labels,
+                             font_size=500 * scaling,
+                             font_weight="bold",
+                             font_color="white",
+                             width=weights)
+    if include_labels == True:
+        for m in range(n_modules):
+            x, y = pos[m]
+            label = str(m)
+            label_font_size = 2 + 30 * scaling * (abs(usage_stats[m]) + 1) / 2
+            plt.text(x, y, label, color="white", fontsize=label_font_size, fontweight="bold", ha="center", va="center")
+
+    t_min = -tscale
+    t_max = tscale
+    smap = plt.cm.ScalarMappable(cmap=plt.get_cmap(cmap), norm=plt.Normalize(vmin=t_min, vmax=t_max))
+    smap.set_array([])
+    cbar_ax = fig.add_axes([0.85, 0.1, 0.05, 0.8])
+    if alt_labels == None:
+        label1 = list(module_usage.group_dict.keys())[0]
+        label2 = list(module_usage.group_dict.keys())[1]
+    else:
+        label1 = alt_labels[list(module_usage.group_dict.keys())[0]]
+        label2 = alt_labels[list(module_usage.group_dict.keys())[1]]
+
+    cbar_ax.text(0, t_max * 1.1, f"{label2}>{label1}", va="bottom", color=plt.get_cmap(cmap)([0.9]))
+    cbar_ax.text(0, t_min * 1.1, f"{label2}<{label1}", va="top", color=plt.get_cmap(cmap)([0.1]))
+    cbar = plt.colorbar(smap, cax=cbar_ax, shrink=0.5)
+    cbar.set_label('t-score')
+    plt.margins(x=0.4, y=0.4)
+    plt.subplots_adjust(right=0.85)
     return fig
 
 # def plot_module_usage(config,labels_df,start,stop,figW=4,figH=2,style="bar_scatter",cmap="jet"):
@@ -660,157 +779,157 @@ def plot_distance_results(module_feature_object, distance_results, figW=3, figH=
 #     return fig
 
 
-def network_pairwise_comparison(config, labels_df, start, end, groupnames, scaling=1,include_labels=True,cmap="bwr",tscale=3):
-    """
-    Plots network depiction of differences in pose module usage and transitions between two subgroups
-
-    :param labels_df: labels_df from label_counter_subgroups
-    :param start: time to start at in seconds
-    :param end: time to end at in seconds
-    :param groupnames: two groups to include in the 1-vs-1 comparison - order is important
-    :param fps: frames per second
-    :param scaling:
-    :param include_labels:
-    :param cmap: matplotlib colormap
-    :return:
-    """
-    fps = int(config["fps"])
-    fig, ax = plt.subplots(1, 1, figsize=(4,3), dpi=100)
-    fig.suptitle(groupnames[0] + " vs. " + groupnames[1], fontsize=16)
-
-    t_min = -tscale
-    t_max = tscale
-
-    #Count label occurences
-    start_frame = start * fps
-    stop_frame = end * fps
-    labels_df = labels_df[start_frame:stop_frame]
-    total_frames = stop_frame - start_frame
-    labels_flat = np.array(labels_df)
-    labels_flat = [item for sublist in labels_flat for item in sublist]
-    modules = np.unique(labels_flat)
-    n_modules = len(modules)
-    label_counts = []
-    for g in range(2):
-        group_g_n=np.sum([item[0]==groupnames[g] for item in labels_df.columns])
-        label_counts_i = np.zeros([group_g_n, n_modules])
-        for i in range(group_g_n):
-            for m in range(n_modules):
-                label_counts_i[i, m] = np.count_nonzero \
-                                           (labels_df[groupnames[g]][
-                                                [labels_df[groupnames[g]].columns[i]]] == m) / total_frames
-        label_counts.append(label_counts_i)
-    modulefreqs_t = np.zeros(n_modules)
-    modulefreqs_p = np.zeros(n_modules)
-    for m in range(n_modules):
-        clust_i_control = [x[m] for x in label_counts[0]]
-        clust_i_exp = [x[m] for x in label_counts[1]]
-        modulefreqs_t[m] = scipy.stats.ttest_ind(clust_i_control, clust_i_exp).statistic
-        modulefreqs_p[m] = scipy.stats.ttest_ind(clust_i_control, clust_i_exp).pvalue
-        if modulefreqs_p[m] < 0.05:
-            print("P-value for cluster " + str(m) + " difference is " + str(
-                round(modulefreqs_p[m], 4)) + "; t score is " + str(round(modulefreqs_t[m], 4)))
-
-    # transitions
-    transition_matrix_grp1, transition_matrix_grp2 = transition_counter(labels_df, groupnames)
-    transition_t = np.zeros([n_modules, n_modules])
-    transition_t_abs = np.zeros([n_modules, n_modules])
-    for i in range(n_modules):
-        for j in range(n_modules):
-            transition_matrix_grp1_ij = [x[i, j] for x in np.array(transition_matrix_grp1)]
-            transition_matrix_grp2_ij = [x[i, j] for x in np.array(transition_matrix_grp2)]
-            transition_t[i, j] = scipy.stats.ttest_ind(transition_matrix_grp1_ij, transition_matrix_grp2_ij).statistic
-            pval_i = scipy.stats.ttest_ind(transition_matrix_grp1_ij, transition_matrix_grp2_ij).pvalue
-            if pval_i < 0.05:
-                print("P-value for transition from cluster " + str(i) +
-                      " to cluster " + str(j) + " is " + str(round(pval_i, 4)) + "; t score is " + str(
-                    round(transition_t[i, j], 4)))
-            if np.isnan(transition_t[i, j]) == True:
-                transition_t[i, j] = 0
-            transition_t_abs[i, j] = np.absolute(transition_t[i, j])
-    transition_t = np.array(transition_t)
-    G = nx.from_numpy_array(transition_t, parallel_edges=True)
-    edges = G.edges()
-    pos = nx.circular_layout(G)
-    weights = [G[u][v]['weight'] for u, v in edges]
-    colormap = plt.get_cmap(cmap)
-    colors = []
-    np.min(weights)
-    np.max(weights)
-    for w in range(len(weights)):
-        if weights[w] >= 0:
-            col_w = colormap([0.95])
-        elif weights[w] < 0:
-            col_w = colormap([0.05])
-        colors.append(col_w)
-    G = nx.from_numpy_array(transition_t_abs * 5000, parallel_edges=True)
-    edges = G.edges()
-    pos = nx.circular_layout(G)
-    scaling = scaling/n_modules
-    weights = [G[u][v]['weight']*scaling*5 for u, v in edges]
-    weights = list(np.array(weights) / 4000)
-    labels = {}
-    plot = nx.draw_circular(G,
-                            node_color=modulefreqs_t,
-                            cmap=plt.get_cmap(cmap),
-                            vmin=-3,
-                            vmax=3,
-                            node_size=np.absolute(modulefreqs_t) * 1000 * scaling,
-                            edge_color=colors,
-                            edgecolors=None,
-                            with_labels=True,  # Keep this as True to display node labels
-                            labels=labels,
-                            font_size=500*scaling,
-                            font_weight="bold",
-                            font_color="white",
-                            width=weights)
-
-    if include_labels==True:
-        for m in range(n_modules):
-            x, y = pos[m]
-            label = str(m)
-            label_font_size = 2 + 30 * scaling * (abs(modulefreqs_t[m]) + 1) / 2
-            plt.text(x, y, label, color="white", fontsize=label_font_size, fontweight="bold", ha="center", va="center")
-
-    sm = plt.cm.ScalarMappable(cmap=plt.get_cmap(cmap), norm=plt.Normalize(vmin=t_min, vmax=t_max))
-    sm.set_array([])
-    cbar = plt.colorbar(sm, shrink=0.7)
-    cbar.set_label('t-score')
-    plt.margins(x=0.4, y=0.4)
-    return fig
-
-
-def transition_counter(labels_df, groupnames):
-    """
-    Generates a Pandas dataframe containing transitions within the labels df.
-
-    :param labels_df:
-    :param groupnames:
-    :return:
-    """
-    unique_values = np.unique(labels_df.values)
-    transition_matrix_grp1 = []
-    transition_matrix_grp2 = []
-    for g in range(len(groupnames)):
-        labels_df_g = labels_df[groupnames[g]]
-        for c in range(labels_df_g.shape[1]):
-            transition_matrix_g = pd.DataFrame(0, index=unique_values, columns=unique_values)
-            for i in range(len(labels_df_g[list(labels_df_g)[c]]) - 1):
-                from_value = labels_df_g[list(labels_df_g)[c]][i]
-                to_value = labels_df_g[list(labels_df_g)[c]][i + 1]
-                transition_matrix_g.at[from_value, to_value] += 1
-            np.fill_diagonal(transition_matrix_g.values, 0)
-            if g == 0:
-                transition_matrix_grp1.append(transition_matrix_g)
-            if g == 1:
-                transition_matrix_grp2.append(transition_matrix_g)
-    return transition_matrix_grp1, transition_matrix_grp2
+# def network_pairwise_comparison(config, labels_df, start, end, groupnames, scaling=1,include_labels=True,cmap="bwr",tscale=3):
+#     """
+#     Plots network depiction of differences in pose module usage and transitions between two subgroups
+#
+#     :param labels_df: labels_df from label_counter_subgroups
+#     :param start: time to start at in seconds
+#     :param end: time to end at in seconds
+#     :param groupnames: two groups to include in the 1-vs-1 comparison - order is important
+#     :param fps: frames per second
+#     :param scaling:
+#     :param include_labels:
+#     :param cmap: matplotlib colormap
+#     :return:
+#     """
+#     fps = int(config["fps"])
+#     fig, ax = plt.subplots(1, 1, figsize=(4,3), dpi=100)
+#     fig.suptitle(groupnames[0] + " vs. " + groupnames[1], fontsize=16)
+#
+#     t_min = -tscale
+#     t_max = tscale
+#
+#     #Count label occurences
+#     start_frame = start * fps
+#     stop_frame = end * fps
+#     labels_df = labels_df[start_frame:stop_frame]
+#     total_frames = stop_frame - start_frame
+#     labels_flat = np.array(labels_df)
+#     labels_flat = [item for sublist in labels_flat for item in sublist]
+#     modules = np.unique(labels_flat)
+#     n_modules = len(modules)
+#     label_counts = []
+#     for g in range(2):
+#         group_g_n=np.sum([item[0]==groupnames[g] for item in labels_df.columns])
+#         label_counts_i = np.zeros([group_g_n, n_modules])
+#         for i in range(group_g_n):
+#             for m in range(n_modules):
+#                 label_counts_i[i, m] = np.count_nonzero \
+#                                            (labels_df[groupnames[g]][
+#                                                 [labels_df[groupnames[g]].columns[i]]] == m) / total_frames
+#         label_counts.append(label_counts_i)
+#     modulefreqs_t = np.zeros(n_modules)
+#     modulefreqs_p = np.zeros(n_modules)
+#     for m in range(n_modules):
+#         clust_i_control = [x[m] for x in label_counts[0]]
+#         clust_i_exp = [x[m] for x in label_counts[1]]
+#         modulefreqs_t[m] = scipy.stats.ttest_ind(clust_i_control, clust_i_exp).statistic
+#         modulefreqs_p[m] = scipy.stats.ttest_ind(clust_i_control, clust_i_exp).pvalue
+#         if modulefreqs_p[m] < 0.05:
+#             print("P-value for cluster " + str(m) + " difference is " + str(
+#                 round(modulefreqs_p[m], 4)) + "; t score is " + str(round(modulefreqs_t[m], 4)))
+#
+#     # transitions
+#     transition_matrix_grp1, transition_matrix_grp2 = transition_counter(labels_df, groupnames)
+#     transition_t = np.zeros([n_modules, n_modules])
+#     transition_t_abs = np.zeros([n_modules, n_modules])
+#     for i in range(n_modules):
+#         for j in range(n_modules):
+#             transition_matrix_grp1_ij = [x[i, j] for x in np.array(transition_matrix_grp1)]
+#             transition_matrix_grp2_ij = [x[i, j] for x in np.array(transition_matrix_grp2)]
+#             transition_t[i, j] = scipy.stats.ttest_ind(transition_matrix_grp1_ij, transition_matrix_grp2_ij).statistic
+#             pval_i = scipy.stats.ttest_ind(transition_matrix_grp1_ij, transition_matrix_grp2_ij).pvalue
+#             if pval_i < 0.05:
+#                 print("P-value for transition from cluster " + str(i) +
+#                       " to cluster " + str(j) + " is " + str(round(pval_i, 4)) + "; t score is " + str(
+#                     round(transition_t[i, j], 4)))
+#             if np.isnan(transition_t[i, j]) == True:
+#                 transition_t[i, j] = 0
+#             transition_t_abs[i, j] = np.absolute(transition_t[i, j])
+#     transition_t = np.array(transition_t)
+#     G = nx.from_numpy_array(transition_t, parallel_edges=True)
+#     edges = G.edges()
+#     pos = nx.circular_layout(G)
+#     weights = [G[u][v]['weight'] for u, v in edges]
+#     colormap = plt.get_cmap(cmap)
+#     colors = []
+#     np.min(weights)
+#     np.max(weights)
+#     for w in range(len(weights)):
+#         if weights[w] >= 0:
+#             col_w = colormap([0.95])
+#         elif weights[w] < 0:
+#             col_w = colormap([0.05])
+#         colors.append(col_w)
+#     G = nx.from_numpy_array(transition_t_abs * 5000, parallel_edges=True)
+#     edges = G.edges()
+#     pos = nx.circular_layout(G)
+#     scaling = scaling/n_modules
+#     weights = [G[u][v]['weight']*scaling*5 for u, v in edges]
+#     weights = list(np.array(weights) / 4000)
+#     labels = {}
+#     plot = nx.draw_circular(G,
+#                             node_color=modulefreqs_t,
+#                             cmap=plt.get_cmap(cmap),
+#                             vmin=-3,
+#                             vmax=3,
+#                             node_size=np.absolute(modulefreqs_t) * 1000 * scaling,
+#                             edge_color=colors,
+#                             edgecolors=None,
+#                             with_labels=True,  # Keep this as True to display node labels
+#                             labels=labels,
+#                             font_size=500*scaling,
+#                             font_weight="bold",
+#                             font_color="white",
+#                             width=weights)
+#
+#     if include_labels==True:
+#         for m in range(n_modules):
+#             x, y = pos[m]
+#             label = str(m)
+#             label_font_size = 2 + 30 * scaling * (abs(modulefreqs_t[m]) + 1) / 2
+#             plt.text(x, y, label, color="white", fontsize=label_font_size, fontweight="bold", ha="center", va="center")
+#
+#     sm = plt.cm.ScalarMappable(cmap=plt.get_cmap(cmap), norm=plt.Normalize(vmin=t_min, vmax=t_max))
+#     sm.set_array([])
+#     cbar = plt.colorbar(sm, shrink=0.7)
+#     cbar.set_label('t-score')
+#     plt.margins(x=0.4, y=0.4)
+#     return fig
+#
+#
+# def transition_counter(labels_df, groupnames):
+#     """
+#     Generates a Pandas dataframe containing transitions within the labels df.
+#
+#     :param labels_df:
+#     :param groupnames:
+#     :return:
+#     """
+#     unique_values = np.unique(labels_df.values)
+#     transition_matrix_grp1 = []
+#     transition_matrix_grp2 = []
+#     for g in range(len(groupnames)):
+#         labels_df_g = labels_df[groupnames[g]]
+#         for c in range(labels_df_g.shape[1]):
+#             transition_matrix_g = pd.DataFrame(0, index=unique_values, columns=unique_values)
+#             for i in range(len(labels_df_g[list(labels_df_g)[c]]) - 1):
+#                 from_value = labels_df_g[list(labels_df_g)[c]][i]
+#                 to_value = labels_df_g[list(labels_df_g)[c]][i + 1]
+#                 transition_matrix_g.at[from_value, to_value] += 1
+#             np.fill_diagonal(transition_matrix_g.values, 0)
+#             if g == 0:
+#                 transition_matrix_grp1.append(transition_matrix_g)
+#             if g == 1:
+#                 transition_matrix_grp2.append(transition_matrix_g)
+#     return transition_matrix_grp1, transition_matrix_grp2
 
 def moving_average(x, w):
     return np.convolve(x, np.ones(w), 'valid') / w
 
 
-def module_usage_sandplot(config, module_usage, BORIS_to_pose_mat=None, long_legend=True, convolve=False, window=5):
+def module_usage_sandplot(config, module_usage, BORIS_to_pose_mat=None, title=None, long_legend=True, figW=7, figH=3, convolve=False, window=5):
     """
     new sandplot function
     :param config:
@@ -821,6 +940,9 @@ def module_usage_sandplot(config, module_usage, BORIS_to_pose_mat=None, long_leg
     :param window:
     :return:
     """
+
+    fig, ax = plt.subplots(figsize=(figW, figH), dpi=100)
+
     data = module_usage.usage_density(convolve=convolve, window=window)
 
     data_mean = np.mean(data, axis=0).T
@@ -866,7 +988,11 @@ def module_usage_sandplot(config, module_usage, BORIS_to_pose_mat=None, long_leg
     plt.ylim([0, 1])
     plt.xlim([xpts[0], xpts[-1]])
     plt.xlabel("Time (m)")
-    plt.ylabel("")
+    plt.ylabel('Moving Average Proportion \nof Time Spent in Pose')
+    if title!=None:
+        plt.title(title)
+    plt.tight_layout()
+    return fig
 
 # def SandPlotClusterFrequency_OverTime(config,
 #                                       labels_df,
@@ -1153,7 +1279,7 @@ def make_and_plot_ellipse(mean, cov, color, label=None):
 #     plt.tight_layout()
 #     return fig
 
-def plot_embeddings(module_feature_object, embeddings_object, figW=3, figH=3, cmap="viridis",title=None,legend=False):
+def plot_embeddings(module_feature_object, embeddings_object, figW=3, figH=3, cmap="viridis",title=None,legend=False,draw_ellipse=True,alt_legend=None):
     """
     Plot embeddings
 
@@ -1191,13 +1317,27 @@ def plot_embeddings(module_feature_object, embeddings_object, figW=3, figH=3, cm
     reverse_group_dict = {v: k for k, v in module_feature_object.group_dict.items()}
     for obs in range(X_tfm.shape[0]):
         if legend_elements[module_feature_object.group_labels[obs]]==0:
+            if alt_legend is not None:
+                leg = alt_legend[reverse_group_dict[module_feature_object.group_labels[obs]]]
+            else:
+                leg = reverse_group_dict[module_feature_object.group_labels[obs]]
             plt.scatter(X_tfm[obs,0],X_tfm[obs,1],color=colors[module_feature_object.group_labels[obs]],
-                        label=reverse_group_dict[module_feature_object.group_labels[obs]])
+                        label=leg)
             legend_elements[module_feature_object.group_labels[obs]]=1
         else:
             plt.scatter(X_tfm[obs,0],X_tfm[obs,1],color=colors[module_feature_object.group_labels[obs]])
+    if draw_ellipse==True:
+        if embeddings_object.__class__==LDA:
+            for r in np.unique(y):
+                emb = X_tfm[y==r,:]
+                mean = np.mean(emb, axis=0)
+                cov = np.cov(emb, rowvar=False)
+                make_and_plot_ellipse(mean, cov, color=colors[r])
+        else:
+            print(f"Ellipse only drawn for embeddings_object of class LDA, not {embeddings_object.__class__}")
     if legend:
-        plt.legend()
+        plt.legend(bbox_to_anchor=[1.05,1])
+    plt.tight_layout()
     return fig
 
 def plot_lda_weights(config, lda_result, n_modules, hide_nofeat_mods=False, remap=False, figW=6, figH=4):
