@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import filedialog, PhotoImage
 import customtkinter
-from utils import metadata, analysis, plot
+from utils import metadata, analyze, plot
 from datetime import datetime
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg

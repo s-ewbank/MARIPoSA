@@ -9,7 +9,7 @@ import networkx as nx
 rcParams['font.family'] = 'sans-serif'
 rcParams['font.sans-serif'] = ['Arial']
 from matplotlib.patches import Patch, Ellipse, Rectangle
-from utils import analysis
+from utils import analyze
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
 from sklearn.decomposition import PCA
 
@@ -27,6 +27,19 @@ def fig_to_array(fig):
     image = np.frombuffer(canvas.tostring_rgb(), dtype='uint8')
     image = image.reshape(height, width, 3)
     return image
+
+def moving_average(x, w):
+    return np.convolve(x, np.ones(w), 'valid') / w
+
+def make_and_plot_ellipse(mean,
+                          cov,
+                          color,
+                          label=None):
+    eigenvalues, eigenvectors = np.linalg.eig(cov)
+    angle = np.arctan2(eigenvectors[1, 0], eigenvectors[0, 0]) * 180 / np.pi
+    ell = Ellipse(mean, width=2 * np.sqrt(eigenvalues[0]), height=2 * np.sqrt(eigenvalues[1]),
+                   angle=angle, facecolor=color, alpha=0.25, label=label,edgecolor="none")
+    plt.gca().add_patch(ell)
 
 def plot_module_usage(config,
                       usage_feats,
@@ -310,7 +323,12 @@ def plot_module_usage(config,
     return fig
 
 
-def plot_distance_results(module_feature_object, distance_results, figW=3, figH=3, cmap="Blues", title=None):
+def plot_distance_results(module_feature_object,
+                          distance_results,
+                          figW=3,
+                          figH=3,
+                          cmap="Blues",
+                          title=None):
     """
     Plot results from distance computation
 
@@ -353,7 +371,15 @@ def plot_distance_results(module_feature_object, distance_results, figW=3, figH=
     return fig
 
 
-def network_plot(config, labels_df, cmap="bwr", include_labels=True, scaling=1, tscale=6, figW=2.8, figH=2.5, alt_labels=None):
+def network_plot(config,
+                 labels_df,
+                 cmap="bwr",
+                 include_labels=True,
+                 scaling=1,
+                 tscale=6,
+                 figW=2.8,
+                 figH=2.5,
+                 alt_labels=None):
     """
     Plot network comparison
     :param config:
@@ -448,9 +474,6 @@ def network_plot(config, labels_df, cmap="bwr", include_labels=True, scaling=1, 
     plt.subplots_adjust(right=0.85)
     return fig
 
-def moving_average(x, w):
-    return np.convolve(x, np.ones(w), 'valid') / w
-
 
 def module_usage_sandplot(config, module_usage, BORIS_to_pose_mat=None, title=None, long_legend=True, figW=7, figH=3, convolve=False, window=5):
     """
@@ -470,7 +493,7 @@ def module_usage_sandplot(config, module_usage, BORIS_to_pose_mat=None, title=No
 
     data_mean = np.mean(data, axis=0).T
     bottom = np.zeros(data_mean[:, 0].shape)
-    xpts = data[0].columns / 60
+    xpts = np.array(data[0].columns / 60, dtype=float)
     if BORIS_to_pose_mat is None:
         for m in range(data_mean.shape[1]):
             y_i = np.array(data_mean[:, m], dtype=float)
@@ -503,6 +526,7 @@ def module_usage_sandplot(config, module_usage, BORIS_to_pose_mat=None, title=No
             if len(sub_modules) > 0:
                 for c in sub_modules:
                     if c in modules:
+                        bottom = np.array(bottom, dtype=float)
                         y_i = np.array(data_mean[:, c], dtype=float)
                         plt.fill_between(xpts, bottom, bottom + y_i, color=colors[c % 2])
                         bottom = y_i + bottom
@@ -561,13 +585,6 @@ def plot_keypoint_displacement_bins(dist_df, cmap="viridis", plottype="band", fi
                 ax.set_xticklabels(groups)
     ax.set_ylabel("Locomotion (pix)")
     return fig
-
-def make_and_plot_ellipse(mean, cov, color, label=None):
-    eigenvalues, eigenvectors = np.linalg.eig(cov)
-    angle = np.arctan2(eigenvectors[1, 0], eigenvectors[0, 0]) * 180 / np.pi
-    ell = Ellipse(mean, width=2 * np.sqrt(eigenvalues[0]), height=2 * np.sqrt(eigenvalues[1]),
-                   angle=angle, facecolor=color, alpha=0.25, label=label,edgecolor="none")
-    plt.gca().add_patch(ell)
 
 def plot_embeddings(module_feature_object, embeddings_object, figW=3, figH=3, cmap="viridis",title=None,legend=False,draw_ellipse=True,alt_legend=None):
     """

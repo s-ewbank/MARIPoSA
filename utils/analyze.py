@@ -658,8 +658,16 @@ class ModuleUsage:
     def to_df(self):
         colnames = []
         flip_group_dict = {v: k for k, v in self.group_dict.items()}
+        bad_group_labels = []
         for i in self.group_labels:
-            colnames.append(flip_group_dict[i])
+            if i in flip_group_dict.keys():
+                colnames.append(flip_group_dict[i])
+            else:
+                colnames.append("none")
+                bad_group_labels.append(i)
+        if len(bad_group_labels) > 0:
+            bad_group_labels = list(np.unique(bad_group_labels))
+            print(f"Warning: the following groups were not detected in the config and were labeled 'none'; continuing:\n{bad_group_labels}")
         df = pd.DataFrame(self.label_counts, columns=self.feat_names, index=self.observation_labels)
         df["group"] = colnames
         return df
@@ -833,8 +841,15 @@ class ModuleTransitions:
     def to_df(self):
         colnames = []
         flip_group_dict = {v: k for k, v in self.group_dict.items()}
+        bad_group_labels = []
         for i in self.group_labels:
-            colnames.append(flip_group_dict[i])
+            if i in flip_group_dict.keys():
+                colnames.append(flip_group_dict[i])
+            else:
+                colnames.append("none")
+                bad_group_labels.append(i)
+        if len(bad_group_labels) > 0:
+            print(f"Warning: the following groups were not detected in the config and were labeled 'none'; continuing:\n{bad_group_labels}")
         df = pd.DataFrame(self.transition_counts, columns=self.feat_names, index=self.observation_labels)
         df["group"] = colnames
         return df

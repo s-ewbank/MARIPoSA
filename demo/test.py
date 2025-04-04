@@ -22,7 +22,7 @@ sys.path.append(utils_dir)
 sys.path.append(mariposa_dir)
 
 #import utils
-from utils import analysis, plot, metadata
+from utils import analyze, plot, metadata
 
 importlib.reload(analysis)
 importlib.reload(plot)
