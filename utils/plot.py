@@ -59,7 +59,7 @@ def plot_module_usage(config,
     Plot module usage
 
     :param config: config
-    :param usage_feats: output of analysis.get_module_usage
+    :param usage_feats: output of analyze.get_module_usage
     :param figW: figure width (default: 4)
     :param figH: figure height (default: 2)
     :param style: plot style; "bar_scatter", "bar_error", "points", or "stacked"
@@ -394,9 +394,9 @@ def network_plot(config,
     :return:
     """
     print("Getting module usage")
-    module_usage = analysis.get_module_usage(config, labels_df)
+    module_usage = analyze.get_module_usage(config, labels_df)
     print("Getting module transitions")
-    module_transitions = analysis.get_module_transitions(config, labels_df)
+    module_transitions = analyze.get_module_transitions(config, labels_df)
 
     g1 = module_usage.label_counts[np.array(module_usage.group_labels) == 0, :]
     g2 = module_usage.label_counts[np.array(module_usage.group_labels) == 1, :]
@@ -544,9 +544,9 @@ def module_usage_sandplot(config, module_usage, BORIS_to_pose_mat=None, title=No
 
 def plot_keypoint_displacement_bins(dist_df, cmap="viridis", plottype="band", figW=6, figH=3):
     """
-    Plots displacement of a keypoint either over time or in bins from dist_df (output of analysis.dist_df_subgroups)
+    Plots displacement of a keypoint either over time or in bins from dist_df (output of analyze.dist_df_subgroups)
 
-    :param dist_df: dist_df output from analysis.dist_df_subgroups
+    :param dist_df: dist_df output from analyze.dist_df_subgroups
     :param cmap: matplotlib colormap
     :param plottype: type of plot ("band", "errorbar", or "bar" if no timebins)
     :param figW: figure width
@@ -590,8 +590,8 @@ def plot_embeddings(module_feature_object, embeddings_object, figW=3, figH=3, cm
     """
     Plot embeddings
 
-    :param module_feature_object: module feature object (ModuleUsage or ModuleTransitions) from analysis.get_module_{xx}
-    :param embeddings_object: embeddings object (LDA or PCA) from analysis.embed
+    :param module_feature_object: module feature object (ModuleUsage or ModuleTransitions) from analyze.get_module_{xx}
+    :param embeddings_object: embeddings object (LDA or PCA) from analyze.embed
     :param figW: figure width
     :param figH: figure height
     :param cmap: matplotlib colormap
@@ -717,8 +717,8 @@ def plot_lda_weights(config, lda_result, n_modules, hide_nofeat_mods=False, rema
             vlim = np.max([np.abs(weights_reshaped.max().max()), np.abs(weights_reshaped.min().min())])
             fig = plt.figure(figsize=(figW, figH))
 
-            BORIS_to_pose_mat, BORIS_to_pose_mat_normalized, loss = analysis.BORIS_to_pose(config)
-            analysis.make_remappings_from_BORIS(config, None, BORIS_to_pose_mat)
+            BORIS_to_pose_mat, BORIS_to_pose_mat_normalized, loss = analyze.BORIS_to_pose(config)
+            analyze.make_remappings_from_BORIS(config, None, BORIS_to_pose_mat)
 
             behaviors = BORIS_to_pose_mat_normalized.index
             mapped_behaviors = {}

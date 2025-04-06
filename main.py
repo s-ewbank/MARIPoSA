@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import os
 from PIL import Image
+import cProfile
 
 factor=0.6
 
@@ -17,7 +18,7 @@ class Application(customtkinter.CTk):
     def __init__(self):
         super().__init__()
         self.title("MARIPoSA")
-        self.after(200, lambda: self.iconphoto(False, PhotoImage(file="other/MARIPoSA_icon.png")))
+        #self.after(200, lambda: self.iconphoto(False, PhotoImage(file="other/MARIPoSA_icon.png")))
         customtkinter.set_appearance_mode("dark")
         customtkinter.set_default_color_theme("blue")
         screen_width = self.winfo_screenwidth()
@@ -80,7 +81,7 @@ class Application(customtkinter.CTk):
     def window1_start(self):
         self.clear_window()
 
-        logo_img = customtkinter.CTkImage(dark_image=Image.open('other/MARIPoSA_icon.png'),size=(100,100))
+        logo_img = customtkinter.CTkImage(dark_image=Image.open('other/MARIPoSA_icon.png'))
         self.projectstart_choice = customtkinter.StringVar(value="New project")
         customtkinter.CTkLabel(self, text="MARIPoSA",
                                font=('Helvetica', 32, "bold")).place(x=int(self.width*0.5), y=int(self.height*0.1),anchor=tk.CENTER)
@@ -284,7 +285,7 @@ class Application(customtkinter.CTk):
         self.clear_window()
         config = metadata.load_project(self.config_path)
         self.config = config
-        self.window4h_pose_vs_BORIS()
+        self.window4b3_pose_vs_BORIS()
 
     def create_sidebar_widget(self):
 
@@ -392,36 +393,49 @@ class Application(customtkinter.CTk):
         self.create_header("Analysis Menu")
 
         # Buttons to analysis windows
-        usage_img = PhotoImage(file='other/usage_icon.png')
-        subgroups_img = PhotoImage(file='other/subgroup_icon.png')
-        embed_img = PhotoImage(file='other/embed_icon.png')
-        classify_img = PhotoImage(file='other/classify_icon.png')
-        remap_img = PhotoImage(file='other/remap_icon.png')
-        button_width=int(self.width*0.2)
-        button_height=int(self.height*0.15)
+        # usage_img = PhotoImage(file='other/usage_icon.png')
+        # subgroups_img = PhotoImage(file='other/subgroup_icon.png')
+        # embed_img = PhotoImage(file='other/embed_icon.png')
+        # classify_img = PhotoImage(file='other/classify_icon.png')
+        # remap_img = PhotoImage(file='other/remap_icon.png')
+        menu_item_width=int(self.width*0.15)
+        button_width=int(self.width*0.45)
+        button_height=int(self.height*0.05)
         customtkinter.CTkLabel(self, text="Further configure project:",
-                               font=('Helvetica', 16),width=button_width,height=button_height).place(x=int(self.width * 0.3), y=int(self.height * 0.2))
-        customtkinter.CTkButton(self, text="Define subgroups \nwithin data",
-                                command=self.window4a_define_subgroups, image=subgroups_img,
-                                font=('Helvetica', 16),width=button_width,height=button_height).place(x=int(self.width*0.3), y=int(self.height*0.3))
-        customtkinter.CTkButton(self, text="Compare modules to \nmanual scoring",
-                                command=self.window4h_pose_vs_BORIS, image=remap_img,
-                                font=('Helvetica', 16),width=button_width,height=button_height).place(x=int(self.width*0.52), y=int(self.height*0.3))
-        customtkinter.CTkButton(self, text="Manually combine \npose modules",
-                                command=self.window1_start, image=remap_img,
-                                font=('Helvetica', 16),width=button_width,height=button_height).place(x=int(self.width*0.74), y=int(self.height*0.3))
+                               font=('Helvetica', 16),width=menu_item_width,height=button_height).place(x=int(self.width * 0.3), y=int(self.height * 0.2))
+        customtkinter.CTkButton(self, text="Define subgroups within data",
+                                command=self.window4a_define_subgroups,
+                                font=('Helvetica', 16),width=button_width,height=button_height).place(x=int(self.width*0.5), y=int(self.height*0.2))
+        customtkinter.CTkButton(self, text="Compare modules to manual scoring",
+                                command=self.window4b_pose_vs_BORIS,
+                                font=('Helvetica', 16),width=button_width,height=button_height).place(x=int(self.width*0.5), y=int(self.height*0.27))
+        customtkinter.CTkButton(self, text="Manually combine pose modules",
+                                command=self.window1_start,
+                                font=('Helvetica', 16),width=button_width,height=button_height).place(x=int(self.width*0.5), y=int(self.height*0.34))
 
-        customtkinter.CTkLabel(self, text="Visualize and classify:",
-                               font=('Helvetica', 16),width=button_width,height=button_height).place(x=int(self.width * 0.3), y=int(self.height * 0.5))
-        customtkinter.CTkButton(self, text="Analyze pose module \nusage and transitions",
-                                command=self.window4b_usage_transitions_menu, image=usage_img,
-                                font=('Helvetica', 16),width=button_width,height=button_height).place(x=int(self.width*0.3), y=int(self.height*0.6))
-        customtkinter.CTkButton(self, text="Embed and measure \ndistance between \ngroups",
-                                command=self.window4e_embed_menu, image=embed_img,
-                                font=('Helvetica', 16),width=button_width,height=button_height).place(x=int(self.width*0.52), y=int(self.height*0.6))
-        customtkinter.CTkButton(self, text="Classify conditions",
-                                command=self.window4g_classify_menu, image=classify_img,
-                                font=('Helvetica', 16),width=button_width,height=button_height).place(x=int(self.width*0.74), y=int(self.height*0.6))
+        customtkinter.CTkLabel(self, text="Analyze and visualize:",
+                               font=('Helvetica', 16),width=menu_item_width,height=button_height).place(x=int(self.width * 0.3), y=int(self.height * 0.44))
+        customtkinter.CTkButton(self, text="Measure pose module usage and transitions",
+                                command=self.window5a_usage_transitions_menu,
+                                font=('Helvetica', 16),width=button_width,height=button_height).place(x=int(self.width*0.5), y=int(self.height*0.44))
+        customtkinter.CTkButton(self, text="Embed and/or measure distance between groups",
+                                command=self.window5b_embed_distance_menu,
+                                font=('Helvetica', 16),width=button_width,height=button_height).place(x=int(self.width*0.5), y=int(self.height*0.51))
+        customtkinter.CTkButton(self, text="Classify and/or regress conditions",
+                                command=self.window5c_classify_regress_menu,
+                                font=('Helvetica', 16),width=button_width,height=button_height).place(x=int(self.width*0.5), y=int(self.height*0.58))
+
+        customtkinter.CTkLabel(self, text="Model and simulate:",
+                               font=('Helvetica', 16),width=menu_item_width,height=button_height).place(x=int(self.width * 0.3), y=int(self.height * 0.68))
+        customtkinter.CTkButton(self, text="Fit curve to within-session pose data",
+                                command=self.window6a_fit_curve_menu,
+                                font=('Helvetica', 16),width=button_width,height=button_height).place(x=int(self.width*0.5), y=int(self.height*0.68))
+        customtkinter.CTkButton(self, text="Simulate module labels, usage, or transitions",
+                                command=self.window6b_simulate_menu,
+                                font=('Helvetica', 16),width=button_width,height=button_height).place(x=int(self.width*0.5), y=int(self.height*0.75))
+        customtkinter.CTkButton(self, text="Get cumulative distribution function from real or simulated behavior",
+                                command=self.window6c_cdf_menu,
+                                font=('Helvetica', 16),width=button_width,height=button_height).place(x=int(self.width*0.5), y=int(self.height*0.82))
 
         customtkinter.CTkButton(self, text="◀◀ back to start", command=self.window1_start,
                                 font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.9))
@@ -461,7 +475,65 @@ class Application(customtkinter.CTk):
         customtkinter.CTkButton(self, text="◀◀ back to start", command=self.window1_start,
                                 font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.9))
 
-    def window4b_usage_transitions_menu(self):
+    def window4b_pose_vs_BORIS(self):
+        self.clear_window()
+        self.create_sidebar_widget()
+        self.create_header("Compare Pose Data to Manual Scoring",header_path="Configure ▶ Manual scoring comparison")
+
+        customtkinter.CTkButton(self, text="Update config file with manual scoring info from BORIS",
+                                command=self.window4b2_boris_config,height=int(self.width*0.1),width=int(self.width*0.6),
+                                font=('Helvetica', 16)).place(x=int(self.width*0.65), y=int(self.height*0.4),anchor=tk.CENTER)
+        customtkinter.CTkButton(self, text="Get and plot pose module to BORIS comparison matrix",
+                                command=self.window4b3_pose_vs_BORIS,height=int(self.width*0.1),width=int(self.width*0.6),
+                                font=('Helvetica', 16)).place(x=int(self.width*0.65), y=int(self.height*0.6),anchor=tk.CENTER)
+        # Bottom back buttons
+        customtkinter.CTkButton(self, text="◀ back to analysis menu", command=self.window3b_PS_menu,
+                                font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.83))
+        customtkinter.CTkButton(self, text="◀◀ back to start", command=self.window1_start,
+                                font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.9))
+
+    def window4b2_boris_config(self):
+        self.clear_window()
+        self.create_sidebar_widget()
+        self.create_header("Compare Pose Data to Manual Scoring",header_path="Configure ▶ Manual scoring comparison ▶ Update config")
+
+        instruction_text = """For this step, you will need to manually edit the config file, which you should be able to access by pressing the 'Edit config.yaml' button below.
+        You'll have to edit the boris_directory and boris_to_pose_pairings."""
+        instruction_block = tk.Label(self,text=instruction_text, wraplength=int(self.width * 0.65),
+            padx=10,pady=10,bg="darkgray",fg="white",justify=tk.LEFT)
+
+        instruction_block.place(x=int(self.width * 0.3),y=int(self.height * 0.3),anchor=tk.NW)
+        edit_config_button = customtkinter.CTkButton(self,
+                                                     text="Edit config.yaml",font=('Helvetica', 16),
+                                                     command=lambda: metadata.edit_config(
+                                                         self.config["project_directory"] + "/config.yaml"))
+        edit_config_button.place(x=int(self.width * 0.65),y=int(self.height * 0.6),anchor=tk.CENTER)
+        # Bottom back buttons
+        customtkinter.CTkButton(self, text="◀ update config and go back to BORIS menu", command=self.load_project_BORIS,
+                                font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.76))
+        customtkinter.CTkButton(self, text="◀ back to analysis menu", command=self.window3b_PS_menu,
+                                font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.83))
+        customtkinter.CTkButton(self, text="◀◀ back to start", command=self.window1_start,
+                                font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.9))
+
+    def window4b3_pose_vs_BORIS(self):
+        self.clear_window()
+        self.create_sidebar_widget()
+        self.create_header("Compare Pose Data to Manual Scoring",header_path="Configure ▶ Manual scoring comparison ▶ Plot comparison matrix")
+
+        customtkinter.CTkLabel(self, text="Get a matrix showing overlap between pose modules and behaviors manually scored in BORIS.",
+                               font=('Helvetica', 16)).place(x=int(self.width*0.65), y=int(self.height*0.4),anchor=tk.CENTER)
+
+        customtkinter.CTkButton(self, text="Compare!",
+                                command=lambda: self.plot_pose_vs_BORIS(),
+                                font=('Helvetica', 16)).place(x=int(self.width*0.85), y=int(self.height*0.9))
+        # Bottom back buttons
+        customtkinter.CTkButton(self, text="◀ back to analysis menu", command=self.window3b_PS_menu,
+                                font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.83))
+        customtkinter.CTkButton(self, text="◀◀ back to start", command=self.window1_start,
+                                font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.9))
+
+    def window5a_usage_transitions_menu(self):
         self.clear_window()
         self.create_sidebar_widget()
         self.create_header("Pose Usage and Transition Analysis Menu",header_path="Viz & Analyze ▶ Usage Analysis")
@@ -475,28 +547,25 @@ class Application(customtkinter.CTk):
         #                         font=('Helvetica', 16)).place(x=int(self.width*0.65), y=int(self.height*0.35),anchor=tk.CENTER)
 
         customtkinter.CTkButton(self, text="Get and plot pose usage",
-                                command=lambda: self.window4c_usage_transitions("subgroups"),height=int(self.height*0.15),width=int(self.width*0.6),
+                                command=lambda: self.window5a1_usage_transitions("subgroups"),height=int(self.height*0.15),width=int(self.width*0.6),
                                 font=('Helvetica', 16)).place(x=int(self.width*0.65), y=int(self.height*0.35),anchor=tk.CENTER)
 
         # customtkinter.CTkButton(self, text="Network plot of usage and transitions",
         #                         command=lambda: self.window4d_network("single"),
         #                         font=('Helvetica', 16)).place(x=int(self.width*0.65), y=int(self.height*0.35),anchor=tk.CENTER)
         customtkinter.CTkButton(self, text="Network plot of usage and transitions for subgroups",
-                                command=lambda: self.window4d_network("comparison"),height=int(self.height*0.15),width=int(self.width*0.6),
+                                command=lambda: self.window5a2_network("comparison"),height=int(self.height*0.15),width=int(self.width*0.6),
                                 font=('Helvetica', 16)).place(x=int(self.width*0.65), y=int(self.height*0.52),anchor=tk.CENTER)
         # Next menu options
         customtkinter.CTkButton(self, text="Plot pose module usage\n in a subgroup over the\n course of a single session",
-                                command=lambda: self.window4f_usage_overtime("within_session"),height=int(self.height*0.15),width=int(self.width*0.29),
+                                command=lambda: self.window5a3_usage_overtime("within_session"),height=int(self.height*0.15),width=int(self.width*0.29),
                                 font=('Helvetica', 16)).place(x=int(self.width*0.80), y=int(self.height*0.69),anchor=tk.CENTER)
-        customtkinter.CTkButton(self, text="Plot pose module usage\n in a subgroup across sessions",
-                                command=lambda: self.window4f_usage_overtime("across_sessions"),height=int(self.height*0.15),width=int(self.width*0.29),
-                                font=('Helvetica', 16)).place(x=int(self.width*0.5), y=int(self.height*0.69),anchor=tk.CENTER)
 
         customtkinter.CTkButton(self, text="◀ back to analysis menu", command=self.window3b_PS_menu,
                                 font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.83))
         customtkinter.CTkButton(self, text="◀◀ back to start", command=self.window1_start,
                                 font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.9))
-    def window4c_usage_transitions(self,subgroup_option):
+    def window5a1_usage_transitions(self,subgroup_option):
         self.clear_window()
         self.create_sidebar_widget()
         self.create_header("Get & Plot Pose Usage",header_path="Viz & Analyze ▶ Usage Analysis ▶ Get & Plot Usage")
@@ -546,7 +615,7 @@ class Application(customtkinter.CTk):
         customtkinter.CTkButton(self, text="◀◀ back to start", command=self.window1_start,
                                 font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.9))
 
-    def window4d_network(self,subgroup_option):
+    def window5a2_network(self,subgroup_option):
         self.clear_window()
         self.create_sidebar_widget()
         self.create_header("Network Plot",header_path="Viz & Analyze ▶ Usage Analysis ▶ Network Plot")
@@ -602,7 +671,7 @@ class Application(customtkinter.CTk):
         customtkinter.CTkButton(self, text="◀◀ back to start", command=self.window1_start,
                                 font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.9))
 
-    def window4f_usage_overtime(self, session_option):
+    def window5a3_usage_overtime(self, session_option):
         self.clear_window()
         self.create_sidebar_widget()
 
@@ -678,23 +747,13 @@ class Application(customtkinter.CTk):
         customtkinter.CTkButton(self, text="◀◀ back to start", command=self.window1_start,
                                 font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.9))
 
-    def window4e_embed_menu(self):
+    def window5b_embed_distance_menu(self):
         self.clear_window()
         self.create_sidebar_widget()
         self.create_header("Embed and Distance Menu",header_path="Viz & Analyze ▶ Embed")
 
         customtkinter.CTkLabel(self, text="What tool do you want to use to embed and/or measure distance?",
                                font=('Helvetica', 16)).place(x=int(self.width*0.65), y=int(self.height*0.24),anchor=tk.CENTER)
-
-        customtkinter.CTkButton(self, text="Sum squared difference from control group",
-                                command=self.window4g_ssd_embed,height=int(self.height*0.15),width=int(self.width*0.6),
-                                font=('Helvetica', 16)).place(x=int(self.width*0.65), y=int(self.height*0.35),anchor=tk.CENTER)
-        customtkinter.CTkButton(self, text="Principal components analysis",
-                                command=self.window4g_pca_embed,height=int(self.height*0.15),width=int(self.width*0.6),
-                                font=('Helvetica', 16)).place(x=int(self.width*0.65), y=int(self.height*0.52),anchor=tk.CENTER)
-        customtkinter.CTkButton(self, text="Linear discriminant analysis",
-                                command=self.window4g_lda_embed_classify,height=int(self.height*0.15),width=int(self.width*0.6),
-                                font=('Helvetica', 16)).place(x=int(self.width*0.65), y=int(self.height*0.69),anchor=tk.CENTER)
         # Bottom back buttons
         customtkinter.CTkButton(self, text="◀ back to analysis menu", command=self.window3b_PS_menu,
                                 font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.83))
@@ -702,7 +761,7 @@ class Application(customtkinter.CTk):
                                 font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.9))
 
 
-    def window4g_classify_menu(self):
+    def window5c_classify_regress_menu(self):
         self.clear_window()
         self.create_sidebar_widget()
         self.create_header("Classify and Embed Menu",header_path="Viz & Analyze ▶ Classify")
@@ -725,278 +784,50 @@ class Application(customtkinter.CTk):
         customtkinter.CTkButton(self, text="◀◀ back to start", command=self.window1_start,
                                 font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.9))
 
-    def window4g_ssd_embed(self):
+    def window6a_fit_curve_menu(self):
         self.clear_window()
         self.create_sidebar_widget()
-        self.create_header("Sum Squared Difference Embedding",header_path="Viz & Analyze ▶ Embed ▶ SSD")
+        self.create_header("Fit a Curve",header_path="Model & Simulate ▶ Curve Fitting")
 
-        customtkinter.CTkLabel(self, text="Enter info about your analysis and plotting parameters.",
-                               font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.25))
-
-        # Plot
-        # Choose start and end time
-        customtkinter.CTkLabel(self, text="Start time (seconds)",
-                               font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.35))
-        start = customtkinter.CTkEntry(self)
-        start.place(x=int(self.width*0.45), y=int(self.height*0.35))
-        customtkinter.CTkLabel(self, text="End time (seconds)",
-                               font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.45))
-        end = customtkinter.CTkEntry(self)
-        end.place(x=int(self.width*0.45), y=int(self.height*0.45))
-        customtkinter.CTkLabel(self, text="Bin size (seconds)",
-                               font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.55))
-        binsize = customtkinter.CTkEntry(self)
-        binsize.place(x=int(self.width*0.45), y=int(self.height*0.55))
-        # Choose color
-        customtkinter.CTkLabel(self, text="Colormap for plot",
-                               font=('Helvetica', 16)).place(x=int(self.width*0.6), y=int(self.height*0.35))
-        color = customtkinter.CTkComboBox(self, values=["jet", "cividis", "viridis", "magma"])
-        color.place(x=int(self.width*0.75), y=int(self.height*0.35))
-        color.set("jet")
-        customtkinter.CTkButton(self, text="Plot embeddings",
-                                command=lambda: self.lda("embed",int(start.get()), int(end.get()), int(binsize.get()), color.get(),),
-                                font=('Helvetica', 16)).place(x=int(self.width*0.8), y=int(self.height*0.76))
-        customtkinter.CTkButton(self, text="Classify and evaluate",
-                                command=lambda: self.lda("classify_eval",int(start.get()), int(end.get()), int(binsize.get()), color.get()),
-                                font=('Helvetica', 16)).place(x=int(self.width*0.8), y=int(self.height*0.83))
-        customtkinter.CTkButton(self, text="Save LDA classifier",
-                                command=lambda: self.lda("save",int(start.get()), int(end.get()), int(binsize.get()), color.get()),
-                                font=('Helvetica', 16)).place(x=int(self.width*0.8), y=int(self.height*0.9))
         # Bottom back buttons
         customtkinter.CTkButton(self, text="◀ back to analysis menu", command=self.window3b_PS_menu,
                                 font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.83))
         customtkinter.CTkButton(self, text="◀◀ back to start", command=self.window1_start,
                                 font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.9))
 
-
-    def window4g_pca_embed(self):
+    def window6b_simulate_menu(self):
         self.clear_window()
         self.create_sidebar_widget()
-        self.create_header("Principal Components Analysis",header_path="Viz & Analyze ▶ Embed ▶ PCA")
+        self.create_header("Simulate Pose Data",header_path="Model & Simulate ▶ Simulate Data")
 
-        customtkinter.CTkLabel(self, text="Enter info about your analysis and plotting parameters.",
-                               font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.25))
-
-        # Plot
-        # Choose start and end time
-        customtkinter.CTkLabel(self, text="Start time (seconds)",
-                               font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.35))
-        start = customtkinter.CTkEntry(self)
-        start.place(x=int(self.width*0.45), y=int(self.height*0.35))
-        customtkinter.CTkLabel(self, text="End time (seconds)",
-                               font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.45))
-        end = customtkinter.CTkEntry(self)
-        end.place(x=int(self.width*0.45), y=int(self.height*0.45))
-        customtkinter.CTkLabel(self, text="Bin size (seconds)",
-                               font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.55))
-        binsize = customtkinter.CTkEntry(self)
-        binsize.place(x=int(self.width*0.45), y=int(self.height*0.55))
-        # Choose color
-        customtkinter.CTkLabel(self, text="Colormap for plot",
-                               font=('Helvetica', 16)).place(x=int(self.width*0.6), y=int(self.height*0.35))
-        color = customtkinter.CTkComboBox(self, values=["jet", "cividis", "viridis", "magma"])
-        color.place(x=int(self.width*0.75), y=int(self.height*0.35))
-        color.set("jet")
-        customtkinter.CTkButton(self, text="Plot embeddings",
-                                command=lambda: self.lda("embed",int(start.get()), int(end.get()), int(binsize.get()), color.get(),),
-                                font=('Helvetica', 16)).place(x=int(self.width*0.8), y=int(self.height*0.76))
-        customtkinter.CTkButton(self, text="Classify and evaluate",
-                                command=lambda: self.lda("classify_eval",int(start.get()), int(end.get()), int(binsize.get()), color.get()),
-                                font=('Helvetica', 16)).place(x=int(self.width*0.8), y=int(self.height*0.83))
-        customtkinter.CTkButton(self, text="Save LDA classifier",
-                                command=lambda: self.lda("save",int(start.get()), int(end.get()), int(binsize.get()), color.get()),
-                                font=('Helvetica', 16)).place(x=int(self.width*0.8), y=int(self.height*0.9))
         # Bottom back buttons
         customtkinter.CTkButton(self, text="◀ back to analysis menu", command=self.window3b_PS_menu,
                                 font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.83))
         customtkinter.CTkButton(self, text="◀◀ back to start", command=self.window1_start,
                                 font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.9))
 
-
-    def window4g_lda_embed_classify(self):
+    def window6c_cdf_menu(self):
         self.clear_window()
         self.create_sidebar_widget()
-        self.create_header("Linear Discriminant Analysis",header_path="Viz & Analyze ▶ Embed ▶ LDA")
+        self.create_header("Fit Cumulative Distribution Function",
+                           header_path="Model & Simulate ▶ Cumulative Distribution Function")
 
-        customtkinter.CTkLabel(self, text="Enter info about your analysis and plotting parameters.",
-                               font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.25))
-
-        # Plot
-        # Choose start and end time
-        customtkinter.CTkLabel(self, text="Start time (seconds)",
-                               font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.35))
-        start = customtkinter.CTkEntry(self)
-        start.place(x=int(self.width*0.45), y=int(self.height*0.35))
-        customtkinter.CTkLabel(self, text="End time (seconds)",
-                               font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.45))
-        end = customtkinter.CTkEntry(self)
-        end.place(x=int(self.width*0.45), y=int(self.height*0.45))
-        customtkinter.CTkLabel(self, text="Bin size (seconds)",
-                               font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.55))
-        binsize = customtkinter.CTkEntry(self)
-        binsize.place(x=int(self.width*0.45), y=int(self.height*0.55))
-        # Choose color
-        customtkinter.CTkLabel(self, text="Colormap for plot",
-                               font=('Helvetica', 16)).place(x=int(self.width*0.6), y=int(self.height*0.35))
-        color = customtkinter.CTkComboBox(self, values=["jet", "cividis", "viridis", "magma"])
-        color.place(x=int(self.width*0.75), y=int(self.height*0.35))
-        color.set("jet")
-        customtkinter.CTkLabel(self, text="Subgroups",
-                               font=('Helvetica', 16)).place(x=int(self.width*0.6), y=int(self.height*0.45))
-        dropdown = MultiDropDown(self,options=list(self.config["subgroups"].keys()))
-        dropdown.place(x=int(self.width*0.75), y=int(self.height*0.45))
-        customtkinter.CTkButton(self, text="Plot embeddings",
-                                command=lambda: self.lda("embed",int(start.get()), int(end.get()),
-                                                         int(binsize.get()), color.get(),
-                                                         dropdown.get_selected_values()),
-                                font=('Helvetica', 16)).place(x=int(self.width*0.8), y=int(self.height*0.76))
-        customtkinter.CTkButton(self, text="Classify and evaluate",
-                                command=lambda: self.lda("classify_eval",int(start.get()), int(end.get()),
-                                                         int(binsize.get()), color.get(),
-                                                         dropdown.get_selected_values()),
-                                font=('Helvetica', 16)).place(x=int(self.width*0.8), y=int(self.height*0.83))
-        customtkinter.CTkButton(self, text="Save LDA classifier",
-                                command=lambda: self.lda("save",int(start.get()), int(end.get()),
-                                                         int(binsize.get()), color.get(),
-                                                         dropdown.get_selected_values()),
-                                font=('Helvetica', 16)).place(x=int(self.width*0.8), y=int(self.height*0.9))
         # Bottom back buttons
         customtkinter.CTkButton(self, text="◀ back to analysis menu", command=self.window3b_PS_menu,
-                                font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.83))
+                                font=('Helvetica', 16)).place(x=int(self.width * 0.3), y=int(self.height * 0.83))
         customtkinter.CTkButton(self, text="◀◀ back to start", command=self.window1_start,
-                                font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.9))
-
-    def window4g_lr_classify(self):
-        self.clear_window()
-        self.create_sidebar_widget()
-        self.create_header("Logistic Regression",header_path="Viz & Analyze ▶ Classify ▶ LogReg")
-
-        customtkinter.CTkLabel(self, text="Enter info about your classification parameters.",
-                               font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.25))
-
-        # Choose start and end time
-        customtkinter.CTkLabel(self, text="Start time (seconds)",
-                               font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.35))
-        start = customtkinter.CTkEntry(self)
-        start.place(x=int(self.width*0.45), y=int(self.height*0.35))
-        customtkinter.CTkLabel(self, text="End time (seconds)",
-                               font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.45))
-        end = customtkinter.CTkEntry(self)
-        end.place(x=int(self.width*0.45), y=int(self.height*0.45))
-        # # Choose color
-        # customtkinter.CTkLabel(self, text="Colormap for plot",
-        #                        font=('Helvetica', 16)).grid(row=4, column=0, pady=10, sticky="E")
-        # color = customtkinter.CTkComboBox(self, values=["jet", "cividis", "viridis", "magma"])
-        # color.grid(row=4, column=1, pady=10, sticky="W")
-        # color.set("jet")
-        customtkinter.CTkLabel(self, text="Bin size (seconds)",
-                               font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.55))
-        binsize = customtkinter.CTkEntry(self)
-        binsize.place(x=int(self.width*0.45), y=int(self.height*0.55))
-        customtkinter.CTkButton(self, text="Classify and Evaluate",
-                                command=lambda: self.lr("classify_eval",int(start.get()), int(end.get()), int(binsize.get())),
-                                font=('Helvetica', 16)).place(x=int(self.width*0.8), y=int(self.height*0.83))
-        customtkinter.CTkButton(self, text="Save",
-                                command=lambda: self.lr("save",int(start.get()), int(end.get()), int(binsize.get())),
-                                font=('Helvetica', 16)).place(x=int(self.width*0.8), y=int(self.height*0.9))
-        # Bottom back buttons
-        customtkinter.CTkButton(self, text="◀ back to analysis menu", command=self.window3b_PS_menu,
-                                font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.83))
-        customtkinter.CTkButton(self, text="◀◀ back to start", command=self.window1_start,
-                                font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.9))
-
-    def window4g_nlp_classify(self):
-        self.clear_window()
-        self.create_sidebar_widget()
-        self.create_header("Natural Language Processing Tools",header_path="Viz & Analyze ▶ Classify ▶ NLP")
-
-        customtkinter.CTkLabel(self, text="Enter info about your classification parameters.",
-                               font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.25))
-
-        # Plot
-        # Choose start and end time
-        customtkinter.CTkLabel(self, text="Start time (seconds)",
-                               font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.35))
-        start = customtkinter.CTkEntry(self)
-        start.place(x=int(self.width*0.45), y=int(self.height*0.35))
-        customtkinter.CTkLabel(self, text="End time (seconds)",
-                               font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.45))
-        end = customtkinter.CTkEntry(self)
-        end.place(x=int(self.width*0.45), y=int(self.height*0.45))
-        # Bottom back buttons
-        customtkinter.CTkButton(self, text="◀ back to analysis menu", command=self.window3b_PS_menu,
-                                font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.83))
-        customtkinter.CTkButton(self, text="◀◀ back to start", command=self.window1_start,
-                                font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.9))
-
-    def window4h_pose_vs_BORIS(self):
-        self.clear_window()
-        self.create_sidebar_widget()
-        self.create_header("Compare Pose Data to Manual Scoring",header_path="Configure ▶ Manual scoring comparison")
-
-        customtkinter.CTkButton(self, text="Update config file with manual scoring info from BORIS",
-                                command=self.window4h2_boris_config,height=int(self.width*0.1),width=int(self.width*0.6),
-                                font=('Helvetica', 16)).place(x=int(self.width*0.65), y=int(self.height*0.4),anchor=tk.CENTER)
-        customtkinter.CTkButton(self, text="Get and plot pose module to BORIS comparison matrix",
-                                command=self.window4h3_pose_vs_BORIS,height=int(self.width*0.1),width=int(self.width*0.6),
-                                font=('Helvetica', 16)).place(x=int(self.width*0.65), y=int(self.height*0.6),anchor=tk.CENTER)
-        # Bottom back buttons
-        customtkinter.CTkButton(self, text="◀ back to analysis menu", command=self.window3b_PS_menu,
-                                font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.83))
-        customtkinter.CTkButton(self, text="◀◀ back to start", command=self.window1_start,
-                                font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.9))
-
-    def window4h2_boris_config(self):
-        self.clear_window()
-        self.create_sidebar_widget()
-        self.create_header("Compare Pose Data to Manual Scoring",header_path="Configure ▶ Manual scoring comparison ▶ Update config")
-
-        instruction_text = """For this step, you will need to manually edit the config file, which you should be able to access by pressing the 'Edit config.yaml' button below.
-        You'll have to edit the boris_directory and boris_to_pose_pairings."""
-        instruction_block = tk.Label(self,text=instruction_text, wraplength=int(self.width * 0.65),
-            padx=10,pady=10,bg="darkgray",fg="white",justify=tk.LEFT)
-
-        instruction_block.place(x=int(self.width * 0.3),y=int(self.height * 0.3),anchor=tk.NW)
-        edit_config_button = customtkinter.CTkButton(self,
-                                                     text="Edit config.yaml",font=('Helvetica', 16),
-                                                     command=lambda: metadata.edit_config(
-                                                         self.config["project_directory"] + "/config.yaml"))
-        edit_config_button.place(x=int(self.width * 0.65),y=int(self.height * 0.6),anchor=tk.CENTER)
-        # Bottom back buttons
-        customtkinter.CTkButton(self, text="◀ update config and go back to BORIS menu", command=self.load_project_BORIS,
-                                font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.76))
-        customtkinter.CTkButton(self, text="◀ back to analysis menu", command=self.window3b_PS_menu,
-                                font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.83))
-        customtkinter.CTkButton(self, text="◀◀ back to start", command=self.window1_start,
-                                font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.9))
-
-    def window4h3_pose_vs_BORIS(self):
-        self.clear_window()
-        self.create_sidebar_widget()
-        self.create_header("Compare Pose Data to Manual Scoring",header_path="Configure ▶ Manual scoring comparison ▶ Plot comparison matrix")
-
-        customtkinter.CTkLabel(self, text="Get a matrix showing overlap between pose modules and behaviors manually scored in BORIS.",
-                               font=('Helvetica', 16)).place(x=int(self.width*0.65), y=int(self.height*0.4),anchor=tk.CENTER)
-
-        customtkinter.CTkButton(self, text="Compare!",
-                                command=lambda: self.plot_pose_vs_BORIS(),
-                                font=('Helvetica', 16)).place(x=int(self.width*0.85), y=int(self.height*0.9))
-        # Bottom back buttons
-        customtkinter.CTkButton(self, text="◀ back to analysis menu", command=self.window3b_PS_menu,
-                                font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.83))
-        customtkinter.CTkButton(self, text="◀◀ back to start", command=self.window1_start,
-                                font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.9))
-
+                                font=('Helvetica', 16)).place(x=int(self.width * 0.3), y=int(self.height * 0.9))
+#
     def plot_usage(self, start, end, style, color, subgroups):
         if subgroups == ["all combined"]:
-            labels_df, n_modules = analysis.label_counter_nosubgroups(self.config, start, end)
+            labels_df, n_modules = analyze.label_counter_nosubgroups(self.config, start, end)
             fig = plot.plot_module_usage(self.config, labels_df, start, end, int(self.config["fps"]), style=style, cmap=color)
             self.plots_generated = self.plots_generated + 1
             self.plot_window = PlotWindow(fig = fig, plot_number = self.plots_generated, master = self)
             self.plot_window.mainloop()
         else:
             selected_subgroups=[i for i in subgroups if (i!="all combined")]
-            labels_df, n_modules = analysis.label_counter_subgroups(self.config, start, end, selected_subgroups=selected_subgroups)
+            labels_df, n_modules = analyze.label_counter_subgroups(self.config, start, end, selected_subgroups=selected_subgroups)
             fig = plot.plot_module_usage_subgroups(self.config, labels_df, start, end, int(self.config["fps"]), style=style, cmap=color)
             self.plots_generated = self.plots_generated + 1
             self.plot_window = PlotWindow(fig = fig, plot_number = self.plots_generated, master = self)
@@ -1004,10 +835,10 @@ class Application(customtkinter.CTk):
 
     def plot_network(self, group1, group2, start, end, style, cmap, subgroup_option):
         if subgroup_option=="single":
-            labels_df, n_modules = analysis.label_counter_nosubgroups(self.config, start, end)
+            labels_df, n_modules = analyze.label_counter_nosubgroups(self.config, start, end)
             #plot.plot_module_usage(labels_df, start, end, int(self.config["fps"]), style=style, cmap=color)
         elif subgroup_option=="comparison":
-            labels_df, n_modules = analysis.label_counter_subgroups(self.config, start, end)
+            labels_df, n_modules = analyze.label_counter_subgroups(self.config, start, end)
             fig = plot.network_pairwise_comparison(self.config, labels_df, 0, 1200, [group1, group2],
                                                    cmap=cmap,include_labels=bool(style))
             self.plots_generated = self.plots_generated + 1
@@ -1017,7 +848,7 @@ class Application(customtkinter.CTk):
     def plot_usage_overtime(self, group, session_option, start=None, time_per_block=None, n_blocks=None, end=None):
         if session_option=="within_session":
             print(group)
-            labels_df, n_modules = analysis.label_counter_subgroups(self.config, start,
+            labels_df, n_modules = analyze.label_counter_subgroups(self.config, start,
                                                                     int(time_per_block*n_blocks),
                                                                     selected_subgroups=[group])
             fig = plot.SandPlotClusterFrequency_OverTime(self.config, labels_df[group], start,
@@ -1026,7 +857,7 @@ class Application(customtkinter.CTk):
             self.plot_window = PlotWindow(fig = fig, plot_number = self.plots_generated, master = self)
             self.plot_window.mainloop()
         elif session_option=="across_sessions":
-            labels_df, n_modules = analysis.label_counter_subgroups(self.config, start, end,selected_subgroups=group)
+            labels_df, n_modules = analyze.label_counter_subgroups(self.config, start, end,selected_subgroups=group)
             fig = plot.plot_module_usage_stacked(self.config, labels_df, start, end)
             self.plots_generated = self.plots_generated + 1
             self.plot_window = PlotWindow(fig = fig, plot_number = self.plots_generated, master = self)
@@ -1034,42 +865,41 @@ class Application(customtkinter.CTk):
             #plot.plot_module_usage_subgroups(labels_df, start, end, int(self.config["fps"]), style=style, cmap=color)
 
     def plot_pose_vs_BORIS(self):
-        BORIS_to_pose_mat, BORIS_to_pose_mat_normalized, loss = analysis.BORIS_to_pose(self.config) # this line is messing up the loaded config
+        BORIS_to_pose_mat, BORIS_to_pose_mat_normalized, loss = analyze.BORIS_to_pose(self.config) # this line is messing up the loaded config
         fig = plot.BORIS_to_pose_matrix_plot(self.config, BORIS_to_pose_mat_normalized)
         self.plots_generated = self.plots_generated + 1
         self.plot_window = PlotWindow(fig = fig, plot_number = self.plots_generated, master = self)
         self.plot_window.mainloop()
 
     def lda(self, do, start, end, binsize, cmap, subgroups):
-        labels_df, n_modules = analysis.label_counter_subgroups(self.config, start, end, selected_subgroups=subgroups)
+        labels_df, n_modules = analyze.label_counter_subgroups(self.config, start, end, selected_subgroups=subgroups)
         if do=="embed":
-            lda_result = analysis.lda_labels_timebins(self.config, labels_df, binsize, selected_subgroups=subgroups)
+            lda_result = analyze.lda_labels_timebins(self.config, labels_df, binsize, selected_subgroups=subgroups)
             fig = plot.plot_lda(self.config, lda_result, cmap=cmap)
             self.plots_generated = self.plots_generated + 1
             self.plot_window = PlotWindow(fig=fig, plot_number=self.plots_generated, master=self)
             self.plot_window.mainloop()
         elif do=="classify_eval":
             print("Classifying and evaluating")
-            lda_result = analysis.lda_labels_timebins(self.config, labels_df, binsize, selected_subgroups=subgroups, loocv=True)
+            lda_result = analyze.lda_labels_timebins(self.config, labels_df, binsize, selected_subgroups=subgroups, loocv=True)
             fig = plot.plot_conf_mat(lda_result, cmap="Greens")
             self.plots_generated = self.plots_generated + 1
             self.plot_window = PlotWindow(fig=fig, plot_number=self.plots_generated, master=self)
             self.plot_window.mainloop()
         elif do=="save":
             print("Saving LDA classifier")
-            #TODO: add in option to save LDA classifier
-            lda_result = analysis.lda_labels_timebins(self.config, labels_df, binsize, selected_subgroups=subgroups)
+            lda_result = analyze.lda_labels_timebins(self.config, labels_df, binsize, selected_subgroups=subgroups)
             fig = plot.plot_lda(self.config, lda_result, cmap=cmap)
             self.plots_generated = self.plots_generated + 1
             self.plot_window = PlotWindow(fig=fig, plot_number=self.plots_generated, master=self)
             self.plot_window.mainloop()
 
     def lr(self, do, start, end, binsize):
-        labels_df, n_modules = analysis.label_counter_subgroups(self.config, start, end)
-        lr, group_labels, label_counts, group_dict, nbins = analysis.lr_labels_timebins(self.config, labels_df, binsize)
+        labels_df, n_modules = analyze.label_counter_subgroups(self.config, start, end)
+        lr, group_labels, label_counts, group_dict, nbins = analyze.lr_labels_timebins(self.config, labels_df, binsize)
         if do=="classify_eval":
             print("Classifying and evaluating")
-            confusion, class_num, class_labels, accuracy = analysis.loocv_conf_mat(lr, label_counts, group_labels, group_dict)
+            confusion, class_num, class_labels, accuracy = analyze.loocv_conf_mat(lr, label_counts, group_labels, group_dict)
             fig = plot.plot_conf_mat(confusion, class_num, class_labels, cmap="Greens")
             self.plots_generated = self.plots_generated + 1
             self.plot_window = PlotWindow(fig=fig, plot_number=self.plots_generated, master=self)
@@ -1179,7 +1009,8 @@ class PlotWindow(customtkinter.CTk):
                                                             ("All Files", "*.*")])
         if file_path:
             fig.savefig(file_path, dpi=500)
-
+#
 if __name__ == "__main__":
     app = Application()
-    app.mainloop()
+    cProfile.run('app.mainloop()')
+    #app.mainloop()

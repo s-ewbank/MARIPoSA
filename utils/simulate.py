@@ -1,8 +1,15 @@
 import numpy as np
 from utils import analyze
-from scipy.special import softmax
 
 def generate_usage(module_feature_object, n_samples):
+    """
+    Generate simulated pose module usage object
+    :param module_feature_object: module feature object of class ModuleUsage (from analyze.get_module_usage)
+    or ModuleTransitions (from analyze.get_module_transitions)
+    :param n_samples: number of samples to generate
+    :return: module_feature_object of the same style as the one input
+
+    """
     if module_feature_object.__class__.__name__=="ModuleUsage":
         X=module_feature_object.label_counts
     elif module_feature_object.__class__.__name__=="ModuleTransitions":
@@ -14,9 +21,22 @@ def generate_usage(module_feature_object, n_samples):
     simulated_X = np.random.multivariate_normal(mean_X, cov_X, size=n_samples)
     simulated_X[simulated_X < 0] = 0
     simulated_X = simulated_X / np.sum(simulated_X, axis=1)[:,np.newaxis]
-    return analyze.ModuleUsage(simulated_X, ["9999999"]*n_samples, ["9999999"]*n_samples, module_feature_object.feat_names, module_feature_object.group_dict, None)
+    if module_feature_object.__class__.__name__=="ModuleUsage":
+        return analyze.ModuleUsage(simulated_X, ["9999999"]*n_samples, ["9999999"]*n_samples, module_feature_object.feat_names, module_feature_object.group_dict, None)
+    elif module_feature_object.__class__.__name__=="ModuleTransitions":
+        print("Warning - generating module transitions currently not tested for this function")
+        return analyze.ModuleTransitions(simulated_X, simulated_X, ["9999999"]*n_samples, ["9999999"]*n_samples, module_feature_object.feat_names, module_feature_object.group_dict, None)
+
 
 def generate_sequence(config, labels_df, T):
+    """
+    Generate individual simulated pose module label sequence of length T (noting that T = number of observations, not time)
+    :param config: the config object
+    :param labels_df: labels_df from analyze.get_module_labels
+    :param T: length of sequence to be generated
+    :return: sequence
+
+    """
     module_usage = analyze.get_module_usage(config, labels_df)
     module_transitions = analyze.get_module_transitions(config, labels_df)
     start_prob = np.mean(module_usage.label_counts,axis=0)
