@@ -372,7 +372,9 @@ def plot_distance_results(module_feature_object,
 
 
 def network_plot(config,
-                 labels_df,
+                 labels_df=None,
+                 module_usage=None,
+                 module_transitions=None,
                  cmap="bwr",
                  include_labels=True,
                  scaling=1,
@@ -384,6 +386,8 @@ def network_plot(config,
     Plot network comparison
     :param config:
     :param labels_df:
+    :param module_usage:
+    :param module_feature_object:
     :param cmap:
     :param include_labels:
     :param scaling:
@@ -393,10 +397,12 @@ def network_plot(config,
     :param alt_labels:
     :return:
     """
-    print("Getting module usage")
-    module_usage = analyze.get_module_usage(config, labels_df)
-    print("Getting module transitions")
-    module_transitions = analyze.get_module_transitions(config, labels_df)
+    if labels_df is not None:
+        print("Defaulting to using labels_df to get module_usage and module_transitions")
+        print("Getting module usage")
+        module_usage = analyze.get_module_usage(config, labels_df)
+        print("Getting module transitions")
+        module_transitions = analyze.get_module_transitions(config, labels_df)
 
     g1 = module_usage.label_counts[np.array(module_usage.group_labels) == 0, :]
     g2 = module_usage.label_counts[np.array(module_usage.group_labels) == 1, :]
@@ -820,104 +826,163 @@ def plot_conf_mat(lda_result, figW=2.5,figH=2.5,cmap="Greens",
     plt.tight_layout()
     return fig
 
-
-def plot_dist_boxplot(dists, dist_from, figW=5, figH=3,alt_labels=None):
-    """
-    Plot distance boxplots
-
-    :param dists: dists returned from lda_result.get_mahalanobis_distance()
-    :param dist_from: a group from the dataset from which to calculate all the distances
-    :param figW:
-    :param figH:
-    :return:
-    """
-
-    centroid=np.sum(["CENTROID" in i for i in list(dists.keys())])>0
-
-    if centroid:
-        pairings = [i for i in list(dists.keys()) if dist_from+"-CENTROID" in i]
-        centroid_lab = " Centroid"
-    else:
-        pairings = [i for i in list(dists.keys()) if dist_from in i]
-        centroid_lab=""
-
-    pairings_ticks = [i.replace("____vs____", "").replace(dist_from, "").replace("-CENTROID", "") for i in pairings]
+def plot_distance_matrix(module_feature_object, dist_mat,cmap="Greens",figW=3,figH=3,alt_labels=None,title=None):
+    fig = plt.figure(figsize=(figW,figH),dpi=100)
+    plt.imshow(dist_mat,aspect="auto",cmap=cmap)
+    reverse_grp_dict = {v: k for k, v in module_feature_object.group_dict.items()}
     if alt_labels is not None:
-        for p,tick in enumerate(pairings_ticks):
-            if tick=="":
-                pairings_ticks[p]=dist_from
-        pairings_ticks = [alt_labels[p] for p in pairings_ticks]
-
-    fig = plt.figure(figsize=(figW, figH))
-    xticks = []
-    for p, pair in enumerate(pairings):
-        xticks.append(p)
-        c1 = "#4198B5"
-        c2 = "#D8EBF1"
-
-        box = plt.boxplot(np.array(dists[pair]), positions=[p], widths=0.5,
-                          patch_artist=True,
-                          boxprops=dict(facecolor=c2, color=c1),
-                          whiskerprops=dict(color=c1),
-                          capprops=dict(color=c1),
-                          medianprops=dict(color=c1),
-                          flierprops=dict(markerfacecolor=c1, marker='o', markersize=4))
-
-        dist_from_name=dist_from
-        if alt_labels is not None:
-            dist_from_name=alt_labels[dist_from]
-
-        plt.ylabel('Mahalanoubis Distance\nfrom '+dist_from_name+centroid_lab)
-        plt.yticks([])
-
-    plt.xticks(ticks=xticks, labels=pairings_ticks, rotation=90)
-    plt.tight_layout()
-
-    return fig
-
-def plot_pc_weights(pca,cmap="PuOr"):
-    """
-    Plot PCA weights
-
-    :param pca: pca object from sklearn
-    :return: fig
-    """
-    components = pca.components_
-    fig = plt.figure(figsize=(4,2),dpi=100)
-    pc_labels=["PC"+str(i+1) for i in range(pca.components_.shape[0])]
-    plt.imshow(components,cmap=cmap,vmin=-1,vmax=1)
-    plt.title("Principle Component Weights")
-    plt.xticks(np.arange(0,pca.components_.shape[1],1))
-    plt.xlabel("Pose Modules")
-    plt.yticks([0,1],labels=pc_labels)
-    plt.colorbar(cmap=cmap)
+        reverse_grp_dict = {v: alt_labels[k] for k, v in module_feature_object.group_dict.items()}
+    xticks=[]
+    xticklabels=[]
+    for group in sorted(np.unique(module_feature_object.group_labels)):
+        xticks.append(group)
+        xticklabels.append(reverse_grp_dict[group])
+        if group!=0:
+            plt.axvline(group-0.5,color="black",linewidth=0.5)
+    plt.xticks(ticks=xticks,labels=xticklabels,rotation=90)
+    arr = np.array(module_feature_object.group_labels)
+    edges = np.where(arr[:-1] != arr[1:])[0]
+    for edge in edges:
+        plt.axhline(edge+0.5,color="black",linewidth=0.5)
+    ylabels = [reverse_grp_dict[i] for i in sorted(np.unique(module_feature_object.group_labels))]
+    plt.yticks(ticks=np.concatenate([np.zeros(1),edges+1]),labels=ylabels)
+    plt.ylabel("Observations")
+    plt.xlabel("Centroids")
+    if title is not None:
+        plt.title(title)
     plt.tight_layout()
     return fig
 
-def BORIS_to_pose_matrix_plot(config, boris_to_pose_output, figW=4, figH=2.5, cmap="Greens",outline_top_match=True):
-    fig, ax = plt.subplots(figsize=(figW, figH), dpi=100)
-    plt.imshow(boris_to_pose_output.to_numpy(dtype='float'),cmap=cmap,aspect="auto",interpolation="none")
-    data = boris_to_pose_output.to_numpy(dtype='float')
-    num_cols = data.shape[1]
-    if outline_top_match==True:
-        for col in range(num_cols):
-            max_row = np.argmax(data[:, col])
-            if np.sum(data[:, col]==data[max_row, col])==1:
-                rect = Rectangle((col - 0.5, max_row - 0.5), 1, 1, edgecolor='purple', facecolor='none', linewidth=0.5)
-                ax.add_patch(rect)
-    if len(boris_to_pose_output.columns>=20):
-        xticks=np.arange(0,np.max(boris_to_pose_output.columns),5,dtype=int)
-        xticklabels=np.array(list(boris_to_pose_output.columns),dtype=int)[xticks]
-    else:
-        xticks=range(len(boris_to_pose_output.columns))
-        xticklabels=boris_to_pose_output.columns
+def plot_distance_box(module_feature_object, dist_mat, cmap="Blues",figW=3,figH=3,alt_labels=None,title=None):
+    fig = plt.figure(figsize=(figW, figH),dpi=100)
+    dst = {}
+    for grp in sorted(np.unique(module_feature_object.group_labels)):
+        dst[grp] = dist_mat[np.array(module_feature_object.group_labels)==grp,0]
 
-    plt.xticks(xticks,labels=xticklabels)
-    plt.yticks(range(len(boris_to_pose_output.index)), labels=boris_to_pose_output.index)
-    plt.xlabel(config["data_source"]+" Pose Module")
-    plt.ylabel("Manually Scored\nBehavior")
-    plt.tick_params(axis='x', rotation=90,
-                    labelsize=plt.rcParams['font.size'] * 0.7, pad=2)
+    cmap = plt.get_cmap(cmap)
+    bplot = plt.boxplot([dst[i] for i in sorted(np.unique(module_feature_object.group_labels))],
+                        positions=sorted(np.unique(module_feature_object.group_labels)),
+                        patch_artist=True,
+                        medianprops={'color': cmap([0.7]), 'linewidth': 2},
+                        boxprops={'color': cmap([0.7])},
+                        whiskerprops={'color': cmap([0.7]), 'linewidth': 2},
+                        capprops={'color': cmap([0.7]), 'linewidth': 2},
+                        flierprops={'markeredgecolor': cmap([0.7]), 'marker': 'o'})
+
+    for patch in bplot['boxes']:
+        patch.set_facecolor(cmap([0.2]))
+
+    reverse_grp_dict = {v: k for k, v in module_feature_object.group_dict.items()}
+    if alt_labels:
+        reverse_grp_dict = {v: alt_labels[k] for k, v in module_feature_object.group_dict.items()}
+    plt.xticks(sorted(np.unique(module_feature_object.group_labels)),
+               labels=[reverse_grp_dict[i] for i in sorted(np.unique(module_feature_object.group_labels))],
+               rotation=90)
+    if title is not None:
+        plt.title(title)
+
+    plt.ylabel(f"Distance to {reverse_grp_dict[0]} Centroid")
     plt.tight_layout()
     return fig
+
+
+# def plot_dist_boxplot(dists, dist_from, figW=5, figH=3,alt_labels=None):
+#     """
+#     Plot distance boxplots
+#
+#     :param dists: dists returned from lda_result.get_mahalanobis_distance()
+#     :param dist_from: a group from the dataset from which to calculate all the distances
+#     :param figW:
+#     :param figH:
+#     :return:
+#     """
+#
+#     centroid=np.sum(["CENTROID" in i for i in list(dists.keys())])>0
+#
+#     if centroid:
+#         pairings = [i for i in list(dists.keys()) if dist_from+"-CENTROID" in i]
+#         centroid_lab = " Centroid"
+#     else:
+#         pairings = [i for i in list(dists.keys()) if dist_from in i]
+#         centroid_lab=""
+#
+#     pairings_ticks = [i.replace("____vs____", "").replace(dist_from, "").replace("-CENTROID", "") for i in pairings]
+#     if alt_labels is not None:
+#         for p,tick in enumerate(pairings_ticks):
+#             if tick=="":
+#                 pairings_ticks[p]=dist_from
+#         pairings_ticks = [alt_labels[p] for p in pairings_ticks]
+#
+#     fig = plt.figure(figsize=(figW, figH))
+#     xticks = []
+#     for p, pair in enumerate(pairings):
+#         xticks.append(p)
+#         c1 = "#4198B5"
+#         c2 = "#D8EBF1"
+#
+#         box = plt.boxplot(np.array(dists[pair]), positions=[p], widths=0.5,
+#                           patch_artist=True,
+#                           boxprops=dict(facecolor=c2, color=c1),
+#                           whiskerprops=dict(color=c1),
+#                           capprops=dict(color=c1),
+#                           medianprops=dict(color=c1),
+#                           flierprops=dict(markerfacecolor=c1, marker='o', markersize=4))
+#
+#         dist_from_name=dist_from
+#         if alt_labels is not None:
+#             dist_from_name=alt_labels[dist_from]
+#
+#         plt.ylabel('Mahalanoubis Distance\nfrom '+dist_from_name+centroid_lab)
+#         plt.yticks([])
+#
+#     plt.xticks(ticks=xticks, labels=pairings_ticks, rotation=90)
+#     plt.tight_layout()
+#
+#     return fig
+#
+# def plot_pc_weights(pca,cmap="PuOr"):
+#     """
+#     Plot PCA weights
+#
+#     :param pca: pca object from sklearn
+#     :return: fig
+#     """
+#     components = pca.components_
+#     fig = plt.figure(figsize=(4,2),dpi=100)
+#     pc_labels=["PC"+str(i+1) for i in range(pca.components_.shape[0])]
+#     plt.imshow(components,cmap=cmap,vmin=-1,vmax=1)
+#     plt.title("Principle Component Weights")
+#     plt.xticks(np.arange(0,pca.components_.shape[1],1))
+#     plt.xlabel("Pose Modules")
+#     plt.yticks([0,1],labels=pc_labels)
+#     plt.colorbar(cmap=cmap)
+#     plt.tight_layout()
+#     return fig
+#
+# def BORIS_to_pose_matrix_plot(config, boris_to_pose_output, figW=4, figH=2.5, cmap="Greens",outline_top_match=True):
+#     fig, ax = plt.subplots(figsize=(figW, figH), dpi=100)
+#     plt.imshow(boris_to_pose_output.to_numpy(dtype='float'),cmap=cmap,aspect="auto",interpolation="none")
+#     data = boris_to_pose_output.to_numpy(dtype='float')
+#     num_cols = data.shape[1]
+#     if outline_top_match==True:
+#         for col in range(num_cols):
+#             max_row = np.argmax(data[:, col])
+#             if np.sum(data[:, col]==data[max_row, col])==1:
+#                 rect = Rectangle((col - 0.5, max_row - 0.5), 1, 1, edgecolor='purple', facecolor='none', linewidth=0.5)
+#                 ax.add_patch(rect)
+#     if len(boris_to_pose_output.columns>=20):
+#         xticks=np.arange(0,np.max(boris_to_pose_output.columns),5,dtype=int)
+#         xticklabels=np.array(list(boris_to_pose_output.columns),dtype=int)[xticks]
+#     else:
+#         xticks=range(len(boris_to_pose_output.columns))
+#         xticklabels=boris_to_pose_output.columns
+#
+#     plt.xticks(xticks,labels=xticklabels)
+#     plt.yticks(range(len(boris_to_pose_output.index)), labels=boris_to_pose_output.index)
+#     plt.xlabel(config["data_source"]+" Pose Module")
+#     plt.ylabel("Manually Scored\nBehavior")
+#     plt.tick_params(axis='x', rotation=90,
+#                     labelsize=plt.rcParams['font.size'] * 0.7, pad=2)
+#     plt.tight_layout()
+#     return fig
 

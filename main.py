@@ -61,8 +61,7 @@ class Application(customtkinter.CTk):
         self.error_label.place(x=x,y=y,anchor=tk.CENTER)
         self.after(3000, lambda: self.error_label.configure(text="",bg_color="gray16"))
 
-    @staticmethod
-    def window_browse(item_path_entry, type="file"):
+    def window_browse(self, item_path_entry, type="file"):
         """
         Function to browse files
         :param item_path_entry:
@@ -81,11 +80,11 @@ class Application(customtkinter.CTk):
     def window1_start(self):
         self.clear_window()
 
-        logo_img = customtkinter.CTkImage(dark_image=Image.open('other/MARIPoSA_icon.png'))
+        #logo_img = customtkinter.CTkImage(dark_image=Image.open('other/MARIPoSA_icon.png'))
         self.projectstart_choice = customtkinter.StringVar(value="New project")
         customtkinter.CTkLabel(self, text="MARIPoSA",
                                font=('Helvetica', 32, "bold")).place(x=int(self.width*0.5), y=int(self.height*0.1),anchor=tk.CENTER)
-        customtkinter.CTkLabel(self, text="",image=logo_img).place(x=int(self.width*0.5), y=int(self.height*0.25),anchor=tk.CENTER)
+        #customtkinter.CTkLabel(self, text="",image=logo_img).place(x=int(self.width*0.5), y=int(self.height*0.25),anchor=tk.CENTER)
         customtkinter.CTkLabel(self, text="Would you like to start a new project or load a previous project?",
                                font=('Helvetica', 16)).place(x=int(self.width*0.5), y=int(self.height*0.4),anchor=tk.CENTER)
 
@@ -93,18 +92,17 @@ class Application(customtkinter.CTk):
         projectstart_options = ["New project","Load previous"]
         grid_last = 0
         for option in projectstart_options:
-            radio_btn = customtkinter.CTkRadioButton(self, text=option, variable=self.projectstart_choice, value=option,
-                                                     font=('Helvetica', 16))
-            radio_btn.place(x=int(self.width*0.2), y=int(self.height*(0.5+0.1*grid_last)))
+            customtkinter.CTkRadioButton(self, text=option, variable=self.projectstart_choice, value=option,
+                                         font=('Helvetica', 16)).place(x=int(self.width*0.2), y=int(self.height*(0.5+0.1*grid_last)))
             grid_last = grid_last + 1
 
         # File path entry and Browse button
         config_path_entry = customtkinter.CTkEntry(self)
         config_path_entry.insert(0, "/path/to/config.yaml")
         config_path_entry.place(x=int(self.width*0.4), y=int(self.height*0.6))
-        browse_button = customtkinter.CTkButton(self, text="Browse",
-                                                command=lambda: self.window_browse(config_path_entry, type="file"))
-        browse_button.place(x=int(self.width*0.6), y=int(self.height*0.6))
+        customtkinter.CTkButton(self,
+                                text="Browse",
+                                command=lambda: self.window_browse(config_path_entry, type="file")).place(x=int(self.width*0.6), y=int(self.height*0.6))
 
         customtkinter.CTkButton(self, text="▶", command=lambda: self.make_or_load_project(config_path_entry.get()),
                                 font=('Helvetica', 16)).place(x=int(self.width*0.8), y=int(self.height*0.9))
@@ -151,8 +149,7 @@ class Application(customtkinter.CTk):
 
             customtkinter.CTkLabel(self, text="Project name",
                                    font=('Helvetica', 16)).place(x=int(self.width*0.2), y=int(self.height*0.2))
-            project_name = customtkinter.CTkEntry(self)
-            project_name.place(x=int(self.width*0.5), y=int(self.height*0.2))
+            customtkinter.CTkEntry(self).place(x=int(self.width*0.5), y=int(self.height*0.2))
 
             # Enter data directory
             customtkinter.CTkLabel(self, text="Path to data directory",
@@ -226,9 +223,8 @@ class Application(customtkinter.CTk):
             # Radio buttons for starting new project or loading old project
             datatype_options = ["B-SOiD", "VAME", "Keypoint-MoSeq"]
             for r, option in enumerate(datatype_options):
-                radio_btn = customtkinter.CTkRadioButton(self, text=option, variable=self.datatype, value=option,
-                                                         font=('Helvetica', 16))
-                radio_btn.place(x=int(self.width * 0.5), y=int(self.height * (0.4 + r * 0.1)))
+                customtkinter.CTkRadioButton(self, text=option, variable=self.datatype, value=option,
+                                                         font=('Helvetica', 16)).place(x=int(self.width * 0.5), y=int(self.height * (0.4 + r * 0.1)))
 
             customtkinter.CTkLabel(self, text="Frames per second",
                                    font=('Helvetica', 16)).place(x=int(self.width * 0.2), y=int(self.height * 0.7))
@@ -353,11 +349,11 @@ class Application(customtkinter.CTk):
         self.create_header("Analysis Menu")
 
         # Buttons to analysis windows
-        usage_img = PhotoImage(file='other/usage_icon.png')
-        subgroups_img = PhotoImage(file='other/subgroup_icon.png')
-        embed_img = PhotoImage(file='other/embed_icon.png')
-        classify_img = PhotoImage(file='other/classify_icon.png')
-        remap_img = PhotoImage(file='other/remap_icon.png')
+        # usage_img = PhotoImage(file='other/usage_icon.png')
+        # subgroups_img = PhotoImage(file='other/subgroup_icon.png')
+        # embed_img = PhotoImage(file='other/embed_icon.png')
+        # classify_img = PhotoImage(file='other/classify_icon.png')
+        # remap_img = PhotoImage(file='other/remap_icon.png')
         button_width=int(self.width*0.2)
         button_height=int(self.height*0.15)
         customtkinter.CTkLabel(self, text="Further configure project:",
@@ -465,10 +461,9 @@ class Application(customtkinter.CTk):
 
         # Place the label in the window
         instruction_block.place(x=int(self.width * 0.3),y=int(self.height * 0.22),anchor=tk.NW)
-        edit_config_button = customtkinter.CTkButton(self,
-                                                     text="Edit config.yaml",font=('Helvetica', 16),
-                                                     command=lambda: metadata.edit_config(self.config_path))
-        edit_config_button.place(x=int(self.width*0.6), y=int(self.height*0.75))
+        customtkinter.CTkButton(self,
+                                text="Edit config.yaml",font=('Helvetica', 16),
+                                command=lambda: metadata.edit_config(self.config_path)).place(x=int(self.width*0.6), y=int(self.height*0.75))
         # Bottom back buttons
         customtkinter.CTkButton(self, text="◀ back to analysis menu", command=self.window3b_PS_menu,
                                 font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.83))
@@ -503,11 +498,10 @@ class Application(customtkinter.CTk):
             padx=10,pady=10,bg="darkgray",fg="white",justify=tk.LEFT)
 
         instruction_block.place(x=int(self.width * 0.3),y=int(self.height * 0.3),anchor=tk.NW)
-        edit_config_button = customtkinter.CTkButton(self,
-                                                     text="Edit config.yaml",font=('Helvetica', 16),
-                                                     command=lambda: metadata.edit_config(
-                                                         self.config["project_directory"] + "/config.yaml"))
-        edit_config_button.place(x=int(self.width * 0.65),y=int(self.height * 0.6),anchor=tk.CENTER)
+        customtkinter.CTkButton(self,
+                                text="Edit config.yaml",
+                                font=('Helvetica', 16),
+                                command=lambda: metadata.edit_config(self.config["project_directory"] + "/config.yaml")).place(x=int(self.width * 0.65),y=int(self.height * 0.6),anchor=tk.CENTER)
         # Bottom back buttons
         customtkinter.CTkButton(self, text="◀ update config and go back to BORIS menu", command=self.load_project_BORIS,
                                 font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.76))
@@ -536,41 +530,28 @@ class Application(customtkinter.CTk):
     def window5a_usage_transitions_menu(self):
         self.clear_window()
         self.create_sidebar_widget()
-        self.create_header("Pose Usage and Transition Analysis Menu",header_path="Viz & Analyze ▶ Usage Analysis")
+        self.create_header("Pose Usage and Transition Analysis Menu",header_path="Viz & Analyze ▶ Usage & Transitions")
 
-        customtkinter.CTkLabel(self, text="What kind of plot would you like to generate?",
+        customtkinter.CTkLabel(self, text="What kind of plot would you like to do?",
                                font=('Helvetica', 16)).place(x=int(self.width*0.65), y=int(self.height*0.3),anchor=tk.CENTER)
 
-        # Next menu options
-        # customtkinter.CTkButton(self, text="Plot pose usage for all individuals",
-        #                         command=lambda: self.window4c_usage_transitions("no_subgroups"),
-        #                         font=('Helvetica', 16)).place(x=int(self.width*0.65), y=int(self.height*0.35),anchor=tk.CENTER)
-
-        customtkinter.CTkButton(self, text="Get and plot pose usage",
-                                command=lambda: self.window5a1_usage_transitions("subgroups"),height=int(self.height*0.15),width=int(self.width*0.6),
+        customtkinter.CTkButton(self, text="1. Get pose usage and transitions",
+                                command=lambda: self.window5a1_get_usage_transitions(),height=int(self.height*0.2),width=int(self.width*0.6),
                                 font=('Helvetica', 16)).place(x=int(self.width*0.65), y=int(self.height*0.35),anchor=tk.CENTER)
-
-        # customtkinter.CTkButton(self, text="Network plot of usage and transitions",
-        #                         command=lambda: self.window4d_network("single"),
-        #                         font=('Helvetica', 16)).place(x=int(self.width*0.65), y=int(self.height*0.35),anchor=tk.CENTER)
-        customtkinter.CTkButton(self, text="Network plot of usage and transitions for subgroups",
-                                command=lambda: self.window5a2_network("comparison"),height=int(self.height*0.15),width=int(self.width*0.6),
-                                font=('Helvetica', 16)).place(x=int(self.width*0.65), y=int(self.height*0.52),anchor=tk.CENTER)
-        # Next menu options
-        customtkinter.CTkButton(self, text="Plot pose module usage\n in a subgroup over the\n course of a single session",
-                                command=lambda: self.window5a3_usage_overtime("within_session"),height=int(self.height*0.15),width=int(self.width*0.29),
-                                font=('Helvetica', 16)).place(x=int(self.width*0.80), y=int(self.height*0.69),anchor=tk.CENTER)
+        customtkinter.CTkButton(self, text="2. Plot pose usage and/or transitions",
+                                command=lambda: self.window5a2_plot_usage_transitions(),height=int(self.height*0.2),width=int(self.width*0.6),
+                                font=('Helvetica', 16)).place(x=int(self.width*0.65), y=int(self.height*0.58),anchor=tk.CENTER)
 
         customtkinter.CTkButton(self, text="◀ back to analysis menu", command=self.window3b_PS_menu,
                                 font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.83))
         customtkinter.CTkButton(self, text="◀◀ back to start", command=self.window1_start,
                                 font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.9))
-    def window5a1_usage_transitions(self,subgroup_option):
+    def window5a1_get_usage_transitions(self):
         self.clear_window()
         self.create_sidebar_widget()
-        self.create_header("Get & Plot Pose Usage",header_path="Viz & Analyze ▶ Usage Analysis ▶ Get & Plot Usage")
+        self.create_header("Measure Pose Usage and Transitions",header_path="Viz & Analyze ▶ Usage & Transitions ▶ Measure")
 
-        customtkinter.CTkLabel(self, text="Enter info about your analysis and plotting parameters.",
+        customtkinter.CTkLabel(self, text="Enter info about your analysis.",
                                font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.25))
 
         customtkinter.CTkLabel(self, text="Start time (seconds)",
@@ -581,33 +562,33 @@ class Application(customtkinter.CTk):
                                font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.45))
         end = customtkinter.CTkEntry(self)
         end.place(x=int(self.width*0.45), y=int(self.height*0.45))
-        customtkinter.CTkLabel(self, text="Data to plot",
+        customtkinter.CTkLabel(self, text="Data to include",
                                font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.55))
         dropdown = MultiDropDown(self,options=["all combined"]+list(self.config["subgroups"].keys()))
         dropdown.place(x=int(self.width*0.45), y=int(self.height*0.55))
-
-        customtkinter.CTkLabel(self, text="Colormap",
-                               font=('Helvetica', 16)).place(x=int(self.width*0.65), y=int(self.height*0.75))
-        color = customtkinter.CTkComboBox(self, values=["jet", "cividis", "viridis", "magma"])
-        color.place(x=int(self.width*0.75), y=int(self.height*0.75))
-        color.set("jet")
-        # Choose style for plot
-        customtkinter.CTkLabel(self, text="What should the plot style be?",
+        customtkinter.CTkLabel(self, text="Binsize (seconds; blank for no binning)",
                                font=('Helvetica', 16)).place(x=int(self.width*0.65), y=int(self.height*0.35))
-        style = customtkinter.StringVar(value="scatter")
-        style_options = ["Bar with scattered individual points",
-                         "Bar with standard error of the mean",
-                         "Points with standard error of the mean"]
-        style_vars = ["bar_scatter", "bar_error", "points"]
+        binsize = customtkinter.CTkEntry(self)
+        binsize.place(x=int(self.width*0.65), y=int(self.height*0.45))
+        save_option = customtkinter.StringVar(value="scatter")
+        save_options = ["Save to pickle (for further using in MARIPoSA)",
+                         "Save to csv (for external use)",
+                         "Save to pickle AND csv"]
+        style_vars = ["pickle", "csv", "both"]
         for s in range(len(style_vars)):
-            radio_btn = customtkinter.CTkRadioButton(self, text=style_options[s],
-                                                     variable=style, value=style_vars[s],
+            radio_btn = customtkinter.CTkRadioButton(self, text=save_options[s],
+                                                     variable=save_option, value=style_vars[s],
                                                      font=('Helvetica', 16))
-            radio_btn.place(x=int(self.width*0.65), y=int(self.height*(0.45+0.08*s)))
-        customtkinter.CTkButton(self, text="Plot it!",
-                                command=lambda: self.plot_usage(int(start.get()), int(end.get()),
-                                                                style.get(), color.get(),
-                                                                dropdown.get_selected_values()),
+            radio_btn.place(x=int(self.width*0.65), y=int(self.height*(0.55+0.08*s)))
+        customtkinter.CTkButton(self, text="Analyze & Save",
+                                command=lambda: self.save_usage_transitions(int(start.get()),
+                                                                            int(end.get()),
+                                                                            dropdown.get_selected_values(),
+                                                                            binsize.get(),
+                                                                            save_to=save_option.get()),
+                                font=('Helvetica', 16)).place(x=int(self.width*0.8), y=int(self.height*0.8))
+        customtkinter.CTkButton(self, text="Proceed to plotting",
+                                command=lambda: self.window5a2_plot_usage_transitions(),
                                 font=('Helvetica', 16)).place(x=int(self.width*0.8), y=int(self.height*0.9))
         # Bottom back buttons
         customtkinter.CTkButton(self, text="◀ back to analysis menu", command=self.window3b_PS_menu,
@@ -615,145 +596,164 @@ class Application(customtkinter.CTk):
         customtkinter.CTkButton(self, text="◀◀ back to start", command=self.window1_start,
                                 font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.9))
 
-    def window5a2_network(self,subgroup_option):
+    def window5a2_plot_usage_transitions(self,pickle_path_prefill = "/path/to/usage.pickle",
+                                         tx_pickle_path_prefill="/path/to/transitions.pickle",
+                                         plot_option=None):
         self.clear_window()
         self.create_sidebar_widget()
-        self.create_header("Network Plot",header_path="Viz & Analyze ▶ Usage Analysis ▶ Network Plot")
+        self.create_header("Get & Plot Pose Usage",
+                           header_path="Viz & Analyze ▶ Usage & Transitions ▶ Plot")
 
-        customtkinter.CTkLabel(self, text="Enter info about your plotting parameters.",
-                               font=('Helvetica', 16)).place(x=int(self.width*0.65), y=int(self.height*0.25),anchor=tk.CENTER)
-
-        # Plot
-        # Choose start and end time
-        # Set groups to compare
-        customtkinter.CTkLabel(self, text="Comparison group 1",
-                               font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.35))
-        group1 = customtkinter.CTkComboBox(self, values=list(self.config["subgroups"].keys()))
-        group1.place(x=int(self.width*0.45), y=int(self.height*0.35))
-        customtkinter.CTkLabel(self, text="Comparison group 2",
-                               font=('Helvetica', 16)).place(x=int(self.width*0.6), y=int(self.height*0.35))
-        group2 = customtkinter.CTkComboBox(self, values=list(self.config["subgroups"].keys()))
-        group2.place(x=int(self.width*0.75), y=int(self.height*0.35))
-        customtkinter.CTkLabel(self, text="Start time\n(seconds)",
-                               font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.45))
-        start = customtkinter.CTkEntry(self)
-        start.place(x=int(self.width*0.45), y=int(self.height*0.45))
-        customtkinter.CTkLabel(self, text="End time\n(seconds)",
-                               font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.55))
-        end = customtkinter.CTkEntry(self)
-        end.place(x=int(self.width*0.45), y=int(self.height*0.55))
-        # Choose color
-        customtkinter.CTkLabel(self, text="Colormap for plot",
-                               font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.65))
-        color = customtkinter.CTkComboBox(self, values=["bwr", "seismic", "PRGn", "BrBG", "PuOr", "PiYG"])
-        color.place(x=int(self.width*0.45), y=int(self.height*0.65))
-        color.set("bwr")
-        # Choose style for plot
-        customtkinter.CTkLabel(self, text="Label module numbers on plot?",
-                               font=('Helvetica', 16)).place(x=int(self.width*0.7), y=int(self.height*0.55))
-        style = customtkinter.StringVar(value="scatter")
-        style_options = ["Yes, label",
-                         "No, don't label"]
-        style_vars = [1,0]
-        for s in range(len(style_vars)):
-            radio_btn = customtkinter.CTkRadioButton(self, text=style_options[s],
-                                                     variable=style, value=style_vars[s],
-                                                     font=('Helvetica', 16))
-            radio_btn.place(x=int(self.width*0.7), y=int(self.height*(0.65+0.1*s)))
-        customtkinter.CTkButton(self, text="Plot it!",
-                                command=lambda: self.plot_network(group1.get(), group2.get(), int(start.get()),
-                                                                  int(end.get()), style.get(), color.get(),
-                                                                  subgroup_option),
-                                font=('Helvetica', 16)).place(x=int(self.width*0.8), y=int(self.height*0.9))
-        # Bottom back buttons
-        customtkinter.CTkButton(self, text="◀ back to analysis menu", command=self.window3b_PS_menu,
-                                font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.83))
-        customtkinter.CTkButton(self, text="◀◀ back to start", command=self.window1_start,
-                                font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.9))
-
-    def window5a3_usage_overtime(self, session_option):
-        self.clear_window()
-        self.create_sidebar_widget()
-
-        customtkinter.CTkLabel(self, text="Choose the parameters for your plot.",
+        customtkinter.CTkLabel(self, text="Path to module usage .pickle:",
                                font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.25))
-
-        if session_option=="within_session":
-            title_string="Time Series of Pose Module Usage Within Session"
-            self.create_header(title_string, header_path="Viz & Analyze ▶ Usage Analysis ▶ Within-Session Over Time")
-
-            customtkinter.CTkLabel(self, text="Subgroup",
-                                   font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.35))
-            group = customtkinter.CTkComboBox(self, values=list(self.config["subgroups"].keys()))
-            group.place(x=int(self.width*0.45), y=int(self.height*0.35))
-            # Choose start and end time
-            customtkinter.CTkLabel(self, text="Start time\n(seconds)",
-                                   font=('Helvetica', 16)).place(x=int(self.width*0.65), y=int(self.height*0.35))
-            start = customtkinter.CTkEntry(self)
-            start.place(x=int(self.width*0.8), y=int(self.height*0.35))
-            customtkinter.CTkLabel(self, text="Time per block\n(seconds)",
-                                   font=('Helvetica', 16)).place(x=int(self.width*0.65), y=int(self.height*0.45))
-            time_per_block = customtkinter.CTkEntry(self)
-            time_per_block.place(x=int(self.width*0.8), y=int(self.height*0.45))
-            customtkinter.CTkLabel(self, text="Number of blocks",
-                                   font=('Helvetica', 16)).place(x=int(self.width*0.65), y=int(self.height*0.55))
-            n_blocks = customtkinter.CTkEntry(self)
-            n_blocks.place(x=int(self.width*0.8), y=int(self.height*0.55))
+        pickle_path = customtkinter.CTkEntry(self)
+        pickle_path.insert(0, pickle_path_prefill)
+        pickle_path.place(x=int(self.width*0.6), y=int(self.height*0.25))
+        customtkinter.CTkButton(self,
+                                text="Browse",
+                                command=lambda: self.window_browse(pickle_path, type="file")).place(x=int(self.width*0.8), y=int(self.height*0.25))
+        customtkinter.CTkLabel(self, text="Path to module transitions .pickle:",
+                               font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.32))
+        tx_pickle_path = customtkinter.CTkEntry(self)
+        tx_pickle_path.insert(0, tx_pickle_path_prefill)
+        tx_pickle_path.place(x=int(self.width*0.6), y=int(self.height*0.32))
+        customtkinter.CTkButton(self,
+                                text="Browse",
+                                command=lambda: self.window_browse(tx_pickle_path, type="file")).place(x=int(self.width*0.8), y=int(self.height*0.32))
+        if plot_option==None:
+            customtkinter.CTkLabel(self, text="What type of plot do you want to make?",
+                                   font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.4))
+            customtkinter.CTkButton(self, text="Usage comparison",
+                                    command=lambda: self.window5a2_plot_usage_transitions(pickle_path_prefill=pickle_path.get(),
+                                                                                          tx_pickle_path_prefill=tx_pickle_path.get(),
+                                                                                          plot_option="usage"),
+                                    font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.45))
+            customtkinter.CTkButton(self, text="Pairwise network\ncomparison",
+                                    command=lambda: self.window5a2_plot_usage_transitions(pickle_path_prefill=pickle_path.get(),
+                                                                                          tx_pickle_path_prefill=tx_pickle_path.get(),
+                                                                                          plot_option="network"),
+                                    font=('Helvetica', 16)).place(x=int(self.width*0.55), y=int(self.height*0.45))
+            customtkinter.CTkButton(self, text="Within-session\ntime dynamic usage",
+                                    command=lambda: self.window5a2_plot_usage_transitions(pickle_path_prefill=pickle_path.get(),
+                                                                                          tx_pickle_path_prefill=tx_pickle_path.get(),
+                                                                                          plot_option="sandplot"),
+                                    font=('Helvetica', 16)).place(x=int(self.width*0.8), y=int(self.height*0.45))
+        elif plot_option=="usage":
+            customtkinter.CTkLabel(self, text="Selected plot type: USAGE",
+                                   font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.4))
+            customtkinter.CTkLabel(self, text="Colormap",
+                                   font=('Helvetica', 16)).place(x=int(self.width*0.65), y=int(self.height*0.5))
+            color = customtkinter.CTkComboBox(self, values=["jet", "cividis", "viridis", "magma"])
+            color.place(x=int(self.width*0.75), y=int(self.height*0.5))
+            color.set("jet")
             # Choose style for plot
-            customtkinter.CTkLabel(self, text="What should the \nplot style be?",
-                                   font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.45))
+            customtkinter.CTkLabel(self, text="What should the usage plot style be?",
+                                   font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.5))
             style = customtkinter.StringVar(value="scatter")
-            style_options = ["Area","Line"]
-            style_vars = ["area", "line"]
+            style_options = ["Bar with scattered individual points",
+                             "Bar with standard error of the mean",
+                             "Points with standard error of the mean",
+                             "Stacked means"]
+            style_vars = ["bar_scatter", "bar_error", "points", "stacked"]
             for s in range(len(style_vars)):
                 radio_btn = customtkinter.CTkRadioButton(self, text=style_options[s],
                                                          variable=style, value=style_vars[s],
                                                          font=('Helvetica', 16))
-                radio_btn.place(x=int(self.width*0.3), y=int(self.height*(0.55+0.1*s)))
+                radio_btn.place(x=int(self.width*0.3), y=int(self.height*(0.5+0.06*s)))
             customtkinter.CTkButton(self, text="Plot it!",
-                                    command=lambda: self.plot_usage_overtime(group.get(),
-                                                                             session_option,
-                                                                             start=int(start.get()),
-                                                                             time_per_block=int(time_per_block.get()),
-                                                                             n_blocks=int(n_blocks.get())),
+                                    command=lambda: self.plot_usage(pickle_path.get(), style.get(), color.get()),
                                     font=('Helvetica', 16)).place(x=int(self.width*0.8), y=int(self.height*0.9))
-        elif session_option=="across_sessions":
-            title_string="Pose Module Usage Across Sessions"
-            self.create_header(title_string,header_path="Viz & Analyze ▶ Usage Analysis ▶ Across Sessions")
 
-            customtkinter.CTkLabel(self, text="Subgroups",
-                                   font=('Helvetica', 16)).place(x=int(self.width * 0.3), y=int(self.height * 0.35))
-            dropdown = MultiDropDown(self,options=list(self.config["subgroups"].keys()))
-            dropdown.place(x=int(self.width * 0.45), y=int(self.height * 0.35))
-
-            # Choose start and end time
-            customtkinter.CTkLabel(self, text="Start time\n(seconds)",
-                                   font=('Helvetica', 16)).place(x=int(self.width * 0.65), y=int(self.height * 0.35))
-            start = customtkinter.CTkEntry(self)
-            start.place(x=int(self.width * 0.8), y=int(self.height * 0.35))
-            customtkinter.CTkLabel(self, text="End time\n(seconds)",
-                                   font=('Helvetica', 16)).place(x=int(self.width * 0.65), y=int(self.height * 0.45))
-            end = customtkinter.CTkEntry(self)
-            end.place(x=int(self.width * 0.8), y=int(self.height * 0.45))
+        elif plot_option == "network":
+            customtkinter.CTkLabel(self, text="Selected plot type: NETWORK",
+                                   font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.4))
+            customtkinter.CTkLabel(self, text="Colormap",
+                                   font=('Helvetica', 16)).place(x=int(self.width*0.65), y=int(self.height*0.5))
+            color = customtkinter.CTkComboBox(self, values=["bwr", "seismic", "PiYG", "BrBG", "PRGn"])
+            color.place(x=int(self.width*0.75), y=int(self.height*0.5))
+            color.set("bwr")
             customtkinter.CTkButton(self, text="Plot it!",
-                                    command=lambda: self.plot_usage_overtime(dropdown.get_selected_values(),
-                                                                             session_option,
-                                                                             start=int(start.get()),
-                                                                             end=int(end.get())),
-                                    font=('Helvetica', 16)).place(x=int(self.width * 0.8), y=int(self.height * 0.9))
+                                    command=lambda: self.plot_network(pickle_path.get(), tx_pickle_path.get(), color.get()),
+                                    font=('Helvetica', 16)).place(x=int(self.width*0.8), y=int(self.height*0.9))
+        elif plot_option=="sandplot":
+            customtkinter.CTkLabel(self, text="Selected plot type: SANDPLOT",
+                                   font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.4))
+            customtkinter.CTkButton(self, text="Plot it!",
+                                    command=lambda: self.plot_sandplot(pickle_path.get()),
+                                    font=('Helvetica', 16)).place(x=int(self.width*0.8), y=int(self.height*0.9))
         # Bottom back buttons
         customtkinter.CTkButton(self, text="◀ back to analysis menu", command=self.window3b_PS_menu,
                                 font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.83))
         customtkinter.CTkButton(self, text="◀◀ back to start", command=self.window1_start,
                                 font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.9))
 
-    def window5b_embed_distance_menu(self):
+    def window5b_embed_distance_menu(self,pickle_path_prefill = "/path/to/file.pickle",
+                                         emb_dist_option=None):
         self.clear_window()
         self.create_sidebar_widget()
         self.create_header("Embed and Distance Menu",header_path="Viz & Analyze ▶ Embed")
 
-        customtkinter.CTkLabel(self, text="What tool do you want to use to embed and/or measure distance?",
-                               font=('Helvetica', 16)).place(x=int(self.width*0.65), y=int(self.height*0.24),anchor=tk.CENTER)
+        customtkinter.CTkLabel(self, text="Path to module feature object (transitions or usage) .pickle:",
+                               font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.25))
+        pickle_path = customtkinter.CTkEntry(self)
+        pickle_path.insert(0, pickle_path_prefill)
+        pickle_path.place(x=int(self.width*0.7), y=int(self.height*0.25))
+        customtkinter.CTkButton(self,
+                                text="Browse",
+                                command=lambda: self.window_browse(pickle_path, type="file")).place(x=int(self.width*0.85), y=int(self.height*0.25))
+
+        if emb_dist_option is None:
+            customtkinter.CTkLabel(self, text="Embed or measure distance between groups?",
+                                   font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.4))
+            customtkinter.CTkButton(self, text="Embed",
+                                    command=lambda: self.window5b_embed_distance_menu(
+                                        pickle_path_prefill=pickle_path.get(),
+                                        emb_dist_option="embed"),
+                                    font=('Helvetica', 16)).place(x=int(self.width * 0.3), y=int(self.height * 0.45))
+            customtkinter.CTkButton(self, text="Distance",
+                                    command=lambda: self.window5b_embed_distance_menu(
+                                        pickle_path_prefill=pickle_path.get(),
+                                        emb_dist_option="distance"),
+                                    font=('Helvetica', 16)).place(x=int(self.width * 0.55), y=int(self.height * 0.45))
+        elif emb_dist_option=="embed":
+            customtkinter.CTkLabel(self, text="Embed or measure distance option: EMBED",
+                                   font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.4))
+            customtkinter.CTkLabel(self, text="Dimensionality reduction method",
+                                   font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.6))
+            embedding_type = customtkinter.CTkComboBox(self, values=["pca", "lda"])
+            embedding_type.place(x=int(self.width*0.65), y=int(self.height*0.6))
+            embedding_type.set("pca")
+            customtkinter.CTkLabel(self, text="Colormap",
+                                   font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.7))
+            color = customtkinter.CTkComboBox(self, values=["jet", "cividis", "viridis", "magma"])
+            color.place(x=int(self.width*0.65), y=int(self.height*0.7))
+            color.set("jet")
+            customtkinter.CTkButton(self, text="Plot embeddings",
+                                    command=lambda: self.embed_plot(pickle_path.get(), embedding_type.get(), color.get()),
+                                    font=('Helvetica', 16)).place(x=int(self.width*0.8), y=int(self.height*0.9))
+        elif emb_dist_option=="distance":
+            customtkinter.CTkLabel(self, text="Embed or measure distance option: DISTANCE",
+                                   font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.4))
+            customtkinter.CTkLabel(self, text="Distance metric to use",
+                                   font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.6))
+            dist_metric = customtkinter.CTkComboBox(self, values=["euclidean","cityblock","correlation"])
+            dist_metric.place(x=int(self.width*0.5), y=int(self.height*0.6))
+            dist_metric.set("euclidean")
+            customtkinter.CTkLabel(self, text="Pairwise or centroid",
+                                   font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.7))
+            pairwise_centroid_opt = customtkinter.CTkComboBox(self, values=["pairwise", "centroid"])
+            pairwise_centroid_opt.place(x=int(self.width*0.5), y=int(self.height*0.7))
+            pairwise_centroid_opt.set("centroid")
+            customtkinter.CTkLabel(self, text="Plot type",
+                                   font=('Helvetica', 16)).place(x=int(self.width*0.65), y=int(self.height*0.6))
+            plot_type = customtkinter.CTkComboBox(self, values=["boxplot", "heatmap"])
+            plot_type.place(x=int(self.width*0.8), y=int(self.height*0.6))
+            plot_type.set("heatmap")
+            customtkinter.CTkButton(self, text="Plot distance",
+                                    command=lambda: self.distance_plot(pickle_path.get(), dist_metric.get(),
+                                                                       pairwise_centroid_opt.get(),
+                                                                       plot_type.get()),
+                                    font=('Helvetica', 16)).place(x=int(self.width*0.8), y=int(self.height*0.9))
         # Bottom back buttons
         customtkinter.CTkButton(self, text="◀ back to analysis menu", command=self.window3b_PS_menu,
                                 font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.83))
@@ -761,23 +761,49 @@ class Application(customtkinter.CTk):
                                 font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.9))
 
 
-    def window5c_classify_regress_menu(self):
+    def window5c_classify_regress_menu(self,pickle_path_prefill="/path/to/file.pickle",classify_regress_opt=None):
         self.clear_window()
         self.create_sidebar_widget()
-        self.create_header("Classify and Embed Menu",header_path="Viz & Analyze ▶ Classify")
+        self.create_header("Classify and Embed Menu",header_path="Viz & Analyze ▶ Classify/Regress")
 
-        customtkinter.CTkLabel(self, text="What tool do you want to use to classify and/or embed?",
-                               font=('Helvetica', 16)).place(x=int(self.width*0.65), y=int(self.height*0.24),anchor=tk.CENTER)
-
-        customtkinter.CTkButton(self, text="Linear discriminant analysis",
-                                command=self.window4g_lda_embed_classify,height=int(self.height*0.15),width=int(self.width*0.6),
-                                font=('Helvetica', 16)).place(x=int(self.width*0.65), y=int(self.height*0.35),anchor=tk.CENTER)
-        customtkinter.CTkButton(self, text="Logistic regression",
-                                command=self.window4g_lr_classify,height=int(self.height*0.15),width=int(self.width*0.6),
-                                font=('Helvetica', 16)).place(x=int(self.width*0.65), y=int(self.height*0.52),anchor=tk.CENTER)
-        customtkinter.CTkButton(self, text="Natural language processing",
-                                command=self.window4g_nlp_classify,height=int(self.height*0.15),width=int(self.width*0.6),
-                                font=('Helvetica', 16)).place(x=int(self.width*0.65), y=int(self.height*0.69),anchor=tk.CENTER)
+        customtkinter.CTkLabel(self, text="Path to module feature object (transitions or usage) .pickle:",
+                               font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.25))
+        pickle_path = customtkinter.CTkEntry(self)
+        pickle_path.insert(0, pickle_path_prefill)
+        pickle_path.place(x=int(self.width*0.7), y=int(self.height*0.25))
+        customtkinter.CTkButton(self,
+                                text="Browse",
+                                command=lambda: self.window_browse(pickle_path, type="file")).place(x=int(self.width*0.85), y=int(self.height*0.25))
+        if classify_regress_opt is None:
+            customtkinter.CTkLabel(self, text="Would you like to predict independent variable associated with subgroups using classification or regression?",
+                                   font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.4))
+            customtkinter.CTkButton(self, text="Classify",
+                                    command=lambda: self.window5c_classify_regress_menu(
+                                        pickle_path_prefill=pickle_path.get(),
+                                        classify_regress_opt="classify"),
+                                    font=('Helvetica', 16)).place(x=int(self.width * 0.3), y=int(self.height * 0.45))
+            customtkinter.CTkButton(self, text="Regress",
+                                    command=lambda: self.window5c_classify_regress_menu(
+                                        pickle_path_prefill=pickle_path.get(),
+                                        classify_regress_opt="regress"),
+                                    font=('Helvetica', 16)).place(x=int(self.width * 0.55), y=int(self.height * 0.45))
+        elif classify_regress_opt=="classify":
+            customtkinter.CTkLabel(self, text="Classification method to use",
+                                   font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.6))
+            method = customtkinter.CTkComboBox(self, values=["LogisticRegression","LDA","MLP","NaiveBayes","KNN","RandomForest"])
+            method.place(x=int(self.width*0.5), y=int(self.height*0.6))
+            method.set("LogisticRegression")
+            customtkinter.CTkLabel(self, text="Classify or regress option: CLASSIFY",
+                                   font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.4))
+            customtkinter.CTkButton(self, text="Leave-one-out-cross-validation (LOOCV)",
+                                    command=lambda: self.classify(pickle_path.get(), method.get(), "loocv"),
+                                    font=('Helvetica', 16)).place(x=int(self.width*0.8), y=int(self.height*0.8))
+            customtkinter.CTkButton(self, text="Fit and save classifier",
+                                    command=lambda: self.classify(pickle_path.get(), method.get(), "fullfit"),
+                                    font=('Helvetica', 16)).place(x=int(self.width*0.8), y=int(self.height*0.9))
+        elif classify_regress_opt=="regress":
+            customtkinter.CTkLabel(self, text="Classify or regress option: REGRESS",
+                                   font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.4))
         # Bottom back buttons
         customtkinter.CTkButton(self, text="◀ back to analysis menu", command=self.window3b_PS_menu,
                                 font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.83))
@@ -818,51 +844,6 @@ class Application(customtkinter.CTk):
         customtkinter.CTkButton(self, text="◀◀ back to start", command=self.window1_start,
                                 font=('Helvetica', 16)).place(x=int(self.width * 0.3), y=int(self.height * 0.9))
 #
-    def plot_usage(self, start, end, style, color, subgroups):
-        if subgroups == ["all combined"]:
-            labels_df, n_modules = analyze.label_counter_nosubgroups(self.config, start, end)
-            fig = plot.plot_module_usage(self.config, labels_df, start, end, int(self.config["fps"]), style=style, cmap=color)
-            self.plots_generated = self.plots_generated + 1
-            self.plot_window = PlotWindow(fig = fig, plot_number = self.plots_generated, master = self)
-            self.plot_window.mainloop()
-        else:
-            selected_subgroups=[i for i in subgroups if (i!="all combined")]
-            labels_df, n_modules = analyze.label_counter_subgroups(self.config, start, end, selected_subgroups=selected_subgroups)
-            fig = plot.plot_module_usage_subgroups(self.config, labels_df, start, end, int(self.config["fps"]), style=style, cmap=color)
-            self.plots_generated = self.plots_generated + 1
-            self.plot_window = PlotWindow(fig = fig, plot_number = self.plots_generated, master = self)
-            self.plot_window.mainloop()
-
-    def plot_network(self, group1, group2, start, end, style, cmap, subgroup_option):
-        if subgroup_option=="single":
-            labels_df, n_modules = analyze.label_counter_nosubgroups(self.config, start, end)
-            #plot.plot_module_usage(labels_df, start, end, int(self.config["fps"]), style=style, cmap=color)
-        elif subgroup_option=="comparison":
-            labels_df, n_modules = analyze.label_counter_subgroups(self.config, start, end)
-            fig = plot.network_pairwise_comparison(self.config, labels_df, 0, 1200, [group1, group2],
-                                                   cmap=cmap,include_labels=bool(style))
-            self.plots_generated = self.plots_generated + 1
-            self.plot_window = PlotWindow(fig = fig, plot_number = self.plots_generated, master = self)
-            self.plot_window.mainloop()
-
-    def plot_usage_overtime(self, group, session_option, start=None, time_per_block=None, n_blocks=None, end=None):
-        if session_option=="within_session":
-            print(group)
-            labels_df, n_modules = analyze.label_counter_subgroups(self.config, start,
-                                                                    int(time_per_block*n_blocks),
-                                                                    selected_subgroups=[group])
-            fig = plot.SandPlotClusterFrequency_OverTime(self.config, labels_df[group], start,
-                                                         time_per_block, n_blocks)
-            self.plots_generated = self.plots_generated + 1
-            self.plot_window = PlotWindow(fig = fig, plot_number = self.plots_generated, master = self)
-            self.plot_window.mainloop()
-        elif session_option=="across_sessions":
-            labels_df, n_modules = analyze.label_counter_subgroups(self.config, start, end,selected_subgroups=group)
-            fig = plot.plot_module_usage_stacked(self.config, labels_df, start, end)
-            self.plots_generated = self.plots_generated + 1
-            self.plot_window = PlotWindow(fig = fig, plot_number = self.plots_generated, master = self)
-            self.plot_window.mainloop()
-            #plot.plot_module_usage_subgroups(labels_df, start, end, int(self.config["fps"]), style=style, cmap=color)
 
     def plot_pose_vs_BORIS(self):
         BORIS_to_pose_mat, BORIS_to_pose_mat_normalized, loss = analyze.BORIS_to_pose(self.config) # this line is messing up the loaded config
@@ -871,45 +852,134 @@ class Application(customtkinter.CTk):
         self.plot_window = PlotWindow(fig = fig, plot_number = self.plots_generated, master = self)
         self.plot_window.mainloop()
 
-    def lda(self, do, start, end, binsize, cmap, subgroups):
-        labels_df, n_modules = analyze.label_counter_subgroups(self.config, start, end, selected_subgroups=subgroups)
-        if do=="embed":
-            lda_result = analyze.lda_labels_timebins(self.config, labels_df, binsize, selected_subgroups=subgroups)
-            fig = plot.plot_lda(self.config, lda_result, cmap=cmap)
-            self.plots_generated = self.plots_generated + 1
-            self.plot_window = PlotWindow(fig=fig, plot_number=self.plots_generated, master=self)
-            self.plot_window.mainloop()
-        elif do=="classify_eval":
-            print("Classifying and evaluating")
-            lda_result = analyze.lda_labels_timebins(self.config, labels_df, binsize, selected_subgroups=subgroups, loocv=True)
-            fig = plot.plot_conf_mat(lda_result, cmap="Greens")
-            self.plots_generated = self.plots_generated + 1
-            self.plot_window = PlotWindow(fig=fig, plot_number=self.plots_generated, master=self)
-            self.plot_window.mainloop()
-        elif do=="save":
-            print("Saving LDA classifier")
-            lda_result = analyze.lda_labels_timebins(self.config, labels_df, binsize, selected_subgroups=subgroups)
-            fig = plot.plot_lda(self.config, lda_result, cmap=cmap)
-            self.plots_generated = self.plots_generated + 1
-            self.plot_window = PlotWindow(fig=fig, plot_number=self.plots_generated, master=self)
-            self.plot_window.mainloop()
+    def save_usage_transitions(self, start, end, subgroups, binsize, save_to):
+        if len(binsize)>0:
+            bin = True
+            binsize = float(binsize)
+        else:
+            bin = False
+        if subgroups == ["all combined"]:
+            labels_df = analyze.get_module_labels(self.config, start, end)
+            if bin:
+                module_usage = analyze.get_module_usage(self.config, labels_df, binsize=binsize)
+            else:
+                module_usage = analyze.get_module_usage(self.config, labels_df)
+            module_transitions = analyze.get_module_transitions(self.config, labels_df)
+            file_path = filedialog.asksaveasfilename(defaultextension='.pickle',
+                                                     filetypes=[("pickle files", "*.pickle"),
+                                                                ("All Files", "*.*")])
+            if save_to=="pickle":
+                module_usage.save(file_path+"_USAGE.pickle")
+                module_transitions.save(file_path+"_TRANSITIONS.pickle")
+            elif save_to=="csv":
+                usage_df = module_usage.to_df()
+                usage_df.to_csv(file_path+"_USAGE.csv")
+                transitions_df = module_transitions.to_df()
+                transitions_df.to_csv(file_path+"_TRANSITIONS.csv")
+            elif save_to=="both":
+                module_usage.save(file_path+"_USAGE.pickle")
+                module_transitions.save(file_path+"_TRANSITIONS.pickle")
+                usage_df = module_usage.to_df()
+                usage_df.to_csv(file_path+"_USAGE.csv")
+                transitions_df = module_transitions.to_df()
+                transitions_df.to_csv(file_path+"_TRANSITIONS.csv")
 
-    def lr(self, do, start, end, binsize):
-        labels_df, n_modules = analyze.label_counter_subgroups(self.config, start, end)
-        lr, group_labels, label_counts, group_dict, nbins = analyze.lr_labels_timebins(self.config, labels_df, binsize)
-        if do=="classify_eval":
-            print("Classifying and evaluating")
-            confusion, class_num, class_labels, accuracy = analyze.loocv_conf_mat(lr, label_counts, group_labels, group_dict)
-            fig = plot.plot_conf_mat(confusion, class_num, class_labels, cmap="Greens")
-            self.plots_generated = self.plots_generated + 1
-            self.plot_window = PlotWindow(fig=fig, plot_number=self.plots_generated, master=self)
-            self.plot_window.mainloop()
-        # elif do=="save":
-        #     print("Saving LDA plot")
-        #     fig = plot.plot_lda(self.config, lda, lda_embeddings, group_labels, nbins, binsize, cmap=cmap)
-        #     self.plots_generated = self.plots_generated + 1
-        #     self.plot_window = PlotWindow(fig=fig, plot_number=self.plots_generated, master=self)
-        #     self.plot_window.mainloop()
+
+        else:
+            selected_subgroups=[i for i in subgroups if (i!="all combined")]
+            labels_df = analyze.get_module_labels(self.config, start, end, subgroups=selected_subgroups)
+            if bin:
+                module_usage = analyze.get_module_usage(self.config, labels_df, binsize=binsize)
+            else:
+                module_usage = analyze.get_module_usage(self.config, labels_df)
+            module_transitions = analyze.get_module_transitions(self.config, labels_df)
+            file_path = filedialog.asksaveasfilename(defaultextension='.pickle',
+                                                     filetypes=[("pickle files", "*.pickle"),
+                                                                ("All Files", "*.*")])
+            if save_to=="pickle":
+                module_usage.save(file_path+"_USAGE.pickle")
+                module_transitions.save(file_path+"_TRANSITIONS.pickle")
+            elif save_to=="csv":
+                usage_df = module_usage.to_df()
+                usage_df.to_csv(file_path+"_USAGE.csv")
+                transitions_df = module_transitions.to_df()
+                transitions_df.to_csv(file_path+"_TRANSITIONS.csv")
+            elif save_to=="both":
+                module_usage.save(file_path+"_USAGE.pickle")
+                module_transitions.save(file_path+"_TRANSITIONS.pickle")
+                usage_df = module_usage.to_df()
+                usage_df.to_csv(file_path+"_USAGE.csv")
+                transitions_df = module_transitions.to_df()
+                transitions_df.to_csv(file_path+"_TRANSITIONS.csv")
+
+    def plot_usage(self, pickle_path, style, color):
+        module_usage = analyze.load_module_feature_object(pickle_path)
+        fig = plot.plot_module_usage(self.config, module_usage, style=style, cmap=color)
+        self.plots_generated = self.plots_generated + 1
+        self.plot_window = PlotWindow(fig = fig, plot_number = self.plots_generated, master = self)
+        self.plot_window.mainloop()
+
+    def plot_network(self, pickle_path, tx_pickle_path, color):
+        module_usage = analyze.load_module_feature_object(pickle_path)
+        module_transitions = analyze.load_module_feature_object(tx_pickle_path)
+        fig = plot.network_plot(self.config, module_usage = module_usage, module_transitions = module_transitions, cmap=color)
+        self.plots_generated = self.plots_generated + 1
+        self.plot_window = PlotWindow(fig = fig, plot_number = self.plots_generated, master = self)
+        self.plot_window.mainloop()
+
+    def plot_sandplot(self, pickle_path):
+        module_usage = analyze.load_module_feature_object(pickle_path)
+        fig = plot.module_usage_sandplot(self.config, module_usage)
+        self.plots_generated = self.plots_generated + 1
+        self.plot_window = PlotWindow(fig = fig, plot_number = self.plots_generated, master = self)
+        self.plot_window.mainloop()
+
+    def embed_plot(self, pickle_path, embedding_type, color):
+        module_feature_object = analyze.load_module_feature_object(pickle_path)
+        emb = analyze.embed(module_feature_object, method=embedding_type, n_components=2)
+        fig = plot.plot_embeddings(module_feature_object, emb, cmap=color)
+        self.plots_generated = self.plots_generated + 1
+        self.plot_window = PlotWindow(fig = fig, plot_number = self.plots_generated, master = self)
+        self.plot_window.mainloop()
+
+    def distance_plot(self, pickle_path, dist_metric, pairwise_centroid_opt, plot_type):
+        module_feature_object = analyze.load_module_feature_object(pickle_path)
+        dist_mat = analyze.get_distance(module_feature_object, method=dist_metric)
+        if plot_type == "heatmap":
+            fig = plot.plot_distance_matrix(module_feature_object, dist_mat)
+        elif plot_type == "boxplot":
+            fig = plot.plot_distance_box(module_feature_object, dist_mat)
+        self.plots_generated = self.plots_generated + 1
+        self.plot_window = PlotWindow(fig = fig, plot_number = self.plots_generated, master = self)
+        self.plot_window.mainloop()
+
+    def classify(self, pickle_path, method, fullfit_or_loocv):
+        if fullfit_or_loocv == "fullfit":
+            module_feature_object = analyze.load_module_feature_object(pickle_path)
+            clf = analyze.classify(module_feature_object, method=method)
+            save_path = filedialog.asksaveasfilename(defaultextension='.pickle',
+                                                     filetypes=[("pickle files", "*.pickle"),
+                                                                ("All Files", "*.*")])
+            analyze.pickle_dump(clf, save_path)
+        elif fullfit_or_loocv == "loocv":
+            module_feature_object = analyze.load_module_feature_object(pickle_path)
+            accuracy, conf_mat = analyze.loocv(module_feature_object, method=method)
+            print(f"Accuracy: {accuracy}")
+            print(f"Confusion matrix: \n{conf_mat}")
+
+    def regress(self, pickle_path, method, fullfit_or_loocv):
+        if fullfit_or_loocv == "fullfit":
+            module_feature_object = analyze.load_module_feature_object(pickle_path)
+            clf = analyze.classify(module_feature_object, method=method)
+            save_path = filedialog.asksaveasfilename(defaultextension='.pickle',
+                                                     filetypes=[("pickle files", "*.pickle"),
+                                                                ("All Files", "*.*")])
+            analyze.pickle_dump(clf, save_path)
+        elif fullfit_or_loocv == "loocv":
+            module_feature_object = analyze.load_module_feature_object(pickle_path)
+            accuracy, conf_mat = analyze.loocv(module_feature_object, method=method)
+            print(f"Accuracy: {accuracy}")
+            print(f"Confusion matrix: \n{conf_mat}")
 
 
 class MultiDropDown(customtkinter.CTkFrame):

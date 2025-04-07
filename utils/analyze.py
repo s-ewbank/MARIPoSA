@@ -16,9 +16,10 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.neural_network import MLPClassifier
 from scipy import stats
 from statsmodels.stats.multitest import multipletests
+import pickle
 
 import scipy
-from scipy.spatial.distance import euclidean, mahalanobis, cityblock
+from scipy.spatial import distance
 
 def is_nonnum(value):
     try:
@@ -37,6 +38,18 @@ def packed_moving_average(x, w):
         x_new[i] = np.mean(x[max(0, i - win_size // 2): min(n, i + win_size // 2 + 1)])
 
     return x_new
+
+def pickle_dump(object, save_path):
+    if ((save_path.endswith(".pkl")==False) and (save_path.endswith(".pickle")==False)):
+        save_path+=".pickle"
+        print(f"Save path changed to {save_path}")
+    with open(save_path, 'wb') as file:
+        pickle.dump(object, file)
+
+def pickle_load(object_path):
+    with open(object_path, 'rb') as file:
+        obj = pickle.load(file)
+    return obj
 
 def get_module_labels(config, start, stop, subgroups = None):
     """
@@ -464,6 +477,13 @@ class ModuleUsage:
         results_df["p_corr"] = multipletests(p_uncorr, method="fdr_bh")[1]
         return results_df
 
+    def save(self, save_path):
+        if ((save_path.endswith(".pkl")==False) and (save_path.endswith(".pickle")==False)):
+            save_path+=".pickle"
+            print(f"Save path changed to {save_path}")
+        with open(save_path, 'wb') as file:
+            pickle.dump(self, file)
+
 
 def get_module_usage(config, labels_df, binsize=None):
     """
@@ -571,6 +591,13 @@ class ModuleTransitions:
         return ModuleTransitions(transition_counts_scaled, self.transition_count_matrices, self.group_labels, self.observation_labels, self.feat_names,
                            self.group_dict)
 
+    def save(self, save_path):
+        if ((save_path.endswith(".pkl")==False) and (save_path.endswith(".pickle")==False)):
+            save_path+=".pickle"
+            print(f"Save path changed to {save_path}")
+        with open(save_path, 'wb') as file:
+            pickle.dump(self, file)
+
 def get_module_transitions(config, labels_df):
     """
     Reshape labels dataframe from label_counter_subgroups to be an array of features
@@ -638,6 +665,11 @@ def get_module_transitions(config, labels_df):
     transition_counts = np.array(transition_counts)
 
     return ModuleTransitions(transition_counts, transition_count_matrices, group_labels, observation_labels, feat_names, group_dict)
+
+def load_module_feature_object(module_feature_object_path):
+    with open(module_feature_object_path, 'rb') as file:
+        module_feature_object = pickle.load(file)
+    return module_feature_object
 
 def embed(module_feature_object,method="lda",n_components=2):
     """
@@ -905,6 +937,36 @@ def loocv(module_feature_object, method="lda"):
 #                                  "distance_ij": distance_ij}, index=[f'{grp_i}_{grp_j}']))
 #         distance_results = pd.concat(distance_results, axis=0)
 #     return distance_results
+
+def get_distance(module_feature_object, method="euclidean"):
+    if module_feature_object.__class__.__name__ == "ModuleUsage":
+        X = module_feature_object.label_counts
+        y = module_feature_object.group_labels
+        obj_type = "module usage"
+    elif module_feature_object.__class__.__name__ == "ModuleTransitions":
+        X = module_feature_object.transition_counts
+        y = module_feature_object.group_labels
+        obj_type = "module transitions"
+    else:
+        raise ValueError(
+            f'module_feature_object class must be ModuleUsage or ModuleTransitions, not {module_feature_object.__class__}')
+    centroids = np.zeros([len(np.unique(X)), len(module_feature_object.feat_names)])
+    for group in sorted(np.unique(module_feature_object.group_labels)):
+        centroids[group, :] = np.mean(X[np.array(module_feature_object.group_labels) == group], axis=0)
+
+    dist_mat = np.zeros([len(np.unique(module_feature_object.group_labels)), len(module_feature_object.group_labels)])
+    for o, obs in enumerate(X):
+        for group in sorted(np.unique(module_feature_object.group_labels)):
+            if method == "euclidean":
+                dist_mat[group, o] = distance.euclidean(obs, centroids[group, :])
+            elif method == "braycurtis":
+                dist_mat[group, o] = distance.braycurtis(obs, centroids[group, :])
+            elif method == "cityblock":
+                dist_mat[group, o] = distance.cityblock(obs, centroids[group, :])
+            elif method == "correlation":
+                dist_mat[group, o] = distance.correlation(obs, centroids[group, :])
+
+    return dist_mat.T
 
 def regress(module_feature_object, dose_dict, method="LinearRegression", alpha = 1):
     if module_feature_object.__class__.__name__=="ModuleUsage":
