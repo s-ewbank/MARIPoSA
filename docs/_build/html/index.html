@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en">
 <head>
@@ -5,25 +7,20 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Welcome to MARIPoSA’s documentation! &mdash; MARIPoSA 0.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-      <link rel="stylesheet" type="text/css" href="_static/css/theme.css" />
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
 
   
-  <!--[if lt IE 9]>
-    <script src="_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="_static/doctools.js"></script>
-        <script src="_static/sphinx_highlight.js"></script>
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=44496db0"></script>
+      <script src="_static/doctools.js?v=888ff710"></script>
+      <script src="_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Demo 1: Basic project creation, pose usage plots, and classification" href="demo1_start.html" /> 
+    <link rel="next" title="Metadata" href="metadata.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -47,13 +44,10 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="demo1_start.html">Demo 1: Basic project creation, pose usage plots, and classification</a></li>
-<li class="toctree-l1"><a class="reference internal" href="demo2_dlc.html">Demo 2: Scalar locomotion data from DeepLabCut</a></li>
-<li class="toctree-l1"><a class="reference internal" href="demo3_pca.html">Demo 3: Principal Components Analysis</a></li>
-<li class="toctree-l1"><a class="reference internal" href="demo4_pk.html">Demo 4: Reducing data to a single dimension based on distance to a control behavior distribution</a></li>
 <li class="toctree-l1"><a class="reference internal" href="metadata.html">Metadata</a></li>
-<li class="toctree-l1"><a class="reference internal" href="analysis.html">Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="analyze.html">Analyze</a></li>
 <li class="toctree-l1"><a class="reference internal" href="plot.html">Plot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="simulate.html">Simulate</a></li>
 </ul>
 
         </div>
@@ -121,52 +115,41 @@
 <div class="toctree-wrapper compound">
 <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="demo1_start.html">Demo 1: Basic project creation, pose usage plots, and classification</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="demo1_start.html#initializing-the-project">Initializing the project</a></li>
-<li class="toctree-l2"><a class="reference internal" href="demo1_start.html#computing-and-visualizing-module-usage">Computing and visualizing module usage</a></li>
-<li class="toctree-l2"><a class="reference internal" href="demo1_start.html#classification-with-linear-discriminant-analysis">Classification with Linear Discriminant Analysis</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="demo2_dlc.html">Demo 2: Scalar locomotion data from DeepLabCut</a></li>
-<li class="toctree-l1"><a class="reference internal" href="demo3_pca.html">Demo 3: Principal Components Analysis</a></li>
-<li class="toctree-l1"><a class="reference internal" href="demo4_pk.html">Demo 4: Reducing data to a single dimension based on distance to a control behavior distribution</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="demo4_pk.html#import-dependencies">Import dependencies</a></li>
-<li class="toctree-l2"><a class="reference internal" href="demo4_pk.html#exercise-1-collapsing-categorical-time-series-data-into-1d-time-series-difference-from-control-group-dose-response">Exercise 1: Collapsing categorical, time-series data into 1D time series difference from control group (dose-response)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="demo4_pk.html#exercise-2-routes-of-administration">Exercise 2: Routes of administration</a></li>
-</ul>
-</li>
 <li class="toctree-l1"><a class="reference internal" href="metadata.html">Metadata</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="metadata.html#utils.metadata.create_PE_project"><code class="docutils literal notranslate"><span class="pre">create_PE_project()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="metadata.html#utils.metadata.create_PS_project"><code class="docutils literal notranslate"><span class="pre">create_PS_project()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="metadata.html#utils.metadata.load_project"><code class="docutils literal notranslate"><span class="pre">load_project()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="analysis.html">Analysis</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="analysis.html#utils.analysis.BORIS_to_pose"><code class="docutils literal notranslate"><span class="pre">BORIS_to_pose()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="analysis.html#utils.analysis.combine_pose_modules"><code class="docutils literal notranslate"><span class="pre">combine_pose_modules()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="analysis.html#utils.analysis.feat_select"><code class="docutils literal notranslate"><span class="pre">feat_select()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="analysis.html#utils.analysis.get_distance_timebins"><code class="docutils literal notranslate"><span class="pre">get_distance_timebins()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="analysis.html#utils.analysis.get_usage_feats"><code class="docutils literal notranslate"><span class="pre">get_usage_feats()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="analysis.html#utils.analysis.get_usage_ssd"><code class="docutils literal notranslate"><span class="pre">get_usage_ssd()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="analysis.html#utils.analysis.label_counter_nosubgroups"><code class="docutils literal notranslate"><span class="pre">label_counter_nosubgroups()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="analysis.html#utils.analysis.label_counter_subgroups"><code class="docutils literal notranslate"><span class="pre">label_counter_subgroups()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="analysis.html#utils.analysis.lda_labels_timebins"><code class="docutils literal notranslate"><span class="pre">lda_labels_timebins()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="analysis.html#utils.analysis.lda_loco_labels_timebins"><code class="docutils literal notranslate"><span class="pre">lda_loco_labels_timebins()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="analysis.html#utils.analysis.lr_labels_timebins"><code class="docutils literal notranslate"><span class="pre">lr_labels_timebins()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="analysis.html#utils.analysis.make_remappings_from_BORIS"><code class="docutils literal notranslate"><span class="pre">make_remappings_from_BORIS()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="analyze.html">Analyze</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="analyze.html#utils.analyze.BORIS_to_pose"><code class="docutils literal notranslate"><span class="pre">BORIS_to_pose()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="analyze.html#utils.analyze.classify"><code class="docutils literal notranslate"><span class="pre">classify()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="analyze.html#utils.analyze.combine_pose_modules"><code class="docutils literal notranslate"><span class="pre">combine_pose_modules()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="analyze.html#utils.analyze.embed"><code class="docutils literal notranslate"><span class="pre">embed()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="analyze.html#utils.analyze.get_distance"><code class="docutils literal notranslate"><span class="pre">get_distance()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="analyze.html#utils.analyze.get_distance_timebins"><code class="docutils literal notranslate"><span class="pre">get_distance_timebins()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="analyze.html#utils.analyze.get_module_labels"><code class="docutils literal notranslate"><span class="pre">get_module_labels()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="analyze.html#utils.analyze.get_module_transitions"><code class="docutils literal notranslate"><span class="pre">get_module_transitions()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="analyze.html#utils.analyze.get_module_usage"><code class="docutils literal notranslate"><span class="pre">get_module_usage()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="analyze.html#utils.analyze.loocv"><code class="docutils literal notranslate"><span class="pre">loocv()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="analyze.html#utils.analyze.loocv_regression"><code class="docutils literal notranslate"><span class="pre">loocv_regression()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="analyze.html#utils.analyze.make_remappings_from_BORIS"><code class="docutils literal notranslate"><span class="pre">make_remappings_from_BORIS()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="plot.html">Plot</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="plot.html#utils.plot.SandPlotClusterFrequency_OverTime"><code class="docutils literal notranslate"><span class="pre">SandPlotClusterFrequency_OverTime()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="plot.html#utils.plot.network_pairwise_comparison"><code class="docutils literal notranslate"><span class="pre">network_pairwise_comparison()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="plot.html#utils.plot.plot_conf_mat"><code class="docutils literal notranslate"><span class="pre">plot_conf_mat()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="plot.html#utils.plot.plot_dist_bins"><code class="docutils literal notranslate"><span class="pre">plot_dist_bins()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="plot.html#utils.plot.plot_lda"><code class="docutils literal notranslate"><span class="pre">plot_lda()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot.html#utils.plot.module_usage_sandplot"><code class="docutils literal notranslate"><span class="pre">module_usage_sandplot()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot.html#utils.plot.network_plot"><code class="docutils literal notranslate"><span class="pre">network_plot()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot.html#utils.plot.plot_distance_box"><code class="docutils literal notranslate"><span class="pre">plot_distance_box()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot.html#utils.plot.plot_distance_matrix"><code class="docutils literal notranslate"><span class="pre">plot_distance_matrix()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot.html#utils.plot.plot_distance_results"><code class="docutils literal notranslate"><span class="pre">plot_distance_results()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot.html#utils.plot.plot_embeddings"><code class="docutils literal notranslate"><span class="pre">plot_embeddings()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot.html#utils.plot.plot_keypoint_displacement_bins"><code class="docutils literal notranslate"><span class="pre">plot_keypoint_displacement_bins()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="plot.html#utils.plot.plot_module_usage"><code class="docutils literal notranslate"><span class="pre">plot_module_usage()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="plot.html#utils.plot.plot_module_usage_stacked"><code class="docutils literal notranslate"><span class="pre">plot_module_usage_stacked()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="plot.html#utils.plot.plot_module_usage_subgroups"><code class="docutils literal notranslate"><span class="pre">plot_module_usage_subgroups()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="plot.html#utils.plot.plot_pc_weights"><code class="docutils literal notranslate"><span class="pre">plot_pc_weights()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="plot.html#utils.plot.transition_counter"><code class="docutils literal notranslate"><span class="pre">transition_counter()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="simulate.html">Simulate</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="simulate.html#utils.simulate.generate_sequence"><code class="docutils literal notranslate"><span class="pre">generate_sequence()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="simulate.html#utils.simulate.generate_usage"><code class="docutils literal notranslate"><span class="pre">generate_usage()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -179,13 +162,13 @@
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="demo1_start.html" class="btn btn-neutral float-right" title="Demo 1: Basic project creation, pose usage plots, and classification" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="metadata.html" class="btn btn-neutral float-right" title="Metadata" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2024, Sedona Ewbank.</p>
+    <p>&#169; Copyright 2025, Sedona Ewbank.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

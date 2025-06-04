@@ -4,8 +4,8 @@ from utils import analyze
 def generate_usage(module_feature_object, n_samples):
     """
     Generate simulated pose module usage object
-    :param module_feature_object: module feature object of class ModuleUsage (from analyze.get_module_usage)
-    or ModuleTransitions (from analyze.get_module_transitions)
+
+    :param module_feature_object: module feature object of class ModuleUsage (from analyze.get_module_usage) or ModuleTransitions (from analyze.get_module_transitions)
     :param n_samples: number of samples to generate
     :return: module_feature_object of the same style as the one input
 
@@ -31,6 +31,7 @@ def generate_usage(module_feature_object, n_samples):
 def generate_sequence(config, labels_df, T):
     """
     Generate individual simulated pose module label sequence of length T (noting that T = number of observations, not time)
+
     :param config: the config object
     :param labels_df: labels_df from analyze.get_module_labels
     :param T: length of sequence to be generated

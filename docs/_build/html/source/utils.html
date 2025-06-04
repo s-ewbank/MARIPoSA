@@ -1,0 +1,729 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>utils package &mdash; MARIPoSA 0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=44496db0"></script>
+      <script src="../_static/doctools.js?v=888ff710"></script>
+      <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            MARIPoSA
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../metadata.html">Metadata</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../analyze.html">Analyze</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../plot.html">Plot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../simulate.html">Simulate</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">MARIPoSA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">utils package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/source/utils.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="utils-package">
+<h1>utils package<a class="headerlink" href="#utils-package" title="Permalink to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
+</section>
+<section id="module-utils.analyze">
+<span id="utils-analyze-module"></span><h2>utils.analyze module<a class="headerlink" href="#module-utils.analyze" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="utils.analyze.BORIS_to_pose">
+<span class="sig-prename descclassname"><span class="pre">utils.analyze.</span></span><span class="sig-name descname"><span class="pre">BORIS_to_pose</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/utils/analyze.html#BORIS_to_pose"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.analyze.BORIS_to_pose" title="Permalink to this definition"></a></dt>
+<dd><p>Intake paired BORIS one-hot-encoded observation files and pose segmented files and align them to see what behaviors
+line up with what pose modules</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>config</strong> – the config</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="utils.analyze.ModuleTransitions">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">utils.analyze.</span></span><span class="sig-name descname"><span class="pre">ModuleTransitions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">transition_counts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transition_count_matrices</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group_labels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">observation_labels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feat_names</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group_dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/utils/analyze.html#ModuleTransitions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.analyze.ModuleTransitions" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="utils.analyze.ModuleTransitions.save">
+<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">save_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/utils/analyze.html#ModuleTransitions.save"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.analyze.ModuleTransitions.save" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="utils.analyze.ModuleTransitions.scale">
+<span class="sig-name descname"><span class="pre">scale</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/utils/analyze.html#ModuleTransitions.scale"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.analyze.ModuleTransitions.scale" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="utils.analyze.ModuleTransitions.to_df">
+<span class="sig-name descname"><span class="pre">to_df</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/utils/analyze.html#ModuleTransitions.to_df"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.analyze.ModuleTransitions.to_df" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="utils.analyze.ModuleUsage">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">utils.analyze.</span></span><span class="sig-name descname"><span class="pre">ModuleUsage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label_counts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group_labels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">observation_labels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feat_names</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scaler</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/utils/analyze.html#ModuleUsage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.analyze.ModuleUsage" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="utils.analyze.ModuleUsage.apply_picks">
+<span class="sig-name descname"><span class="pre">apply_picks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pick_names</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/utils/analyze.html#ModuleUsage.apply_picks"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.analyze.ModuleUsage.apply_picks" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="utils.analyze.ModuleUsage.collapse_timebins">
+<span class="sig-name descname"><span class="pre">collapse_timebins</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/utils/analyze.html#ModuleUsage.collapse_timebins"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.analyze.ModuleUsage.collapse_timebins" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="utils.analyze.ModuleUsage.f_oneway">
+<span class="sig-name descname"><span class="pre">f_oneway</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/utils/analyze.html#ModuleUsage.f_oneway"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.analyze.ModuleUsage.f_oneway" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="utils.analyze.ModuleUsage.save">
+<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">save_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/utils/analyze.html#ModuleUsage.save"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.analyze.ModuleUsage.save" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="utils.analyze.ModuleUsage.scale">
+<span class="sig-name descname"><span class="pre">scale</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/utils/analyze.html#ModuleUsage.scale"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.analyze.ModuleUsage.scale" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="utils.analyze.ModuleUsage.to_df">
+<span class="sig-name descname"><span class="pre">to_df</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/utils/analyze.html#ModuleUsage.to_df"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.analyze.ModuleUsage.to_df" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="utils.analyze.ModuleUsage.usage_density">
+<span class="sig-name descname"><span class="pre">usage_density</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">convolve</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">window</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/utils/analyze.html#ModuleUsage.usage_density"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.analyze.ModuleUsage.usage_density" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="utils.analyze.classify">
+<span class="sig-prename descclassname"><span class="pre">utils.analyze.</span></span><span class="sig-name descname"><span class="pre">classify</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">module_feature_object</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'lda'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/utils/analyze.html#classify"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.analyze.classify" title="Permalink to this definition"></a></dt>
+<dd><p>Classify pose segmentation data using either module usage or transitions</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>module_feature_object</strong> – ModuleUsage or ModuleTransitions object</p></li>
+<li><p><strong>method</strong> – classification method to use; options include “lda”, “logisticregression”, “mlp”, “naivebayes”, “knn”, or “randomforest”</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>classifier</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="utils.analyze.combine_pose_modules">
+<span class="sig-prename descclassname"><span class="pre">utils.analyze.</span></span><span class="sig-name descname"><span class="pre">combine_pose_modules</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force_no_numeric</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/utils/analyze.html#combine_pose_modules"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.analyze.combine_pose_modules" title="Permalink to this definition"></a></dt>
+<dd><p>Combine pose modules based on remappings key in config</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config</strong> – config</p></li>
+<li><p><strong>labels_df</strong> – from label_counter (subgroups or no_subgroups)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="utils.analyze.dist_df_subgroups">
+<span class="sig-prename descclassname"><span class="pre">utils.analyze.</span></span><span class="sig-name descname"><span class="pre">dist_df_subgroups</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">PE_config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">binsize</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">thresh</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">70</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">selected_subgroups</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'all'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/utils/analyze.html#dist_df_subgroups"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.analyze.dist_df_subgroups" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="utils.analyze.embed">
+<span class="sig-prename descclassname"><span class="pre">utils.analyze.</span></span><span class="sig-name descname"><span class="pre">embed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">module_feature_object</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'lda'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_components</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/utils/analyze.html#embed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.analyze.embed" title="Permalink to this definition"></a></dt>
+<dd><p>Get dimensionally reduced space embeddings of the data with LDA or PCA</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>module_feature_object</strong> – module feature object</p></li>
+<li><p><strong>method</strong> – LDA or PCA; default LDA</p></li>
+<li><p><strong>n_components</strong> – number of components</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="utils.analyze.get_distance">
+<span class="sig-prename descclassname"><span class="pre">utils.analyze.</span></span><span class="sig-name descname"><span class="pre">get_distance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">module_feature_object</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'euclidean'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/utils/analyze.html#get_distance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.analyze.get_distance" title="Permalink to this definition"></a></dt>
+<dd><p>Get distance</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>module_feature_object</strong> – </p></li>
+<li><p><strong>method</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="utils.analyze.get_distance_timebins">
+<span class="sig-prename descclassname"><span class="pre">utils.analyze.</span></span><span class="sig-name descname"><span class="pre">get_distance_timebins</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">PE_config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filepath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">binsize</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bodypart</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">thresh</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">70</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/utils/analyze.html#get_distance_timebins"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.analyze.get_distance_timebins" title="Permalink to this definition"></a></dt>
+<dd><p>Get distance/locomotion for a body part from a DLC file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>DLC_config</strong> – config file (can be DLC or pose - used only for “fps”)</p></li>
+<li><p><strong>filepath</strong> – path to file of interest</p></li>
+<li><p><strong>binsize</strong> – size of timebins (in seconds)</p></li>
+<li><p><strong>start</strong> – start time</p></li>
+<li><p><strong>end</strong> – end time</p></li>
+<li><p><strong>bodypart</strong> – which bodypart to track</p></li>
+<li><p><strong>thresh</strong> – threshold for point-to-point distance that should be marked as wrong and excluded</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="utils.analyze.get_module_labels">
+<span class="sig-prename descclassname"><span class="pre">utils.analyze.</span></span><span class="sig-name descname"><span class="pre">get_module_labels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subgroups</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/utils/analyze.html#get_module_labels"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.analyze.get_module_labels" title="Permalink to this definition"></a></dt>
+<dd><p>Generates a Pandas dataframe containing the labels for every frame in the specified time range for the video paths in defined groups.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config</strong> – the config</p></li>
+<li><p><strong>start</strong> – time in seconds to start dataframe from.</p></li>
+<li><p><strong>stop</strong> – time in seconds to stop dataframe at.</p></li>
+<li><p><strong>fps</strong> – frames per second of recording.</p></li>
+<li><p><strong>subgroups</strong> – subgroups to include; by default, None will result in an object without data subgrouped; could alternatively be a list of subgroup names from config or “all” (to include all subgroups present in config)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="utils.analyze.get_module_transitions">
+<span class="sig-prename descclassname"><span class="pre">utils.analyze.</span></span><span class="sig-name descname"><span class="pre">get_module_transitions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels_df</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/utils/analyze.html#get_module_transitions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.analyze.get_module_transitions" title="Permalink to this definition"></a></dt>
+<dd><p>Reshape labels dataframe from label_counter_subgroups to be an array of features</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config</strong> – config object</p></li>
+<li><p><strong>labels_df</strong> – labels dataframe from label_counter_subgroups</p></li>
+<li><p><strong>binsize</strong> – width of bins in seconds; if None, no binning is performed</p></li>
+<li><p><strong>selected_subgroups</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="utils.analyze.get_module_usage">
+<span class="sig-prename descclassname"><span class="pre">utils.analyze.</span></span><span class="sig-name descname"><span class="pre">get_module_usage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">binsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/utils/analyze.html#get_module_usage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.analyze.get_module_usage" title="Permalink to this definition"></a></dt>
+<dd><p>Reshape labels dataframe from label_counter_subgroups to be an array of features</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config</strong> – config object</p></li>
+<li><p><strong>labels_df</strong> – labels dataframe from label_counter_subgroups</p></li>
+<li><p><strong>binsize</strong> – width of bins in seconds; if None, no binning is performed</p></li>
+<li><p><strong>selected_subgroups</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="utils.analyze.is_nonnum">
+<span class="sig-prename descclassname"><span class="pre">utils.analyze.</span></span><span class="sig-name descname"><span class="pre">is_nonnum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/utils/analyze.html#is_nonnum"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.analyze.is_nonnum" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="utils.analyze.load_module_feature_object">
+<span class="sig-prename descclassname"><span class="pre">utils.analyze.</span></span><span class="sig-name descname"><span class="pre">load_module_feature_object</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">module_feature_object_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/utils/analyze.html#load_module_feature_object"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.analyze.load_module_feature_object" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="utils.analyze.loocv">
+<span class="sig-prename descclassname"><span class="pre">utils.analyze.</span></span><span class="sig-name descname"><span class="pre">loocv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">module_feature_object</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'lda'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/utils/analyze.html#loocv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.analyze.loocv" title="Permalink to this definition"></a></dt>
+<dd><p>Perform leave-one-out cross-validation for a method of classifying pose segmentation data using either module usage or transitions</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>module_feature_object</strong> – ModuleUsage or ModuleTransitions object</p></li>
+<li><p><strong>method</strong> – classification method to use; options include “lda”, “logisticregression”, “mlp”, “naivebayes”, “knn”, or “randomforest”</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>accuracy, conf_mat</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="utils.analyze.loocv_regression">
+<span class="sig-prename descclassname"><span class="pre">utils.analyze.</span></span><span class="sig-name descname"><span class="pre">loocv_regression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">module_feature_object</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dose_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'LinearRegression'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constrain_pos</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/utils/analyze.html#loocv_regression"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.analyze.loocv_regression" title="Permalink to this definition"></a></dt>
+<dd><p>Perform LOOCV for linear regression</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>module_feature_object</strong> – </p></li>
+<li><p><strong>dose_dict</strong> – </p></li>
+<li><p><strong>method</strong> – </p></li>
+<li><p><strong>constrain_pos</strong> – </p></li>
+<li><p><strong>alpha</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="utils.analyze.make_remappings_from_BORIS">
+<span class="sig-prename descclassname"><span class="pre">utils.analyze.</span></span><span class="sig-name descname"><span class="pre">make_remappings_from_BORIS</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels_df</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">BORIS_to_pose_mat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force_no_numeric</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/utils/analyze.html#make_remappings_from_BORIS"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.analyze.make_remappings_from_BORIS" title="Permalink to this definition"></a></dt>
+<dd><p>Make remappings based on BORIS output and apply to labels_df</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config</strong> – config</p></li>
+<li><p><strong>labels_df</strong> – </p></li>
+<li><p><strong>BORIS_to_pose_mat</strong> – the non-normalized result matrix (first result option) from BORIS_to_pose</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="utils.analyze.packed_moving_average">
+<span class="sig-prename descclassname"><span class="pre">utils.analyze.</span></span><span class="sig-name descname"><span class="pre">packed_moving_average</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/utils/analyze.html#packed_moving_average"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.analyze.packed_moving_average" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="utils.analyze.pickle_dump">
+<span class="sig-prename descclassname"><span class="pre">utils.analyze.</span></span><span class="sig-name descname"><span class="pre">pickle_dump</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">object</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/utils/analyze.html#pickle_dump"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.analyze.pickle_dump" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="utils.analyze.pickle_load">
+<span class="sig-prename descclassname"><span class="pre">utils.analyze.</span></span><span class="sig-name descname"><span class="pre">pickle_load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">object_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/utils/analyze.html#pickle_load"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.analyze.pickle_load" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="utils.analyze.regress">
+<span class="sig-prename descclassname"><span class="pre">utils.analyze.</span></span><span class="sig-name descname"><span class="pre">regress</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">module_feature_object</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dose_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'LinearRegression'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/utils/analyze.html#regress"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.analyze.regress" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-utils.metadata">
+<span id="utils-metadata-module"></span><h2>utils.metadata module<a class="headerlink" href="#module-utils.metadata" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="utils.metadata.create_PE_project">
+<span class="sig-prename descclassname"><span class="pre">utils.metadata.</span></span><span class="sig-name descname"><span class="pre">create_PE_project</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">project_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_directory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_source</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_directory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fps</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/utils/metadata.html#create_PE_project"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.metadata.create_PE_project" title="Permalink to this definition"></a></dt>
+<dd><p>Make project directory and write config_PE.yaml file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>project_name</strong> – what to call your creation</p></li>
+<li><p><strong>data_directory</strong> – path to source data</p></li>
+<li><p><strong>data_source</strong> – DeepLabCut or SLEAP</p></li>
+<li><p><strong>output_directory</strong> – path where output directory and config file should be created</p></li>
+<li><p><strong>fps</strong> – frames per second</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="utils.metadata.create_PS_project">
+<span class="sig-prename descclassname"><span class="pre">utils.metadata.</span></span><span class="sig-name descname"><span class="pre">create_PS_project</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">project_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_directory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_source</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_directory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fps</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/utils/metadata.html#create_PS_project"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.metadata.create_PS_project" title="Permalink to this definition"></a></dt>
+<dd><p>Make project directory and write config_PS.yaml file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>project_name</strong> – what to call your creation</p></li>
+<li><p><strong>data_directory</strong> – path to source data</p></li>
+<li><p><strong>data_source</strong> – B-SOiD, VAME, or Keypoint-MoSeq</p></li>
+<li><p><strong>output_directory</strong> – path where output directory and config file should be created</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="utils.metadata.edit_config">
+<span class="sig-prename descclassname"><span class="pre">utils.metadata.</span></span><span class="sig-name descname"><span class="pre">edit_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/utils/metadata.html#edit_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.metadata.edit_config" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="utils.metadata.load_project">
+<span class="sig-prename descclassname"><span class="pre">utils.metadata.</span></span><span class="sig-name descname"><span class="pre">load_project</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/utils/metadata.html#load_project"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.metadata.load_project" title="Permalink to this definition"></a></dt>
+<dd><p>Loads project from config_PS.yaml or config_PE.yaml file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>config_path</strong> – path to config file:</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-utils.plot">
+<span id="utils-plot-module"></span><h2>utils.plot module<a class="headerlink" href="#module-utils.plot" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="utils.plot.fig_to_array">
+<span class="sig-prename descclassname"><span class="pre">utils.plot.</span></span><span class="sig-name descname"><span class="pre">fig_to_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fig</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/utils/plot.html#fig_to_array"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.plot.fig_to_array" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="utils.plot.is_nonnum">
+<span class="sig-prename descclassname"><span class="pre">utils.plot.</span></span><span class="sig-name descname"><span class="pre">is_nonnum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/utils/plot.html#is_nonnum"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.plot.is_nonnum" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="utils.plot.make_and_plot_ellipse">
+<span class="sig-prename descclassname"><span class="pre">utils.plot.</span></span><span class="sig-name descname"><span class="pre">make_and_plot_ellipse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mean</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cov</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/utils/plot.html#make_and_plot_ellipse"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.plot.make_and_plot_ellipse" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="utils.plot.module_usage_sandplot">
+<span class="sig-prename descclassname"><span class="pre">utils.plot.</span></span><span class="sig-name descname"><span class="pre">module_usage_sandplot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">module_usage</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">BORIS_to_pose_mat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">long_legend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figW</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">7</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figH</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">convolve</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">window</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/utils/plot.html#module_usage_sandplot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.plot.module_usage_sandplot" title="Permalink to this definition"></a></dt>
+<dd><p>new sandplot function</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config</strong> – </p></li>
+<li><p><strong>module_usage</strong> – </p></li>
+<li><p><strong>BORIS_to_pose_mat</strong> – </p></li>
+<li><p><strong>long_legend</strong> – </p></li>
+<li><p><strong>convolve</strong> – </p></li>
+<li><p><strong>window</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="utils.plot.moving_average">
+<span class="sig-prename descclassname"><span class="pre">utils.plot.</span></span><span class="sig-name descname"><span class="pre">moving_average</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/utils/plot.html#moving_average"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.plot.moving_average" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="utils.plot.network_plot">
+<span class="sig-prename descclassname"><span class="pre">utils.plot.</span></span><span class="sig-name descname"><span class="pre">network_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels_df</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">module_usage</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">module_transitions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'bwr'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scaling</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tscale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">6</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figW</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figH</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alt_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/utils/plot.html#network_plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.plot.network_plot" title="Permalink to this definition"></a></dt>
+<dd><p>Plot network comparison</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config</strong> – </p></li>
+<li><p><strong>labels_df</strong> – </p></li>
+<li><p><strong>module_usage</strong> – </p></li>
+<li><p><strong>module_feature_object</strong> – </p></li>
+<li><p><strong>cmap</strong> – </p></li>
+<li><p><strong>include_labels</strong> – </p></li>
+<li><p><strong>scaling</strong> – </p></li>
+<li><p><strong>tscale</strong> – </p></li>
+<li><p><strong>figW</strong> – </p></li>
+<li><p><strong>figH</strong> – </p></li>
+<li><p><strong>alt_labels</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="utils.plot.plot_distance_box">
+<span class="sig-prename descclassname"><span class="pre">utils.plot.</span></span><span class="sig-name descname"><span class="pre">plot_distance_box</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">module_feature_object</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dist_mat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Blues'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figW</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figH</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alt_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/utils/plot.html#plot_distance_box"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.plot.plot_distance_box" title="Permalink to this definition"></a></dt>
+<dd><p>Plot distance boxplot</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>module_feature_object</strong> – </p></li>
+<li><p><strong>dist_mat</strong> – </p></li>
+<li><p><strong>cmap</strong> – </p></li>
+<li><p><strong>figW</strong> – </p></li>
+<li><p><strong>figH</strong> – </p></li>
+<li><p><strong>alt_labels</strong> – </p></li>
+<li><p><strong>title</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="utils.plot.plot_distance_matrix">
+<span class="sig-prename descclassname"><span class="pre">utils.plot.</span></span><span class="sig-name descname"><span class="pre">plot_distance_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">module_feature_object</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dist_mat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Greens'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figW</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figH</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alt_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/utils/plot.html#plot_distance_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.plot.plot_distance_matrix" title="Permalink to this definition"></a></dt>
+<dd><p>Plot distance matrix</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>module_feature_object</strong> – </p></li>
+<li><p><strong>dist_mat</strong> – </p></li>
+<li><p><strong>cmap</strong> – </p></li>
+<li><p><strong>figW</strong> – </p></li>
+<li><p><strong>figH</strong> – </p></li>
+<li><p><strong>alt_labels</strong> – </p></li>
+<li><p><strong>title</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="utils.plot.plot_distance_results">
+<span class="sig-prename descclassname"><span class="pre">utils.plot.</span></span><span class="sig-name descname"><span class="pre">plot_distance_results</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">module_feature_object</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distance_results</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figW</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figH</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Blues'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/utils/plot.html#plot_distance_results"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.plot.plot_distance_results" title="Permalink to this definition"></a></dt>
+<dd><p>Plot results from distance computation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>module_feature_object</strong> – </p></li>
+<li><p><strong>distance_results</strong> – </p></li>
+<li><p><strong>figW</strong> – </p></li>
+<li><p><strong>figH</strong> – </p></li>
+<li><p><strong>cmap</strong> – </p></li>
+<li><p><strong>title</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="utils.plot.plot_embeddings">
+<span class="sig-prename descclassname"><span class="pre">utils.plot.</span></span><span class="sig-name descname"><span class="pre">plot_embeddings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">module_feature_object</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">embeddings_object</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figW</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figH</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'viridis'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">draw_ellipse</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alt_legend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/utils/plot.html#plot_embeddings"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.plot.plot_embeddings" title="Permalink to this definition"></a></dt>
+<dd><p>Plot embeddings</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>module_feature_object</strong> – module feature object (ModuleUsage or ModuleTransitions) from analyze.get_module_{xx}</p></li>
+<li><p><strong>embeddings_object</strong> – embeddings object (LDA or PCA) from analyze.embed</p></li>
+<li><p><strong>figW</strong> – figure width</p></li>
+<li><p><strong>figH</strong> – figure height</p></li>
+<li><p><strong>cmap</strong> – matplotlib colormap</p></li>
+<li><p><strong>title</strong> – title string, or None</p></li>
+<li><p><strong>legend</strong> – True or False</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>fig</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="utils.plot.plot_keypoint_displacement_bins">
+<span class="sig-prename descclassname"><span class="pre">utils.plot.</span></span><span class="sig-name descname"><span class="pre">plot_keypoint_displacement_bins</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dist_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'viridis'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plottype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'band'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figW</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">6</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figH</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/utils/plot.html#plot_keypoint_displacement_bins"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.plot.plot_keypoint_displacement_bins" title="Permalink to this definition"></a></dt>
+<dd><p>Plots displacement of a keypoint either over time or in bins from dist_df (output of analyze.dist_df_subgroups)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dist_df</strong> – dist_df output from analyze.dist_df_subgroups</p></li>
+<li><p><strong>cmap</strong> – matplotlib colormap</p></li>
+<li><p><strong>plottype</strong> – type of plot (“band”, “errorbar”, or “bar” if no timebins)</p></li>
+<li><p><strong>figW</strong> – figure width</p></li>
+<li><p><strong>figH</strong> – figure height</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="utils.plot.plot_module_usage">
+<span class="sig-prename descclassname"><span class="pre">utils.plot.</span></span><span class="sig-name descname"><span class="pre">plot_module_usage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">usage_feats</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figW</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figH</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">style</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'bar_scatter'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'jet'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legend_pos</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'outside'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">BORIS_to_pose_mat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">long_legend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alt_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alt_xticks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_stats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/utils/plot.html#plot_module_usage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.plot.plot_module_usage" title="Permalink to this definition"></a></dt>
+<dd><p>Plot module usage</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config</strong> – config</p></li>
+<li><p><strong>usage_feats</strong> – output of analyze.get_module_usage</p></li>
+<li><p><strong>figW</strong> – figure width (default: 4)</p></li>
+<li><p><strong>figH</strong> – figure height (default: 2)</p></li>
+<li><p><strong>style</strong> – plot style; “bar_scatter”, “bar_error”, “points”, or “stacked”</p></li>
+<li><p><strong>cmap</strong> – colormap (default: jet)</p></li>
+<li><p><strong>legend_pos</strong> – legend position (default: outside)</p></li>
+<li><p><strong>BORIS_to_pose_mat</strong> – BORIS_to_pose_mat (default: None)</p></li>
+<li><p><strong>legend</strong> – boolean to include or not include legend (default: False)</p></li>
+<li><p><strong>long_legend</strong> – long legend (default: False)</p></li>
+<li><p><strong>alt_labels</strong> – alternative group label dictionary (default: None)</p></li>
+<li><p><strong>alt_xticks</strong> – alternative xticklabels (list), for stacked plot style only (default: None)</p></li>
+<li><p><strong>title</strong> – plot title (default: None)</p></li>
+<li><p><strong>plot_stats</strong> – include stats on plot (default: False)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>fig</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-utils.simulate">
+<span id="utils-simulate-module"></span><h2>utils.simulate module<a class="headerlink" href="#module-utils.simulate" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="utils.simulate.generate_sequence">
+<span class="sig-prename descclassname"><span class="pre">utils.simulate.</span></span><span class="sig-name descname"><span class="pre">generate_sequence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">T</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/utils/simulate.html#generate_sequence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.simulate.generate_sequence" title="Permalink to this definition"></a></dt>
+<dd><p>Generate individual simulated pose module label sequence of length T (noting that T = number of observations, not time)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config</strong> – the config object</p></li>
+<li><p><strong>labels_df</strong> – labels_df from analyze.get_module_labels</p></li>
+<li><p><strong>T</strong> – length of sequence to be generated</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>sequence</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="utils.simulate.generate_usage">
+<span class="sig-prename descclassname"><span class="pre">utils.simulate.</span></span><span class="sig-name descname"><span class="pre">generate_usage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">module_feature_object</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_samples</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/utils/simulate.html#generate_usage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.simulate.generate_usage" title="Permalink to this definition"></a></dt>
+<dd><p>Generate simulated pose module usage object</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>module_feature_object</strong> – module feature object of class ModuleUsage (from analyze.get_module_usage) or ModuleTransitions (from analyze.get_module_transitions)</p></li>
+<li><p><strong>n_samples</strong> – number of samples to generate</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>module_feature_object of the same style as the one input</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-utils">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-utils" title="Permalink to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Sedona Ewbank.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

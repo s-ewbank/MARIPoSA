@@ -384,6 +384,7 @@ def network_plot(config,
                  alt_labels=None):
     """
     Plot network comparison
+
     :param config:
     :param labels_df:
     :param module_usage:
@@ -484,6 +485,7 @@ def network_plot(config,
 def module_usage_sandplot(config, module_usage, BORIS_to_pose_mat=None, title=None, long_legend=True, figW=7, figH=3, convolve=False, window=5):
     """
     new sandplot function
+
     :param config:
     :param module_usage:
     :param BORIS_to_pose_mat:
@@ -653,180 +655,20 @@ def plot_embeddings(module_feature_object, embeddings_object, figW=3, figH=3, cm
     plt.tight_layout()
     return fig
 
-def plot_lda_weights(config, lda_result, n_modules, hide_nofeat_mods=False, remap=False, figW=6, figH=4):
-    """
-
-    :param lda_result:
-    :param n_modules:
-    :param hide_nofeat_mods:
-    :return:
-    """
-    weights = lda_result.get_discriminant_weights()
-    mods = [f"module{i}" for i in range(n_modules)]
-    bins = []
-    for b in range(lda_result.nbins):
-        binstart = int(b * (lda_result.binsize))
-        binstop = int((b + 1) * (lda_result.binsize))
-        bins.append(f"t{binstart}-{binstop}")
-
-    figs = []
-    for LD in list(weights.columns):
-        weights_reshaped = pd.DataFrame(index=bins, columns=mods)
-        for bin, row in weights_reshaped.iterrows():
-            for mod in weights_reshaped.columns:
-                if len(bins) == 1:
-                    i = mod
-                else:
-                    i = mod + "_" + bin
-                if i not in weights.index:
-                    weights_reshaped.at[bin, mod] = np.nan
-                else:
-                    weights_reshaped.at[bin, mod] = weights.at[i, LD]
-        if hide_nofeat_mods == True:
-            weights_reshaped = weights_reshaped.dropna(axis=1, how='all')
-
-        if remap == False:
-            fig = plt.figure(figsize=(figW, figH))
-            vlim = np.max([np.abs(weights_reshaped.max().max()), np.abs(weights_reshaped.min().min())])
-            data = np.array(weights_reshaped, dtype=np.float32)
-            plt.imshow(data, cmap="seismic", vmin=-vlim, vmax=vlim, aspect="auto",interpolation=None)
-            plt.imshow(np.zeros_like(data) + 0.8, cmap="gray", vmax=1, vmin=0, aspect="auto")
-            plt.imshow(data, cmap="seismic", vmin=-vlim, vmax=vlim, aspect="auto",interpolation=None)
-            names = [i.replace("module", "") for i in weights_reshaped.columns]
-            if len(names) > 50:
-                tick_positions = range(0, len(names), 10)
-                tick_labels = [names[i] for i in tick_positions]
-                plt.xticks(ticks=tick_positions, labels=tick_labels)
-            elif len(names) > 20:
-                tick_positions = range(0, len(names), 5)
-                tick_labels = [names[i] for i in tick_positions]
-                plt.xticks(ticks=tick_positions, labels=tick_labels)
-            else:
-                plt.xticks(ticks=range(weights_reshaped.shape[1]), labels=names)
-
-            binnames = [bin.replace("t", "") for bin in bins]
-            if len(binnames) > 10:
-                tick_positions = range(0, len(binnames), 5)
-                tick_labels=[]
-                for t in tick_positions:
-                    tick_labels.append(binnames[t])
-                plt.yticks(ticks=tick_positions, labels=tick_labels)
-            else:
-                plt.yticks(ticks=range(len(bins)), labels=[bin.replace("t", "") for bin in bins])
-            cbar = plt.colorbar()
-            cbar.set_label('Weight')
-            plt.ylabel('Time bin (s)')
-            plt.xlabel("Modules")
-            plt.title(LD)
-
-        elif remap == True:
-            vlim = np.max([np.abs(weights_reshaped.max().max()), np.abs(weights_reshaped.min().min())])
-            fig = plt.figure(figsize=(figW, figH))
-
-            BORIS_to_pose_mat, BORIS_to_pose_mat_normalized, loss = analyze.BORIS_to_pose(config)
-            analyze.make_remappings_from_BORIS(config, None, BORIS_to_pose_mat)
-
-            behaviors = BORIS_to_pose_mat_normalized.index
-            mapped_behaviors = {}
-            for beh in behaviors:
-                beh_mod = []
-                beh_mod.extend([i[0][0] for i in config["remappings"] if i[1] == beh])
-                if len(beh_mod) > 0:
-                    mapped_behaviors[beh] = beh_mod
-
-            widths = []
-            for b, beh_i in enumerate(list(mapped_behaviors.keys())):
-                mapped_behaviors[beh_i] = ["module" + str(int(i)) for i in mapped_behaviors[beh_i]]
-                if hide_nofeat_mods == True:
-                    mapped_behaviors[beh_i] = [i for i in mapped_behaviors[beh_i] if i in weights_reshaped.columns]
-                if len(mapped_behaviors[beh_i]) > 0:
-                    widths.append(len(mapped_behaviors[beh_i]))
-                else:
-                    del mapped_behaviors[beh_i]
-            total_mods = np.sum(widths)
-            widths.extend([total_mods / 15])
-            widths = widths / np.sum(widths)
-            gs = gridspec.GridSpec(1, len(widths), width_ratios=widths)
-            for b, beh_i in enumerate(list(mapped_behaviors.keys())):
-                ax = plt.subplot(gs[b])
-                beh_i_mods = mapped_behaviors[beh_i]
-                data = np.array(weights_reshaped[beh_i_mods], dtype=np.float32)
-                ax.imshow(data, cmap="seismic", aspect="auto", vmin=-vlim, vmax=vlim,interpolation=None)
-                ax.imshow(np.zeros_like(data) + 0.8, cmap="gray", vmax=1, vmin=0, aspect="auto")
-                cb = ax.imshow(data, cmap="seismic", aspect="auto", vmin=-vlim, vmax=vlim,interpolation=None)
-                ax.set_xticks(ticks=range(len(mapped_behaviors[beh_i])), labels=mapped_behaviors[beh_i])
-                ax.set_xlabel(beh_i)
-                names = [i.replace("module", "") for i in weights_reshaped[beh_i_mods].columns]
-                if total_mods < 30:
-                    ax.set_xticks(ticks=range(weights_reshaped[beh_i_mods].shape[1]), labels=names)
-                else:
-                    ax.set_xticks(ticks=range(weights_reshaped[beh_i_mods].shape[1]), labels=[])
-
-                binnames = [bin.replace("t", "") for bin in bins]
-                if b == 0:
-                    ax.set_ylabel('Time bin (s)')
-                    if len(binnames) > 10:
-                        tick_positions = range(0, len(binnames), 5)
-                        tick_labels=[]
-                        for t in tick_positions:
-                            tick_labels.append(binnames[t])
-                        ax.set_yticks(ticks=tick_positions, labels=tick_labels)
-                    else:
-                        ax.set_yticks(ticks=range(len(bins)), labels=[bin.replace("t", "") for bin in bins])
-                else:
-                    ax.set_yticks(ticks=range(len(bins)), labels=[])
-            plt.suptitle(LD)
-            cbar_ax = plt.subplot(gs[-1])
-            cbar = plt.colorbar(cb, cax=cbar_ax)
-            cbar.set_label("Weight")
-        plt.tight_layout()
-        figs.append(fig)
-    return figs
-
-def plot_conf_mat(lda_result, figW=2.5,figH=2.5,cmap="Greens",
-                  alt_title=False,rotate_xticks=False,alt_labels=None):
-    """
-    Generate a confusion matrix plot
-
-    :param confusion: the confusion matrix from sklearn
-    :param class_num: the classes (as integers)
-    :param class_labels: the classes (string names)
-    :param figW: figure width
-    :param figH: figure height
-    :param cmap: colormap
-    :param alt_title: title other than confusion matrix
-    :param rotate_xticks: whether or not to rotate xticks
-    :return:
-    """
-    fig = plt.figure(figsize=(figW, figH), dpi=100)
-    plt.imshow(lda_result.loocv_confmat, cmap=cmap)
-    class_labels=list(lda_result.group_dict.keys())
-    if alt_labels is not None:
-        class_labels_ticks=class_labels.copy()
-        for i in range(len(class_labels_ticks)):
-            class_labels_ticks[i]=alt_labels[class_labels[i]]
-    else:
-        class_labels_ticks=class_labels.copy()
-
-    ticks=[lda_result.group_dict[key] for key in class_labels]
-    if rotate_xticks==True:
-        plt.xticks(ticks, class_labels_ticks,rotation=90)
-    else:
-        plt.xticks(ticks, class_labels_ticks)
-    plt.yticks(ticks, class_labels_ticks)
-    for i in range(len(class_labels)):
-        for j in range(len(class_labels)):
-            plt.text(j, i, str(int(lda_result.loocv_confmat[i, j])), ha='center', va='center', color='black')
-    plt.xlabel('Predicted Class')
-    plt.ylabel('True Class')
-    if alt_title==False:
-        plt.title('Confusion Matrix')
-    else:
-        plt.title(alt_title)
-    plt.tight_layout()
-    return fig
 
 def plot_distance_matrix(module_feature_object, dist_mat,cmap="Greens",figW=3,figH=3,alt_labels=None,title=None):
+    """
+    Plot distance matrix
+
+    :param module_feature_object:
+    :param dist_mat:
+    :param cmap:
+    :param figW:
+    :param figH:
+    :param alt_labels:
+    :param title:
+    :return:
+    """
     fig = plt.figure(figsize=(figW,figH),dpi=100)
     plt.imshow(dist_mat,aspect="auto",cmap=cmap)
     reverse_grp_dict = {v: k for k, v in module_feature_object.group_dict.items()}
@@ -854,6 +696,18 @@ def plot_distance_matrix(module_feature_object, dist_mat,cmap="Greens",figW=3,fi
     return fig
 
 def plot_distance_box(module_feature_object, dist_mat, cmap="Blues",figW=3,figH=3,alt_labels=None,title=None):
+    """
+    Plot distance boxplot
+
+    :param module_feature_object:
+    :param dist_mat:
+    :param cmap:
+    :param figW:
+    :param figH:
+    :param alt_labels:
+    :param title:
+    :return:
+    """
     fig = plt.figure(figsize=(figW, figH),dpi=100)
     dst = {}
     for grp in sorted(np.unique(module_feature_object.group_labels)):
@@ -959,30 +813,30 @@ def plot_distance_box(module_feature_object, dist_mat, cmap="Blues",figW=3,figH=
 #     plt.tight_layout()
 #     return fig
 #
-# def BORIS_to_pose_matrix_plot(config, boris_to_pose_output, figW=4, figH=2.5, cmap="Greens",outline_top_match=True):
-#     fig, ax = plt.subplots(figsize=(figW, figH), dpi=100)
-#     plt.imshow(boris_to_pose_output.to_numpy(dtype='float'),cmap=cmap,aspect="auto",interpolation="none")
-#     data = boris_to_pose_output.to_numpy(dtype='float')
-#     num_cols = data.shape[1]
-#     if outline_top_match==True:
-#         for col in range(num_cols):
-#             max_row = np.argmax(data[:, col])
-#             if np.sum(data[:, col]==data[max_row, col])==1:
-#                 rect = Rectangle((col - 0.5, max_row - 0.5), 1, 1, edgecolor='purple', facecolor='none', linewidth=0.5)
-#                 ax.add_patch(rect)
-#     if len(boris_to_pose_output.columns>=20):
-#         xticks=np.arange(0,np.max(boris_to_pose_output.columns),5,dtype=int)
-#         xticklabels=np.array(list(boris_to_pose_output.columns),dtype=int)[xticks]
-#     else:
-#         xticks=range(len(boris_to_pose_output.columns))
-#         xticklabels=boris_to_pose_output.columns
-#
-#     plt.xticks(xticks,labels=xticklabels)
-#     plt.yticks(range(len(boris_to_pose_output.index)), labels=boris_to_pose_output.index)
-#     plt.xlabel(config["data_source"]+" Pose Module")
-#     plt.ylabel("Manually Scored\nBehavior")
-#     plt.tick_params(axis='x', rotation=90,
-#                     labelsize=plt.rcParams['font.size'] * 0.7, pad=2)
-#     plt.tight_layout()
-#     return fig
+def BORIS_to_pose_matrix_plot(config, boris_to_pose_output, figW=4, figH=2.5, cmap="Greens",outline_top_match=True):
+    fig, ax = plt.subplots(figsize=(figW, figH), dpi=100)
+    plt.imshow(boris_to_pose_output.to_numpy(dtype='float'),cmap=cmap,aspect="auto",interpolation="none")
+    data = boris_to_pose_output.to_numpy(dtype='float')
+    num_cols = data.shape[1]
+    if outline_top_match==True:
+        for col in range(num_cols):
+            max_row = np.argmax(data[:, col])
+            if np.sum(data[:, col]==data[max_row, col])==1:
+                rect = Rectangle((col - 0.5, max_row - 0.5), 1, 1, edgecolor='purple', facecolor='none', linewidth=0.5)
+                ax.add_patch(rect)
+    if len(boris_to_pose_output.columns>=20):
+        xticks=np.arange(0,len(boris_to_pose_output.columns),5,dtype=int)
+        xticklabels=np.arange(0,len(boris_to_pose_output.columns),1,dtype=int)[xticks]
+    else:
+        xticks=range(len(boris_to_pose_output.columns))
+        xticklabels=boris_to_pose_output.columns
+
+    plt.xticks(xticks,labels=xticklabels)
+    plt.yticks(range(len(boris_to_pose_output.index)), labels=boris_to_pose_output.index)
+    plt.xlabel(config["data_source"]+" Pose Module")
+    plt.ylabel("Manually Scored\nBehavior")
+    plt.tick_params(axis='x', rotation=90,
+                    labelsize=plt.rcParams['font.size'] * 0.7, pad=2)
+    plt.tight_layout()
+    return fig
 

@@ -65,5 +65,6 @@ Check out the demo scripts for a full analysis and plotting pipeline!
    demo3_pca
    demo4_pk
    metadata
-   analysis
+   analyze
    plot
+   simulate

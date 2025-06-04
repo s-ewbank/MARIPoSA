@@ -1,24 +1,21 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>utils.metadata &mdash; MARIPoSA 0.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
-      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css" />
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
 
   
-  <!--[if lt IE 9]>
-    <script src="../../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-        <script src="../../_static/jquery.js"></script>
-        <script src="../../_static/underscore.js"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../../_static/doctools.js"></script>
-        <script src="../../_static/sphinx_highlight.js"></script>
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=44496db0"></script>
+      <script src="../../_static/doctools.js?v=888ff710"></script>
+      <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -45,13 +42,10 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../demo1_start.html">Demo 1: Basic project creation, pose usage plots, and classification</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../demo2_dlc.html">Demo 2: Scalar locomotion data from DeepLabCut</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../demo3_pca.html">Demo 3: Principal Components Analysis</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../demo4_pk.html">Demo 4: Reducing data to a single dimension based on distance to a control behavior distribution</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../metadata.html">Metadata</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../analysis.html">Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../analyze.html">Analyze</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../plot.html">Plot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../simulate.html">Simulate</a></li>
 </ul>
 
         </div>
@@ -85,7 +79,7 @@
 <span class="kn">import</span> <span class="nn">subprocess</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 
-<div class="viewcode-block" id="create_PS_project"><a class="viewcode-back" href="../../metadata.html#utils.metadata.create_PS_project">[docs]</a><span class="k">def</span> <span class="nf">create_PS_project</span><span class="p">(</span><span class="n">project_name</span><span class="p">,</span><span class="n">data_directory</span><span class="p">,</span><span class="n">data_source</span><span class="p">,</span><span class="n">output_directory</span><span class="p">,</span><span class="n">fps</span><span class="p">):</span>
+<div class="viewcode-block" id="create_PS_project"><a class="viewcode-back" href="../../source/utils.html#utils.metadata.create_PS_project">[docs]</a><span class="k">def</span> <span class="nf">create_PS_project</span><span class="p">(</span><span class="n">project_name</span><span class="p">,</span><span class="n">data_directory</span><span class="p">,</span><span class="n">data_source</span><span class="p">,</span><span class="n">output_directory</span><span class="p">,</span><span class="n">fps</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Make project directory and write config_PS.yaml file.</span>
 
@@ -94,7 +88,6 @@
 <span class="sd">    :param data_source: B-SOiD, VAME, or Keypoint-MoSeq</span>
 <span class="sd">    :param output_directory: path where output directory and config file should be created</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
     <span class="k">if</span> <span class="n">data_source</span> <span class="o">==</span> <span class="s2">&quot;B-SOiD&quot;</span><span class="p">:</span>
         <span class="n">project_files</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">data_directory</span><span class="p">))</span>
     <span class="k">elif</span> <span class="n">data_source</span> <span class="o">==</span> <span class="s2">&quot;VAME&quot;</span><span class="p">:</span>
@@ -131,7 +124,7 @@
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">project_directory</span><span class="o">+</span><span class="s2">&quot;/config_PS.yaml&quot;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
         <span class="n">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">filedata</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="create_PE_project"><a class="viewcode-back" href="../../metadata.html#utils.metadata.create_PE_project">[docs]</a><span class="k">def</span> <span class="nf">create_PE_project</span><span class="p">(</span><span class="n">project_name</span><span class="p">,</span><span class="n">data_directory</span><span class="p">,</span><span class="n">data_source</span><span class="p">,</span><span class="n">output_directory</span><span class="p">,</span><span class="n">fps</span><span class="p">):</span>
+<div class="viewcode-block" id="create_PE_project"><a class="viewcode-back" href="../../source/utils.html#utils.metadata.create_PE_project">[docs]</a><span class="k">def</span> <span class="nf">create_PE_project</span><span class="p">(</span><span class="n">project_name</span><span class="p">,</span><span class="n">data_directory</span><span class="p">,</span><span class="n">data_source</span><span class="p">,</span><span class="n">output_directory</span><span class="p">,</span><span class="n">fps</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Make project directory and write config_PE.yaml file.</span>
 
@@ -145,6 +138,8 @@
         <span class="n">project_files</span><span class="o">=</span><span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">data_directory</span><span class="p">))</span> <span class="k">if</span> <span class="n">i</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.csv&quot;</span><span class="p">)]</span>
     <span class="k">elif</span> <span class="n">data_source</span><span class="o">==</span><span class="s2">&quot;SLEAP&quot;</span><span class="p">:</span>
         <span class="n">project_files</span><span class="o">=</span><span class="nb">sorted</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">data_directory</span><span class="p">))</span>
+    <span class="k">elif</span> <span class="n">data_source</span><span class="o">==</span><span class="s2">&quot;OpenFace&quot;</span><span class="p">:</span>
+        <span class="n">project_files</span><span class="o">=</span><span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">data_directory</span><span class="p">))</span> <span class="k">if</span> <span class="n">i</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.csv&quot;</span><span class="p">)]</span>
     <span class="n">project_directory</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">output_directory</span><span class="o">+</span><span class="s2">&quot;/&quot;</span><span class="o">+</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%y%m</span><span class="si">%d</span><span class="s1">_&#39;</span><span class="p">)</span><span class="o">+</span><span class="n">project_name</span><span class="p">)</span>
     <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">project_directory</span><span class="p">)</span>
 
@@ -161,7 +156,7 @@
         <span class="n">yaml</span><span class="o">.</span><span class="n">Dumper</span><span class="o">.</span><span class="n">ignore_aliases</span> <span class="o">=</span> <span class="k">lambda</span> <span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="kc">True</span>
         <span class="n">yaml</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">PE_config</span><span class="p">,</span> <span class="n">outfile</span><span class="p">,</span> <span class="n">default_flow_style</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">Dumper</span><span class="o">=</span><span class="n">yaml</span><span class="o">.</span><span class="n">Dumper</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="load_project"><a class="viewcode-back" href="../../metadata.html#utils.metadata.load_project">[docs]</a><span class="k">def</span> <span class="nf">load_project</span><span class="p">(</span><span class="n">config_path</span><span class="p">):</span>
+<div class="viewcode-block" id="load_project"><a class="viewcode-back" href="../../source/utils.html#utils.metadata.load_project">[docs]</a><span class="k">def</span> <span class="nf">load_project</span><span class="p">(</span><span class="n">config_path</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Loads project from config_PS.yaml or config_PE.yaml file</span>
 
@@ -171,14 +166,14 @@
         <span class="n">config</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">config</span></div>
 
-<span class="k">def</span> <span class="nf">edit_config</span><span class="p">(</span><span class="n">config_path</span><span class="p">):</span>
+<div class="viewcode-block" id="edit_config"><a class="viewcode-back" href="../../source/utils.html#utils.metadata.edit_config">[docs]</a><span class="k">def</span> <span class="nf">edit_config</span><span class="p">(</span><span class="n">config_path</span><span class="p">):</span>
     <span class="n">config</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">config_path</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span><span class="o">==</span><span class="s2">&quot;win32&quot;</span><span class="p">:</span>
         <span class="n">os</span><span class="o">.</span><span class="n">startfile</span><span class="p">(</span><span class="n">config_path</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span><span class="o">==</span><span class="s2">&quot;darwin&quot;</span><span class="p">:</span>
         <span class="n">subprocess</span><span class="o">.</span><span class="n">call</span><span class="p">([</span><span class="s2">&quot;open&quot;</span><span class="p">,</span><span class="n">config_path</span><span class="p">])</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">subprocess</span><span class="o">.</span><span class="n">call</span><span class="p">([</span><span class="s2">&quot;xdg-open&quot;</span><span class="p">,</span> <span class="n">config_path</span><span class="p">])</span>
+        <span class="n">subprocess</span><span class="o">.</span><span class="n">call</span><span class="p">([</span><span class="s2">&quot;xdg-open&quot;</span><span class="p">,</span> <span class="n">config_path</span><span class="p">])</span></div>
 </pre></div>
 
            </div>
@@ -188,7 +183,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2024, Sedona Ewbank.</p>
+    <p>&#169; Copyright 2025, Sedona Ewbank.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

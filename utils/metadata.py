@@ -16,7 +16,8 @@ def create_PS_project(project_name,data_directory,data_source,output_directory,f
     if data_source == "B-SOiD":
         project_files = sorted(os.listdir(data_directory))
     elif data_source == "VAME":
-        project_files = sorted([item for item in os.listdir(data_directory) if os.path.isdir(os.path.join(data_directory, item))])
+        project_files = sorted([item for item in os.listdir(data_directory) if
+                                (os.path.isdir(os.path.join(data_directory, item)) and (item!="community_cohort"))])
     elif data_source == "Keypoint-MoSeq":
         project_files = sorted(os.listdir(data_directory))
     project_directory = str(output_directory+"/"+datetime.now().strftime('%y%m%d_')+project_name)
@@ -30,6 +31,8 @@ def create_PS_project(project_name,data_directory,data_source,output_directory,f
     PS_config["data_source"] = str(data_source)
     PS_config["fps"] = str(fps)
     PS_config["project_files"] = project_files
+    if data_source == "VAME":
+        PS_config["vame_model_name"] = sorted(os.listdir(PS_config["data_directory"]+"/"+project_files[0]+"/VAME/"))[0]
     PS_config["subgroups"] = {"group1" : project_files}
     PS_config["remappings"] = [["#old_poses; e.g., [1,2,3]","#new_pose; e.g., 400"],
                           ["#old_poses; e.g., [1,2,3]","#new_pose; e.g., 400"]]

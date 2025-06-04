@@ -96,10 +96,7 @@ def get_module_labels(config, start, stop, subgroups = None):
                 count = count + 1
         elif config["data_source"]=="VAME":
             data_directory = config["data_directory"]
-            model_path = ""
-            model_path = model_path + "/" + os.listdir(data_directory + "/" + os.listdir(data_directory)[0])[0]
-            model_path = model_path + "/" + os.listdir(data_directory + "/" + os.listdir(data_directory)[0] + model_path)[
-                0] + "/"
+            model_path = "/VAME/"+config["vame_model_name"]+"/"
             for f in range(len(config["project_files"])):
                 header.append(config["project_files"][f])
                 datstr = [i for i in os.listdir(data_directory + "/" + config["project_files"][f] + model_path) if "_label_" in i][0]
@@ -167,10 +164,7 @@ def get_module_labels(config, start, stop, subgroups = None):
             labels_df.columns = [header1, header2]
         elif config["data_source"]=="VAME":
             data_directory = config["data_directory"]
-            model_path = ""
-            model_path = model_path + "/" + os.listdir(data_directory + "/" + os.listdir(data_directory)[0])[0]
-            model_path = model_path + "/" + os.listdir(data_directory + "/" + os.listdir(data_directory)[0] + model_path)[
-                0] + "/"
+            model_path = "/VAME/"+config["vame_model_name"]+"/"
             for g in range(n_groups):
                 label_paths_g = config["subgroups"][subgroups[g]]
                 for f in range(len(label_paths_g)):
@@ -674,6 +668,7 @@ def load_module_feature_object(module_feature_object_path):
 def embed(module_feature_object,method="lda",n_components=2):
     """
     Get dimensionally reduced space embeddings of the data with LDA or PCA
+
     :param module_feature_object: module feature object
     :param method: LDA or PCA; default LDA
     :param n_components: number of components
@@ -701,6 +696,7 @@ def embed(module_feature_object,method="lda",n_components=2):
 def classify(module_feature_object, method="lda"):
     """
     Classify pose segmentation data using either module usage or transitions
+
     :param module_feature_object: ModuleUsage or ModuleTransitions object
     :param method: classification method to use; options include "lda", "logisticregression", "mlp", "naivebayes", "knn", or "randomforest"
     :return: classifier
@@ -741,6 +737,7 @@ def classify(module_feature_object, method="lda"):
 def loocv(module_feature_object, method="lda"):
     """
     Perform leave-one-out cross-validation for a method of classifying pose segmentation data using either module usage or transitions
+
     :param module_feature_object: ModuleUsage or ModuleTransitions object
     :param method: classification method to use; options include "lda", "logisticregression", "mlp", "naivebayes", "knn", or "randomforest"
     :return: accuracy, conf_mat
@@ -939,6 +936,13 @@ def loocv(module_feature_object, method="lda"):
 #     return distance_results
 
 def get_distance(module_feature_object, method="euclidean"):
+    """
+    Get distance
+
+    :param module_feature_object:
+    :param method:
+    :return:
+    """
     if module_feature_object.__class__.__name__ == "ModuleUsage":
         X = module_feature_object.label_counts
         y = module_feature_object.group_labels
@@ -986,6 +990,16 @@ def regress(module_feature_object, dose_dict, method="LinearRegression", alpha =
     return reg, dose_labels
 
 def loocv_regression(module_feature_object, dose_dict, method="LinearRegression", constrain_pos = True, alpha=1):
+    """
+    Perform LOOCV for linear regression
+
+    :param module_feature_object:
+    :param dose_dict:
+    :param method:
+    :param constrain_pos:
+    :param alpha:
+    :return:
+    """
     loocv_preds = []
     if module_feature_object.__class__.__name__=="ModuleUsage":
         X=module_feature_object.label_counts
@@ -1014,31 +1028,32 @@ def loocv_regression(module_feature_object, dose_dict, method="LinearRegression"
     sq_err = np.square(loocv_preds-y)
     return loocv_preds, sq_err
 
-def get_usage_ssd(control_usage_feats, exp_usage_feats):
-    """
-    Get the time-resolved sum squared difference in module usage relative to a control distribution of usage.
-    :param control_usage_feats: output from analysis.get_usage_feats for the control group ONLY
-    :param exp_usage_feats:
-    :return:
-    """
-    control_usage_feats_df = control_usage_feats.to_df()
-    exp_usage_df = exp_usage_feats.to_df()
-    control_usage_feats_df.drop("group", axis=1, inplace=True)
-    exp_usage_df.drop("group", axis=1, inplace=True)
-    control_usage = control_usage_feats_df.mean(axis=0)
-
-    exp_usage_df_sqdiff = exp_usage_df.copy()
-
-    for module in control_usage.index:
-        mod_cols = [i for i in exp_usage_df.columns if module + '_' in i]
-        exp_usage_df_sqdiff[mod_cols] = np.square(exp_usage_df_sqdiff[mod_cols] - control_usage[module])
-
-    extracted = [col.split("_t")[1].split("-")[0] for col in exp_usage_df.columns]
-    binstarts = pd.Series(extracted).unique()
-    exp_usage_df_ssd = pd.DataFrame(index=exp_usage_df.index, columns=binstarts)
-
-    for i in range(len(exp_usage_df_ssd.index)):
-        for bin in binstarts:
-            exp_usage_df_ssd.iloc[i][bin] = np.sum(exp_usage_df_sqdiff.iloc[i].filter(like="_t" + bin + "-"))
-
-    return exp_usage_df_ssd
+# def get_usage_ssd(control_usage_feats, exp_usage_feats):
+#     """
+#     Get the time-resolved sum squared difference in module usage relative to a control distribution of usage.
+#
+#     :param control_usage_feats: output from analysis.get_usage_feats for the control group ONLY
+#     :param exp_usage_feats:
+#     :return:
+#     """
+#     control_usage_feats_df = control_usage_feats.to_df()
+#     exp_usage_df = exp_usage_feats.to_df()
+#     control_usage_feats_df.drop("group", axis=1, inplace=True)
+#     exp_usage_df.drop("group", axis=1, inplace=True)
+#     control_usage = control_usage_feats_df.mean(axis=0)
+#
+#     exp_usage_df_sqdiff = exp_usage_df.copy()
+#
+#     for module in control_usage.index:
+#         mod_cols = [i for i in exp_usage_df.columns if module + '_' in i]
+#         exp_usage_df_sqdiff[mod_cols] = np.square(exp_usage_df_sqdiff[mod_cols] - control_usage[module])
+#
+#     extracted = [col.split("_t")[1].split("-")[0] for col in exp_usage_df.columns]
+#     binstarts = pd.Series(extracted).unique()
+#     exp_usage_df_ssd = pd.DataFrame(index=exp_usage_df.index, columns=binstarts)
+#
+#     for i in range(len(exp_usage_df_ssd.index)):
+#         for bin in binstarts:
+#             exp_usage_df_ssd.iloc[i][bin] = np.sum(exp_usage_df_sqdiff.iloc[i].filter(like="_t" + bin + "-"))
+#
+#     return exp_usage_df_ssd
