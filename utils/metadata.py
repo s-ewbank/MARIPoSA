@@ -4,7 +4,7 @@ import yaml
 import subprocess
 import sys
 
-def create_PS_project(project_name,data_directory,data_source,output_directory,fps):
+def create_PS_project(project_name,data_directory,data_source,output_directory,fps,n_modules):
     """
     Make project directory and write config_PS.yaml file.
 
@@ -29,10 +29,11 @@ def create_PS_project(project_name,data_directory,data_source,output_directory,f
     PS_config["project_directory"] = str(output_directory+"/"+datetime.now().strftime('%y%m%d_')+project_name)
     PS_config["data_type"] = "Pose segmentation"
     PS_config["data_source"] = str(data_source)
+    PS_config["n_modules"] = str(int(n_modules))
     PS_config["fps"] = str(fps)
-    PS_config["project_files"] = project_files
     if data_source == "VAME":
         PS_config["vame_model_name"] = sorted(os.listdir(PS_config["data_directory"]+"/"+project_files[0]+"/VAME/"))[0]
+    PS_config["project_files"] = project_files
     PS_config["subgroups"] = {"group1" : project_files}
     PS_config["remappings"] = [["#old_poses; e.g., [1,2,3]","#new_pose; e.g., 400"],
                           ["#old_poses; e.g., [1,2,3]","#new_pose; e.g., 400"]]

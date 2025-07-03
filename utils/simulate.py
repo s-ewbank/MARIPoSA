@@ -1,7 +1,8 @@
 import numpy as np
 from utils import analyze
 
-def generate_usage(module_feature_object, n_samples):
+
+def generate_usage(module_feature_object, n_samples, n_bootstraps=10, bootstrap_fraction=0.3):
     """
     Generate simulated pose module usage object
 
@@ -10,22 +11,34 @@ def generate_usage(module_feature_object, n_samples):
     :return: module_feature_object of the same style as the one input
 
     """
-    if module_feature_object.__class__.__name__=="ModuleUsage":
-        X=module_feature_object.label_counts
-    elif module_feature_object.__class__.__name__=="ModuleTransitions":
-        X=module_feature_object.transition_counts
+    if module_feature_object.__class__.__name__ == "ModuleUsage":
+        X = module_feature_object.label_counts
+    elif module_feature_object.__class__.__name__ == "ModuleTransitions":
+        X = module_feature_object.transition_counts
     else:
-        raise ValueError(f'module_feature_object class must be ModuleUsage or ModuleTransitions, not {module_feature_object.__class__}')
-    mean_X = np.mean(X, axis=0)
-    cov_X = np.cov(X.T)
-    simulated_X = np.random.multivariate_normal(mean_X, cov_X, size=n_samples)
-    simulated_X[simulated_X < 0] = 0
-    simulated_X = simulated_X / np.sum(simulated_X, axis=1)[:,np.newaxis]
-    if module_feature_object.__class__.__name__=="ModuleUsage":
-        return analyze.ModuleUsage(simulated_X, ["9999999"]*n_samples, ["9999999"]*n_samples, module_feature_object.feat_names, module_feature_object.group_dict, None)
-    elif module_feature_object.__class__.__name__=="ModuleTransitions":
+        raise ValueError(
+            f'module_feature_object class must be ModuleUsage or ModuleTransitions, not {module_feature_object.__class__}')
+
+    simulated_X = []
+    for boot in range(n_bootstraps):
+        boot = np.random.randint(0, high=X.shape[0], size=int(X.shape[0] * bootstrap_fraction))
+        X_b = X[boot, :]
+        mean_X = np.mean(X_b, axis=0)
+        cov_X = np.cov(X_b.T)
+        simulated_X_b = np.random.multivariate_normal(mean_X, cov_X, size=int(n_samples / n_bootstraps))
+        simulated_X_b[simulated_X_b < 0] = 0
+        simulated_X_b = simulated_X_b / np.sum(simulated_X_b, axis=1)[:, np.newaxis]
+        simulated_X.append(simulated_X_b)
+
+    simulated_X = np.concatenate(simulated_X, axis=0)
+
+    if module_feature_object.__class__.__name__ == "ModuleUsage":
+        return analyze.ModuleUsage(simulated_X, ["9999999"] * n_samples, ["9999999"] * n_samples,
+                                   module_feature_object.feat_names, module_feature_object.group_dict, None)
+    elif module_feature_object.__class__.__name__ == "ModuleTransitions":
         print("Warning - generating module transitions currently not tested for this function")
-        return analyze.ModuleTransitions(simulated_X, simulated_X, ["9999999"]*n_samples, ["9999999"]*n_samples, module_feature_object.feat_names, module_feature_object.group_dict, None)
+        return analyze.ModuleTransitions(simulated_X, simulated_X, ["9999999"] * n_samples, ["9999999"] * n_samples,
+                                         module_feature_object.feat_names, module_feature_object.group_dict, None)
 
 
 def generate_sequence(config, labels_df, T):

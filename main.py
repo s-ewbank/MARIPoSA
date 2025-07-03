@@ -208,38 +208,43 @@ class Application(customtkinter.CTk):
 
             # Enter data directory
             customtkinter.CTkLabel(self, text="Path to data directory",
-                                   font=('Helvetica', 16)).place(x=int(self.width * 0.2), y=int(self.height * 0.3))
+                                   font=('Helvetica', 16)).place(x=int(self.width * 0.2), y=int(self.height * 0.28))
             data_path_entry = customtkinter.CTkEntry(self)
-            data_path_entry.place(x=int(self.width * 0.5), y=int(self.height * 0.3))
+            data_path_entry.place(x=int(self.width * 0.5), y=int(self.height * 0.28))
             browse_button = customtkinter.CTkButton(self, text="Browse",
                                                     command=lambda: self.window_browse(data_path_entry,
                                                                                        type="directory"))
-            browse_button.place(x=int(self.width * 0.7), y=int(self.height * 0.3))
+            browse_button.place(x=int(self.width * 0.7), y=int(self.height * 0.28))
 
             # Info about data
             customtkinter.CTkLabel(self, text="Source of data for new project",
-                                   font=('Helvetica', 16)).place(x=int(self.width * 0.2), y=int(self.height * 0.4))
+                                   font=('Helvetica', 16)).place(x=int(self.width * 0.2), y=int(self.height * 0.36))
 
             # Radio buttons for starting new project or loading old project
             datatype_options = ["B-SOiD", "VAME", "Keypoint-MoSeq"]
             for r, option in enumerate(datatype_options):
                 customtkinter.CTkRadioButton(self, text=option, variable=self.datatype, value=option,
-                                                         font=('Helvetica', 16)).place(x=int(self.width * 0.5), y=int(self.height * (0.4 + r * 0.1)))
+                                                         font=('Helvetica', 16)).place(x=int(self.width * 0.5), y=int(self.height * (0.36 + r * 0.08)))
 
             customtkinter.CTkLabel(self, text="Frames per second",
-                                   font=('Helvetica', 16)).place(x=int(self.width * 0.2), y=int(self.height * 0.7))
+                                   font=('Helvetica', 16)).place(x=int(self.width * 0.2), y=int(self.height * 0.6))
             fps = customtkinter.CTkEntry(self)
-            fps.place(x=int(self.width * 0.5), y=int(self.height * 0.7))
+            fps.place(x=int(self.width * 0.5), y=int(self.height * 0.6))
+
+            customtkinter.CTkLabel(self, text="Number of modules",
+                                   font=('Helvetica', 16)).place(x=int(self.width * 0.2), y=int(self.height * 0.68))
+            n_modules = customtkinter.CTkEntry(self)
+            n_modules.place(x=int(self.width * 0.5), y=int(self.height * 0.68))
 
             # Enter project directory
             customtkinter.CTkLabel(self, text="Destination path for MARIPoSA output",
-                                   font=('Helvetica', 16)).place(x=int(self.width * 0.2), y=int(self.height * 0.8))
+                                   font=('Helvetica', 16)).place(x=int(self.width * 0.2), y=int(self.height * 0.75))
             project_path_entry = customtkinter.CTkEntry(self)
-            project_path_entry.place(x=int(self.width * 0.5), y=int(self.height * 0.8))
+            project_path_entry.place(x=int(self.width * 0.5), y=int(self.height * 0.75))
             browse_button = customtkinter.CTkButton(self, text="Browse",
                                                     command=lambda: self.window_browse(project_path_entry,
                                                                                        type="directory"))
-            browse_button.place(x=int(self.width * 0.7), y=int(self.height * 0.8))
+            browse_button.place(x=int(self.width * 0.7), y=int(self.height * 0.75))
 
             # Back to the initial view
             customtkinter.CTkButton(self, text="◀", command=self.window1_start,
@@ -247,7 +252,7 @@ class Application(customtkinter.CTk):
             customtkinter.CTkButton(self, text="▶",
                                     command=lambda: self.create_PS_project(
                                         project_name.get(), data_path_entry.get(), self.datatype.get(),
-                                        project_path_entry.get(), fps.get()),
+                                        project_path_entry.get(), fps.get(), n_modules.get()),
                                     font=('Helvetica', 16)).place(x=int(self.width * 0.8), y=int(self.height * 0.9))
 
     def create_PE_project(self, project_name, data_directory, data_source, output_directory,fps):
@@ -259,8 +264,8 @@ class Application(customtkinter.CTk):
         self.config = config
         self.window3a_PE_menu()
 
-    def create_PS_project(self, project_name, data_directory, data_source, output_directory,fps):
-        metadata.create_PS_project(project_name, data_directory, data_source, output_directory,fps)
+    def create_PS_project(self, project_name, data_directory, data_source, output_directory,fps,n_modules):
+        metadata.create_PS_project(project_name, data_directory, data_source, output_directory,fps,n_modules)
         self.clear_window()
         self.project_name = datetime.now().strftime('%y%m%d_') + project_name
         self.config_path = output_directory + "/" + self.project_name + "/config_PS.yaml"

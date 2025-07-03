@@ -51,6 +51,42 @@ def pickle_load(object_path):
         obj = pickle.load(file)
     return obj
 
+class KeypointFeature:
+    def __init__(self, keypoint_feature, group_labels, observation_labels, feat_names, group_dict, scaler):
+        self.keypoint_feature = keypoint_feature
+        self.group_labels = group_labels
+        self.observation_labels = observation_labels
+        self.feat_names = feat_names
+        self.group_dict = group_dict
+        self.scaler = scaler
+        mean_check = np.allclose(np.mean(keypoint_feature, axis=0), 0, atol=0.1)
+        std_check = np.allclose(np.std(keypoint_feature, axis=0), 1, atol=0.1)
+        self.scaled = mean_check and std_check
+
+    def to_df(self):
+        colnames = []
+        flip_group_dict = {v: k for k, v in self.group_dict.items()}
+        bad_group_labels = []
+        for i in self.group_labels:
+            if i in flip_group_dict.keys():
+                colnames.append(flip_group_dict[i])
+            else:
+                colnames.append("none")
+                bad_group_labels.append(i)
+        if len(bad_group_labels) > 0:
+            bad_group_labels = list(np.unique(bad_group_labels))
+            print(f"Warning: the following groups were not detected in the config and were labeled 'none'; continuing:\n{bad_group_labels}")
+        df = pd.DataFrame(self.keypoint_feature, columns=self.feat_names, index=self.observation_labels)
+        df["group"] = colnames
+        return df
+
+    def scale(self):
+        scaler = StandardScaler()
+        label_counts_scaled = scaler.fit_transform(self.keypoint_feature)
+        return ModuleUsage(label_counts_scaled, self.group_labels, self.observation_labels, self.feat_names,
+                           self.group_dict, scaler)
+
+
 def get_module_labels(config, start, stop, subgroups = None):
     """
     Generates a Pandas dataframe containing the labels for every frame in the specified time range for the video paths in defined groups.
@@ -198,57 +234,129 @@ def get_module_labels(config, start, stop, subgroups = None):
             labels_df.columns = [header1, header2]
     return labels_df
 
-def get_distance_timebins(PE_config,filepath,binsize,start,end,bodypart,thresh=70):
+def get_keypoint_travel(PE_config,
+                        keypoint,
+                        start,
+                        end,
+                        binsize=None,
+                        thresh=70,
+                        selected_subgroups="all",
+                        return_as_df=True):
     """
-    Get distance/locomotion for a body part from a DLC file
+    Measure keypodint distance travelled across group of subjects
 
-    :param DLC_config: config file (can be DLC or pose - used only for "fps")
-    :param filepath: path to file of interest
-    :param binsize: size of timebins (in seconds)
-    :param start: start time
-    :param end: end time
-    :param bodypart: which bodypart to track
-    :param thresh: threshold for point-to-point distance that should be marked as wrong and excluded
+    :param PE_config: pose estimation config - used for FPS only
+    :param keypoint: name of keypoint
+    :param start: start time in seconds
+    :param end: end time in seconds
+    :param binsize: if binned output is desired, size of timebins (default is None for no binning)
+    :param thresh: threshold for when distance 'jump' is too large and should be excluded; default 70
+    :param selected_subgroups: subgroups to analyze as defined in config; default "all"
+    :param return_as_df: return as a dataframe or return as KeypointTravel class (for embedding, classification)
     :return:
     """
-    data=pd.read_csv(filepath,header=[1,2])
-    nbins=int((end-start)/binsize)
-    dist=np.zeros(nbins)
-    for b in range(nbins):
-        x = np.array(data[bodypart]['x'])[(start+b*binsize)*PE_config["fps"]:(start+(b+1)*binsize)*PE_config["fps"]]
-        y = np.array(data[bodypart]['y'])[(start+b*binsize)*PE_config["fps"]:(start+(b+1)*binsize)*PE_config["fps"]]
-        for i in range(len(x)-1):
-            if np.absolute(x[i+1]-x[i])>thresh:
-                x[i+1]=x[i]
-            if np.absolute(y[i+1]-y[i])>thresh:
-                y[i+1]=y[i]
-            dist[b]=dist[b]+np.sqrt((x[i+1]-x[i])**2+(y[i+1]-y[i])**2)
-    return dist
-
-def dist_df_subgroups(PE_config, binsize, start, end, thresh=70, selected_subgroups="all"):
     if selected_subgroups=="all":
         selected_subgroups=PE_config["subgroups"].keys()
-    count = 0
-    header1 = []
-    header2 = []
-    for g, group in enumerate(selected_subgroups):
-        group_data=[]
-        for s, sess in enumerate(PE_config["subgroups"][group]):
-            header = sess
-            header2.append(header)
-            header1.append(group)
-            path = PE_config["path"]+sess
-            dist_i = get_distance_timebins(PE_config,path,binsize,start,end,"tailbase",thresh=thresh)
-            if s == 0 and g == 0:
-                dist_df = pd.DataFrame(dist_i, columns=[header])
-            else:
-                dist_df.insert(loc=count, value=dist_i, column=header)
-            count = count + 1
-    dist_df.columns = [header1, header2]
-    dist_df.index=np.arange(start/60,end/60,binsize/60)
-    return dist_df
 
-def BORIS_to_pose(config):
+    group_dict = {selected_subgroups[i]: i for i in range(len(selected_subgroups))}
+
+    group_labels=[]
+    travel_data=[]
+    observation_labels=[]
+    for g, group in enumerate(selected_subgroups):
+        for s, sess in enumerate(PE_config["subgroups"][group]):
+            observation_labels.append(sess)
+            group_labels.append(group_dict[group])
+            filepath = PE_config["data_directory"]+sess
+            data = pd.read_csv(filepath, header=[1, 2])
+            if binsize == None:
+                binsize = end - start
+                nbins = 1
+            else:
+                nbins = int((end - start) / binsize)
+            dist_i = np.zeros(nbins)
+            fps = int(PE_config["fps"])
+            for b in range(nbins):
+                x = np.array(data[keypoint]['x'])[(start + b * binsize) * fps:(start + (b + 1) * binsize) * fps]
+                y = np.array(data[keypoint]['y'])[(start + b * binsize) * fps:(start + (b + 1) * binsize) * fps]
+                for i in range(len(x) - 1):
+                    if np.absolute(x[i + 1] - x[i]) > thresh:
+                        x[i + 1] = x[i]
+                    if np.absolute(y[i + 1] - y[i]) > thresh:
+                        y[i + 1] = y[i]
+                    dist_i[b] = dist_i[b] + np.sqrt((x[i + 1] - x[i]) ** 2 + (y[i + 1] - y[i]) ** 2)
+            travel_data.append(dist_i)
+    travel_data = np.array(travel_data)
+    if binsize is not None:
+        feat_names=np.arange(start/60,end/60,binsize/60)
+    else:
+        feat_names="travel"
+    if return_as_df:
+        kf = KeypointFeature(travel_data, group_labels, observation_labels, feat_names, group_dict, None)
+        kf_df = kf.to_df()
+        return kf_df
+    else:
+        return KeypointFeature(travel_data, group_labels, observation_labels, feat_names, group_dict, None)
+
+
+# def get_keypoint_travel(PE_config,
+#                                   keypoint,
+#                                   start,
+#                                   end,
+#                                   binsize=None,
+#                                   thresh=70,
+#                                   selected_subgroups="all"):
+#     """
+#     Measure keypodint distance travelled across group of subjects
+#
+#     :param PE_config: pose estimation config - used for FPS only
+#     :param keypoint: name of keypoint
+#     :param start: start time in seconds
+#     :param end: end time in seconds
+#     :param binsize: if binned output is desired, size of timebins (default is None for no binning)
+#     :param thresh: threshold for when distance 'jump' is too large and should be excluded; default 70
+#     :param selected_subgroups: subgroups to analyze as defined in config; default "all"
+#     :return:
+#     """
+#     if selected_subgroups=="all":
+#         selected_subgroups=PE_config["subgroups"].keys()
+#     count = 0
+#     header1 = []
+#     header2 = []
+#     for g, group in enumerate(selected_subgroups):
+#         for s, sess in enumerate(PE_config["subgroups"][group]):
+#             header = sess
+#             header2.append(header)
+#             header1.append(group)
+#             filepath = PE_config["data_directory"]+sess
+#             data = pd.read_csv(filepath, header=[1, 2])
+#             if binsize == None:
+#                 binsize = end - start
+#                 nbins = 1
+#             else:
+#                 nbins = int((end - start) / binsize)
+#             dist_i = np.zeros(nbins)
+#             fps = int(PE_config["fps"])
+#             for b in range(nbins):
+#                 x = np.array(data[keypoint]['x'])[(start + b * binsize) * fps:(start + (b + 1) * binsize) * fps]
+#                 y = np.array(data[keypoint]['y'])[(start + b * binsize) * fps:(start + (b + 1) * binsize) * fps]
+#                 for i in range(len(x) - 1):
+#                     if np.absolute(x[i + 1] - x[i]) > thresh:
+#                         x[i + 1] = x[i]
+#                     if np.absolute(y[i + 1] - y[i]) > thresh:
+#                         y[i + 1] = y[i]
+#                     dist_i[b] = dist_i[b] + np.sqrt((x[i + 1] - x[i]) ** 2 + (y[i + 1] - y[i]) ** 2)
+#             if s == 0 and g == 0:
+#                 dist_df = pd.DataFrame(dist_i, columns=[header])
+#             else:
+#                 dist_df.insert(loc=count, value=dist_i, column=header)
+#             count = count + 1
+#     dist_df.columns = [header1, header2]
+#     if binsize is not None:
+#         dist_df.index=np.arange(start/60,end/60,binsize/60)
+#     return dist_df
+
+def BORIS_to_pose(config, verbose = True):
     """
     Intake paired BORIS one-hot-encoded observation files and pose segmented files and align them to see what behaviors
     line up with what pose modules
@@ -264,9 +372,12 @@ def BORIS_to_pose(config):
     labels_df = get_module_labels(config_modulo, 0, 1200)
     labels_flat = np.array(labels_df)
     labels_flat = [item for sublist in labels_flat for item in sublist]
-    modules = np.unique(labels_flat)
-    n_modules = len(modules)
-    modules = np.unique(labels_df.values.flatten())
+    ## old way
+    # modules = np.unique(labels_flat)
+    # n_modules = len(modules)
+    # modules = np.unique(labels_df.values.flatten())
+    n_modules=int(config["n_modules"])
+    modules = np.arange(0,n_modules,1)
     for pairing in boris_to_pose_pairings:
         if pairing[0]==None:
             continue
@@ -292,13 +403,15 @@ def BORIS_to_pose(config):
                 for module in range(n_modules):
                     results_i.at[module,behavior] = np.sum(masked_labels==module).to_numpy()[0]
             results=results+results_i
-            print("done with " + str(pairing))
+            if verbose:
+                print("done with " + str(pairing))
     results=results.T
     column_sums = results.sum()
     column_sums = column_sums.replace(0, 1)
     normalized_results = results / column_sums
     loss_score = np.sum(results.sum()-results.max())/np.sum(results.sum())
-    print(config["data_source"] + " modules map onto scored behaviors with 'loss' of " + str(loss_score))
+    if verbose:
+        print(config["data_source"] + " modules map onto scored behaviors with 'loss' of " + str(loss_score))
     return results, normalized_results, loss_score
 
 def combine_pose_modules(config, labels_df, force_no_numeric=False):
@@ -479,14 +592,14 @@ class ModuleUsage:
             pickle.dump(self, file)
 
 
-def get_module_usage(config, labels_df, binsize=None):
+def get_module_usage(config, labels_df, binsize=None, modules_altered=False):
     """
     Reshape labels dataframe from label_counter_subgroups to be an array of features
 
     :param config: config object
     :param labels_df: labels dataframe from label_counter_subgroups
     :param binsize: width of bins in seconds; if None, no binning is performed
-    :param selected_subgroups:
+    :param modules_altered: must be true if modules have been remapped
     :return:
     """
     data_subgrouped = False
@@ -504,8 +617,17 @@ def get_module_usage(config, labels_df, binsize=None):
     fps = int(config["fps"])
     labels_flat = np.array(labels_df)
     labels_flat = [item for sublist in labels_flat for item in sublist]
-    modules = np.unique(labels_flat)
-    n_modules = len(modules)
+    if modules_altered:
+        modules = np.unique(labels_flat)
+        n_modules = len(modules)
+    else:
+        n_modules = int(config["n_modules"])
+        modules = np.arange(0, n_modules, 1)
+        modules_detect = np.unique(labels_flat)
+        for m in modules_detect:
+            if is_nonnum(m):
+                print("Warning, detected non-numeric modules - consider setting 'modules_altered' to True (False by defualt)")
+                break
 
     label_counts = []
 
@@ -592,7 +714,7 @@ class ModuleTransitions:
         with open(save_path, 'wb') as file:
             pickle.dump(self, file)
 
-def get_module_transitions(config, labels_df):
+def get_module_transitions(config, labels_df, modules_altered=False):
     """
     Reshape labels dataframe from label_counter_subgroups to be an array of features
 
@@ -618,7 +740,10 @@ def get_module_transitions(config, labels_df):
     labels_flat = np.array(labels_df)
     labels_flat = [item for sublist in labels_flat for item in sublist]
     modules = np.unique(labels_flat)
-    n_modules = len(modules)
+    if modules_altered:
+        n_modules = len(modules)
+    else:
+        n_modules = int(config["n_modules"])
 
     transition_counts = []
     transition_count_matrices = []
@@ -682,8 +807,12 @@ def embed(module_feature_object,method="lda",n_components=2):
         X=module_feature_object.transition_counts
         y=module_feature_object.group_labels
         obj_type="module transitions"
+    elif module_feature_object.__class__.__name__=="KeypointFeature":
+        X=module_feature_object.keypoint_feature
+        y=module_feature_object.group_labels
+        obj_type="keypoint feature"
     else:
-        raise ValueError(f'module_feature_object class must be ModuleUsage or ModuleTransitions, not {module_feature_object.__class__}')
+        raise ValueError(f'module_feature_object class must be ModuleUsage or ModuleTransitions or KeypointFeature, not {module_feature_object.__class__}')
 
     if ((method == "lda") or (method == "LDA") or (method == "lineardiscriminantanalysis") or (method == "LinearDiscriminantAnalysis")):
         emb = LDA(n_components=n_components,store_covariance=True)
@@ -703,16 +832,19 @@ def classify(module_feature_object, method="lda"):
 
     """
     if module_feature_object.__class__.__name__=="ModuleUsage":
-        X = module_feature_object.label_counts
-        y = module_feature_object.group_labels
-        obj_type = "module usage"
-    elif module_feature_object.__class__.__name__ == "ModuleTransitions":
-        X = module_feature_object.transition_counts
-        y = module_feature_object.group_labels
-        obj_type = "module transitions"
+        X=module_feature_object.label_counts
+        y=module_feature_object.group_labels
+        obj_type="module usage"
+    elif module_feature_object.__class__.__name__=="ModuleTransitions":
+        X=module_feature_object.transition_counts
+        y=module_feature_object.group_labels
+        obj_type="module transitions"
+    elif module_feature_object.__class__.__name__=="KeypointFeature":
+        X=module_feature_object.keypoint_feature
+        y=module_feature_object.group_labels
+        obj_type="keypoint feature"
     else:
-        raise ValueError(
-            f'module_feature_object class must be ModuleUsage or ModuleTransitions, not {module_feature_object.__class__}')
+        raise ValueError(f'module_feature_object class must be ModuleUsage or ModuleTransitions or KeypointFeature, not {module_feature_object.__class__}')
 
     if ((method == "lda") or (method == "LDA") or (method == "lineardiscriminantanalysis") or (
             method == "LinearDiscriminantAnalysis")):
@@ -745,14 +877,19 @@ def loocv(module_feature_object, method="lda"):
     """
     loocv_preds = []
     if module_feature_object.__class__.__name__=="ModuleUsage":
-        X = module_feature_object.label_counts
-        y = module_feature_object.group_labels
-    elif module_feature_object.__class__.__name__ == "ModuleTransitions":
-        X = module_feature_object.transition_counts
-        y = module_feature_object.group_labels
+        X=module_feature_object.label_counts
+        y=module_feature_object.group_labels
+        obj_type="module usage"
+    elif module_feature_object.__class__.__name__=="ModuleTransitions":
+        X=module_feature_object.transition_counts
+        y=module_feature_object.group_labels
+        obj_type="module transitions"
+    elif module_feature_object.__class__.__name__=="KeypointFeature":
+        X=module_feature_object.keypoint_feature
+        y=module_feature_object.group_labels
+        obj_type="keypoint feature"
     else:
-        raise ValueError(
-            f'module_feature_object class must be ModuleUsage or ModuleTransitions, not {module_feature_object.__class__}')
+        raise ValueError(f'module_feature_object class must be ModuleUsage or ModuleTransitions or KeypointFeature, not {module_feature_object.__class__}')
     for obs in range(len(y)):
         sub_X = np.delete(X, obs, axis=0)
         sub_y = y[:obs] + y[obs + 1:]
@@ -943,17 +1080,20 @@ def get_distance(module_feature_object, method="euclidean"):
     :param method:
     :return:
     """
-    if module_feature_object.__class__.__name__ == "ModuleUsage":
-        X = module_feature_object.label_counts
-        y = module_feature_object.group_labels
-        obj_type = "module usage"
-    elif module_feature_object.__class__.__name__ == "ModuleTransitions":
-        X = module_feature_object.transition_counts
-        y = module_feature_object.group_labels
-        obj_type = "module transitions"
+    if module_feature_object.__class__.__name__=="ModuleUsage":
+        X=module_feature_object.label_counts
+        y=module_feature_object.group_labels
+        obj_type="module usage"
+    elif module_feature_object.__class__.__name__=="ModuleTransitions":
+        X=module_feature_object.transition_counts
+        y=module_feature_object.group_labels
+        obj_type="module transitions"
+    elif module_feature_object.__class__.__name__=="KeypointFeature":
+        X=module_feature_object.keypoint_feature
+        y=module_feature_object.group_labels
+        obj_type="keypoint feature"
     else:
-        raise ValueError(
-            f'module_feature_object class must be ModuleUsage or ModuleTransitions, not {module_feature_object.__class__}')
+        raise ValueError(f'module_feature_object class must be ModuleUsage or ModuleTransitions or KeypointFeature, not {module_feature_object.__class__}')
     centroids = np.zeros([len(np.unique(X)), len(module_feature_object.feat_names)])
     for group in sorted(np.unique(module_feature_object.group_labels)):
         centroids[group, :] = np.mean(X[np.array(module_feature_object.group_labels) == group], axis=0)
@@ -977,8 +1117,10 @@ def regress(module_feature_object, dose_dict, method="LinearRegression", alpha =
         X=module_feature_object.label_counts
     elif module_feature_object.__class__.__name__=="ModuleTransitions":
         X=module_feature_object.transition_counts
+    elif module_feature_object.__class__.__name__=="KeypointFeature":
+        X=module_feature_object.keypoint_feature
     else:
-        raise ValueError(f'module_feature_object class must be ModuleUsage or ModuleTransitions, not {module_feature_object.__class__}')
+        raise ValueError(f'module_feature_object class must be ModuleUsage or ModuleTransitions or KeypointFeature, not {module_feature_object.__class__}')
     reverse_grp_dict = {v: k for k, v in module_feature_object.group_dict.items()}
     dose_labels = [dose_dict[reverse_grp_dict[i]] for i in module_feature_object.group_labels]
     if method=="LinearRegression":
@@ -1003,10 +1145,18 @@ def loocv_regression(module_feature_object, dose_dict, method="LinearRegression"
     loocv_preds = []
     if module_feature_object.__class__.__name__=="ModuleUsage":
         X=module_feature_object.label_counts
+        y=module_feature_object.group_labels
+        obj_type="module usage"
     elif module_feature_object.__class__.__name__=="ModuleTransitions":
         X=module_feature_object.transition_counts
+        y=module_feature_object.group_labels
+        obj_type="module transitions"
+    elif module_feature_object.__class__.__name__=="KeypointFeature":
+        X=module_feature_object.keypoint_feature
+        y=module_feature_object.group_labels
+        obj_type="keypoint feature"
     else:
-        raise ValueError(f'module_feature_object class must be ModuleUsage or ModuleTransitions, not {module_feature_object.__class__}')
+        raise ValueError(f'module_feature_object class must be ModuleUsage or ModuleTransitions or KeypointFeature, not {module_feature_object.__class__}')
     reverse_grp_dict = {v: k for k, v in module_feature_object.group_dict.items()}
     y = [dose_dict[reverse_grp_dict[i]] for i in module_feature_object.group_labels]
     for obs in range(len(y)):

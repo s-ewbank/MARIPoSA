@@ -86,8 +86,10 @@ def plot_module_usage(config,
     if not data_subgrouped:
         usage_df = usage_feats.to_df()
         usage_df.drop("group", axis=1, inplace=True)
+
         modules = usage_feats.feat_names
         n_modules = len(modules)
+
         bar_heights = np.mean(usage_df, axis=0)
         bar_sems = np.std(usage_df, axis=0) / np.sqrt(usage_df.shape[1])
 
@@ -138,6 +140,7 @@ def plot_module_usage(config,
         n_groups = len(groupnames)
 
         usage_df = usage_feats.to_df()
+
         modules = usage_feats.feat_names
         n_modules = len(modules)
 
@@ -535,7 +538,7 @@ def module_usage_sandplot(config, module_usage, BORIS_to_pose_mat=None, title=No
                 for c in sub_modules:
                     if c in modules:
                         bottom = np.array(bottom, dtype=float)
-                        y_i = np.array(data_mean[:, c], dtype=float)
+                        y_i = np.array(data_mean[:, modules.index(c)], dtype=float)
                         plt.fill_between(xpts, bottom, bottom + y_i, color=colors[c % 2])
                         bottom = y_i + bottom
                         modules_plotted.append(c)
@@ -549,8 +552,7 @@ def module_usage_sandplot(config, module_usage, BORIS_to_pose_mat=None, title=No
     plt.tight_layout()
     return fig
 
-
-def plot_keypoint_displacement_bins(dist_df, cmap="viridis", plottype="band", figW=6, figH=3):
+def plot_keypoint_travel(keypoint_feature, cmap="viridis", plottype="band", figW=6, figH=3):
     """
     Plots displacement of a keypoint either over time or in bins from dist_df (output of analyze.dist_df_subgroups)
 
@@ -561,18 +563,19 @@ def plot_keypoint_displacement_bins(dist_df, cmap="viridis", plottype="band", fi
     :param figH: figure height
     :return:
     """
+    groups=list(keypoint_feature.group_dict.keys())
+    n_groups=len(groups)
     fig, ax = plt.subplots(figsize=(figW, figH), dpi=100)
-    groups = pd.Series([i[0] for i in dist_df.columns]).unique()
-    n_groups = len(groups)
-    if dist_df.shape[0] == 1:
+    if len(keypoint_feature.feat_names) == 1:
         plottype = "bar"
     cmap = plt.get_cmap(cmap)
     colors = [cmap([i]) for i in np.linspace(0, 1, n_groups)]
-    xticks = dist_df.index
+    xticks = keypoint_feature.feat_names
     for g, group in enumerate(groups):
-        sub_df = dist_df[group]
-        group_mean = sub_df.mean(axis=1)
-        group_sem = sub_df.std(axis=1) / np.sqrt(sub_df.shape[1])
+        group_slice = np.array(keypoint_feature.group_labels)==keypoint_feature.group_dict[group]
+        group_data = keypoint_feature.keypoint_feature[group_slice,:]
+        group_mean = group_data.mean(axis=0)
+        group_sem = group_data.std(axis=0) / np.sqrt(group_data.shape[1])
         if plottype == "errorbar":
             ax.errorbar(xticks, group_mean, label=group, yerr=group_sem, marker="o", capsize=2, color=colors[g])
             ax.legend()
@@ -612,6 +615,8 @@ def plot_embeddings(module_feature_object, embeddings_object, figW=3, figH=3, cm
         X_tfm = embeddings_object.transform(module_feature_object.label_counts)
     elif module_feature_object.__class__.__name__=="ModuleTransitions":
         X_tfm = embeddings_object.transform(module_feature_object.transition_counts)
+    elif module_feature_object.__class__.__name__=="KeypointFeature":
+        X_tfm = embeddings_object.transform(module_feature_object.keypoint_feature)
     y=module_feature_object.group_labels
     cmap = plt.get_cmap(cmap)
     colors=[cmap([i]) for i in np.arange(0,len(np.unique(y)),1/(len(np.unique(y))-0.9))]
