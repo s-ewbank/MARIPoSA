@@ -129,7 +129,7 @@ def plot_module_usage(config,
                 capsize=2, markeredgewidth=0.75
             )
         ax.set_xlabel(config["data_source"] + ' Pose Label')
-        ax.set_ylabel('Frequency')
+        ax.set_ylabel('Usage')
         ax.set_xticks(np.arange(0, n_modules, 1), labels=[i.split("module")[1] for i in modules])
         ax.tick_params(axis='x', rotation=90, labelsize=plt.rcParams['font.size'] * 0.5, pad=2)
         plt.tight_layout()
@@ -210,13 +210,14 @@ def plot_module_usage(config,
                     capsize=2, markeredgewidth=0.75
                 )
         if style != "stacked":
-            if legend_pos == "inside":
-                ax.legend()
-            elif legend_pos == "outside":
-                ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+            if legend:
+                if legend_pos == "inside":
+                    ax.legend()
+                elif legend_pos == "outside":
+                    ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
 
             ax.set_xlabel(config["data_source"] + ' Pose Label')
-            ax.set_ylabel('Frequency')
+            ax.set_ylabel('Usage')
             all_num_modules = np.sum([isinstance(module, str) for module in modules]) == 0
             if ((all_num_modules) and (n_modules >= 20)):
                 xticks = np.arange(0, n_modules, 5, dtype=int)
@@ -224,7 +225,10 @@ def plot_module_usage(config,
                 ax.set_xticklabels(modules[xticks])
             else:
                 ax.set_xticks(np.arange(0, n_modules, 1))
-                ax.set_xticklabels(modules)
+                try:
+                    ax.set_xticklabels([i.split("module")[1] for i in modules])
+                except:
+                    ax.set_xticklabels(modules)
             ax.tick_params(axis='x', rotation=90, labelsize=plt.rcParams['font.size'] * 0.2 * n_groups, pad=2)
             if plot_stats:
                 ylim = plt.ylim()
