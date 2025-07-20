@@ -390,19 +390,19 @@ def network_plot(config,
                  figH=2.5,
                  alt_labels=None):
     """
-    Plot network comparison
+    Plot network comparison. You must provide EITHER labels_df OR module_usage and module_tsransitions
 
-    :param config:
-    :param labels_df:
-    :param module_usage:
-    :param module_feature_object:
-    :param cmap:
-    :param include_labels:
-    :param scaling:
-    :param tscale:
-    :param figW:
-    :param figH:
-    :param alt_labels:
+    :param config: project config object
+    :param labels_df: labels_df for two groups to be compared; if provided, ModuleUsage and ModuleTransitions will be computed
+    :param module_usage: ModuleUsage object for comparison between two groups (not needed if labels_df is provided)
+    :param module_transitions: ModuleTransitions object for comparison between two groups (not needed if labels_df is provided)
+    :param cmap: color map
+    :param include_labels: True or False; default True
+    :param scaling: controls size of nodes in network plot; larger --> bigger; default 1
+    :param tscale: vmax and vmin for tscore; default 6
+    :param figW: figure width
+    :param figH: figure height
+    :param alt_labels: possible alt labels
     :return:
     """
     if labels_df is not None:
@@ -489,13 +489,24 @@ def network_plot(config,
     return fig
 
 
-def module_usage_sandplot(config, module_usage, BORIS_to_pose_mat=None, title=None, long_legend=True, figW=7, figH=3, convolve=False, window=5):
+def module_usage_sandplot(config,
+                          module_usage,
+                          BORIS_to_pose_mat=None,
+                          title=None,
+                          legend=True,
+                          long_legend=True,
+                          figW=7,
+                          figH=3,
+                          convolve=False,
+                          window=5):
     """
     new sandplot function
 
-    :param config:
+    :param config: the config object
     :param module_usage:
-    :param BORIS_to_pose_mat:
+    :param BORIS_to_pose_mat: optional BORIS_to_pose_mat from analyze.boris_to_pose to re-align modules by their most overlapping manually scored behavior class
+    :param title:
+    :param legend: plot legend or not
     :param long_legend:
     :param convolve:
     :param window:
@@ -509,10 +520,18 @@ def module_usage_sandplot(config, module_usage, BORIS_to_pose_mat=None, title=No
     data_mean = np.mean(data, axis=0).T
     bottom = np.zeros(data_mean[:, 0].shape)
     xpts = np.array(data[0].columns / 60, dtype=float)
+    leg_handles=[]
+    for col in range(10):
+        m_in_col=[i for i in range(data_mean.shape[1]) if i%10==col]
+        if len(m_in_col)>0:
+            leg_handles.append(f"Modules {m_in_col}")
     if BORIS_to_pose_mat is None:
         for m in range(data_mean.shape[1]):
             y_i = np.array(data_mean[:, m], dtype=float)
-            plt.fill_between(xpts, bottom, bottom + y_i)
+            if m<len(leg_handles):
+                plt.fill_between(xpts, bottom, bottom + y_i, label=leg_handles[m])
+            else:
+                plt.fill_between(xpts, bottom, bottom + y_i)
             bottom = y_i + bottom
     else:
         modules = list(data[0].index)
@@ -551,6 +570,8 @@ def module_usage_sandplot(config, module_usage, BORIS_to_pose_mat=None, title=No
     plt.xlim([xpts[0], xpts[-1]])
     plt.xlabel("Time (m)")
     plt.ylabel('Moving Average Proportion \nof Time Spent in Pose')
+    if legend:
+        plt.legend(bbox_to_anchor=(1.5, 1))
     if title!=None:
         plt.title(title)
     plt.tight_layout()

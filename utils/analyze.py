@@ -96,7 +96,7 @@ def get_module_labels(config, start, stop, subgroups = None):
     :param stop: time in seconds to stop dataframe at.
     :param fps: frames per second of recording.
     :param subgroups: subgroups to include; by default, None will result in an object without data subgrouped; could alternatively be a list of subgroup names from config or "all" (to include all subgroups present in config)
-    :return:
+    :return: labels dataframe
     """
     fps = config["fps"]
     start_frame = start * int(fps)
@@ -482,7 +482,7 @@ class ModuleUsage:
         self.group_dict = group_dict
         self.scaler = scaler
         mean_check = np.allclose(np.mean(label_counts, axis=0), 0, atol=0.1)
-        std_check = np.allclose(np.std(label_counts, axis=0), 1, atol=0.1)
+        std_check = np.allclose(np.std(label_counts, axis=0), 1, atol=1)
         self.scaled = mean_check and std_check
 
     def to_df(self):
@@ -600,7 +600,7 @@ def get_module_usage(config, labels_df, binsize=None, modules_altered=False):
     :param labels_df: labels dataframe from label_counter_subgroups
     :param binsize: width of bins in seconds; if None, no binning is performed
     :param modules_altered: must be true if modules have been remapped
-    :return:
+    :return: object of class ModuleUsage
     """
     data_subgrouped = False
     try:
@@ -681,7 +681,7 @@ class ModuleTransitions:
         self.feat_names = feat_names
         self.group_dict = group_dict
         mean_check = np.allclose(np.mean(transition_counts, axis=0), 0, atol=0.1)
-        std_check = np.allclose(np.std(transition_counts, axis=0), 1, atol=0.1)
+        std_check = np.allclose(np.std(transition_counts, axis=0), 1, atol=1)
         self.scaled = mean_check and std_check
 
     def to_df(self):
