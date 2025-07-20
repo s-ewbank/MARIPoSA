@@ -12,6 +12,9 @@ def create_PS_project(project_name,data_directory,data_source,output_directory,f
     :param data_directory: path to source data
     :param data_source: B-SOiD, VAME, or Keypoint-MoSeq
     :param output_directory: path where output directory and config file should be created
+    :param fps: frames per second
+    :param n_modules: number of pose states / modules
+    :return: path to saved config (in specified output directory)
     """
     if data_source == "B-SOiD":
         project_files = sorted(os.listdir(data_directory))
@@ -21,7 +24,10 @@ def create_PS_project(project_name,data_directory,data_source,output_directory,f
     elif data_source == "Keypoint-MoSeq":
         project_files = sorted(os.listdir(data_directory))
     project_directory = str(output_directory+"/"+datetime.now().strftime('%y%m%d_')+project_name)
-    os.mkdir(project_directory)
+    if os.path.exists(project_directory):
+        print(f"[{datetime.now()}] Warning - the path '{project_directory}' exists - a config will still be made (possible overwrite).")
+    else:
+        os.mkdir(project_directory)
 
     PS_config = {}
     PS_config["project_name"] = datetime.now().strftime('%y%m%d_') + project_name
@@ -32,7 +38,12 @@ def create_PS_project(project_name,data_directory,data_source,output_directory,f
     PS_config["n_modules"] = str(int(n_modules))
     PS_config["fps"] = str(fps)
     if data_source == "VAME":
-        PS_config["vame_model_name"] = sorted(os.listdir(PS_config["data_directory"]+"/"+project_files[0]+"/VAME/"))[0]
+        vame_models = sorted(os.listdir(PS_config["data_directory"]+"/"+project_files[0]+"/VAME/"))
+        compatible_vame_models = [i for i in vame_models if (i.endswith(f"-{PS_config['n_modules']}") or i.endswith(f"-{PS_config['n_modules']}/"))]
+        if len(compatible_vame_models)==0:
+            raise ValueError(f"Specified number of states, {str(int(n_modules))}, not compatible with VAME models found: {vame_models}")
+        else:
+            PS_config["vame_model_name"] = compatible_vame_models[0]
     PS_config["project_files"] = project_files
     PS_config["subgroups"] = {"group1" : project_files}
     PS_config["remappings"] = [["#old_poses; e.g., [1,2,3]","#new_pose; e.g., 400"],
@@ -45,13 +56,15 @@ def create_PS_project(project_name,data_directory,data_source,output_directory,f
         yaml.Dumper.ignore_aliases = lambda self, data: True
         yaml.dump(PS_config, outfile, default_flow_style=False, sort_keys=False, Dumper=yaml.Dumper)
 
-    # Fix comments
     with open(project_directory+"/config_PS.yaml", 'r') as file:
         filedata = file.read()
     filedata = filedata.replace("'#", "#")
     filedata = filedata.replace('"#', "#")
     with open(project_directory+"/config_PS.yaml", 'w') as file:
         file.write(filedata)
+
+    print(f"[{datetime.now()}] Made project {PS_config['project_name']} and saved at {project_directory+'/config_PS.yaml'}")
+    return project_directory+'/config_PS.yaml'
 
 def create_PE_project(project_name,data_directory,data_source,output_directory,fps):
     """
@@ -62,6 +75,7 @@ def create_PE_project(project_name,data_directory,data_source,output_directory,f
     :param data_source: DeepLabCut or SLEAP
     :param output_directory: path where output directory and config file should be created
     :param fps: frames per second
+    :return: path to saved config (in specified output directory)
     """
     if data_source=="DeepLabCut":
         project_files=[i for i in sorted(os.listdir(data_directory)) if i.endswith(".csv")]
@@ -70,7 +84,10 @@ def create_PE_project(project_name,data_directory,data_source,output_directory,f
     elif data_source=="OpenFace":
         project_files=[i for i in sorted(os.listdir(data_directory)) if i.endswith(".csv")]
     project_directory=str(output_directory+"/"+datetime.now().strftime('%y%m%d_')+project_name)
-    os.mkdir(project_directory)
+    if os.path.exists(project_directory):
+        print(f"[{datetime.now()}] Warning - the path '{project_directory}' exists - a config will still be made (possible overwrite).")
+    else:
+        os.mkdir(project_directory)
 
     PE_config = {}
     PE_config["project_name"]=datetime.now().strftime('%y%m%d_') + project_name
@@ -85,6 +102,9 @@ def create_PE_project(project_name,data_directory,data_source,output_directory,f
         yaml.Dumper.ignore_aliases = lambda self, data: True
         yaml.dump(PE_config, outfile, default_flow_style=False, sort_keys=False, Dumper=yaml.Dumper)
 
+    print(f"[{datetime.now()}] Made project {PE_config['project_name']} and saved at {project_directory+'/config_PE.yaml'}")
+    return project_directory+'/config_PE.yaml'
+
 def load_project(config_path):
     """
     Loads project from config_PS.yaml or config_PE.yaml file
@@ -94,6 +114,33 @@ def load_project(config_path):
     with open(config_path, "r") as file:
         config = yaml.safe_load(file)
     return config
+
+def save_edited_project(config, config_path):
+    """
+    Loads project from config_PS.yaml or config_PE.yaml file
+
+    :param config_path: path to config file:
+    """
+    if os.path.exists(config_path):
+        existed=True
+    else:
+        existed=False
+
+    with open(config_path, "w") as outfile:
+        yaml.Dumper.ignore_aliases = lambda self, data: True
+        yaml.dump(config, outfile, default_flow_style=False, sort_keys=False, Dumper=yaml.Dumper)
+
+    with open(config_path, 'r') as file:
+        filedata = file.read()
+    filedata = filedata.replace("'#", "#")
+    filedata = filedata.replace('"#', "#")
+    with open(config_path, 'w') as file:
+        file.write(filedata)
+
+    if existed:
+        print(f"[{datetime.now()}] Saved specified config object at {config_path}, overwriting an existing file at that path")
+    else:
+        print(f"[{datetime.now()}] Saved specified config object at {config_path}")
 
 def edit_config(config_path):
     config = yaml.safe_load(config_path)
