@@ -1,16 +1,18 @@
 import numpy as np
 from utils import analyze
 
-
-def generate_usage(module_feature_object, n_samples, n_bootstraps=10, bootstrap_fraction=0.3):
+def generate_usage(module_feature_object, n_samples, n_bootstraps=10, bootstrap_fraction=0.3, random_state=42):
     """
     Generate simulated pose module usage object
 
     :param module_feature_object: module feature object of class ModuleUsage (from analyze.get_module_usage) or ModuleTransitions (from analyze.get_module_transitions)
     :param n_samples: number of samples to generate
+    :param random_state: random state seed (default: 42
     :return: module_feature_object of the same style as the one input
 
     """
+    np.random.seed(random_state)
+
     if module_feature_object.__class__.__name__ == "ModuleUsage":
         X = module_feature_object.label_counts
     elif module_feature_object.__class__.__name__ == "ModuleTransitions":
@@ -41,16 +43,18 @@ def generate_usage(module_feature_object, n_samples, n_bootstraps=10, bootstrap_
                                          module_feature_object.feat_names, module_feature_object.group_dict, None)
 
 
-def generate_sequence(config, labels_df, T):
+def generate_sequence(config, labels_df, T, random_state=42):
     """
     Generate individual simulated pose module label sequence of length T (noting that T = number of observations, not time)
 
     :param config: the config object
     :param labels_df: labels_df from analyze.get_module_labels
     :param T: length of sequence to be generated
+    :param random_state: random state seed (default: 42
     :return: sequence
 
     """
+    np.random.seed(random_state)
     module_usage = analyze.get_module_usage(config, labels_df)
     module_transitions = analyze.get_module_transitions(config, labels_df)
     start_prob = np.mean(module_usage.label_counts,axis=0)
