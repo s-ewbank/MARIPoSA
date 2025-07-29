@@ -1,0 +1,340 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Demo 1: Project Creation &mdash; MARIPoSA 0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=44496db0"></script>
+      <script src="../_static/doctools.js?v=888ff710"></script>
+      <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Demo 2: Visualization of Pose Module Usage" href="Demo2-PoseSegmentation-Visualize.html" />
+    <link rel="prev" title="Welcome to MARIPoSA’s documentation!" href="../index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            MARIPoSA
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Demo 1: Project Creation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#import-and-setup">1.0 Import and Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#creating-a-pose-segmentation-project">1.1: Creating a pose segmentation project</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#creating-a-pose-estimation-project">1.2 Creating a pose estimation project</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="Demo2-PoseSegmentation-Visualize.html">Demo 2: Visualization of Pose Module Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Demo3-PoseSegmentation-Embed.html">Demo 3: Embedding of Pose Segmentation Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Demo4-PoseSegmentation-ClassificationAndRegression.html">Demo 4: Regression and Classification of Group Conditions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Demo5-PoseSegmentation-ManualScoring.html">Demo 5: Comparing Pose Modules to Manual Scoring Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Demo6-PoseSegmentation-Simulation.html">Demo 6: Simulating Pose Segmentation Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../metadata.html">Metadata</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../analyze.html">Analyze</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../plot.html">Plot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../simulate.html">Simulate</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">MARIPoSA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Demo 1: Project Creation</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/demo/Demo1-ProjectCreation.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="demo-1-project-creation">
+<h1>Demo 1: Project Creation<a class="headerlink" href="#demo-1-project-creation" title="Permalink to this heading"></a></h1>
+<p><em>Written and last updated July 19, 2025 by Sedona Ewbank, snewbank&#64;stanford.edu</em></p>
+<p>The purpose of this demo is to demonstrate how to create and edit a MARIPoSA project via the Python module.</p>
+<section id="import-and-setup">
+<h2>1.0 Import and Setup<a class="headerlink" href="#import-and-setup" title="Permalink to this heading"></a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">importlib</span>
+
+<span class="c1">#This block only important for running as script</span>
+<span class="c1">#script_dir = os.path.dirname(os.path.abspath(__file__))</span>
+<span class="n">mariposa_dir</span> <span class="o">=</span> <span class="s2">&quot;/Users/snewbank/PycharmProjects/MARIPoSA&quot;</span>
+<span class="n">utils_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">mariposa_dir</span><span class="p">,</span> <span class="s1">&#39;utils&#39;</span><span class="p">)</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">utils_dir</span><span class="p">)</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mariposa_dir</span><span class="p">)</span>
+
+<span class="c1">#import utils</span>
+<span class="kn">from</span> <span class="nn">utils</span> <span class="kn">import</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">analyze</span><span class="p">,</span> <span class="n">plot</span><span class="p">,</span> <span class="n">simulate</span>
+
+<span class="n">importlib</span><span class="o">.</span><span class="n">reload</span><span class="p">(</span><span class="n">metadata</span><span class="p">)</span>
+<span class="n">importlib</span><span class="o">.</span><span class="n">reload</span><span class="p">(</span><span class="n">analyze</span><span class="p">)</span>
+<span class="n">importlib</span><span class="o">.</span><span class="n">reload</span><span class="p">(</span><span class="n">plot</span><span class="p">)</span>
+<span class="n">importlib</span><span class="o">.</span><span class="n">reload</span><span class="p">(</span><span class="n">simulate</span><span class="p">)</span>
+
+<span class="n">demo_dir</span><span class="o">=</span><span class="s2">&quot;/Users/snewbank/Behavior/MARIPoSA_demo_data/&quot;</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="creating-a-pose-segmentation-project">
+<h2>1.1: Creating a pose segmentation project<a class="headerlink" href="#creating-a-pose-segmentation-project" title="Permalink to this heading"></a></h2>
+<p>Two types of projects can be created: pose segmentation (to handle data output from Keypoint-MoSeq, B-SOiD, or VAME) and pose estimation (to handle data output from DeepLabCut or OpenFace). We will start by making a pose segmentation project, using command metadata.create_PS_project:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">help</span><span class="p">(</span><span class="n">metadata</span><span class="o">.</span><span class="n">create_PS_project</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Help on function create_PS_project in module utils.metadata:
+
+create_PS_project(project_name, data_directory, data_source, output_directory, fps, n_modules)
+    Make project directory and write config_PS.yaml file.
+    
+    :param project_name: what to call your creation
+    :param data_directory: path to source data
+    :param data_source: B-SOiD, VAME, or Keypoint-MoSeq
+    :param output_directory: path where output directory and config file should be created
+    :param fps: frames per second
+    :param n_modules: number of pose states / modules
+    :return: path to saved config (in specified output directory)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">project_name</span><span class="o">=</span><span class="s2">&quot;test&quot;</span>
+<span class="n">data_directory</span><span class="o">=</span><span class="n">demo_dir</span><span class="o">+</span><span class="s2">&quot;PS-TEST-25-05-20-rat-VAME/results/&quot;</span>
+<span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;VAME&quot;</span>
+<span class="n">output_directory</span><span class="o">=</span><span class="n">demo_dir</span>
+<span class="n">fps</span><span class="o">=</span><span class="mi">30</span>
+<span class="n">n_modules</span><span class="o">=</span><span class="mi">30</span>
+
+<span class="n">config_path</span> <span class="o">=</span> <span class="n">metadata</span><span class="o">.</span><span class="n">create_PS_project</span><span class="p">(</span><span class="n">project_name</span><span class="p">,</span>
+                                         <span class="n">data_directory</span><span class="p">,</span>
+                                         <span class="n">data_source</span><span class="p">,</span>
+                                         <span class="n">output_directory</span><span class="p">,</span>
+                                         <span class="n">fps</span><span class="p">,</span>
+                                         <span class="n">n_modules</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[2025-07-20 20:53:37.018554] Warning - the path &#39;/Users/snewbank/Behavior/MARIPoSA_demo_data//250720_test&#39; exists - a config will still be made (possible overwrite).
+[2025-07-20 20:53:37.034512] Made project 250720_test and saved at /Users/snewbank/Behavior/MARIPoSA_demo_data//250720_test/config_PS.yaml
+</pre></div>
+</div>
+</div>
+</div>
+<p>Now we can load our config from the path it was saved at using metadata.load_config and the path to config (output by the project creation function).</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">config</span> <span class="o">=</span> <span class="n">metadata</span><span class="o">.</span><span class="n">load_project</span><span class="p">(</span><span class="n">config_path</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{&#39;project_name&#39;: &#39;250720_test&#39;, &#39;data_directory&#39;: &#39;/Users/snewbank/Behavior/MARIPoSA_demo_data/PS-TEST-25-05-20-rat-VAME/results/&#39;, &#39;project_directory&#39;: &#39;/Users/snewbank/Behavior/MARIPoSA_demo_data//250720_test&#39;, &#39;data_type&#39;: &#39;Pose segmentation&#39;, &#39;data_source&#39;: &#39;VAME&#39;, &#39;n_modules&#39;: &#39;30&#39;, &#39;fps&#39;: &#39;30&#39;, &#39;vame_model_name&#39;: &#39;hmm-30&#39;, &#39;project_files&#39;: [&#39;2023-05-09_15-52-24_bm01_badinjxnDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-05-09_16-02-49_bm02_k5DLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-05-09_16-36-04_bm03_salDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-05-09_17-02-19_bm04_k1DLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-05-09_17-41-11_bf01_nal10k10DLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-05-09_18-06-23_bf02_k10ipDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-05-09_19-16-35_bf03_k5DLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-05-09_20-12-22_bf04_k25DLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-05-15_11-00-30_bm01_k5DLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-05-15_11-30-56_bm02_salDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-05-15_12-01-26_bm03_k10ipDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-05-15_13-16-30_bm04_salDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-05-15_13-44-36_bf01_cocDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-05-15_14-09-38_bf02_k1DLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-05-15_16-47-52_bf03_k10ivDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-05-15_18-18-22_bf04_k10ivDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-05-20_17-11-22_bm01_k10ipDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-05-20_18-17-01_bm02_cocDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-05-21_13-24-45_bm03_k25DLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-05-21_13-52-07_bm04_halDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-05-21_14-22-22_bm04_halketDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-05-21_14-53-10_bf01_halDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-05-21_15-23-17_bf01_halketDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-05-21_16-17-57_bf02_k10scDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-05-21_17-26-26_bf03_halDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-05-21_17-58-44_bf03_halketDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-05-21_18-25-03_bf04_halDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-05-21_18-58-40_bf04_halketDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-05-25_13-59-51_bm01_cocDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-05-25_14-30-54_bm02_k10ivDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-05-26_12-51-23_bm03_nalketDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-05-26_13-18-27_bm04_k5DLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-05-26_13-47-55_bf01_salDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-05-26_14-27-59_bf02_nalketDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-05-26_14-56-26_bf03_salDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-05-26_15-22-23_bf04_k1DLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-05-30_13-39-15_bm01_k25DLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-05-30_14-08-51_bm02_k10scDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-05-31_11-26-43_bm04_badinjxnDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-05-31_11-34-17_bm03_k1DLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-05-31_12-02-23_bf02_cocDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-05-31_17-08-06_bf01_k10ivDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-05-31_18-28-16_bf03_nalketDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-05-31_19-08-34_bf04_k10ipDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-06-09_16-55-57_bm01_halDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-06-09_17-33-31_bm01_halketDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-06-09_18-18-49_bm02_k25DLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-06-09_18-53-52_bm03_halDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-06-09_19-25-00_bm03_halketDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-06-09_20-06-37_bm04_nalket_cutshortDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-06-10_20-30-02_bf01_k1DLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-06-10_20-57-51_bf02_k25DLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-06-10_21-26-14_bf03_mk801DLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-06-10_21-52-24_bf04_k5DLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-06-15_17-16-18_bm01_k5ivDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-06-15_17-54-08_bm02_nalketDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-06-15_18-21-57_bm03_mk801DLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-06-15_19-15-24_bm04_nalketDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-06-15_19-46-22_bf01_k10ipDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-06-15_20-51-12_bf02_mk801DLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-06-15_21-28-12_bf04_salivDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-06-15_22-01-50_bf03_salivDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-06-20_15-03-24_bm02_mk801DLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-06-20_15-41-01_bm03_salivDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-06-20_16-13-48_bm04_salivDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-06-20_16-46-29_bf01_k5DLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-06-20_17-21-51_bf02_salivDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-06-20_17-54-10_bf03_k10scDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-06-20_19-10-38_bf04_k1ivDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-06-26_15-35-45_bf01_k1ivDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-06-26_16-15-58_bf02_k5ivDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-06-26_16-49-06_bf03_co10DLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-06-26_17-16-08_bf04_mk801DLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-06-26_18-27-06_bm01_k25DLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-06-26_19-00-05_bm02_k1ivDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-06-27_10-14-36_bm03_co10DLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-06-27_10-47-10_bm04_k1ivDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-07-03_15-04-47_bm01_k10scDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-07-03_16-15-21_bm02_salivDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-07-03_16-46-00_bm03_mk801DLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-07-03_17-54-37_bm04_mk801DLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-07-03_19-20-49_bf01_salivDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-07-03_19-48-04_bf02_salDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-07-03_20-27-25_bf03_k5ivDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-07-03_20-52-16_bf04_mk801DLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-07-08_14-12-55_bf01_k5iv_badinjxnDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-07-08_14-42-24_bf02_k1ivDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-07-08_15-13-11_bf03_k25DLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-07-08_15-47-29_bm01_k1ivDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-07-08_16-19-27_bm02_k5ivDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-07-08_16-55-20_bm03_k10scDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-07-13_14-33-00_bf03_mk801DLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-07-13_15-45-26_bm03_k10ivDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-07-13_16-56-46_bm04_k10ipDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-07-14_13-56-09_bm01_k10ivDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-07-14_15-05-22_bm02_mk801DLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-07-14_16-25-47_bf01_k5ivDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-07-14_17-04-10_bf02_mk801DLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-07-18_18-19-50_bm04_k10ivDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-07-18_19-35-14_bm03_k5ivDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-07-21_18-00-15_bf04_k10scDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-07-21_19-14-09_bm02_k1DLC_resnet101_DevRats2Jul21shuffle1_500000&#39;], &#39;subgroups&#39;: {&#39;group1&#39;: [&#39;2023-05-09_15-52-24_bm01_badinjxnDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-05-09_16-02-49_bm02_k5DLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-05-09_16-36-04_bm03_salDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-05-09_17-02-19_bm04_k1DLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-05-09_17-41-11_bf01_nal10k10DLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-05-09_18-06-23_bf02_k10ipDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-05-09_19-16-35_bf03_k5DLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-05-09_20-12-22_bf04_k25DLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-05-15_11-00-30_bm01_k5DLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-05-15_11-30-56_bm02_salDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-05-15_12-01-26_bm03_k10ipDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-05-15_13-16-30_bm04_salDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-05-15_13-44-36_bf01_cocDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-05-15_14-09-38_bf02_k1DLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-05-15_16-47-52_bf03_k10ivDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-05-15_18-18-22_bf04_k10ivDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-05-20_17-11-22_bm01_k10ipDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-05-20_18-17-01_bm02_cocDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-05-21_13-24-45_bm03_k25DLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-05-21_13-52-07_bm04_halDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-05-21_14-22-22_bm04_halketDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-05-21_14-53-10_bf01_halDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-05-21_15-23-17_bf01_halketDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-05-21_16-17-57_bf02_k10scDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-05-21_17-26-26_bf03_halDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-05-21_17-58-44_bf03_halketDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-05-21_18-25-03_bf04_halDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-05-21_18-58-40_bf04_halketDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-05-25_13-59-51_bm01_cocDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-05-25_14-30-54_bm02_k10ivDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-05-26_12-51-23_bm03_nalketDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-05-26_13-18-27_bm04_k5DLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-05-26_13-47-55_bf01_salDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-05-26_14-27-59_bf02_nalketDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-05-26_14-56-26_bf03_salDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-05-26_15-22-23_bf04_k1DLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-05-30_13-39-15_bm01_k25DLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-05-30_14-08-51_bm02_k10scDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-05-31_11-26-43_bm04_badinjxnDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-05-31_11-34-17_bm03_k1DLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-05-31_12-02-23_bf02_cocDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-05-31_17-08-06_bf01_k10ivDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-05-31_18-28-16_bf03_nalketDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-05-31_19-08-34_bf04_k10ipDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-06-09_16-55-57_bm01_halDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-06-09_17-33-31_bm01_halketDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-06-09_18-18-49_bm02_k25DLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-06-09_18-53-52_bm03_halDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-06-09_19-25-00_bm03_halketDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-06-09_20-06-37_bm04_nalket_cutshortDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-06-10_20-30-02_bf01_k1DLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-06-10_20-57-51_bf02_k25DLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-06-10_21-26-14_bf03_mk801DLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-06-10_21-52-24_bf04_k5DLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-06-15_17-16-18_bm01_k5ivDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-06-15_17-54-08_bm02_nalketDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-06-15_18-21-57_bm03_mk801DLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-06-15_19-15-24_bm04_nalketDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-06-15_19-46-22_bf01_k10ipDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-06-15_20-51-12_bf02_mk801DLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-06-15_21-28-12_bf04_salivDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-06-15_22-01-50_bf03_salivDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-06-20_15-03-24_bm02_mk801DLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-06-20_15-41-01_bm03_salivDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-06-20_16-13-48_bm04_salivDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-06-20_16-46-29_bf01_k5DLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-06-20_17-21-51_bf02_salivDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-06-20_17-54-10_bf03_k10scDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-06-20_19-10-38_bf04_k1ivDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-06-26_15-35-45_bf01_k1ivDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-06-26_16-15-58_bf02_k5ivDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-06-26_16-49-06_bf03_co10DLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-06-26_17-16-08_bf04_mk801DLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-06-26_18-27-06_bm01_k25DLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-06-26_19-00-05_bm02_k1ivDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-06-27_10-14-36_bm03_co10DLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-06-27_10-47-10_bm04_k1ivDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-07-03_15-04-47_bm01_k10scDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-07-03_16-15-21_bm02_salivDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-07-03_16-46-00_bm03_mk801DLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-07-03_17-54-37_bm04_mk801DLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-07-03_19-20-49_bf01_salivDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-07-03_19-48-04_bf02_salDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-07-03_20-27-25_bf03_k5ivDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-07-03_20-52-16_bf04_mk801DLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-07-08_14-12-55_bf01_k5iv_badinjxnDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-07-08_14-42-24_bf02_k1ivDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-07-08_15-13-11_bf03_k25DLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-07-08_15-47-29_bm01_k1ivDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-07-08_16-19-27_bm02_k5ivDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-07-08_16-55-20_bm03_k10scDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-07-13_14-33-00_bf03_mk801DLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-07-13_15-45-26_bm03_k10ivDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-07-13_16-56-46_bm04_k10ipDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-07-14_13-56-09_bm01_k10ivDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-07-14_15-05-22_bm02_mk801DLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-07-14_16-25-47_bf01_k5ivDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-07-14_17-04-10_bf02_mk801DLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-07-18_18-19-50_bm04_k10ivDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-07-18_19-35-14_bm03_k5ivDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-07-21_18-00-15_bf04_k10scDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;, &#39;2023-07-21_19-14-09_bm02_k1DLC_resnet101_DevRats2Jul21shuffle1_500000&#39;]}, &#39;remappings&#39;: [[None, None], [None, None]], &#39;boris_directory&#39;: None, &#39;boris_to_pose_pairings&#39;: [[None, None], [None, None], [None, None]]}
+</pre></div>
+</div>
+</div>
+</div>
+<p>Say we want to edit our config - perhaps to have subgroups for later analyses, or boris to pose pairings. We can do this by directly editing the config file in a text editor on our machine (often easier), or we can also edit the config object with and save the edited config.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># See what the existing subgroups are</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;subgroups&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+
+<span class="c1">#Make a blank slate</span>
+<span class="n">config</span><span class="p">[</span><span class="s2">&quot;subgroups&quot;</span><span class="p">]</span><span class="o">=</span><span class="p">{}</span>
+
+<span class="c1">#Save our own subgroups, using paths from config[&quot;project_files&quot;]</span>
+<span class="n">config</span><span class="p">[</span><span class="s2">&quot;subgroups&quot;</span><span class="p">][</span><span class="s2">&quot;sal&quot;</span><span class="p">]</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;2023-06-15_21-28-12_bf04_salivDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;2023-06-15_22-01-50_bf03_salivDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;2023-06-20_15-41-01_bm03_salivDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;2023-06-20_16-13-48_bm04_salivDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;2023-06-20_17-21-51_bf02_salivDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;2023-07-03_16-15-21_bm02_salivDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;2023-07-03_19-20-49_bf01_salivDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;</span><span class="p">]</span>
+
+<span class="n">config</span><span class="p">[</span><span class="s2">&quot;subgroups&quot;</span><span class="p">][</span><span class="s2">&quot;k1&quot;</span><span class="p">]</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;2023-06-20_19-10-38_bf04_k1ivDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;2023-06-26_15-35-45_bf01_k1ivDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;2023-06-26_19-00-05_bm02_k1ivDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;2023-06-27_10-47-10_bm04_k1ivDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;2023-07-08_14-42-24_bf02_k1ivDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;2023-07-08_15-47-29_bm01_k1ivDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;</span><span class="p">]</span>
+
+<span class="n">config</span><span class="p">[</span><span class="s2">&quot;subgroups&quot;</span><span class="p">][</span><span class="s2">&quot;k5&quot;</span><span class="p">]</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;2023-06-15_17-16-18_bm01_k5ivDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;2023-06-26_16-15-58_bf02_k5ivDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;2023-07-03_20-27-25_bf03_k5ivDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;2023-07-08_16-19-27_bm02_k5ivDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;2023-07-14_16-25-47_bf01_k5ivDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;2023-07-18_19-35-14_bm03_k5ivDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;</span><span class="p">]</span>
+
+<span class="n">config</span><span class="p">[</span><span class="s2">&quot;subgroups&quot;</span><span class="p">][</span><span class="s2">&quot;k10&quot;</span><span class="p">]</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;2023-05-15_16-47-52_bf03_k10ivDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;2023-05-15_18-18-22_bf04_k10ivDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;2023-05-25_14-30-54_bm02_k10ivDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;2023-05-31_17-08-06_bf01_k10ivDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;2023-07-13_15-45-26_bm03_k10ivDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;2023-07-14_13-56-09_bm01_k10ivDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;2023-07-18_18-19-50_bm04_k10ivDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;</span><span class="p">]</span>
+
+<span class="c1">#see what the new config subgroups are</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;subgroups&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+
+<span class="c1">#save the new config</span>
+<span class="n">metadata</span><span class="o">.</span><span class="n">save_edited_project</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="n">config_path</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>dict_keys([&#39;group1&#39;])
+dict_keys([&#39;sal&#39;, &#39;k1&#39;, &#39;k5&#39;, &#39;k10&#39;])
+[2025-07-20 20:53:37.122121] Saved specified config object at /Users/snewbank/Behavior/MARIPoSA_demo_data//250720_test/config_PS.yaml, overwriting an existing file at that path
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="creating-a-pose-estimation-project">
+<h2>1.2 Creating a pose estimation project<a class="headerlink" href="#creating-a-pose-estimation-project" title="Permalink to this heading"></a></h2>
+<p>This will be a similar process, except we start with metadata.create_PE_project, since our input data may come from different sources (DeepLabCut or OpenFace) and take different formats.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">help</span><span class="p">(</span><span class="n">metadata</span><span class="o">.</span><span class="n">create_PE_project</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Help on function create_PE_project in module utils.metadata:
+
+create_PE_project(project_name, data_directory, data_source, output_directory, fps)
+    Make project directory and write config_PE.yaml file.
+    
+    :param project_name: what to call your creation
+    :param data_directory: path to source data
+    :param data_source: DeepLabCut or SLEAP
+    :param output_directory: path where output directory and config file should be created
+    :param fps: frames per second
+    :return: path to saved config (in specified output directory)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">project_name</span><span class="o">=</span><span class="s2">&quot;test_PE&quot;</span>
+<span class="n">data_directory</span><span class="o">=</span><span class="n">demo_dir</span><span class="o">+</span><span class="s2">&quot;PE-TEST-25-05-20-rat-DLC/&quot;</span>
+<span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;DeepLabCut&quot;</span>
+<span class="n">output_directory</span><span class="o">=</span><span class="n">demo_dir</span>
+<span class="n">fps</span><span class="o">=</span><span class="mi">30</span>
+
+<span class="n">PE_config_path</span> <span class="o">=</span> <span class="n">metadata</span><span class="o">.</span><span class="n">create_PE_project</span><span class="p">(</span><span class="n">project_name</span><span class="p">,</span>
+                                            <span class="n">data_directory</span><span class="p">,</span>
+                                            <span class="n">data_source</span><span class="p">,</span>
+                                            <span class="n">output_directory</span><span class="p">,</span>
+                                            <span class="n">fps</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[2025-07-20 20:53:37.144840] Warning - the path &#39;/Users/snewbank/Behavior/MARIPoSA_demo_data//250720_test_PE&#39; exists - a config will still be made (possible overwrite).
+[2025-07-20 20:53:37.166130] Made project 250720_test_PE and saved at /Users/snewbank/Behavior/MARIPoSA_demo_data//250720_test_PE/config_PE.yaml
+</pre></div>
+</div>
+</div>
+</div>
+<p>Now we can load our pose estimation config (and edit it, if we wish) just the same as if it were a pose segmentation config.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">PE_config</span> <span class="o">=</span> <span class="n">metadata</span><span class="o">.</span><span class="n">load_project</span><span class="p">(</span><span class="n">PE_config_path</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">PE_config</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{&#39;project_name&#39;: &#39;250720_test_PE&#39;, &#39;data_directory&#39;: &#39;/Users/snewbank/Behavior/MARIPoSA_demo_data/PE-TEST-25-05-20-rat-DLC/&#39;, &#39;project_directory&#39;: &#39;/Users/snewbank/Behavior/MARIPoSA_demo_data//250720_test_PE&#39;, &#39;data_type&#39;: &#39;Pose estimation&#39;, &#39;data_source&#39;: &#39;DeepLabCut&#39;, &#39;fps&#39;: &#39;30&#39;, &#39;project_files&#39;: [&#39;2023-05-09_15-52-24_bm01_badinjxnDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-05-09_16-02-49_bm02_k5DLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-05-09_16-36-04_bm03_salDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-05-09_17-02-19_bm04_k1DLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-05-09_17-41-11_bf01_nal10k10DLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-05-09_18-06-23_bf02_k10ipDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-05-09_19-16-35_bf03_k5DLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-05-09_20-12-22_bf04_k25DLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-05-15_11-00-30_bm01_k5DLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-05-15_11-30-56_bm02_salDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-05-15_12-01-26_bm03_k10ipDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-05-15_13-16-30_bm04_salDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-05-15_13-44-36_bf01_cocDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-05-15_14-09-38_bf02_k1DLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-05-15_16-47-52_bf03_k10ivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-05-15_18-18-22_bf04_k10ivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-05-20_17-11-22_bm01_k10ipDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-05-20_18-17-01_bm02_cocDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-05-21_13-24-45_bm03_k25DLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-05-21_13-52-07_bm04_halDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-05-21_14-22-22_bm04_halketDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-05-21_14-53-10_bf01_halDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-05-21_15-23-17_bf01_halketDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-05-21_16-17-57_bf02_k10scDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-05-21_17-26-26_bf03_halDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-05-21_17-58-44_bf03_halketDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-05-21_18-25-03_bf04_halDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-05-21_18-58-40_bf04_halketDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-05-25_13-59-51_bm01_cocDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-05-25_14-30-54_bm02_k10ivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-05-26_12-51-23_bm03_nalketDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-05-26_13-18-27_bm04_k5DLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-05-26_13-47-55_bf01_salDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-05-26_14-27-59_bf02_nalketDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-05-26_14-56-26_bf03_salDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-05-26_15-22-23_bf04_k1DLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-05-30_13-39-15_bm01_k25DLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-05-30_14-08-51_bm02_k10scDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-05-31_11-26-43_bm04_badinjxnDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-05-31_11-34-17_bm03_k1DLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-05-31_12-02-23_bf02_cocDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-05-31_17-08-06_bf01_k10ivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-05-31_18-28-16_bf03_nalketDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-05-31_19-08-34_bf04_k10ipDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-06-09_16-55-57_bm01_halDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-06-09_17-33-31_bm01_halketDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-06-09_18-18-49_bm02_k25DLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-06-09_18-53-52_bm03_halDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-06-09_19-25-00_bm03_halketDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-06-09_20-06-37_bm04_nalket_cutshortDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-06-10_20-30-02_bf01_k1DLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-06-10_20-57-51_bf02_k25DLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-06-10_21-26-14_bf03_mk801DLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-06-10_21-52-24_bf04_k5DLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-06-15_17-16-18_bm01_k5ivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-06-15_17-54-08_bm02_nalketDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-06-15_18-21-57_bm03_mk801DLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-06-15_19-15-24_bm04_nalketDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-06-15_19-46-22_bf01_k10ipDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-06-15_20-51-12_bf02_mk801DLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-06-15_21-28-12_bf04_salivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-06-15_22-01-50_bf03_salivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-06-20_15-03-24_bm02_mk801DLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-06-20_15-41-01_bm03_salivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-06-20_16-13-48_bm04_salivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-06-20_16-46-29_bf01_k5DLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-06-20_17-21-51_bf02_salivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-06-20_17-54-10_bf03_k10scDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-06-20_19-10-38_bf04_k1ivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-06-26_15-35-45_bf01_k1ivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-06-26_16-15-58_bf02_k5ivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-06-26_16-49-06_bf03_co10DLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-06-26_17-16-08_bf04_mk801DLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-06-26_18-27-06_bm01_k25DLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-06-26_19-00-05_bm02_k1ivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-06-27_10-14-36_bm03_co10DLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-06-27_10-47-10_bm04_k1ivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-07-03_15-04-47_bm01_k10scDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-07-03_16-15-21_bm02_salivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-07-03_16-46-00_bm03_mk801DLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-07-03_17-54-37_bm04_mk801DLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-07-03_19-20-49_bf01_salivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-07-03_19-48-04_bf02_salDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-07-03_20-27-25_bf03_k5ivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-07-03_20-52-16_bf04_mk801DLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-07-08_14-12-55_bf01_k5iv_badinjxnDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-07-08_14-42-24_bf02_k1ivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-07-08_15-13-11_bf03_k25DLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-07-08_15-47-29_bm01_k1ivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-07-08_16-19-27_bm02_k5ivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-07-08_16-55-20_bm03_k10scDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-07-13_14-33-00_bf03_mk801DLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-07-13_15-45-26_bm03_k10ivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-07-13_16-56-46_bm04_k10ipDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-07-14_13-56-09_bm01_k10ivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-07-14_15-05-22_bm02_mk801DLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-07-14_16-25-47_bf01_k5ivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-07-14_17-04-10_bf02_mk801DLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-07-18_18-19-50_bm04_k10ivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-07-18_19-35-14_bm03_k5ivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-07-21_18-00-15_bf04_k10scDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-07-21_19-14-09_bm02_k1DLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;], &#39;subgroups&#39;: {&#39;group1&#39;: [&#39;2023-05-09_15-52-24_bm01_badinjxnDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-05-09_16-02-49_bm02_k5DLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-05-09_16-36-04_bm03_salDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-05-09_17-02-19_bm04_k1DLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-05-09_17-41-11_bf01_nal10k10DLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-05-09_18-06-23_bf02_k10ipDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-05-09_19-16-35_bf03_k5DLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-05-09_20-12-22_bf04_k25DLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-05-15_11-00-30_bm01_k5DLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-05-15_11-30-56_bm02_salDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-05-15_12-01-26_bm03_k10ipDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-05-15_13-16-30_bm04_salDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-05-15_13-44-36_bf01_cocDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-05-15_14-09-38_bf02_k1DLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-05-15_16-47-52_bf03_k10ivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-05-15_18-18-22_bf04_k10ivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-05-20_17-11-22_bm01_k10ipDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-05-20_18-17-01_bm02_cocDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-05-21_13-24-45_bm03_k25DLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-05-21_13-52-07_bm04_halDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-05-21_14-22-22_bm04_halketDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-05-21_14-53-10_bf01_halDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-05-21_15-23-17_bf01_halketDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-05-21_16-17-57_bf02_k10scDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-05-21_17-26-26_bf03_halDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-05-21_17-58-44_bf03_halketDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-05-21_18-25-03_bf04_halDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-05-21_18-58-40_bf04_halketDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-05-25_13-59-51_bm01_cocDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-05-25_14-30-54_bm02_k10ivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-05-26_12-51-23_bm03_nalketDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-05-26_13-18-27_bm04_k5DLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-05-26_13-47-55_bf01_salDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-05-26_14-27-59_bf02_nalketDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-05-26_14-56-26_bf03_salDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-05-26_15-22-23_bf04_k1DLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-05-30_13-39-15_bm01_k25DLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-05-30_14-08-51_bm02_k10scDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-05-31_11-26-43_bm04_badinjxnDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-05-31_11-34-17_bm03_k1DLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-05-31_12-02-23_bf02_cocDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-05-31_17-08-06_bf01_k10ivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-05-31_18-28-16_bf03_nalketDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-05-31_19-08-34_bf04_k10ipDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-06-09_16-55-57_bm01_halDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-06-09_17-33-31_bm01_halketDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-06-09_18-18-49_bm02_k25DLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-06-09_18-53-52_bm03_halDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-06-09_19-25-00_bm03_halketDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-06-09_20-06-37_bm04_nalket_cutshortDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-06-10_20-30-02_bf01_k1DLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-06-10_20-57-51_bf02_k25DLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-06-10_21-26-14_bf03_mk801DLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-06-10_21-52-24_bf04_k5DLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-06-15_17-16-18_bm01_k5ivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-06-15_17-54-08_bm02_nalketDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-06-15_18-21-57_bm03_mk801DLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-06-15_19-15-24_bm04_nalketDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-06-15_19-46-22_bf01_k10ipDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-06-15_20-51-12_bf02_mk801DLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-06-15_21-28-12_bf04_salivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-06-15_22-01-50_bf03_salivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-06-20_15-03-24_bm02_mk801DLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-06-20_15-41-01_bm03_salivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-06-20_16-13-48_bm04_salivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-06-20_16-46-29_bf01_k5DLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-06-20_17-21-51_bf02_salivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-06-20_17-54-10_bf03_k10scDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-06-20_19-10-38_bf04_k1ivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-06-26_15-35-45_bf01_k1ivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-06-26_16-15-58_bf02_k5ivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-06-26_16-49-06_bf03_co10DLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-06-26_17-16-08_bf04_mk801DLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-06-26_18-27-06_bm01_k25DLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-06-26_19-00-05_bm02_k1ivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-06-27_10-14-36_bm03_co10DLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-06-27_10-47-10_bm04_k1ivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-07-03_15-04-47_bm01_k10scDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-07-03_16-15-21_bm02_salivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-07-03_16-46-00_bm03_mk801DLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-07-03_17-54-37_bm04_mk801DLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-07-03_19-20-49_bf01_salivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-07-03_19-48-04_bf02_salDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-07-03_20-27-25_bf03_k5ivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-07-03_20-52-16_bf04_mk801DLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-07-08_14-12-55_bf01_k5iv_badinjxnDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-07-08_14-42-24_bf02_k1ivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-07-08_15-13-11_bf03_k25DLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-07-08_15-47-29_bm01_k1ivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-07-08_16-19-27_bm02_k5ivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-07-08_16-55-20_bm03_k10scDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-07-13_14-33-00_bf03_mk801DLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-07-13_15-45-26_bm03_k10ivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-07-13_16-56-46_bm04_k10ipDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-07-14_13-56-09_bm01_k10ivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-07-14_15-05-22_bm02_mk801DLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-07-14_16-25-47_bf01_k5ivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-07-14_17-04-10_bf02_mk801DLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-07-18_18-19-50_bm04_k10ivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-07-18_19-35-14_bm03_k5ivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-07-21_18-00-15_bf04_k10scDLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;, &#39;2023-07-21_19-14-09_bm02_k1DLC_resnet101_DevRats2Jul21shuffle1_500000.csv&#39;]}}
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../index.html" class="btn btn-neutral float-left" title="Welcome to MARIPoSA’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Demo2-PoseSegmentation-Visualize.html" class="btn btn-neutral float-right" title="Demo 2: Visualization of Pose Module Usage" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Sedona Ewbank.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

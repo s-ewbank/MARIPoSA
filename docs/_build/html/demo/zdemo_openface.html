@@ -1,0 +1,259 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>&lt;no title&gt; &mdash; MARIPoSA 0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=44496db0"></script>
+      <script src="../_static/doctools.js?v=888ff710"></script>
+      <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            MARIPoSA
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="Demo1-ProjectCreation.html">Demo 1: Project Creation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Demo2-PoseSegmentation-Visualize.html">Demo 2: Visualization of Pose Module Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Demo3-PoseSegmentation-Embed.html">Demo 3: Embedding of Pose Segmentation Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Demo4-PoseSegmentation-ClassificationAndRegression.html">Demo 4: Regression and Classification of Group Conditions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Demo5-PoseSegmentation-ManualScoring.html">Demo 5: Comparing Pose Modules to Manual Scoring Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Demo6-PoseSegmentation-Simulation.html">Demo 6: Simulating Pose Segmentation Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../metadata.html">Metadata</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../analyze.html">Analyze</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../plot.html">Plot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../simulate.html">Simulate</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">MARIPoSA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">&lt;no title&gt;</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/demo/zdemo_openface.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">ttest_ind</span>
+<span class="kn">from</span> <span class="nn">sklearn.decomposition</span> <span class="kn">import</span> <span class="n">PCA</span>
+<span class="kn">from</span> <span class="nn">utils</span> <span class="kn">import</span> <span class="n">analyze</span><span class="p">,</span> <span class="n">plot</span><span class="p">,</span> <span class="n">metadata</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">ModuleNotFoundError</span><span class="g g-Whitespace">                       </span>Traceback (most recent call last)
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">line</span> <span class="mi">7</span>
+<span class="g g-Whitespace">      </span><span class="mi">5</span> <span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">ttest_ind</span>
+<span class="g g-Whitespace">      </span><span class="mi">6</span> <span class="kn">from</span> <span class="nn">sklearn.decomposition</span> <span class="kn">import</span> <span class="n">PCA</span>
+<span class="ne">----&gt; </span><span class="mi">7</span> <span class="kn">from</span> <span class="nn">utils</span> <span class="kn">import</span> <span class="n">analyze</span><span class="p">,</span> <span class="n">plot</span><span class="p">,</span> <span class="n">metadata</span>
+
+<span class="ne">ModuleNotFoundError</span>: No module named &#39;utils&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">config_path</span><span class="o">=</span><span class="s2">&quot;/Users/snewbank/Behavior/MARIPOSA_test/250206_monologues-of/config_PE.yaml&quot;</span>
+<span class="n">config</span> <span class="o">=</span> <span class="n">metadata</span><span class="o">.</span><span class="n">load_project</span><span class="p">(</span><span class="n">config_path</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;data_directory&quot;</span><span class="p">]</span><span class="o">+</span><span class="s2">&quot;/&quot;</span><span class="o">+</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;project_files&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span><span class="n">header</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">index_col</span><span class="o">=</span><span class="s2">&quot;frame&quot;</span><span class="p">)</span>
+<span class="n">feature</span><span class="o">=</span><span class="s2">&quot; AU14_c&quot;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">feature_mean</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="n">selected_subgroups</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">selected_subgroups</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">final_df</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;project_files&quot;</span><span class="p">]:</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;data_directory&quot;</span><span class="p">]</span><span class="o">+</span><span class="s2">&quot;/&quot;</span><span class="o">+</span><span class="n">file</span><span class="p">,</span><span class="n">header</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">index_col</span><span class="o">=</span><span class="s2">&quot;frame&quot;</span><span class="p">)</span>
+            <span class="n">final_df</span><span class="p">[</span><span class="n">file</span><span class="p">]</span><span class="o">=</span><span class="n">df</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">final_df</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">final_df</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">selected_subgroups</span><span class="o">==</span><span class="s2">&quot;all&quot;</span><span class="p">:</span>
+            <span class="n">selected_subgroups</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;subgroups&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="n">final_df</span><span class="o">=</span><span class="p">[]</span>
+        <span class="k">for</span> <span class="n">subgroup</span> <span class="ow">in</span> <span class="n">selected_subgroups</span><span class="p">:</span>
+            <span class="n">group_df</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;subgroups&quot;</span><span class="p">][</span><span class="n">subgroup</span><span class="p">]):</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;data_directory&quot;</span><span class="p">]</span><span class="o">+</span><span class="s2">&quot;/&quot;</span><span class="o">+</span><span class="n">file</span><span class="p">,</span><span class="n">header</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">index_col</span><span class="o">=</span><span class="s2">&quot;frame&quot;</span><span class="p">)</span>
+                <span class="n">group_df</span><span class="p">[</span><span class="n">file</span><span class="p">]</span><span class="o">=</span><span class="n">df</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">group_df</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">group_df</span><span class="p">)</span>
+            <span class="n">group_df</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">MultiIndex</span><span class="o">.</span><span class="n">from_tuples</span><span class="p">([(</span><span class="n">subgroup</span><span class="p">,</span> <span class="n">col</span><span class="p">)</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">group_df</span><span class="o">.</span><span class="n">columns</span><span class="p">])</span>
+            <span class="n">final_df</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">group_df</span><span class="p">)</span>
+        <span class="n">final_df</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">final_df</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">final_df</span>
+        
+<span class="n">df</span> <span class="o">=</span> <span class="n">feature_mean</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="n">selected_subgroups</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">au_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+<span class="n">sig_au</span><span class="o">=</span><span class="p">[]</span>
+<span class="k">for</span> <span class="n">au</span> <span class="ow">in</span> <span class="n">au_list</span><span class="p">:</span>
+    <span class="n">com</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;comedic&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">au</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+    <span class="n">dram</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;dramatic&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">au</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+    <span class="n">res</span><span class="o">=</span><span class="n">ttest_ind</span><span class="p">(</span><span class="n">com</span><span class="p">,</span><span class="n">dram</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">((</span><span class="n">res</span><span class="o">.</span><span class="n">pvalue</span><span class="o">&lt;</span><span class="mf">0.1</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="s2">&quot;AU&quot;</span> <span class="ow">in</span> <span class="n">au</span><span class="p">)):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">au</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+        <span class="n">sig_au</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">au</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">boxplot</span><span class="p">([</span><span class="n">com</span><span class="p">,</span><span class="n">dram</span><span class="p">],</span><span class="n">positions</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">],</span><span class="n">labels</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Comedy&quot;</span><span class="p">,</span><span class="s2">&quot;Drama&quot;</span><span class="p">])</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="n">au</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span> AU01_r
+Ttest_indResult(statistic=3.474740198316621, pvalue=0.002536610862461383)
+ AU02_r
+Ttest_indResult(statistic=3.5362554560747044, pvalue=0.002206064795669847)
+ AU05_r
+Ttest_indResult(statistic=2.720567814712361, pvalue=0.013572836505524932)
+ AU17_r
+Ttest_indResult(statistic=1.7495410092313954, pvalue=0.09633253594545318)
+ AU23_r
+Ttest_indResult(statistic=3.174911202306972, pvalue=0.00498673508625527)
+ AU01_c
+Ttest_indResult(statistic=1.9889290021672215, pvalue=0.06130476899012543)
+ AU02_c
+Ttest_indResult(statistic=1.7319642645230884, pvalue=0.09948408982368341)
+ AU28_c
+Ttest_indResult(statistic=1.7830953785715664, pvalue=0.09055524209214842)
+ AU45_c
+Ttest_indResult(statistic=1.7942498213089628, pvalue=0.08870250387082415)
+</pre></div>
+</div>
+<img alt="../_images/b71b49c3663f550007288c4b6379a8c3800dafd8b4529167c068a937435a6f21.png" src="../_images/b71b49c3663f550007288c4b6379a8c3800dafd8b4529167c068a937435a6f21.png" />
+<img alt="../_images/64bf537e77857b83753875d8fda4deb3daa340c723c3a9fb49e1d03dbb82db53.png" src="../_images/64bf537e77857b83753875d8fda4deb3daa340c723c3a9fb49e1d03dbb82db53.png" />
+<img alt="../_images/8eae7ed64ea3dc7a645ceb23441fc1461a58e771eecbd8b4e00d335a899c6cd2.png" src="../_images/8eae7ed64ea3dc7a645ceb23441fc1461a58e771eecbd8b4e00d335a899c6cd2.png" />
+<img alt="../_images/e6192534427e328c4fa5a76ec79e0ba77e48437bc5d3e3be0c10b6887fbf4e7e.png" src="../_images/e6192534427e328c4fa5a76ec79e0ba77e48437bc5d3e3be0c10b6887fbf4e7e.png" />
+<img alt="../_images/f812365ca56b453484c545f0e4b02c53382d6639545d25baa09fa629fdb84444.png" src="../_images/f812365ca56b453484c545f0e4b02c53382d6639545d25baa09fa629fdb84444.png" />
+<img alt="../_images/beb39156d3d53dc586bfaa9149d1b6e587c9a022a5da62919c57f86da6437dc3.png" src="../_images/beb39156d3d53dc586bfaa9149d1b6e587c9a022a5da62919c57f86da6437dc3.png" />
+<img alt="../_images/107d8a083eecdb29eb2276337ed0f1b5185631df65a040318627ad98bc20d6f1.png" src="../_images/107d8a083eecdb29eb2276337ed0f1b5185631df65a040318627ad98bc20d6f1.png" />
+<img alt="../_images/b61c7ffcd0dc23216f8c581a15b269ef96805e0593dc059b020946bb381e1480.png" src="../_images/b61c7ffcd0dc23216f8c581a15b269ef96805e0593dc059b020946bb381e1480.png" />
+<img alt="../_images/587553714c48cf936451a97711ecd792e2e7727444e72107632da2f027c4bf64.png" src="../_images/587553714c48cf936451a97711ecd792e2e7727444e72107632da2f027c4bf64.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mf">2.5</span><span class="p">,</span><span class="mf">2.5</span><span class="p">),</span><span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
+
+<span class="n">pca</span> <span class="o">=</span> <span class="n">PCA</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">featselect_df</span><span class="o">=</span><span class="n">df</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">items</span><span class="o">=</span><span class="n">sig_au</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="n">pca</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">featselect_df</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+<span class="n">sub_df1</span><span class="o">=</span><span class="n">featselect_df</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">like</span><span class="o">=</span><span class="s2">&quot;comedic&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+<span class="n">weights1</span><span class="o">=</span><span class="n">pca</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">sub_df1</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">weights1</span><span class="p">[:,</span><span class="mi">0</span><span class="p">],</span><span class="n">weights1</span><span class="p">[:,</span><span class="mi">1</span><span class="p">])</span>
+
+<span class="n">sub_df2</span><span class="o">=</span><span class="n">featselect_df</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">like</span><span class="o">=</span><span class="s2">&quot;dramatic&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+<span class="n">weights2</span><span class="o">=</span><span class="n">pca</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">sub_df2</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">weights2</span><span class="p">[:,</span><span class="mi">0</span><span class="p">],</span><span class="n">weights2</span><span class="p">[:,</span><span class="mi">1</span><span class="p">])</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;PC1&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;PC2&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Text(0, 0.5, &#39;PC2&#39;)
+</pre></div>
+</div>
+<img alt="../_images/4047238e3a9e9b59f68521bd6cd0141bda4f4d4c25240f0c584da8ac2ca4eb6c.png" src="../_images/4047238e3a9e9b59f68521bd6cd0141bda4f4d4c25240f0c584da8ac2ca4eb6c.png" />
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Sedona Ewbank.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

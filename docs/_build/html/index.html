@@ -20,7 +20,7 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Metadata" href="metadata.html" /> 
+    <link rel="next" title="Demo 1: Project Creation" href="demo/Demo1-ProjectCreation.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -44,6 +44,12 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="demo/Demo1-ProjectCreation.html">Demo 1: Project Creation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="demo/Demo2-PoseSegmentation-Visualize.html">Demo 2: Visualization of Pose Module Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="demo/Demo3-PoseSegmentation-Embed.html">Demo 3: Embedding of Pose Segmentation Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="demo/Demo4-PoseSegmentation-ClassificationAndRegression.html">Demo 4: Regression and Classification of Group Conditions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="demo/Demo5-PoseSegmentation-ManualScoring.html">Demo 5: Comparing Pose Modules to Manual Scoring Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="demo/Demo6-PoseSegmentation-Simulation.html">Demo 6: Simulating Pose Segmentation Data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="metadata.html">Metadata</a></li>
 <li class="toctree-l1"><a class="reference internal" href="analyze.html">Analyze</a></li>
 <li class="toctree-l1"><a class="reference internal" href="plot.html">Plot</a></li>
@@ -115,10 +121,37 @@
 <div class="toctree-wrapper compound">
 <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="demo/Demo1-ProjectCreation.html">Demo 1: Project Creation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="demo/Demo1-ProjectCreation.html#import-and-setup">1.0 Import and Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="demo/Demo1-ProjectCreation.html#creating-a-pose-segmentation-project">1.1: Creating a pose segmentation project</a></li>
+<li class="toctree-l2"><a class="reference internal" href="demo/Demo1-ProjectCreation.html#creating-a-pose-estimation-project">1.2 Creating a pose estimation project</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="demo/Demo2-PoseSegmentation-Visualize.html">Demo 2: Visualization of Pose Module Usage</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="demo/Demo2-PoseSegmentation-Visualize.html#loading-data-and-simply-visualizing-usage-no-subgroups-or-time-binning">2.1: Loading data and simply visualizing usage (no subgroups or time binning)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="demo/Demo2-PoseSegmentation-Visualize.html#loading-data-and-visualizing-usage-by-subgroups">2.2: Loading data and visualizing usage by subgroups</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="demo/Demo3-PoseSegmentation-Embed.html">Demo 3: Embedding of Pose Segmentation Data</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="demo/Demo3-PoseSegmentation-Embed.html#embedding-with-pca">3.1: Embedding with PCA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="demo/Demo3-PoseSegmentation-Embed.html#embedding-with-lda">3.2 Embedding with LDA</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="demo/Demo4-PoseSegmentation-ClassificationAndRegression.html">Demo 4: Regression and Classification of Group Conditions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="demo/Demo4-PoseSegmentation-ClassificationAndRegression.html#classification">4.1: Classification</a></li>
+<li class="toctree-l2"><a class="reference internal" href="demo/Demo4-PoseSegmentation-ClassificationAndRegression.html#regression">4.2: Regression</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="demo/Demo5-PoseSegmentation-ManualScoring.html">Demo 5: Comparing Pose Modules to Manual Scoring Data</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="demo/Demo5-PoseSegmentation-ManualScoring.html#incorporating-manual-scoring-data-from-boris">5.1: Incorporating manual scoring data from BORIS</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="demo/Demo6-PoseSegmentation-Simulation.html">Demo 6: Simulating Pose Segmentation Data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="metadata.html">Metadata</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="metadata.html#utils.metadata.create_PE_project"><code class="docutils literal notranslate"><span class="pre">create_PE_project()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="metadata.html#utils.metadata.create_PS_project"><code class="docutils literal notranslate"><span class="pre">create_PS_project()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="metadata.html#utils.metadata.load_project"><code class="docutils literal notranslate"><span class="pre">load_project()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="metadata.html#utils.metadata.save_edited_project"><code class="docutils literal notranslate"><span class="pre">save_edited_project()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="analyze.html">Analyze</a><ul>
@@ -127,7 +160,7 @@
 <li class="toctree-l2"><a class="reference internal" href="analyze.html#utils.analyze.combine_pose_modules"><code class="docutils literal notranslate"><span class="pre">combine_pose_modules()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="analyze.html#utils.analyze.embed"><code class="docutils literal notranslate"><span class="pre">embed()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="analyze.html#utils.analyze.get_distance"><code class="docutils literal notranslate"><span class="pre">get_distance()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="analyze.html#utils.analyze.get_distance_timebins"><code class="docutils literal notranslate"><span class="pre">get_distance_timebins()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="analyze.html#utils.analyze.get_keypoint_travel"><code class="docutils literal notranslate"><span class="pre">get_keypoint_travel()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="analyze.html#utils.analyze.get_module_labels"><code class="docutils literal notranslate"><span class="pre">get_module_labels()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="analyze.html#utils.analyze.get_module_transitions"><code class="docutils literal notranslate"><span class="pre">get_module_transitions()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="analyze.html#utils.analyze.get_module_usage"><code class="docutils literal notranslate"><span class="pre">get_module_usage()</span></code></a></li>
@@ -143,7 +176,7 @@
 <li class="toctree-l2"><a class="reference internal" href="plot.html#utils.plot.plot_distance_matrix"><code class="docutils literal notranslate"><span class="pre">plot_distance_matrix()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="plot.html#utils.plot.plot_distance_results"><code class="docutils literal notranslate"><span class="pre">plot_distance_results()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="plot.html#utils.plot.plot_embeddings"><code class="docutils literal notranslate"><span class="pre">plot_embeddings()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="plot.html#utils.plot.plot_keypoint_displacement_bins"><code class="docutils literal notranslate"><span class="pre">plot_keypoint_displacement_bins()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot.html#utils.plot.plot_keypoint_travel"><code class="docutils literal notranslate"><span class="pre">plot_keypoint_travel()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="plot.html#utils.plot.plot_module_usage"><code class="docutils literal notranslate"><span class="pre">plot_module_usage()</span></code></a></li>
 </ul>
 </li>
@@ -162,7 +195,7 @@
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="metadata.html" class="btn btn-neutral float-right" title="Metadata" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="demo/Demo1-ProjectCreation.html" class="btn btn-neutral float-right" title="Demo 1: Project Creation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

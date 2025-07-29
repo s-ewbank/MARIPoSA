@@ -42,6 +42,12 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../demo/Demo1-ProjectCreation.html">Demo 1: Project Creation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../demo/Demo2-PoseSegmentation-Visualize.html">Demo 2: Visualization of Pose Module Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../demo/Demo3-PoseSegmentation-Embed.html">Demo 3: Embedding of Pose Segmentation Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../demo/Demo4-PoseSegmentation-ClassificationAndRegression.html">Demo 4: Regression and Classification of Group Conditions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../demo/Demo5-PoseSegmentation-ManualScoring.html">Demo 5: Comparing Pose Modules to Manual Scoring Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../demo/Demo6-PoseSegmentation-Simulation.html">Demo 6: Simulating Pose Segmentation Data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../metadata.html">Metadata</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../analyze.html">Analyze</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../plot.html">Plot</a></li>
@@ -126,6 +132,42 @@
         <span class="n">obj</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">obj</span></div>
 
+<div class="viewcode-block" id="KeypointFeature"><a class="viewcode-back" href="../../source/utils.html#utils.analyze.KeypointFeature">[docs]</a><span class="k">class</span> <span class="nc">KeypointFeature</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keypoint_feature</span><span class="p">,</span> <span class="n">group_labels</span><span class="p">,</span> <span class="n">observation_labels</span><span class="p">,</span> <span class="n">feat_names</span><span class="p">,</span> <span class="n">group_dict</span><span class="p">,</span> <span class="n">scaler</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">keypoint_feature</span> <span class="o">=</span> <span class="n">keypoint_feature</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">group_labels</span> <span class="o">=</span> <span class="n">group_labels</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">observation_labels</span> <span class="o">=</span> <span class="n">observation_labels</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">feat_names</span> <span class="o">=</span> <span class="n">feat_names</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">group_dict</span> <span class="o">=</span> <span class="n">group_dict</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scaler</span> <span class="o">=</span> <span class="n">scaler</span>
+        <span class="n">mean_check</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">keypoint_feature</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+        <span class="n">std_check</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">keypoint_feature</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="mi">1</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scaled</span> <span class="o">=</span> <span class="n">mean_check</span> <span class="ow">and</span> <span class="n">std_check</span>
+
+<div class="viewcode-block" id="KeypointFeature.to_df"><a class="viewcode-back" href="../../source/utils.html#utils.analyze.KeypointFeature.to_df">[docs]</a>    <span class="k">def</span> <span class="nf">to_df</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">colnames</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">flip_group_dict</span> <span class="o">=</span> <span class="p">{</span><span class="n">v</span><span class="p">:</span> <span class="n">k</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">group_dict</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+        <span class="n">bad_group_labels</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">group_labels</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">flip_group_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="n">colnames</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">flip_group_dict</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">colnames</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;none&quot;</span><span class="p">)</span>
+                <span class="n">bad_group_labels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">bad_group_labels</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">bad_group_labels</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">bad_group_labels</span><span class="p">))</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Warning: the following groups were not detected in the config and were labeled &#39;none&#39;; continuing:</span><span class="se">\n</span><span class="si">{</span><span class="n">bad_group_labels</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">keypoint_feature</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">feat_names</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">observation_labels</span><span class="p">)</span>
+        <span class="n">df</span><span class="p">[</span><span class="s2">&quot;group&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">colnames</span>
+        <span class="k">return</span> <span class="n">df</span></div>
+
+<div class="viewcode-block" id="KeypointFeature.scale"><a class="viewcode-back" href="../../source/utils.html#utils.analyze.KeypointFeature.scale">[docs]</a>    <span class="k">def</span> <span class="nf">scale</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">scaler</span> <span class="o">=</span> <span class="n">StandardScaler</span><span class="p">()</span>
+        <span class="n">label_counts_scaled</span> <span class="o">=</span> <span class="n">scaler</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">keypoint_feature</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ModuleUsage</span><span class="p">(</span><span class="n">label_counts_scaled</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">group_labels</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">observation_labels</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">feat_names</span><span class="p">,</span>
+                           <span class="bp">self</span><span class="o">.</span><span class="n">group_dict</span><span class="p">,</span> <span class="n">scaler</span><span class="p">)</span></div></div>
+
+
 <div class="viewcode-block" id="get_module_labels"><a class="viewcode-back" href="../../source/utils.html#utils.analyze.get_module_labels">[docs]</a><span class="k">def</span> <span class="nf">get_module_labels</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">,</span> <span class="n">subgroups</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Generates a Pandas dataframe containing the labels for every frame in the specified time range for the video paths in defined groups.</span>
@@ -135,7 +177,7 @@
 <span class="sd">    :param stop: time in seconds to stop dataframe at.</span>
 <span class="sd">    :param fps: frames per second of recording.</span>
 <span class="sd">    :param subgroups: subgroups to include; by default, None will result in an object without data subgrouped; could alternatively be a list of subgroup names from config or &quot;all&quot; (to include all subgroups present in config)</span>
-<span class="sd">    :return:</span>
+<span class="sd">    :return: labels dataframe</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">fps</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;fps&quot;</span><span class="p">]</span>
     <span class="n">start_frame</span> <span class="o">=</span> <span class="n">start</span> <span class="o">*</span> <span class="nb">int</span><span class="p">(</span><span class="n">fps</span><span class="p">)</span>
@@ -171,10 +213,7 @@
                 <span class="n">count</span> <span class="o">=</span> <span class="n">count</span> <span class="o">+</span> <span class="mi">1</span>
         <span class="k">elif</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;data_source&quot;</span><span class="p">]</span><span class="o">==</span><span class="s2">&quot;VAME&quot;</span><span class="p">:</span>
             <span class="n">data_directory</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;data_directory&quot;</span><span class="p">]</span>
-            <span class="n">model_path</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-            <span class="n">model_path</span> <span class="o">=</span> <span class="n">model_path</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">data_directory</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">data_directory</span><span class="p">)[</span><span class="mi">0</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="n">model_path</span> <span class="o">=</span> <span class="n">model_path</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">data_directory</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">data_directory</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">model_path</span><span class="p">)[</span>
-                <span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span>
+            <span class="n">model_path</span> <span class="o">=</span> <span class="s2">&quot;/VAME/&quot;</span><span class="o">+</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;vame_model_name&quot;</span><span class="p">]</span><span class="o">+</span><span class="s2">&quot;/&quot;</span>
             <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;project_files&quot;</span><span class="p">])):</span>
                 <span class="n">header</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;project_files&quot;</span><span class="p">][</span><span class="n">f</span><span class="p">])</span>
                 <span class="n">datstr</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">data_directory</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;project_files&quot;</span><span class="p">][</span><span class="n">f</span><span class="p">]</span> <span class="o">+</span> <span class="n">model_path</span><span class="p">)</span> <span class="k">if</span> <span class="s2">&quot;_label_&quot;</span> <span class="ow">in</span> <span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
@@ -242,10 +281,7 @@
             <span class="n">labels_df</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">header1</span><span class="p">,</span> <span class="n">header2</span><span class="p">]</span>
         <span class="k">elif</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;data_source&quot;</span><span class="p">]</span><span class="o">==</span><span class="s2">&quot;VAME&quot;</span><span class="p">:</span>
             <span class="n">data_directory</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;data_directory&quot;</span><span class="p">]</span>
-            <span class="n">model_path</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-            <span class="n">model_path</span> <span class="o">=</span> <span class="n">model_path</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">data_directory</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">data_directory</span><span class="p">)[</span><span class="mi">0</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="n">model_path</span> <span class="o">=</span> <span class="n">model_path</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">data_directory</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">data_directory</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">model_path</span><span class="p">)[</span>
-                <span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span>
+            <span class="n">model_path</span> <span class="o">=</span> <span class="s2">&quot;/VAME/&quot;</span><span class="o">+</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;vame_model_name&quot;</span><span class="p">]</span><span class="o">+</span><span class="s2">&quot;/&quot;</span>
             <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_groups</span><span class="p">):</span>
                 <span class="n">label_paths_g</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;subgroups&quot;</span><span class="p">][</span><span class="n">subgroups</span><span class="p">[</span><span class="n">g</span><span class="p">]]</span>
                 <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">label_paths_g</span><span class="p">)):</span>
@@ -279,57 +315,129 @@
             <span class="n">labels_df</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">header1</span><span class="p">,</span> <span class="n">header2</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">labels_df</span></div>
 
-<div class="viewcode-block" id="get_distance_timebins"><a class="viewcode-back" href="../../source/utils.html#utils.analyze.get_distance_timebins">[docs]</a><span class="k">def</span> <span class="nf">get_distance_timebins</span><span class="p">(</span><span class="n">PE_config</span><span class="p">,</span><span class="n">filepath</span><span class="p">,</span><span class="n">binsize</span><span class="p">,</span><span class="n">start</span><span class="p">,</span><span class="n">end</span><span class="p">,</span><span class="n">bodypart</span><span class="p">,</span><span class="n">thresh</span><span class="o">=</span><span class="mi">70</span><span class="p">):</span>
+<div class="viewcode-block" id="get_keypoint_travel"><a class="viewcode-back" href="../../source/utils.html#utils.analyze.get_keypoint_travel">[docs]</a><span class="k">def</span> <span class="nf">get_keypoint_travel</span><span class="p">(</span><span class="n">PE_config</span><span class="p">,</span>
+                        <span class="n">keypoint</span><span class="p">,</span>
+                        <span class="n">start</span><span class="p">,</span>
+                        <span class="n">end</span><span class="p">,</span>
+                        <span class="n">binsize</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                        <span class="n">thresh</span><span class="o">=</span><span class="mi">70</span><span class="p">,</span>
+                        <span class="n">selected_subgroups</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">,</span>
+                        <span class="n">return_as_df</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Get distance/locomotion for a body part from a DLC file</span>
+<span class="sd">    Measure keypodint distance travelled across group of subjects</span>
 
-<span class="sd">    :param DLC_config: config file (can be DLC or pose - used only for &quot;fps&quot;)</span>
-<span class="sd">    :param filepath: path to file of interest</span>
-<span class="sd">    :param binsize: size of timebins (in seconds)</span>
-<span class="sd">    :param start: start time</span>
-<span class="sd">    :param end: end time</span>
-<span class="sd">    :param bodypart: which bodypart to track</span>
-<span class="sd">    :param thresh: threshold for point-to-point distance that should be marked as wrong and excluded</span>
+<span class="sd">    :param PE_config: pose estimation config - used for FPS only</span>
+<span class="sd">    :param keypoint: name of keypoint</span>
+<span class="sd">    :param start: start time in seconds</span>
+<span class="sd">    :param end: end time in seconds</span>
+<span class="sd">    :param binsize: if binned output is desired, size of timebins (default is None for no binning)</span>
+<span class="sd">    :param thresh: threshold for when distance &#39;jump&#39; is too large and should be excluded; default 70</span>
+<span class="sd">    :param selected_subgroups: subgroups to analyze as defined in config; default &quot;all&quot;</span>
+<span class="sd">    :param return_as_df: return as a dataframe or return as KeypointTravel class (for embedding, classification)</span>
 <span class="sd">    :return:</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">data</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span><span class="n">header</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">])</span>
-    <span class="n">nbins</span><span class="o">=</span><span class="nb">int</span><span class="p">((</span><span class="n">end</span><span class="o">-</span><span class="n">start</span><span class="p">)</span><span class="o">/</span><span class="n">binsize</span><span class="p">)</span>
-    <span class="n">dist</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">nbins</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nbins</span><span class="p">):</span>
-        <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">bodypart</span><span class="p">][</span><span class="s1">&#39;x&#39;</span><span class="p">])[(</span><span class="n">start</span><span class="o">+</span><span class="n">b</span><span class="o">*</span><span class="n">binsize</span><span class="p">)</span><span class="o">*</span><span class="n">PE_config</span><span class="p">[</span><span class="s2">&quot;fps&quot;</span><span class="p">]:(</span><span class="n">start</span><span class="o">+</span><span class="p">(</span><span class="n">b</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">binsize</span><span class="p">)</span><span class="o">*</span><span class="n">PE_config</span><span class="p">[</span><span class="s2">&quot;fps&quot;</span><span class="p">]]</span>
-        <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">bodypart</span><span class="p">][</span><span class="s1">&#39;y&#39;</span><span class="p">])[(</span><span class="n">start</span><span class="o">+</span><span class="n">b</span><span class="o">*</span><span class="n">binsize</span><span class="p">)</span><span class="o">*</span><span class="n">PE_config</span><span class="p">[</span><span class="s2">&quot;fps&quot;</span><span class="p">]:(</span><span class="n">start</span><span class="o">+</span><span class="p">(</span><span class="n">b</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">binsize</span><span class="p">)</span><span class="o">*</span><span class="n">PE_config</span><span class="p">[</span><span class="s2">&quot;fps&quot;</span><span class="p">]]</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">absolute</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">])</span><span class="o">&gt;</span><span class="n">thresh</span><span class="p">:</span>
-                <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="o">=</span><span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">absolute</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">y</span><span class="p">[</span><span class="n">i</span><span class="p">])</span><span class="o">&gt;</span><span class="n">thresh</span><span class="p">:</span>
-                <span class="n">y</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="o">=</span><span class="n">y</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-            <span class="n">dist</span><span class="p">[</span><span class="n">b</span><span class="p">]</span><span class="o">=</span><span class="n">dist</span><span class="p">[</span><span class="n">b</span><span class="p">]</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">])</span><span class="o">**</span><span class="mi">2</span><span class="o">+</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">y</span><span class="p">[</span><span class="n">i</span><span class="p">])</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">dist</span></div>
-
-<div class="viewcode-block" id="dist_df_subgroups"><a class="viewcode-back" href="../../source/utils.html#utils.analyze.dist_df_subgroups">[docs]</a><span class="k">def</span> <span class="nf">dist_df_subgroups</span><span class="p">(</span><span class="n">PE_config</span><span class="p">,</span> <span class="n">binsize</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">thresh</span><span class="o">=</span><span class="mi">70</span><span class="p">,</span> <span class="n">selected_subgroups</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">selected_subgroups</span><span class="o">==</span><span class="s2">&quot;all&quot;</span><span class="p">:</span>
         <span class="n">selected_subgroups</span><span class="o">=</span><span class="n">PE_config</span><span class="p">[</span><span class="s2">&quot;subgroups&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
-    <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="n">header1</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="n">header2</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">g</span><span class="p">,</span> <span class="n">group</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">selected_subgroups</span><span class="p">):</span>
-        <span class="n">group_data</span><span class="o">=</span><span class="p">[]</span>
-        <span class="k">for</span> <span class="n">s</span><span class="p">,</span> <span class="n">sess</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">PE_config</span><span class="p">[</span><span class="s2">&quot;subgroups&quot;</span><span class="p">][</span><span class="n">group</span><span class="p">]):</span>
-            <span class="n">header</span> <span class="o">=</span> <span class="n">sess</span>
-            <span class="n">header2</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">header</span><span class="p">)</span>
-            <span class="n">header1</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
-            <span class="n">path</span> <span class="o">=</span> <span class="n">PE_config</span><span class="p">[</span><span class="s2">&quot;path&quot;</span><span class="p">]</span><span class="o">+</span><span class="n">sess</span>
-            <span class="n">dist_i</span> <span class="o">=</span> <span class="n">get_distance_timebins</span><span class="p">(</span><span class="n">PE_config</span><span class="p">,</span><span class="n">path</span><span class="p">,</span><span class="n">binsize</span><span class="p">,</span><span class="n">start</span><span class="p">,</span><span class="n">end</span><span class="p">,</span><span class="s2">&quot;tailbase&quot;</span><span class="p">,</span><span class="n">thresh</span><span class="o">=</span><span class="n">thresh</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">s</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">g</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="n">dist_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">dist_i</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="n">header</span><span class="p">])</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">dist_df</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="n">count</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">dist_i</span><span class="p">,</span> <span class="n">column</span><span class="o">=</span><span class="n">header</span><span class="p">)</span>
-            <span class="n">count</span> <span class="o">=</span> <span class="n">count</span> <span class="o">+</span> <span class="mi">1</span>
-    <span class="n">dist_df</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">header1</span><span class="p">,</span> <span class="n">header2</span><span class="p">]</span>
-    <span class="n">dist_df</span><span class="o">.</span><span class="n">index</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">start</span><span class="o">/</span><span class="mi">60</span><span class="p">,</span><span class="n">end</span><span class="o">/</span><span class="mi">60</span><span class="p">,</span><span class="n">binsize</span><span class="o">/</span><span class="mi">60</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">dist_df</span></div>
 
-<div class="viewcode-block" id="BORIS_to_pose"><a class="viewcode-back" href="../../source/utils.html#utils.analyze.BORIS_to_pose">[docs]</a><span class="k">def</span> <span class="nf">BORIS_to_pose</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+    <span class="n">group_dict</span> <span class="o">=</span> <span class="p">{</span><span class="n">selected_subgroups</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">selected_subgroups</span><span class="p">))}</span>
+
+    <span class="n">group_labels</span><span class="o">=</span><span class="p">[]</span>
+    <span class="n">travel_data</span><span class="o">=</span><span class="p">[]</span>
+    <span class="n">observation_labels</span><span class="o">=</span><span class="p">[]</span>
+    <span class="k">for</span> <span class="n">g</span><span class="p">,</span> <span class="n">group</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">selected_subgroups</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">s</span><span class="p">,</span> <span class="n">sess</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">PE_config</span><span class="p">[</span><span class="s2">&quot;subgroups&quot;</span><span class="p">][</span><span class="n">group</span><span class="p">]):</span>
+            <span class="n">observation_labels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sess</span><span class="p">)</span>
+            <span class="n">group_labels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">group_dict</span><span class="p">[</span><span class="n">group</span><span class="p">])</span>
+            <span class="n">filepath</span> <span class="o">=</span> <span class="n">PE_config</span><span class="p">[</span><span class="s2">&quot;data_directory&quot;</span><span class="p">]</span><span class="o">+</span><span class="n">sess</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">binsize</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">binsize</span> <span class="o">=</span> <span class="n">end</span> <span class="o">-</span> <span class="n">start</span>
+                <span class="n">nbins</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">nbins</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">end</span> <span class="o">-</span> <span class="n">start</span><span class="p">)</span> <span class="o">/</span> <span class="n">binsize</span><span class="p">)</span>
+            <span class="n">dist_i</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">nbins</span><span class="p">)</span>
+            <span class="n">fps</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">PE_config</span><span class="p">[</span><span class="s2">&quot;fps&quot;</span><span class="p">])</span>
+            <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nbins</span><span class="p">):</span>
+                <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">keypoint</span><span class="p">][</span><span class="s1">&#39;x&#39;</span><span class="p">])[(</span><span class="n">start</span> <span class="o">+</span> <span class="n">b</span> <span class="o">*</span> <span class="n">binsize</span><span class="p">)</span> <span class="o">*</span> <span class="n">fps</span><span class="p">:(</span><span class="n">start</span> <span class="o">+</span> <span class="p">(</span><span class="n">b</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">binsize</span><span class="p">)</span> <span class="o">*</span> <span class="n">fps</span><span class="p">]</span>
+                <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">keypoint</span><span class="p">][</span><span class="s1">&#39;y&#39;</span><span class="p">])[(</span><span class="n">start</span> <span class="o">+</span> <span class="n">b</span> <span class="o">*</span> <span class="n">binsize</span><span class="p">)</span> <span class="o">*</span> <span class="n">fps</span><span class="p">:(</span><span class="n">start</span> <span class="o">+</span> <span class="p">(</span><span class="n">b</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">binsize</span><span class="p">)</span> <span class="o">*</span> <span class="n">fps</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">absolute</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">&gt;</span> <span class="n">thresh</span><span class="p">:</span>
+                        <span class="n">x</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">absolute</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">y</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">&gt;</span> <span class="n">thresh</span><span class="p">:</span>
+                        <span class="n">y</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                    <span class="n">dist_i</span><span class="p">[</span><span class="n">b</span><span class="p">]</span> <span class="o">=</span> <span class="n">dist_i</span><span class="p">[</span><span class="n">b</span><span class="p">]</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">x</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">y</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+            <span class="n">travel_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dist_i</span><span class="p">)</span>
+    <span class="n">travel_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">travel_data</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">binsize</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">feat_names</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">start</span><span class="o">/</span><span class="mi">60</span><span class="p">,</span><span class="n">end</span><span class="o">/</span><span class="mi">60</span><span class="p">,</span><span class="n">binsize</span><span class="o">/</span><span class="mi">60</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">feat_names</span><span class="o">=</span><span class="s2">&quot;travel&quot;</span>
+    <span class="k">if</span> <span class="n">return_as_df</span><span class="p">:</span>
+        <span class="n">kf</span> <span class="o">=</span> <span class="n">KeypointFeature</span><span class="p">(</span><span class="n">travel_data</span><span class="p">,</span> <span class="n">group_labels</span><span class="p">,</span> <span class="n">observation_labels</span><span class="p">,</span> <span class="n">feat_names</span><span class="p">,</span> <span class="n">group_dict</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">kf_df</span> <span class="o">=</span> <span class="n">kf</span><span class="o">.</span><span class="n">to_df</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">kf_df</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">KeypointFeature</span><span class="p">(</span><span class="n">travel_data</span><span class="p">,</span> <span class="n">group_labels</span><span class="p">,</span> <span class="n">observation_labels</span><span class="p">,</span> <span class="n">feat_names</span><span class="p">,</span> <span class="n">group_dict</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+
+
+<span class="c1"># def get_keypoint_travel(PE_config,</span>
+<span class="c1">#                                   keypoint,</span>
+<span class="c1">#                                   start,</span>
+<span class="c1">#                                   end,</span>
+<span class="c1">#                                   binsize=None,</span>
+<span class="c1">#                                   thresh=70,</span>
+<span class="c1">#                                   selected_subgroups=&quot;all&quot;):</span>
+<span class="c1">#     &quot;&quot;&quot;</span>
+<span class="c1">#     Measure keypodint distance travelled across group of subjects</span>
+<span class="c1">#</span>
+<span class="c1">#     :param PE_config: pose estimation config - used for FPS only</span>
+<span class="c1">#     :param keypoint: name of keypoint</span>
+<span class="c1">#     :param start: start time in seconds</span>
+<span class="c1">#     :param end: end time in seconds</span>
+<span class="c1">#     :param binsize: if binned output is desired, size of timebins (default is None for no binning)</span>
+<span class="c1">#     :param thresh: threshold for when distance &#39;jump&#39; is too large and should be excluded; default 70</span>
+<span class="c1">#     :param selected_subgroups: subgroups to analyze as defined in config; default &quot;all&quot;</span>
+<span class="c1">#     :return:</span>
+<span class="c1">#     &quot;&quot;&quot;</span>
+<span class="c1">#     if selected_subgroups==&quot;all&quot;:</span>
+<span class="c1">#         selected_subgroups=PE_config[&quot;subgroups&quot;].keys()</span>
+<span class="c1">#     count = 0</span>
+<span class="c1">#     header1 = []</span>
+<span class="c1">#     header2 = []</span>
+<span class="c1">#     for g, group in enumerate(selected_subgroups):</span>
+<span class="c1">#         for s, sess in enumerate(PE_config[&quot;subgroups&quot;][group]):</span>
+<span class="c1">#             header = sess</span>
+<span class="c1">#             header2.append(header)</span>
+<span class="c1">#             header1.append(group)</span>
+<span class="c1">#             filepath = PE_config[&quot;data_directory&quot;]+sess</span>
+<span class="c1">#             data = pd.read_csv(filepath, header=[1, 2])</span>
+<span class="c1">#             if binsize == None:</span>
+<span class="c1">#                 binsize = end - start</span>
+<span class="c1">#                 nbins = 1</span>
+<span class="c1">#             else:</span>
+<span class="c1">#                 nbins = int((end - start) / binsize)</span>
+<span class="c1">#             dist_i = np.zeros(nbins)</span>
+<span class="c1">#             fps = int(PE_config[&quot;fps&quot;])</span>
+<span class="c1">#             for b in range(nbins):</span>
+<span class="c1">#                 x = np.array(data[keypoint][&#39;x&#39;])[(start + b * binsize) * fps:(start + (b + 1) * binsize) * fps]</span>
+<span class="c1">#                 y = np.array(data[keypoint][&#39;y&#39;])[(start + b * binsize) * fps:(start + (b + 1) * binsize) * fps]</span>
+<span class="c1">#                 for i in range(len(x) - 1):</span>
+<span class="c1">#                     if np.absolute(x[i + 1] - x[i]) &gt; thresh:</span>
+<span class="c1">#                         x[i + 1] = x[i]</span>
+<span class="c1">#                     if np.absolute(y[i + 1] - y[i]) &gt; thresh:</span>
+<span class="c1">#                         y[i + 1] = y[i]</span>
+<span class="c1">#                     dist_i[b] = dist_i[b] + np.sqrt((x[i + 1] - x[i]) ** 2 + (y[i + 1] - y[i]) ** 2)</span>
+<span class="c1">#             if s == 0 and g == 0:</span>
+<span class="c1">#                 dist_df = pd.DataFrame(dist_i, columns=[header])</span>
+<span class="c1">#             else:</span>
+<span class="c1">#                 dist_df.insert(loc=count, value=dist_i, column=header)</span>
+<span class="c1">#             count = count + 1</span>
+<span class="c1">#     dist_df.columns = [header1, header2]</span>
+<span class="c1">#     if binsize is not None:</span>
+<span class="c1">#         dist_df.index=np.arange(start/60,end/60,binsize/60)</span>
+<span class="c1">#     return dist_df</span>
+
+<div class="viewcode-block" id="BORIS_to_pose"><a class="viewcode-back" href="../../source/utils.html#utils.analyze.BORIS_to_pose">[docs]</a><span class="k">def</span> <span class="nf">BORIS_to_pose</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">verbose</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Intake paired BORIS one-hot-encoded observation files and pose segmented files and align them to see what behaviors</span>
 <span class="sd">    line up with what pose modules</span>
@@ -345,9 +453,12 @@
     <span class="n">labels_df</span> <span class="o">=</span> <span class="n">get_module_labels</span><span class="p">(</span><span class="n">config_modulo</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1200</span><span class="p">)</span>
     <span class="n">labels_flat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">labels_df</span><span class="p">)</span>
     <span class="n">labels_flat</span> <span class="o">=</span> <span class="p">[</span><span class="n">item</span> <span class="k">for</span> <span class="n">sublist</span> <span class="ow">in</span> <span class="n">labels_flat</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">sublist</span><span class="p">]</span>
-    <span class="n">modules</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">labels_flat</span><span class="p">)</span>
-    <span class="n">n_modules</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">modules</span><span class="p">)</span>
-    <span class="n">modules</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">labels_df</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span>
+    <span class="c1">## old way</span>
+    <span class="c1"># modules = np.unique(labels_flat)</span>
+    <span class="c1"># n_modules = len(modules)</span>
+    <span class="c1"># modules = np.unique(labels_df.values.flatten())</span>
+    <span class="n">n_modules</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;n_modules&quot;</span><span class="p">])</span>
+    <span class="n">modules</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">n_modules</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">pairing</span> <span class="ow">in</span> <span class="n">boris_to_pose_pairings</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">pairing</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="kc">None</span><span class="p">:</span>
             <span class="k">continue</span>
@@ -373,13 +484,15 @@
                 <span class="k">for</span> <span class="n">module</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_modules</span><span class="p">):</span>
                     <span class="n">results_i</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">module</span><span class="p">,</span><span class="n">behavior</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">masked_labels</span><span class="o">==</span><span class="n">module</span><span class="p">)</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
             <span class="n">results</span><span class="o">=</span><span class="n">results</span><span class="o">+</span><span class="n">results_i</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;done with &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">pairing</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;done with &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">pairing</span><span class="p">))</span>
     <span class="n">results</span><span class="o">=</span><span class="n">results</span><span class="o">.</span><span class="n">T</span>
     <span class="n">column_sums</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
     <span class="n">column_sums</span> <span class="o">=</span> <span class="n">column_sums</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
     <span class="n">normalized_results</span> <span class="o">=</span> <span class="n">results</span> <span class="o">/</span> <span class="n">column_sums</span>
     <span class="n">loss_score</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">results</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">-</span><span class="n">results</span><span class="o">.</span><span class="n">max</span><span class="p">())</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">results</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;data_source&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot; modules map onto scored behaviors with &#39;loss&#39; of &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">loss_score</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;data_source&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot; modules map onto scored behaviors with &#39;loss&#39; of &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">loss_score</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">results</span><span class="p">,</span> <span class="n">normalized_results</span><span class="p">,</span> <span class="n">loss_score</span></div>
 
 <div class="viewcode-block" id="combine_pose_modules"><a class="viewcode-back" href="../../source/utils.html#utils.analyze.combine_pose_modules">[docs]</a><span class="k">def</span> <span class="nf">combine_pose_modules</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">labels_df</span><span class="p">,</span> <span class="n">force_no_numeric</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
@@ -450,7 +563,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">group_dict</span> <span class="o">=</span> <span class="n">group_dict</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">scaler</span> <span class="o">=</span> <span class="n">scaler</span>
         <span class="n">mean_check</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">label_counts</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
-        <span class="n">std_check</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">label_counts</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="mi">1</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+        <span class="n">std_check</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">label_counts</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="mi">1</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">scaled</span> <span class="o">=</span> <span class="n">mean_check</span> <span class="ow">and</span> <span class="n">std_check</span>
 
 <div class="viewcode-block" id="ModuleUsage.to_df"><a class="viewcode-back" href="../../source/utils.html#utils.analyze.ModuleUsage.to_df">[docs]</a>    <span class="k">def</span> <span class="nf">to_df</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -560,15 +673,15 @@
             <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span></div></div>
 
 
-<div class="viewcode-block" id="get_module_usage"><a class="viewcode-back" href="../../source/utils.html#utils.analyze.get_module_usage">[docs]</a><span class="k">def</span> <span class="nf">get_module_usage</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">labels_df</span><span class="p">,</span> <span class="n">binsize</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="get_module_usage"><a class="viewcode-back" href="../../source/utils.html#utils.analyze.get_module_usage">[docs]</a><span class="k">def</span> <span class="nf">get_module_usage</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">labels_df</span><span class="p">,</span> <span class="n">binsize</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">modules_altered</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Reshape labels dataframe from label_counter_subgroups to be an array of features</span>
 
 <span class="sd">    :param config: config object</span>
 <span class="sd">    :param labels_df: labels dataframe from label_counter_subgroups</span>
 <span class="sd">    :param binsize: width of bins in seconds; if None, no binning is performed</span>
-<span class="sd">    :param selected_subgroups:</span>
-<span class="sd">    :return:</span>
+<span class="sd">    :param modules_altered: must be true if modules have been remapped</span>
+<span class="sd">    :return: object of class ModuleUsage</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">data_subgrouped</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="k">try</span><span class="p">:</span>
@@ -585,8 +698,17 @@
     <span class="n">fps</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;fps&quot;</span><span class="p">])</span>
     <span class="n">labels_flat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">labels_df</span><span class="p">)</span>
     <span class="n">labels_flat</span> <span class="o">=</span> <span class="p">[</span><span class="n">item</span> <span class="k">for</span> <span class="n">sublist</span> <span class="ow">in</span> <span class="n">labels_flat</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">sublist</span><span class="p">]</span>
-    <span class="n">modules</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">labels_flat</span><span class="p">)</span>
-    <span class="n">n_modules</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">modules</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">modules_altered</span><span class="p">:</span>
+        <span class="n">modules</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">labels_flat</span><span class="p">)</span>
+        <span class="n">n_modules</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">modules</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">n_modules</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;n_modules&quot;</span><span class="p">])</span>
+        <span class="n">modules</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n_modules</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">modules_detect</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">labels_flat</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">modules_detect</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">is_nonnum</span><span class="p">(</span><span class="n">m</span><span class="p">):</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Warning, detected non-numeric modules - consider setting &#39;modules_altered&#39; to True (False by defualt)&quot;</span><span class="p">)</span>
+                <span class="k">break</span>
 
     <span class="n">label_counts</span> <span class="o">=</span> <span class="p">[]</span>
 
@@ -640,7 +762,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">feat_names</span> <span class="o">=</span> <span class="n">feat_names</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">group_dict</span> <span class="o">=</span> <span class="n">group_dict</span>
         <span class="n">mean_check</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">transition_counts</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
-        <span class="n">std_check</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">transition_counts</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="mi">1</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+        <span class="n">std_check</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">transition_counts</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="mi">1</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">scaled</span> <span class="o">=</span> <span class="n">mean_check</span> <span class="ow">and</span> <span class="n">std_check</span>
 
 <div class="viewcode-block" id="ModuleTransitions.to_df"><a class="viewcode-back" href="../../source/utils.html#utils.analyze.ModuleTransitions.to_df">[docs]</a>    <span class="k">def</span> <span class="nf">to_df</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -673,7 +795,7 @@
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">save_path</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
             <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span></div></div>
 
-<div class="viewcode-block" id="get_module_transitions"><a class="viewcode-back" href="../../source/utils.html#utils.analyze.get_module_transitions">[docs]</a><span class="k">def</span> <span class="nf">get_module_transitions</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">labels_df</span><span class="p">):</span>
+<div class="viewcode-block" id="get_module_transitions"><a class="viewcode-back" href="../../source/utils.html#utils.analyze.get_module_transitions">[docs]</a><span class="k">def</span> <span class="nf">get_module_transitions</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">labels_df</span><span class="p">,</span> <span class="n">modules_altered</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Reshape labels dataframe from label_counter_subgroups to be an array of features</span>
 
@@ -699,7 +821,10 @@
     <span class="n">labels_flat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">labels_df</span><span class="p">)</span>
     <span class="n">labels_flat</span> <span class="o">=</span> <span class="p">[</span><span class="n">item</span> <span class="k">for</span> <span class="n">sublist</span> <span class="ow">in</span> <span class="n">labels_flat</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">sublist</span><span class="p">]</span>
     <span class="n">modules</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">labels_flat</span><span class="p">)</span>
-    <span class="n">n_modules</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">modules</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">modules_altered</span><span class="p">:</span>
+        <span class="n">n_modules</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">modules</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">n_modules</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;n_modules&quot;</span><span class="p">])</span>
 
     <span class="n">transition_counts</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">transition_count_matrices</span> <span class="o">=</span> <span class="p">[]</span>
@@ -763,8 +888,12 @@
         <span class="n">X</span><span class="o">=</span><span class="n">module_feature_object</span><span class="o">.</span><span class="n">transition_counts</span>
         <span class="n">y</span><span class="o">=</span><span class="n">module_feature_object</span><span class="o">.</span><span class="n">group_labels</span>
         <span class="n">obj_type</span><span class="o">=</span><span class="s2">&quot;module transitions&quot;</span>
+    <span class="k">elif</span> <span class="n">module_feature_object</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="o">==</span><span class="s2">&quot;KeypointFeature&quot;</span><span class="p">:</span>
+        <span class="n">X</span><span class="o">=</span><span class="n">module_feature_object</span><span class="o">.</span><span class="n">keypoint_feature</span>
+        <span class="n">y</span><span class="o">=</span><span class="n">module_feature_object</span><span class="o">.</span><span class="n">group_labels</span>
+        <span class="n">obj_type</span><span class="o">=</span><span class="s2">&quot;keypoint feature&quot;</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;module_feature_object class must be ModuleUsage or ModuleTransitions, not </span><span class="si">{</span><span class="n">module_feature_object</span><span class="o">.</span><span class="vm">__class__</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;module_feature_object class must be ModuleUsage or ModuleTransitions or KeypointFeature, not </span><span class="si">{</span><span class="n">module_feature_object</span><span class="o">.</span><span class="vm">__class__</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="p">((</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;lda&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;LDA&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;lineardiscriminantanalysis&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;LinearDiscriminantAnalysis&quot;</span><span class="p">)):</span>
         <span class="n">emb</span> <span class="o">=</span> <span class="n">LDA</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="n">n_components</span><span class="p">,</span><span class="n">store_covariance</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -784,16 +913,19 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">module_feature_object</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="o">==</span><span class="s2">&quot;ModuleUsage&quot;</span><span class="p">:</span>
-        <span class="n">X</span> <span class="o">=</span> <span class="n">module_feature_object</span><span class="o">.</span><span class="n">label_counts</span>
-        <span class="n">y</span> <span class="o">=</span> <span class="n">module_feature_object</span><span class="o">.</span><span class="n">group_labels</span>
-        <span class="n">obj_type</span> <span class="o">=</span> <span class="s2">&quot;module usage&quot;</span>
-    <span class="k">elif</span> <span class="n">module_feature_object</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;ModuleTransitions&quot;</span><span class="p">:</span>
-        <span class="n">X</span> <span class="o">=</span> <span class="n">module_feature_object</span><span class="o">.</span><span class="n">transition_counts</span>
-        <span class="n">y</span> <span class="o">=</span> <span class="n">module_feature_object</span><span class="o">.</span><span class="n">group_labels</span>
-        <span class="n">obj_type</span> <span class="o">=</span> <span class="s2">&quot;module transitions&quot;</span>
+        <span class="n">X</span><span class="o">=</span><span class="n">module_feature_object</span><span class="o">.</span><span class="n">label_counts</span>
+        <span class="n">y</span><span class="o">=</span><span class="n">module_feature_object</span><span class="o">.</span><span class="n">group_labels</span>
+        <span class="n">obj_type</span><span class="o">=</span><span class="s2">&quot;module usage&quot;</span>
+    <span class="k">elif</span> <span class="n">module_feature_object</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="o">==</span><span class="s2">&quot;ModuleTransitions&quot;</span><span class="p">:</span>
+        <span class="n">X</span><span class="o">=</span><span class="n">module_feature_object</span><span class="o">.</span><span class="n">transition_counts</span>
+        <span class="n">y</span><span class="o">=</span><span class="n">module_feature_object</span><span class="o">.</span><span class="n">group_labels</span>
+        <span class="n">obj_type</span><span class="o">=</span><span class="s2">&quot;module transitions&quot;</span>
+    <span class="k">elif</span> <span class="n">module_feature_object</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="o">==</span><span class="s2">&quot;KeypointFeature&quot;</span><span class="p">:</span>
+        <span class="n">X</span><span class="o">=</span><span class="n">module_feature_object</span><span class="o">.</span><span class="n">keypoint_feature</span>
+        <span class="n">y</span><span class="o">=</span><span class="n">module_feature_object</span><span class="o">.</span><span class="n">group_labels</span>
+        <span class="n">obj_type</span><span class="o">=</span><span class="s2">&quot;keypoint feature&quot;</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s1">&#39;module_feature_object class must be ModuleUsage or ModuleTransitions, not </span><span class="si">{</span><span class="n">module_feature_object</span><span class="o">.</span><span class="vm">__class__</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;module_feature_object class must be ModuleUsage or ModuleTransitions or KeypointFeature, not </span><span class="si">{</span><span class="n">module_feature_object</span><span class="o">.</span><span class="vm">__class__</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="p">((</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;lda&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;LDA&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;lineardiscriminantanalysis&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span>
             <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;LinearDiscriminantAnalysis&quot;</span><span class="p">)):</span>
@@ -826,14 +958,19 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">loocv_preds</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">if</span> <span class="n">module_feature_object</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="o">==</span><span class="s2">&quot;ModuleUsage&quot;</span><span class="p">:</span>
-        <span class="n">X</span> <span class="o">=</span> <span class="n">module_feature_object</span><span class="o">.</span><span class="n">label_counts</span>
-        <span class="n">y</span> <span class="o">=</span> <span class="n">module_feature_object</span><span class="o">.</span><span class="n">group_labels</span>
-    <span class="k">elif</span> <span class="n">module_feature_object</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;ModuleTransitions&quot;</span><span class="p">:</span>
-        <span class="n">X</span> <span class="o">=</span> <span class="n">module_feature_object</span><span class="o">.</span><span class="n">transition_counts</span>
-        <span class="n">y</span> <span class="o">=</span> <span class="n">module_feature_object</span><span class="o">.</span><span class="n">group_labels</span>
+        <span class="n">X</span><span class="o">=</span><span class="n">module_feature_object</span><span class="o">.</span><span class="n">label_counts</span>
+        <span class="n">y</span><span class="o">=</span><span class="n">module_feature_object</span><span class="o">.</span><span class="n">group_labels</span>
+        <span class="n">obj_type</span><span class="o">=</span><span class="s2">&quot;module usage&quot;</span>
+    <span class="k">elif</span> <span class="n">module_feature_object</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="o">==</span><span class="s2">&quot;ModuleTransitions&quot;</span><span class="p">:</span>
+        <span class="n">X</span><span class="o">=</span><span class="n">module_feature_object</span><span class="o">.</span><span class="n">transition_counts</span>
+        <span class="n">y</span><span class="o">=</span><span class="n">module_feature_object</span><span class="o">.</span><span class="n">group_labels</span>
+        <span class="n">obj_type</span><span class="o">=</span><span class="s2">&quot;module transitions&quot;</span>
+    <span class="k">elif</span> <span class="n">module_feature_object</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="o">==</span><span class="s2">&quot;KeypointFeature&quot;</span><span class="p">:</span>
+        <span class="n">X</span><span class="o">=</span><span class="n">module_feature_object</span><span class="o">.</span><span class="n">keypoint_feature</span>
+        <span class="n">y</span><span class="o">=</span><span class="n">module_feature_object</span><span class="o">.</span><span class="n">group_labels</span>
+        <span class="n">obj_type</span><span class="o">=</span><span class="s2">&quot;keypoint feature&quot;</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s1">&#39;module_feature_object class must be ModuleUsage or ModuleTransitions, not </span><span class="si">{</span><span class="n">module_feature_object</span><span class="o">.</span><span class="vm">__class__</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;module_feature_object class must be ModuleUsage or ModuleTransitions or KeypointFeature, not </span><span class="si">{</span><span class="n">module_feature_object</span><span class="o">.</span><span class="vm">__class__</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">obs</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">)):</span>
         <span class="n">sub_X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">obs</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
         <span class="n">sub_y</span> <span class="o">=</span> <span class="n">y</span><span class="p">[:</span><span class="n">obs</span><span class="p">]</span> <span class="o">+</span> <span class="n">y</span><span class="p">[</span><span class="n">obs</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:]</span>
@@ -1024,17 +1161,20 @@
 <span class="sd">    :param method:</span>
 <span class="sd">    :return:</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">module_feature_object</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;ModuleUsage&quot;</span><span class="p">:</span>
-        <span class="n">X</span> <span class="o">=</span> <span class="n">module_feature_object</span><span class="o">.</span><span class="n">label_counts</span>
-        <span class="n">y</span> <span class="o">=</span> <span class="n">module_feature_object</span><span class="o">.</span><span class="n">group_labels</span>
-        <span class="n">obj_type</span> <span class="o">=</span> <span class="s2">&quot;module usage&quot;</span>
-    <span class="k">elif</span> <span class="n">module_feature_object</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;ModuleTransitions&quot;</span><span class="p">:</span>
-        <span class="n">X</span> <span class="o">=</span> <span class="n">module_feature_object</span><span class="o">.</span><span class="n">transition_counts</span>
-        <span class="n">y</span> <span class="o">=</span> <span class="n">module_feature_object</span><span class="o">.</span><span class="n">group_labels</span>
-        <span class="n">obj_type</span> <span class="o">=</span> <span class="s2">&quot;module transitions&quot;</span>
+    <span class="k">if</span> <span class="n">module_feature_object</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="o">==</span><span class="s2">&quot;ModuleUsage&quot;</span><span class="p">:</span>
+        <span class="n">X</span><span class="o">=</span><span class="n">module_feature_object</span><span class="o">.</span><span class="n">label_counts</span>
+        <span class="n">y</span><span class="o">=</span><span class="n">module_feature_object</span><span class="o">.</span><span class="n">group_labels</span>
+        <span class="n">obj_type</span><span class="o">=</span><span class="s2">&quot;module usage&quot;</span>
+    <span class="k">elif</span> <span class="n">module_feature_object</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="o">==</span><span class="s2">&quot;ModuleTransitions&quot;</span><span class="p">:</span>
+        <span class="n">X</span><span class="o">=</span><span class="n">module_feature_object</span><span class="o">.</span><span class="n">transition_counts</span>
+        <span class="n">y</span><span class="o">=</span><span class="n">module_feature_object</span><span class="o">.</span><span class="n">group_labels</span>
+        <span class="n">obj_type</span><span class="o">=</span><span class="s2">&quot;module transitions&quot;</span>
+    <span class="k">elif</span> <span class="n">module_feature_object</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="o">==</span><span class="s2">&quot;KeypointFeature&quot;</span><span class="p">:</span>
+        <span class="n">X</span><span class="o">=</span><span class="n">module_feature_object</span><span class="o">.</span><span class="n">keypoint_feature</span>
+        <span class="n">y</span><span class="o">=</span><span class="n">module_feature_object</span><span class="o">.</span><span class="n">group_labels</span>
+        <span class="n">obj_type</span><span class="o">=</span><span class="s2">&quot;keypoint feature&quot;</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s1">&#39;module_feature_object class must be ModuleUsage or ModuleTransitions, not </span><span class="si">{</span><span class="n">module_feature_object</span><span class="o">.</span><span class="vm">__class__</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;module_feature_object class must be ModuleUsage or ModuleTransitions or KeypointFeature, not </span><span class="si">{</span><span class="n">module_feature_object</span><span class="o">.</span><span class="vm">__class__</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
     <span class="n">centroids</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">X</span><span class="p">)),</span> <span class="nb">len</span><span class="p">(</span><span class="n">module_feature_object</span><span class="o">.</span><span class="n">feat_names</span><span class="p">)])</span>
     <span class="k">for</span> <span class="n">group</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">module_feature_object</span><span class="o">.</span><span class="n">group_labels</span><span class="p">)):</span>
         <span class="n">centroids</span><span class="p">[</span><span class="n">group</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">module_feature_object</span><span class="o">.</span><span class="n">group_labels</span><span class="p">)</span> <span class="o">==</span> <span class="n">group</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
@@ -1058,8 +1198,10 @@
         <span class="n">X</span><span class="o">=</span><span class="n">module_feature_object</span><span class="o">.</span><span class="n">label_counts</span>
     <span class="k">elif</span> <span class="n">module_feature_object</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="o">==</span><span class="s2">&quot;ModuleTransitions&quot;</span><span class="p">:</span>
         <span class="n">X</span><span class="o">=</span><span class="n">module_feature_object</span><span class="o">.</span><span class="n">transition_counts</span>
+    <span class="k">elif</span> <span class="n">module_feature_object</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="o">==</span><span class="s2">&quot;KeypointFeature&quot;</span><span class="p">:</span>
+        <span class="n">X</span><span class="o">=</span><span class="n">module_feature_object</span><span class="o">.</span><span class="n">keypoint_feature</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;module_feature_object class must be ModuleUsage or ModuleTransitions, not </span><span class="si">{</span><span class="n">module_feature_object</span><span class="o">.</span><span class="vm">__class__</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;module_feature_object class must be ModuleUsage or ModuleTransitions or KeypointFeature, not </span><span class="si">{</span><span class="n">module_feature_object</span><span class="o">.</span><span class="vm">__class__</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
     <span class="n">reverse_grp_dict</span> <span class="o">=</span> <span class="p">{</span><span class="n">v</span><span class="p">:</span> <span class="n">k</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">module_feature_object</span><span class="o">.</span><span class="n">group_dict</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
     <span class="n">dose_labels</span> <span class="o">=</span> <span class="p">[</span><span class="n">dose_dict</span><span class="p">[</span><span class="n">reverse_grp_dict</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">module_feature_object</span><span class="o">.</span><span class="n">group_labels</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">method</span><span class="o">==</span><span class="s2">&quot;LinearRegression&quot;</span><span class="p">:</span>
@@ -1084,10 +1226,18 @@
     <span class="n">loocv_preds</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">if</span> <span class="n">module_feature_object</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="o">==</span><span class="s2">&quot;ModuleUsage&quot;</span><span class="p">:</span>
         <span class="n">X</span><span class="o">=</span><span class="n">module_feature_object</span><span class="o">.</span><span class="n">label_counts</span>
+        <span class="n">y</span><span class="o">=</span><span class="n">module_feature_object</span><span class="o">.</span><span class="n">group_labels</span>
+        <span class="n">obj_type</span><span class="o">=</span><span class="s2">&quot;module usage&quot;</span>
     <span class="k">elif</span> <span class="n">module_feature_object</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="o">==</span><span class="s2">&quot;ModuleTransitions&quot;</span><span class="p">:</span>
         <span class="n">X</span><span class="o">=</span><span class="n">module_feature_object</span><span class="o">.</span><span class="n">transition_counts</span>
+        <span class="n">y</span><span class="o">=</span><span class="n">module_feature_object</span><span class="o">.</span><span class="n">group_labels</span>
+        <span class="n">obj_type</span><span class="o">=</span><span class="s2">&quot;module transitions&quot;</span>
+    <span class="k">elif</span> <span class="n">module_feature_object</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="o">==</span><span class="s2">&quot;KeypointFeature&quot;</span><span class="p">:</span>
+        <span class="n">X</span><span class="o">=</span><span class="n">module_feature_object</span><span class="o">.</span><span class="n">keypoint_feature</span>
+        <span class="n">y</span><span class="o">=</span><span class="n">module_feature_object</span><span class="o">.</span><span class="n">group_labels</span>
+        <span class="n">obj_type</span><span class="o">=</span><span class="s2">&quot;keypoint feature&quot;</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;module_feature_object class must be ModuleUsage or ModuleTransitions, not </span><span class="si">{</span><span class="n">module_feature_object</span><span class="o">.</span><span class="vm">__class__</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;module_feature_object class must be ModuleUsage or ModuleTransitions or KeypointFeature, not </span><span class="si">{</span><span class="n">module_feature_object</span><span class="o">.</span><span class="vm">__class__</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
     <span class="n">reverse_grp_dict</span> <span class="o">=</span> <span class="p">{</span><span class="n">v</span><span class="p">:</span> <span class="n">k</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">module_feature_object</span><span class="o">.</span><span class="n">group_dict</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
     <span class="n">y</span> <span class="o">=</span> <span class="p">[</span><span class="n">dose_dict</span><span class="p">[</span><span class="n">reverse_grp_dict</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">module_feature_object</span><span class="o">.</span><span class="n">group_labels</span><span class="p">]</span>
     <span class="k">for</span> <span class="n">obs</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">)):</span>

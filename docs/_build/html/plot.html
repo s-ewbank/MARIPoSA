@@ -45,6 +45,12 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="demo/Demo1-ProjectCreation.html">Demo 1: Project Creation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="demo/Demo2-PoseSegmentation-Visualize.html">Demo 2: Visualization of Pose Module Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="demo/Demo3-PoseSegmentation-Embed.html">Demo 3: Embedding of Pose Segmentation Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="demo/Demo4-PoseSegmentation-ClassificationAndRegression.html">Demo 4: Regression and Classification of Group Conditions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="demo/Demo5-PoseSegmentation-ManualScoring.html">Demo 5: Comparing Pose Modules to Manual Scoring Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="demo/Demo6-PoseSegmentation-Simulation.html">Demo 6: Simulating Pose Segmentation Data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="metadata.html">Metadata</a></li>
 <li class="toctree-l1"><a class="reference internal" href="analyze.html">Analyze</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Plot</a><ul>
@@ -54,7 +60,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#utils.plot.plot_distance_matrix"><code class="docutils literal notranslate"><span class="pre">plot_distance_matrix()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#utils.plot.plot_distance_results"><code class="docutils literal notranslate"><span class="pre">plot_distance_results()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#utils.plot.plot_embeddings"><code class="docutils literal notranslate"><span class="pre">plot_embeddings()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#utils.plot.plot_keypoint_displacement_bins"><code class="docutils literal notranslate"><span class="pre">plot_keypoint_displacement_bins()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#utils.plot.plot_keypoint_travel"><code class="docutils literal notranslate"><span class="pre">plot_keypoint_travel()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#utils.plot.plot_module_usage"><code class="docutils literal notranslate"><span class="pre">plot_module_usage()</span></code></a></li>
 </ul>
 </li>
@@ -89,14 +95,16 @@
 <span id="plot"></span><h1>Plot<a class="headerlink" href="#module-utils.plot" title="Permalink to this heading"></a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="utils.plot.module_usage_sandplot">
-<span class="sig-prename descclassname"><span class="pre">utils.plot.</span></span><span class="sig-name descname"><span class="pre">module_usage_sandplot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">module_usage</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">BORIS_to_pose_mat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">long_legend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figW</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">7</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figH</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">convolve</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">window</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/utils/plot.html#module_usage_sandplot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.plot.module_usage_sandplot" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">utils.plot.</span></span><span class="sig-name descname"><span class="pre">module_usage_sandplot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">module_usage</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">BORIS_to_pose_mat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">long_legend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figW</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">7</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figH</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">convolve</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">window</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/utils/plot.html#module_usage_sandplot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.plot.module_usage_sandplot" title="Permalink to this definition"></a></dt>
 <dd><p>new sandplot function</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>config</strong> – </p></li>
+<li><p><strong>config</strong> – the config object</p></li>
 <li><p><strong>module_usage</strong> – </p></li>
-<li><p><strong>BORIS_to_pose_mat</strong> – </p></li>
+<li><p><strong>BORIS_to_pose_mat</strong> – optional BORIS_to_pose_mat from analyze.boris_to_pose to re-align modules by their most overlapping manually scored behavior class</p></li>
+<li><p><strong>title</strong> – </p></li>
+<li><p><strong>legend</strong> – plot legend or not</p></li>
 <li><p><strong>long_legend</strong> – </p></li>
 <li><p><strong>convolve</strong> – </p></li>
 <li><p><strong>window</strong> – </p></li>
@@ -111,21 +119,21 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="utils.plot.network_plot">
 <span class="sig-prename descclassname"><span class="pre">utils.plot.</span></span><span class="sig-name descname"><span class="pre">network_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels_df</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">module_usage</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">module_transitions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'bwr'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scaling</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tscale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">6</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figW</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figH</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alt_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/utils/plot.html#network_plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.plot.network_plot" title="Permalink to this definition"></a></dt>
-<dd><p>Plot network comparison</p>
+<dd><p>Plot network comparison. You must provide EITHER labels_df OR module_usage and module_tsransitions</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>config</strong> – </p></li>
-<li><p><strong>labels_df</strong> – </p></li>
-<li><p><strong>module_usage</strong> – </p></li>
-<li><p><strong>module_feature_object</strong> – </p></li>
-<li><p><strong>cmap</strong> – </p></li>
-<li><p><strong>include_labels</strong> – </p></li>
-<li><p><strong>scaling</strong> – </p></li>
-<li><p><strong>tscale</strong> – </p></li>
-<li><p><strong>figW</strong> – </p></li>
-<li><p><strong>figH</strong> – </p></li>
-<li><p><strong>alt_labels</strong> – </p></li>
+<li><p><strong>config</strong> – project config object</p></li>
+<li><p><strong>labels_df</strong> – labels_df for two groups to be compared; if provided, ModuleUsage and ModuleTransitions will be computed</p></li>
+<li><p><strong>module_usage</strong> – ModuleUsage object for comparison between two groups (not needed if labels_df is provided)</p></li>
+<li><p><strong>module_transitions</strong> – ModuleTransitions object for comparison between two groups (not needed if labels_df is provided)</p></li>
+<li><p><strong>cmap</strong> – color map</p></li>
+<li><p><strong>include_labels</strong> – True or False; default True</p></li>
+<li><p><strong>scaling</strong> – controls size of nodes in network plot; larger –&gt; bigger; default 1</p></li>
+<li><p><strong>tscale</strong> – vmax and vmin for tscore; default 6</p></li>
+<li><p><strong>figW</strong> – figure width</p></li>
+<li><p><strong>figH</strong> – figure height</p></li>
+<li><p><strong>alt_labels</strong> – possible alt labels</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -222,8 +230,8 @@
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="utils.plot.plot_keypoint_displacement_bins">
-<span class="sig-prename descclassname"><span class="pre">utils.plot.</span></span><span class="sig-name descname"><span class="pre">plot_keypoint_displacement_bins</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dist_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'viridis'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plottype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'band'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figW</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">6</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figH</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/utils/plot.html#plot_keypoint_displacement_bins"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.plot.plot_keypoint_displacement_bins" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="utils.plot.plot_keypoint_travel">
+<span class="sig-prename descclassname"><span class="pre">utils.plot.</span></span><span class="sig-name descname"><span class="pre">plot_keypoint_travel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">keypoint_feature</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'viridis'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plottype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'band'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figW</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">6</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figH</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/utils/plot.html#plot_keypoint_travel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.plot.plot_keypoint_travel" title="Permalink to this definition"></a></dt>
 <dd><p>Plots displacement of a keypoint either over time or in bins from dist_df (output of analyze.dist_df_subgroups)</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>

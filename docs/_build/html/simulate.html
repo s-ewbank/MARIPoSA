@@ -44,6 +44,12 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="demo/Demo1-ProjectCreation.html">Demo 1: Project Creation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="demo/Demo2-PoseSegmentation-Visualize.html">Demo 2: Visualization of Pose Module Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="demo/Demo3-PoseSegmentation-Embed.html">Demo 3: Embedding of Pose Segmentation Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="demo/Demo4-PoseSegmentation-ClassificationAndRegression.html">Demo 4: Regression and Classification of Group Conditions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="demo/Demo5-PoseSegmentation-ManualScoring.html">Demo 5: Comparing Pose Modules to Manual Scoring Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="demo/Demo6-PoseSegmentation-Simulation.html">Demo 6: Simulating Pose Segmentation Data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="metadata.html">Metadata</a></li>
 <li class="toctree-l1"><a class="reference internal" href="analyze.html">Analyze</a></li>
 <li class="toctree-l1"><a class="reference internal" href="plot.html">Plot</a></li>
@@ -82,7 +88,7 @@
 <span id="simulate"></span><h1>Simulate<a class="headerlink" href="#module-utils.simulate" title="Permalink to this heading"></a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="utils.simulate.generate_sequence">
-<span class="sig-prename descclassname"><span class="pre">utils.simulate.</span></span><span class="sig-name descname"><span class="pre">generate_sequence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">T</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/utils/simulate.html#generate_sequence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.simulate.generate_sequence" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">utils.simulate.</span></span><span class="sig-name descname"><span class="pre">generate_sequence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">T</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">42</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/utils/simulate.html#generate_sequence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.simulate.generate_sequence" title="Permalink to this definition"></a></dt>
 <dd><p>Generate individual simulated pose module label sequence of length T (noting that T = number of observations, not time)</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -90,6 +96,7 @@
 <li><p><strong>config</strong> – the config object</p></li>
 <li><p><strong>labels_df</strong> – labels_df from analyze.get_module_labels</p></li>
 <li><p><strong>T</strong> – length of sequence to be generated</p></li>
+<li><p><strong>random_state</strong> – random state seed (default: 42</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -100,13 +107,14 @@
 
 <dl class="py function">
 <dt class="sig sig-object py" id="utils.simulate.generate_usage">
-<span class="sig-prename descclassname"><span class="pre">utils.simulate.</span></span><span class="sig-name descname"><span class="pre">generate_usage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">module_feature_object</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_samples</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/utils/simulate.html#generate_usage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.simulate.generate_usage" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">utils.simulate.</span></span><span class="sig-name descname"><span class="pre">generate_usage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">module_feature_object</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_samples</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_bootstraps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bootstrap_fraction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">42</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/utils/simulate.html#generate_usage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.simulate.generate_usage" title="Permalink to this definition"></a></dt>
 <dd><p>Generate simulated pose module usage object</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>module_feature_object</strong> – module feature object of class ModuleUsage (from analyze.get_module_usage) or ModuleTransitions (from analyze.get_module_transitions)</p></li>
 <li><p><strong>n_samples</strong> – number of samples to generate</p></li>
+<li><p><strong>random_state</strong> – random state seed (default: 42</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>

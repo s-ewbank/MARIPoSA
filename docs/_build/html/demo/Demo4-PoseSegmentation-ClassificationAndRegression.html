@@ -1,0 +1,423 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Demo 4: Regression and Classification of Group Conditions &mdash; MARIPoSA 0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=44496db0"></script>
+      <script src="../_static/doctools.js?v=888ff710"></script>
+      <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Demo 5: Comparing Pose Modules to Manual Scoring Data" href="Demo5-PoseSegmentation-ManualScoring.html" />
+    <link rel="prev" title="Demo 3: Embedding of Pose Segmentation Data" href="Demo3-PoseSegmentation-Embed.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            MARIPoSA
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="Demo1-ProjectCreation.html">Demo 1: Project Creation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Demo2-PoseSegmentation-Visualize.html">Demo 2: Visualization of Pose Module Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Demo3-PoseSegmentation-Embed.html">Demo 3: Embedding of Pose Segmentation Data</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Demo 4: Regression and Classification of Group Conditions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#classification">4.1: Classification</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#regression">4.2: Regression</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="Demo5-PoseSegmentation-ManualScoring.html">Demo 5: Comparing Pose Modules to Manual Scoring Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Demo6-PoseSegmentation-Simulation.html">Demo 6: Simulating Pose Segmentation Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../metadata.html">Metadata</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../analyze.html">Analyze</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../plot.html">Plot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../simulate.html">Simulate</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">MARIPoSA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Demo 4: Regression and Classification of Group Conditions</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/demo/Demo4-PoseSegmentation-ClassificationAndRegression.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="demo-4-regression-and-classification-of-group-conditions">
+<h1>Demo 4: Regression and Classification of Group Conditions<a class="headerlink" href="#demo-4-regression-and-classification-of-group-conditions" title="Permalink to this heading"></a></h1>
+<p><em>Written and last updated July 19, 2025 by Sedona Ewbank, snewbank&#64;stanford.edu</em></p>
+<p>The purpose of this demo is to demonstrate how to classify and/or regress group conditions from pose segmentation data.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># A few extra imports this time for manipulating the results and viewing them!</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">importlib</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="c1">#This block only important for running as script</span>
+<span class="c1">#script_dir = os.path.dirname(os.path.abspath(__file__))</span>
+<span class="n">mariposa_dir</span> <span class="o">=</span> <span class="s2">&quot;/Users/snewbank/PycharmProjects/MARIPoSA&quot;</span>
+<span class="n">utils_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">mariposa_dir</span><span class="p">,</span> <span class="s1">&#39;utils&#39;</span><span class="p">)</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">utils_dir</span><span class="p">)</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mariposa_dir</span><span class="p">)</span>
+
+<span class="c1">#import utils</span>
+<span class="kn">from</span> <span class="nn">utils</span> <span class="kn">import</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">analyze</span><span class="p">,</span> <span class="n">plot</span><span class="p">,</span> <span class="n">simulate</span>
+
+<span class="n">importlib</span><span class="o">.</span><span class="n">reload</span><span class="p">(</span><span class="n">metadata</span><span class="p">)</span>
+<span class="n">importlib</span><span class="o">.</span><span class="n">reload</span><span class="p">(</span><span class="n">analyze</span><span class="p">)</span>
+<span class="n">importlib</span><span class="o">.</span><span class="n">reload</span><span class="p">(</span><span class="n">plot</span><span class="p">)</span>
+<span class="n">importlib</span><span class="o">.</span><span class="n">reload</span><span class="p">(</span><span class="n">simulate</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;module &#39;utils.simulate&#39; from &#39;/Users/snewbank/PycharmProjects/MARIPoSA/utils/simulate.py&#39;&gt;
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">demo_dir</span><span class="o">=</span><span class="s2">&quot;/Users/snewbank/Behavior/MARIPoSA_demo_data/&quot;</span>
+<span class="n">config</span><span class="o">=</span><span class="n">metadata</span><span class="o">.</span><span class="n">load_project</span><span class="p">(</span><span class="n">demo_dir</span><span class="o">+</span><span class="s2">&quot;250719_test/config_PS.yaml&quot;</span><span class="p">)</span>
+<span class="n">save</span><span class="o">=</span><span class="kc">True</span>
+<span class="n">save_path</span> <span class="o">=</span> <span class="n">demo_dir</span><span class="o">+</span><span class="s2">&quot;demo_figures/&quot;</span>
+<span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">save_path</span><span class="p">):</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">save_path</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<section id="classification">
+<h2>4.1: Classification<a class="headerlink" href="#classification" title="Permalink to this heading"></a></h2>
+<p>There are two main functions of interest to us here: analyze.classify() and analyze.loocv(). analyze.classify does classification by the desired method based on the entire dataset (only really recommended if the classifier is to be used on additional held-out data), and analyze.loocv does cross-validation of a classification method via leave-one-out cross-validation and gives the prediction for every sample when it is held out (useful for conveying the classification results).</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">help</span><span class="p">(</span><span class="n">analyze</span><span class="o">.</span><span class="n">classify</span><span class="p">)</span>
+<span class="n">help</span><span class="p">(</span><span class="n">analyze</span><span class="o">.</span><span class="n">loocv</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Help on function classify in module utils.analyze:
+
+classify(module_feature_object, method=&#39;lda&#39;)
+    Classify pose segmentation data using either module usage or transitions
+    
+    :param module_feature_object: ModuleUsage or ModuleTransitions object
+    :param method: classification method to use; options include &quot;lda&quot;, &quot;logisticregression&quot;, &quot;mlp&quot;, &quot;naivebayes&quot;, &quot;knn&quot;, or &quot;randomforest&quot;
+    :return: classifier
+
+Help on function loocv in module utils.analyze:
+
+loocv(module_feature_object, method=&#39;lda&#39;)
+    Perform leave-one-out cross-validation for a method of classifying pose segmentation data using either module usage or transitions
+    
+    :param module_feature_object: ModuleUsage or ModuleTransitions object
+    :param method: classification method to use; options include &quot;lda&quot;, &quot;logisticregression&quot;, &quot;mlp&quot;, &quot;naivebayes&quot;, &quot;knn&quot;, or &quot;randomforest&quot;
+    :return: accuracy, conf_mat
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">labels_df</span> <span class="o">=</span> <span class="n">analyze</span><span class="o">.</span><span class="n">get_module_labels</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1200</span><span class="p">,</span> <span class="n">subgroups</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;sal&quot;</span><span class="p">,</span><span class="s2">&quot;k1&quot;</span><span class="p">,</span><span class="s2">&quot;k5&quot;</span><span class="p">,</span><span class="s2">&quot;k10&quot;</span><span class="p">])</span>
+<span class="n">module_usage</span> <span class="o">=</span> <span class="n">analyze</span><span class="o">.</span><span class="n">get_module_usage</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">labels_df</span><span class="p">,</span> <span class="n">binsize</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
+<span class="n">module_usage</span> <span class="o">=</span> <span class="n">module_usage</span><span class="o">.</span><span class="n">scale</span><span class="p">()</span>
+
+<span class="n">accuracy</span><span class="p">,</span> <span class="n">conf_mat</span> <span class="o">=</span> <span class="n">analyze</span><span class="o">.</span><span class="n">loocv</span><span class="p">(</span><span class="n">module_usage</span><span class="p">,</span><span class="n">method</span><span class="o">=</span><span class="s2">&quot;logisticregression&quot;</span><span class="p">)</span>
+    
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Logistic regression LOOCV accuracy: </span><span class="se">\n</span><span class="si">{</span><span class="n">accuracy</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Logistic regression LOOCV confusion matrix: </span><span class="se">\n</span><span class="si">{</span><span class="n">conf_mat</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="n">save</span><span class="p">:</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">save_path</span><span class="o">+</span><span class="s2">&quot;demo4-1_LR-confmat.png&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Logistic regression LOOCV accuracy: 
+0.7692307692307693
+Logistic regression LOOCV confusion matrix: 
+[[6. 1. 0. 0.]
+ [5. 1. 0. 0.]
+ [0. 0. 6. 0.]
+ [0. 0. 0. 7.]]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;Figure size 640x480 with 0 Axes&gt;
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">method_acc</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">method_cmat</span> <span class="o">=</span> <span class="p">{}</span>
+
+<span class="n">labels_df</span> <span class="o">=</span> <span class="n">analyze</span><span class="o">.</span><span class="n">get_module_labels</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1200</span><span class="p">,</span> <span class="n">subgroups</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;sal&quot;</span><span class="p">,</span><span class="s2">&quot;k1&quot;</span><span class="p">,</span><span class="s2">&quot;k5&quot;</span><span class="p">,</span><span class="s2">&quot;k10&quot;</span><span class="p">])</span>
+<span class="n">module_usage</span> <span class="o">=</span> <span class="n">analyze</span><span class="o">.</span><span class="n">get_module_usage</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">labels_df</span><span class="p">,</span> <span class="n">binsize</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
+<span class="n">module_usage</span> <span class="o">=</span> <span class="n">module_usage</span><span class="o">.</span><span class="n">scale</span><span class="p">()</span>
+<span class="n">module_transitions</span> <span class="o">=</span> <span class="n">analyze</span><span class="o">.</span><span class="n">get_module_transitions</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">labels_df</span><span class="p">)</span>
+<span class="n">module_transitions</span> <span class="o">=</span> <span class="n">module_transitions</span><span class="o">.</span><span class="n">scale</span><span class="p">()</span>
+
+<span class="k">for</span> <span class="n">method</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;LogisticRegression&quot;</span><span class="p">,</span><span class="s2">&quot;LDA&quot;</span><span class="p">,</span><span class="s2">&quot;MLP&quot;</span><span class="p">,</span><span class="s2">&quot;NaiveBayes&quot;</span><span class="p">,</span><span class="s2">&quot;KNN&quot;</span><span class="p">,</span><span class="s2">&quot;RandomForest&quot;</span><span class="p">]:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">method</span><span class="p">)</span>
+    <span class="n">method_acc</span><span class="p">[</span><span class="n">method</span><span class="o">+</span><span class="s2">&quot; usage&quot;</span><span class="p">],</span> <span class="n">method_cmat</span><span class="p">[</span><span class="n">method</span><span class="o">+</span><span class="s2">&quot; usage&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">analyze</span><span class="o">.</span><span class="n">loocv</span><span class="p">(</span><span class="n">module_usage</span><span class="p">,</span><span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">)</span>
+    <span class="n">clf</span> <span class="o">=</span> <span class="n">analyze</span><span class="o">.</span><span class="n">classify</span><span class="p">(</span><span class="n">module_usage</span><span class="p">,</span><span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">)</span>
+    <span class="n">method_acc</span><span class="p">[</span><span class="n">method</span><span class="o">+</span><span class="s2">&quot; tx&quot;</span><span class="p">],</span> <span class="n">method_cmat</span><span class="p">[</span><span class="n">method</span><span class="o">+</span><span class="s2">&quot; tx&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">analyze</span><span class="o">.</span><span class="n">loocv</span><span class="p">(</span><span class="n">module_transitions</span><span class="p">,</span><span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">)</span>
+    <span class="n">clf</span> <span class="o">=</span> <span class="n">analyze</span><span class="o">.</span><span class="n">classify</span><span class="p">(</span><span class="n">module_transitions</span><span class="p">,</span><span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">)</span>
+    
+<span class="n">xticks</span><span class="o">=</span><span class="p">[]</span>
+<span class="n">xticklabels</span><span class="o">=</span><span class="p">[]</span>
+<span class="n">jet</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">get_cmap</span><span class="p">(</span><span class="s2">&quot;jet&quot;</span><span class="p">)</span>
+<span class="n">colors</span><span class="o">=</span><span class="p">[</span><span class="n">jet</span><span class="p">([</span><span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mf">0.15</span><span class="p">)]</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="mi">4</span><span class="p">),</span><span class="n">dpi</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">key</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">method_acc</span><span class="o">.</span><span class="n">keys</span><span class="p">())):</span>
+    <span class="k">if</span> <span class="s2">&quot; usage&quot;</span> <span class="ow">in</span> <span class="n">key</span><span class="p">:</span>
+        <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">k</span><span class="p">,</span><span class="n">method_acc</span><span class="p">[</span><span class="n">key</span><span class="p">],</span><span class="n">color</span><span class="o">=</span><span class="n">colors</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">trunc</span><span class="p">(</span><span class="n">k</span><span class="o">/</span><span class="mi">2</span><span class="p">))])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">k</span><span class="p">,</span><span class="n">method_acc</span><span class="p">[</span><span class="n">key</span><span class="p">],</span><span class="n">edgecolor</span><span class="o">=</span><span class="n">colors</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">trunc</span><span class="p">(</span><span class="n">k</span><span class="o">/</span><span class="mi">2</span><span class="p">))],</span><span class="n">color</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">,</span><span class="n">hatch</span><span class="o">=</span><span class="s2">&quot;//////&quot;</span><span class="p">)</span>
+    <span class="n">xticks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+    <span class="n">xticklabels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">xticks</span><span class="p">,</span><span class="n">labels</span><span class="o">=</span><span class="n">xticklabels</span><span class="p">,</span><span class="n">rotation</span><span class="o">=</span><span class="mi">90</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Accuracy&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="k">if</span> <span class="n">save</span><span class="p">:</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">save_path</span><span class="o">+</span><span class="s2">&quot;demo4-1_classif_compare.png&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>LogisticRegression
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>LDA
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>MLP
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>NaiveBayes
+KNN
+RandomForest
+</pre></div>
+</div>
+<img alt="../_images/360b146b9938b150052562a5f984c41157cfbd4c79555963a359d6b3cfaa3d8a.png" src="../_images/360b146b9938b150052562a5f984c41157cfbd4c79555963a359d6b3cfaa3d8a.png" />
+</div>
+</div>
+</section>
+<section id="regression">
+<h2>4.2: Regression<a class="headerlink" href="#regression" title="Permalink to this heading"></a></h2>
+<p>If your classes actually correspond to a continuous variable (e.g., doses of a drug or stimulus intensity), it could be more informative to do regression as opposed to classification. We can do this using the analyze.regress and analyze.loocv_regression functions, and the only thing we need to add is a dictionary (dose_dict) relating our string subgroup names to the corresponding intensity/dose.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">help</span><span class="p">(</span><span class="n">analyze</span><span class="o">.</span><span class="n">regress</span><span class="p">)</span>
+<span class="n">help</span><span class="p">(</span><span class="n">analyze</span><span class="o">.</span><span class="n">loocv_regression</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Help on function regress in module utils.analyze:
+
+regress(module_feature_object, dose_dict, method=&#39;LinearRegression&#39;, alpha=1)
+
+Help on function loocv_regression in module utils.analyze:
+
+loocv_regression(module_feature_object, dose_dict, method=&#39;LinearRegression&#39;, constrain_pos=True, alpha=1)
+    Perform LOOCV for linear regression
+    
+    :param module_feature_object:
+    :param dose_dict:
+    :param method:
+    :param constrain_pos:
+    :param alpha:
+    :return:
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dose_dict</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;sal&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;k1&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;k5&#39;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="s1">&#39;k10&#39;</span><span class="p">:</span> <span class="mi">10</span><span class="p">}</span>
+
+<span class="n">labels_df</span> <span class="o">=</span> <span class="n">analyze</span><span class="o">.</span><span class="n">get_module_labels</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1200</span><span class="p">,</span><span class="n">subgroups</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;sal&quot;</span><span class="p">,</span><span class="s2">&quot;k1&quot;</span><span class="p">,</span><span class="s2">&quot;k5&quot;</span><span class="p">,</span><span class="s2">&quot;k10&quot;</span><span class="p">])</span>
+<span class="n">all_module_usage</span> <span class="o">=</span> <span class="n">analyze</span><span class="o">.</span><span class="n">get_module_usage</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">labels_df</span><span class="p">)</span>
+<span class="n">all_module_usage</span> <span class="o">=</span> <span class="n">all_module_usage</span><span class="o">.</span><span class="n">scale</span><span class="p">()</span>
+
+<span class="n">cmap</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">get_cmap</span><span class="p">(</span><span class="s2">&quot;viridis_r&quot;</span><span class="p">)</span>
+
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mf">2.2</span><span class="p">,</span><span class="mf">2.5</span><span class="p">),</span><span class="n">dpi</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;True Dose&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Predicted Dose&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">([</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span><span class="mi">12</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">([</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span><span class="mi">12</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axline</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span><span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;dashed&quot;</span><span class="p">,</span><span class="n">color</span><span class="o">=</span><span class="s2">&quot;gray&quot;</span><span class="p">)</span>
+<span class="n">reg</span><span class="p">,</span> <span class="n">dose_labels</span> <span class="o">=</span> <span class="n">analyze</span><span class="o">.</span><span class="n">regress</span><span class="p">(</span><span class="n">all_module_usage</span><span class="p">,</span><span class="n">dose_dict</span><span class="p">,</span><span class="n">method</span><span class="o">=</span><span class="s2">&quot;LinearRegression&quot;</span><span class="p">)</span>
+<span class="n">y_hat</span> <span class="o">=</span> <span class="n">reg</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">all_module_usage</span><span class="o">.</span><span class="n">label_counts</span><span class="p">)</span>
+<span class="n">loocv_preds</span><span class="p">,</span> <span class="n">sq_err</span> <span class="o">=</span> <span class="n">analyze</span><span class="o">.</span><span class="n">loocv_regression</span><span class="p">(</span><span class="n">all_module_usage</span><span class="p">,</span><span class="n">dose_dict</span><span class="p">,</span><span class="n">method</span><span class="o">=</span><span class="s2">&quot;LinearRegression&quot;</span><span class="p">)</span>
+<span class="n">dose_cats</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">dose_labels</span><span class="p">)</span>
+<span class="n">colors</span> <span class="o">=</span> <span class="p">[</span><span class="n">cmap</span><span class="p">([</span><span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">dose_cats</span><span class="p">))]</span>
+<span class="k">for</span> <span class="n">d</span><span class="p">,</span> <span class="n">do</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">dose_cats</span><span class="p">):</span>
+    <span class="n">y_d_hat</span> <span class="o">=</span> <span class="n">loocv_preds</span><span class="p">[</span><span class="n">dose_labels</span><span class="o">==</span><span class="n">do</span><span class="p">]</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">errorbar</span><span class="p">(</span><span class="n">do</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">y_d_hat</span><span class="p">),</span><span class="n">yerr</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">y_d_hat</span><span class="p">),</span><span class="n">marker</span><span class="o">=</span><span class="s2">&quot;o&quot;</span><span class="p">,</span><span class="n">capsize</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">color</span><span class="o">=</span><span class="n">colors</span><span class="p">[</span><span class="n">d</span><span class="p">])</span>
+<span class="n">rmse</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">sq_err</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Linear Regression</span><span class="se">\n</span><span class="s1">RMSE=</span><span class="si">{</span><span class="n">rmse</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Linear Regression</span><span class="se">\n</span><span class="s1">RMSE=</span><span class="si">{</span><span class="n">rmse</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="k">if</span> <span class="n">save</span><span class="p">:</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">save_path</span><span class="o">+</span><span class="s2">&quot;demo4-2_linear_regression.png&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Linear Regression
+RMSE=1.99
+</pre></div>
+</div>
+<img alt="../_images/d1c2629d00bc7ae813acafe9b729e4059a399c532530a333cdd15eda378840a7.png" src="../_images/d1c2629d00bc7ae813acafe9b729e4059a399c532530a333cdd15eda378840a7.png" />
+</div>
+</div>
+<p>As with classification, we can use various approaches (here, linear regression with no regularization or with lasso or ridge regularization with the alpha set) and compare their performance on each of module usage and transitions.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dose_dict</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;sal&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;k1&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;k5&#39;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="s1">&#39;k10&#39;</span><span class="p">:</span> <span class="mi">10</span><span class="p">}</span>
+
+<span class="n">labels_df</span> <span class="o">=</span> <span class="n">analyze</span><span class="o">.</span><span class="n">get_module_labels</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1200</span><span class="p">,</span><span class="n">subgroups</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;sal&quot;</span><span class="p">,</span><span class="s2">&quot;k1&quot;</span><span class="p">,</span><span class="s2">&quot;k5&quot;</span><span class="p">,</span><span class="s2">&quot;k10&quot;</span><span class="p">])</span>
+<span class="n">all_module_usage</span> <span class="o">=</span> <span class="n">analyze</span><span class="o">.</span><span class="n">get_module_usage</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">labels_df</span><span class="p">,</span><span class="n">binsize</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
+<span class="n">all_module_usage</span> <span class="o">=</span> <span class="n">all_module_usage</span><span class="o">.</span><span class="n">scale</span><span class="p">()</span>
+<span class="n">all_module_tx</span> <span class="o">=</span> <span class="n">analyze</span><span class="o">.</span><span class="n">get_module_transitions</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">labels_df</span><span class="p">)</span>
+<span class="n">all_module_tx</span> <span class="o">=</span> <span class="n">all_module_tx</span><span class="o">.</span><span class="n">scale</span><span class="p">()</span>
+
+<span class="n">cmap</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">get_cmap</span><span class="p">(</span><span class="s2">&quot;viridis_r&quot;</span><span class="p">)</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mf">8.5</span><span class="p">,</span><span class="mf">4.5</span><span class="p">),</span><span class="n">dpi</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">d</span><span class="p">,</span><span class="n">dat</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">([</span><span class="s2">&quot;Usage&quot;</span><span class="p">,</span><span class="s2">&quot;Tx&quot;</span><span class="p">]):</span>
+    <span class="k">for</span> <span class="n">m</span><span class="p">,</span><span class="n">method</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">([[</span><span class="s2">&quot;LinearRegression&quot;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">],[</span><span class="s2">&quot;Lasso&quot;</span><span class="p">,</span><span class="mf">0.1</span><span class="p">],[</span><span class="s2">&quot;Lasso&quot;</span><span class="p">,</span><span class="mf">0.5</span><span class="p">],[</span><span class="s2">&quot;Ridge&quot;</span><span class="p">,</span><span class="mf">0.1</span><span class="p">],[</span><span class="s2">&quot;Ridge&quot;</span><span class="p">,</span><span class="mf">0.5</span><span class="p">]]):</span>
+        <span class="n">ax</span><span class="p">[</span><span class="n">d</span><span class="p">,</span><span class="n">m</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;True Dose&quot;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="p">[</span><span class="n">d</span><span class="p">,</span><span class="n">m</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Predicted Dose&quot;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="p">[</span><span class="n">d</span><span class="p">,</span><span class="n">m</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">([</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span><span class="mi">12</span><span class="p">])</span>
+        <span class="n">ax</span><span class="p">[</span><span class="n">d</span><span class="p">,</span><span class="n">m</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">([</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span><span class="mi">12</span><span class="p">])</span>
+        <span class="n">ax</span><span class="p">[</span><span class="n">d</span><span class="p">,</span><span class="n">m</span><span class="p">]</span><span class="o">.</span><span class="n">axline</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span><span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;dashed&quot;</span><span class="p">,</span><span class="n">color</span><span class="o">=</span><span class="s2">&quot;gray&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">dat</span><span class="o">==</span><span class="s2">&quot;Usage&quot;</span><span class="p">:</span>
+            <span class="n">reg</span><span class="p">,</span> <span class="n">dose_labels</span> <span class="o">=</span> <span class="n">analyze</span><span class="o">.</span><span class="n">regress</span><span class="p">(</span><span class="n">all_module_usage</span><span class="p">,</span><span class="n">dose_dict</span><span class="p">,</span><span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">alpha</span><span class="o">=</span><span class="n">method</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">y_hat</span> <span class="o">=</span> <span class="n">reg</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">all_module_usage</span><span class="o">.</span><span class="n">label_counts</span><span class="p">)</span>
+            <span class="n">loocv_preds</span><span class="p">,</span> <span class="n">sq_err</span> <span class="o">=</span> <span class="n">analyze</span><span class="o">.</span><span class="n">loocv_regression</span><span class="p">(</span><span class="n">all_module_usage</span><span class="p">,</span><span class="n">dose_dict</span><span class="p">,</span><span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">alpha</span><span class="o">=</span><span class="n">method</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="n">dat</span><span class="o">==</span><span class="s2">&quot;Tx&quot;</span><span class="p">:</span>
+            <span class="n">reg</span><span class="p">,</span> <span class="n">dose_labels</span> <span class="o">=</span> <span class="n">analyze</span><span class="o">.</span><span class="n">regress</span><span class="p">(</span><span class="n">all_module_tx</span><span class="p">,</span><span class="n">dose_dict</span><span class="p">,</span><span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">alpha</span><span class="o">=</span><span class="n">method</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">y_hat</span> <span class="o">=</span> <span class="n">reg</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">all_module_tx</span><span class="o">.</span><span class="n">transition_counts</span><span class="p">)</span>
+            <span class="n">loocv_preds</span><span class="p">,</span> <span class="n">sq_err</span> <span class="o">=</span> <span class="n">analyze</span><span class="o">.</span><span class="n">loocv_regression</span><span class="p">(</span><span class="n">all_module_tx</span><span class="p">,</span><span class="n">dose_dict</span><span class="p">,</span><span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">alpha</span><span class="o">=</span><span class="n">method</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">dose_cats</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">dose_labels</span><span class="p">)</span>
+        <span class="n">colors</span> <span class="o">=</span> <span class="p">[</span><span class="n">cmap</span><span class="p">([</span><span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">dose_cats</span><span class="p">))]</span>
+        <span class="k">for</span> <span class="n">do</span><span class="p">,</span> <span class="n">dose</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">dose_cats</span><span class="p">):</span>
+            <span class="n">y_d_hat</span> <span class="o">=</span> <span class="n">loocv_preds</span><span class="p">[</span><span class="n">dose_labels</span><span class="o">==</span><span class="n">dose</span><span class="p">]</span>
+            <span class="n">ax</span><span class="p">[</span><span class="n">d</span><span class="p">,</span><span class="n">m</span><span class="p">]</span><span class="o">.</span><span class="n">errorbar</span><span class="p">(</span><span class="n">dose</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">y_d_hat</span><span class="p">),</span><span class="n">yerr</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">y_d_hat</span><span class="p">),</span><span class="n">marker</span><span class="o">=</span><span class="s2">&quot;o&quot;</span><span class="p">,</span><span class="n">capsize</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">color</span><span class="o">=</span><span class="n">colors</span><span class="p">[</span><span class="n">do</span><span class="p">])</span>
+        <span class="n">rmse</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">sq_err</span><span class="p">))</span>
+        <span class="n">ax</span><span class="p">[</span><span class="n">d</span><span class="p">,</span><span class="n">m</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">dat</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">method</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="se">\n</span><span class="s1">alpha </span><span class="si">{</span><span class="n">method</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="se">\n</span><span class="s1">RMSE=</span><span class="si">{</span><span class="n">rmse</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">dat</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">method</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">, alpha </span><span class="si">{</span><span class="n">method</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s1"> RMSE: </span><span class="si">{</span><span class="n">rmse</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="k">if</span> <span class="n">save</span><span class="p">:</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">save_path</span><span class="o">+</span><span class="s2">&quot;demo4-2_regression_bymethod.png&quot;</span><span class="p">,</span><span class="n">dpi</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Usage LinearRegression, alpha nan RMSE: 1.53
+Usage Lasso, alpha 0.1 RMSE: 1.75
+Usage Lasso, alpha 0.5 RMSE: 1.88
+Usage Ridge, alpha 0.1 RMSE: 1.53
+Usage Ridge, alpha 0.5 RMSE: 1.52
+Tx LinearRegression, alpha nan RMSE: 1.30
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Tx Lasso, alpha 0.1 RMSE: 1.45
+Tx Lasso, alpha 0.5 RMSE: 1.98
+Tx Ridge, alpha 0.1 RMSE: 1.30
+Tx Ridge, alpha 0.5 RMSE: 1.30
+</pre></div>
+</div>
+<img alt="../_images/7d9c65cedffcd976eedce1d1a9086df485efdb4d1b38156ed50bf8fbd729d0ad.png" src="../_images/7d9c65cedffcd976eedce1d1a9086df485efdb4d1b38156ed50bf8fbd729d0ad.png" />
+</div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="Demo3-PoseSegmentation-Embed.html" class="btn btn-neutral float-left" title="Demo 3: Embedding of Pose Segmentation Data" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Demo5-PoseSegmentation-ManualScoring.html" class="btn btn-neutral float-right" title="Demo 5: Comparing Pose Modules to Manual Scoring Data" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Sedona Ewbank.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

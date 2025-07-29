@@ -60,10 +60,12 @@ Check out the demo scripts for a full analysis and plotting pipeline!
    :maxdepth: 2
    :caption: Contents:
 
-   demo1_start
-   demo2_dlc
-   demo3_pca
-   demo4_pk
+   demo/Demo1-ProjectCreation
+   demo/Demo2-PoseSegmentation-Visualize
+   demo/Demo3-PoseSegmentation-Embed
+   demo/Demo4-PoseSegmentation-ClassificationAndRegression
+   demo/Demo5-PoseSegmentation-ManualScoring
+   demo/Demo6-PoseSegmentation-Simulation
    metadata
    analyze
    plot
