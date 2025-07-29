@@ -520,8 +520,11 @@ class ModuleUsage:
 
     def usage_density(self, convolve=False, window=5):
         df = self.to_df()
-        modules = sorted(
-            np.unique([int(i.split("module")[1].split("_")[0]) for i in list(df.columns) if "module" in i]))
+        modules = np.unique([i.split("module")[1].split("_")[0] for i in list(df.columns) if "module" in i])
+        if is_nonnum(modules[0]):
+            modules = sorted(modules)
+        else:
+            modules = sorted([int(m) for m in modules])
         start_times = [int(col.split("_t")[1].split("-")[0]) for col in list(df.columns) if
                        f"module{modules[0]}_" in col]
         subjs = list(df.index)

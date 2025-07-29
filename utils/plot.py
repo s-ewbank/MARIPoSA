@@ -261,7 +261,7 @@ def plot_module_usage(config,
                     ax.spines['top'].set_visible(False)
             else:
                 modules = [int(i.split("module")[1]) for i in modules]
-                behaviors = list(BORIS_to_pose_mat.index)
+                behaviors = sorted(np.unique([remap[1] for remap in config["remappings"]]))
                 if "other" not in behaviors:
                     behaviors = behaviors + ["other"]
                 n_behaviors = len(behaviors)
@@ -269,7 +269,7 @@ def plot_module_usage(config,
                 leg_handles_col1 = []
                 leg_labels = [""] * n_behaviors
                 bottom = True
-                cm_list = ['magma', 'Greys', 'YlOrBr', 'Blues', 'Purples', 'copper', 'Reds', 'BuGn', 'bone', 'YlGn',
+                cm_list = ['magma', 'YlOrBr', 'Blues', 'copper', 'Greys_r', 'BuGn', 'Reds_r', 'magma_r', 'Purples', 'YlGn',
                            'YlGnBu', 'YlOrRd']
                 modules_plotted=[] #To account for modules not seen in remapping
                 for remap in range(n_behaviors):
@@ -535,14 +535,14 @@ def module_usage_sandplot(config,
             bottom = y_i + bottom
     else:
         modules = list(data[0].index)
-        behaviors = list(BORIS_to_pose_mat.index)
+        behaviors = sorted(np.unique([remap[1] for remap in config["remappings"]]))
         if "other" not in behaviors:
             behaviors = behaviors + ["other"]
         n_behaviors = len(behaviors)
         leg_handles_col0 = []
         leg_handles_col1 = []
         leg_labels = [""] * n_behaviors
-        cm_list = ['magma', 'Greys', 'YlOrBr', 'Blues', 'Purples', 'copper', 'Reds', 'BuGn', 'bone', 'YlGn',
+        cm_list = ['magma', 'YlOrBr', 'Blues', 'copper', 'Greys_r', 'BuGn', 'Reds_r', 'magma_r', 'Purples', 'YlGn',
                    'YlGnBu', 'YlOrRd']
         modules_plotted = []  # To account for modules not seen in remapping
         for remap in range(n_behaviors):
