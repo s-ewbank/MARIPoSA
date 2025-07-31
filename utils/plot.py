@@ -48,7 +48,7 @@ def plot_module_usage(config,
                       style="bar_scatter",
                       cmap="jet",
                       legend_pos="outside",
-                      BORIS_to_pose_mat=None,
+                      remap=False,
                       legend=True,
                       long_legend=False,
                       alt_labels=None,
@@ -247,7 +247,7 @@ def plot_module_usage(config,
             plt.tight_layout()
         else:
             any_nonint = False
-            if BORIS_to_pose_mat is None:
+            if not remap:
                 for m, module in enumerate(modules):
                     if any_nonint:
                         module = m
@@ -308,7 +308,7 @@ def plot_module_usage(config,
             if title is not None:
                 ax.set_title(title)
             if legend == True:
-                if BORIS_to_pose_mat is None:
+                if not remap:
                     modules = [int(i.split("module")[1]) for i in modules]
                     if len(modules) > 10:
                         leg_modules = []
@@ -491,7 +491,7 @@ def network_plot(config,
 
 def module_usage_sandplot(config,
                           module_usage,
-                          BORIS_to_pose_mat=None,
+                          remap=False,
                           title=None,
                           legend=True,
                           long_legend=True,
@@ -520,12 +520,17 @@ def module_usage_sandplot(config,
     data_mean = np.mean(data, axis=0).T
     bottom = np.zeros(data_mean[:, 0].shape)
     xpts = np.array(data[0].columns / 60, dtype=float)
-    leg_handles=[]
-    for col in range(10):
-        m_in_col=[i for i in range(data_mean.shape[1]) if i%10==col]
-        if len(m_in_col)>0:
-            leg_handles.append(f"Modules {m_in_col}")
-    if BORIS_to_pose_mat is None:
+    if not remap:
+        leg_handles=[]
+        col = module_usage.to_df().columns
+        mods = np.unique([c.split("module")[1].split("_t")[0] for c in col if "module" in c])
+        if np.sum([analyze.is_nonnum(m) for m in mods]):
+            leg_handles=mods
+        else:
+            for col in range(10):
+                m_in_col=[i for i in range(data_mean.shape[1]) if i%10==col]
+                if len(m_in_col)>0:
+                    leg_handles.append(f"Modules {m_in_col}")
         for m in range(data_mean.shape[1]):
             y_i = np.array(data_mean[:, m], dtype=float)
             if m<len(leg_handles):
@@ -533,6 +538,8 @@ def module_usage_sandplot(config,
             else:
                 plt.fill_between(xpts, bottom, bottom + y_i)
             bottom = y_i + bottom
+        if legend:
+            plt.legend(bbox_to_anchor=(1.5, 1))
     else:
         modules = list(data[0].index)
         behaviors = sorted(np.unique([remap[1] for remap in config["remappings"]]))
@@ -565,13 +572,16 @@ def module_usage_sandplot(config,
                         plt.fill_between(xpts, bottom, bottom + y_i, color=colors[c % 2])
                         bottom = y_i + bottom
                         modules_plotted.append(c)
+        if legend:
+            leg_handles = leg_handles_col0 + leg_handles_col1
+            ax.legend(handles=leg_handles,
+                      labels=leg_labels,
+                      ncol=2, handletextpad=0.5, handlelength=1.0, columnspacing=-0.5, bbox_to_anchor=(1.5, 1))
 
     plt.ylim([0, 1])
     plt.xlim([xpts[0], xpts[-1]])
     plt.xlabel("Time (m)")
     plt.ylabel('Moving Average Proportion \nof Time Spent in Pose')
-    if legend:
-        plt.legend(bbox_to_anchor=(1.5, 1))
     if title!=None:
         plt.title(title)
     plt.tight_layout()
