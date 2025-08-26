@@ -6,10 +6,11 @@ from sklearn.tree import plot_tree
 from sklearn.decomposition import PCA
 from sklearn.model_selection import LeaveOneOut, cross_val_predict
 from sklearn.metrics import accuracy_score, confusion_matrix
+from sklearn.pipeline import make_pipeline
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
 from sklearn.linear_model import LogisticRegression as LR
 from sklearn.linear_model import LinearRegression, Lasso, Ridge
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import StandardScaler, PolynomialFeatures
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.naive_bayes import GaussianNB
 from sklearn.neighbors import KNeighborsClassifier
@@ -1115,7 +1116,7 @@ def get_distance(module_feature_object, method="euclidean"):
 
     return dist_mat.T
 
-def regress(module_feature_object, dose_dict, method="LinearRegression", alpha = 1):
+def regress(module_feature_object, dose_dict, method="LinearRegression", degree=1, alpha = 1):
     if module_feature_object.__class__.__name__=="ModuleUsage":
         X=module_feature_object.label_counts
     elif module_feature_object.__class__.__name__=="ModuleTransitions":
@@ -1126,15 +1127,29 @@ def regress(module_feature_object, dose_dict, method="LinearRegression", alpha =
         raise ValueError(f'module_feature_object class must be ModuleUsage or ModuleTransitions or KeypointFeature, not {module_feature_object.__class__}')
     reverse_grp_dict = {v: k for k, v in module_feature_object.group_dict.items()}
     dose_labels = [dose_dict[reverse_grp_dict[i]] for i in module_feature_object.group_labels]
-    if method=="LinearRegression":
-        reg = LinearRegression().fit(X, dose_labels)
-    elif method=="Lasso":
-        reg = Lasso(alpha=alpha).fit(X, dose_labels)
-    elif method=="Ridge":
-        reg = Ridge(alpha=alpha).fit(X, dose_labels)
+    if ((degree<=0) or (degree%1!=0)):
+        raise ValueError("Degree must be a positive, non-zero integer!")
+    if degree==1:
+        if method=="LinearRegression":
+            reg = LinearRegression().fit(X, dose_labels)
+        elif method=="Lasso":
+            reg = Lasso(alpha=alpha).fit(X, dose_labels)
+        elif method=="Ridge":
+            reg = Ridge(alpha=alpha).fit(X, dose_labels)
+    elif degree>1:
+        if method=="LinearRegression":
+            reg = make_pipeline(PolynomialFeatures(degree=degree), LinearRegression())
+            reg.fit(X, dose_labels)
+        elif method=="Lasso":
+            reg = make_pipeline(PolynomialFeatures(degree=degree), Lasso(alpha=alpha))
+            reg.fit(X, dose_labels)
+        elif method=="Ridge":
+            reg = make_pipeline(PolynomialFeatures(degree=degree), Ridge(alpha=alpha))
+            reg.fit(X, dose_labels)
+
     return reg, dose_labels
 
-def loocv_regression(module_feature_object, dose_dict, method="LinearRegression", constrain_pos = True, alpha=1):
+def loocv_regression(module_feature_object, dose_dict, method="LinearRegression", constrain_pos = True, degree=1, alpha=1):
     """
     Perform LOOCV for linear regression
 
@@ -1167,12 +1182,26 @@ def loocv_regression(module_feature_object, dose_dict, method="LinearRegression"
         sub_y = y[:obs] + y[obs + 1:]
         X_i = X[obs, :]
         y_i = y[obs]
-        if method=="LinearRegression":
-            reg = LinearRegression().fit(sub_X, sub_y)
-        elif method=="Lasso":
-            reg = Lasso(alpha=alpha).fit(sub_X, sub_y)
-        elif method=="Ridge":
-            reg = Ridge(alpha=alpha).fit(sub_X, sub_y)
+        if ((degree<=0) or (degree%1!=0)):
+            raise ValueError("Degree must be a positive, non-zero integer!")
+        if degree==1:
+            if method=="LinearRegression":
+                reg = LinearRegression().fit(sub_X, sub_y)
+            elif method=="Lasso":
+                reg = Lasso(alpha=alpha).fit(sub_X, sub_y)
+            elif method=="Ridge":
+                reg = Ridge(alpha=alpha).fit(sub_X, sub_y)
+        elif degree>1:
+            if method=="LinearRegression":
+                reg = make_pipeline(PolynomialFeatures(degree=degree), LinearRegression())
+                reg.fit(sub_X, sub_y)
+            elif method=="Lasso":
+                reg = make_pipeline(PolynomialFeatures(degree=degree), Lasso(alpha=alpha))
+                reg.fit(sub_X, sub_y)
+            elif method=="Ridge":
+                reg = make_pipeline(PolynomialFeatures(degree=degree), Ridge(alpha=alpha))
+                reg.fit(sub_X, sub_y)
+
         loocv_preds.append(reg.predict(X_i.reshape(1, -1))[0])
     loocv_preds = np.array(loocv_preds)
     if constrain_pos:
