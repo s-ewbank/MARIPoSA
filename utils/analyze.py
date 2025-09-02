@@ -83,8 +83,8 @@ class KeypointFeature:
 
     def scale(self):
         scaler = StandardScaler()
-        label_counts_scaled = scaler.fit_transform(self.keypoint_feature)
-        return ModuleUsage(label_counts_scaled, self.group_labels, self.observation_labels, self.feat_names,
+        keypoint_feature_scaled = scaler.fit_transform(self.keypoint_feature)
+        return KeypointFeature(keypoint_feature_scaled, self.group_labels, self.observation_labels, self.feat_names,
                            self.group_dict, scaler)
 
 
@@ -299,63 +299,6 @@ def get_keypoint_travel(PE_config,
     else:
         return KeypointFeature(travel_data, group_labels, observation_labels, feat_names, group_dict, None)
 
-
-# def get_keypoint_travel(PE_config,
-#                                   keypoint,
-#                                   start,
-#                                   end,
-#                                   binsize=None,
-#                                   thresh=70,
-#                                   selected_subgroups="all"):
-#     """
-#     Measure keypodint distance travelled across group of subjects
-#
-#     :param PE_config: pose estimation config - used for FPS only
-#     :param keypoint: name of keypoint
-#     :param start: start time in seconds
-#     :param end: end time in seconds
-#     :param binsize: if binned output is desired, size of timebins (default is None for no binning)
-#     :param thresh: threshold for when distance 'jump' is too large and should be excluded; default 70
-#     :param selected_subgroups: subgroups to analyze as defined in config; default "all"
-#     :return:
-#     """
-#     if selected_subgroups=="all":
-#         selected_subgroups=PE_config["subgroups"].keys()
-#     count = 0
-#     header1 = []
-#     header2 = []
-#     for g, group in enumerate(selected_subgroups):
-#         for s, sess in enumerate(PE_config["subgroups"][group]):
-#             header = sess
-#             header2.append(header)
-#             header1.append(group)
-#             filepath = PE_config["data_directory"]+sess
-#             data = pd.read_csv(filepath, header=[1, 2])
-#             if binsize == None:
-#                 binsize = end - start
-#                 nbins = 1
-#             else:
-#                 nbins = int((end - start) / binsize)
-#             dist_i = np.zeros(nbins)
-#             fps = int(PE_config["fps"])
-#             for b in range(nbins):
-#                 x = np.array(data[keypoint]['x'])[(start + b * binsize) * fps:(start + (b + 1) * binsize) * fps]
-#                 y = np.array(data[keypoint]['y'])[(start + b * binsize) * fps:(start + (b + 1) * binsize) * fps]
-#                 for i in range(len(x) - 1):
-#                     if np.absolute(x[i + 1] - x[i]) > thresh:
-#                         x[i + 1] = x[i]
-#                     if np.absolute(y[i + 1] - y[i]) > thresh:
-#                         y[i + 1] = y[i]
-#                     dist_i[b] = dist_i[b] + np.sqrt((x[i + 1] - x[i]) ** 2 + (y[i + 1] - y[i]) ** 2)
-#             if s == 0 and g == 0:
-#                 dist_df = pd.DataFrame(dist_i, columns=[header])
-#             else:
-#                 dist_df.insert(loc=count, value=dist_i, column=header)
-#             count = count + 1
-#     dist_df.columns = [header1, header2]
-#     if binsize is not None:
-#         dist_df.index=np.arange(start/60,end/60,binsize/60)
-#     return dist_df
 
 def BORIS_to_pose(config, verbose = True):
     """
@@ -928,154 +871,6 @@ def loocv(module_feature_object, method="lda"):
             conf_mat[i, j] = np.sum(loocv_preds[y == i] == j)
     return accuracy, conf_mat
 
-# def get_distance(module_feature_object, metric="euclidean", method="centroid", embedding=None, hold_out=False,
-#                  n_components=2):
-#     """
-#     Get distance in some method between
-#     :param module_feature_object: ModuleUsage or ModuleTransitions object
-#     :param metric: distance metric to use; options are "euclidean","cityblock","mahalanobis"
-#     :param method: what distance to calculate; options are "pairwise" for between every pair of points or "centroid" for between points to group centroids
-#     :param hold_out: whether to hold out each sample when computing distance (only relevant if embedding is not None)
-#     :param embedding: compute distance in some embedded space or not; options are "pca", "lda", or None
-#     :return: distance
-#
-#     """
-#     if module_feature_object.__class__.__name__ == "ModuleUsage":
-#         X = module_feature_object.label_counts
-#         obj_type = "module usage"
-#     elif module_feature_object.__class__.__name__ == "ModuleTransitions":
-#         X = module_feature_object.transition_counts
-#         obj_type = "module transitions"
-#     else:
-#         raise ValueError(
-#             f'module_feature_object class must be ModuleUsage or ModuleTransitions, not {module_feature_object.__class__}')
-#
-#     distance_results = []
-#
-#     if metric == "mahalanobis":
-#         lda = embed(module_feature_object, method="lda")
-#         cov = lda.covariance_
-#
-#     if embedding == None:
-#         if hold_out:
-#             hold_out = False
-#             print("Ignoring hold_out=True because embedding is None")
-#
-#     if not hold_out:
-#         if embedding != None:
-#             print(f"Warning - embedding (embedding={embedding}) without hold_out")
-#             if ((embedding == "lda") or (embedding == "LDA") or (embedding == "lineardiscriminantanalysis") or (
-#                     embedding == "LinearDiscriminantAnalysis")):
-#                 emb = LDA(n_components=n_components, store_covariance=True)
-#                 emb.fit(X, module_feature_object.group_labels)
-#                 X = emb.transform(X)
-#             elif ((embedding == "pca") or (embedding == "PCA")):
-#                 emb = PCA(n_components=n_components)
-#                 emb.fit(X)
-#                 X = emb.transform(X)
-#
-#         if method == "pairwise":
-#             for i in range(X.shape[0]):
-#                 for j in range(X.shape[0]):
-#                     if i < j:
-#                         grp_i = module_feature_object.group_labels[i]
-#                         grp_j = module_feature_object.group_labels[j]
-#                         obs_i = module_feature_object.observation_labels[i]
-#                         obs_j = module_feature_object.observation_labels[j]
-#                         if metric == "euclidean":
-#                             distance_ij = euclidean(X[i, :], X[j, :])
-#                         elif metric == "cityblock":
-#                             distance_ij = cityblock(X[i, :], X[j, :])
-#                         elif metric == "mahalanobis":
-#                             distance_ij = mahalanobis(X[i, :], X[j, :], cov)
-#                         else:
-#                             raise ValueError(f'metric must be euclidean, cityblock, or mahalanobis, not {metric}')
-#                         distance_results.append(pd.DataFrame(
-#                             {"grp_i": grp_i, "grp_j": grp_j, "obs_i": obs_i, "obs_j": obs_j,
-#                              "distance_ij": distance_ij},
-#                             index=[f'{grp_i}_{grp_j}']))
-#         elif method == "centroid":
-#             for group in sorted(np.unique(module_feature_object.group_labels)):
-#                 centroid = np.mean(X[np.array(module_feature_object.group_labels) == group, :], axis=0)
-#                 for i in range(X.shape[0]):
-#                     grp_i = module_feature_object.group_labels[i]
-#                     grp_j = group
-#                     obs_i = module_feature_object.observation_labels[i]
-#                     obs_j = f'centroid_{group}'
-#                     if metric == "euclidean":
-#                         distance_ij = euclidean(X[i, :], centroid)
-#                     elif metric == "cityblock":
-#                         distance_ij = cityblock(X[i, :], centroid)
-#                     elif metric == "mahalanobis":
-#                         distance_ij = mahalanobis(X[i, :], centroid, cov)
-#                     else:
-#                         raise ValueError(f'metric must be euclidean, cityblock, or mahalanobis, not {metric}')
-#                     distance_results.append(pd.DataFrame(
-#                         {"grp_i": grp_i, "grp_j": grp_j, "obs_i": obs_i, "obs_j": obs_j,
-#                          "distance_ij": distance_ij}, index=[f'{grp_i}_{grp_j}']))
-#         distance_results = pd.concat(distance_results, axis=0)
-#     else:
-#         for obs in range(len(module_feature_object.group_labels)):
-#             sub_X = np.delete(X, obs, axis=0)
-#             sub_y = module_feature_object.group_labels[:obs] + module_feature_object.group_labels[obs + 1:]
-#             X_i = X[obs, :]
-#             y_i = module_feature_object.group_labels[obs]
-#             if embedding != None:
-#                 if ((embedding == "lda") or (embedding == "LDA") or (embedding == "lineardiscriminantanalysis") or (
-#                         embedding == "LinearDiscriminantAnalysis")):
-#                     emb = LDA(n_components=n_components, store_covariance=True)
-#                     emb.fit(sub_X, sub_y)
-#                     X = emb.transform(X)
-#                 elif ((embedding == "pca") or (embedding == "PCA")):
-#                     emb = PCA(n_components=n_components)
-#                     emb.fit(sub_X)
-#                     X = emb.transform(X)
-#
-#             if method == "pairwise":
-#                 for i in range(X.shape[0]):
-#                     for j in range(X.shape[0]):
-#                         if i < j:
-#                             if ((j == obs) or (i == obs)):
-#                                 grp_i = module_feature_object.group_labels[i]
-#                                 grp_j = module_feature_object.group_labels[j]
-#                                 obs_i = module_feature_object.observation_labels[i]
-#                                 obs_j = module_feature_object.observation_labels[j]
-#                                 if metric == "euclidean":
-#                                     distance_ij = euclidean(X[i, :], X[j, :])
-#                                 elif metric == "cityblock":
-#                                     distance_ij = cityblock(X[i, :], X[j, :])
-#                                 elif metric == "mahalanobis":
-#                                     distance_ij = mahalanobis(X[i, :], X[j, :], cov)
-#                                 else:
-#                                     raise ValueError(
-#                                         f'metric must be euclidean, cityblock, or mahalanobis, not {metric}')
-#                                 distance_results.append(pd.DataFrame(
-#                                     {"grp_i": grp_i, "grp_j": grp_j, "obs_i": obs_i, "obs_j": obs_j,
-#                                      "distance_ij": distance_ij}, index=[f'{grp_i}_{grp_j}']))
-#             elif method == "centroid":
-#                 for group in sorted(np.unique(module_feature_object.group_labels)):
-#                     centroid = np.mean(X[np.array(module_feature_object.group_labels) == group, :], axis=0)
-#                     for i in range(X.shape[0]):
-#                         if i == obs:
-#                             grp_i = module_feature_object.group_labels[i]
-#                             grp_j = group
-#                             obs_i = module_feature_object.observation_labels[i]
-#                             obs_j = f'centroid_{group}'
-#                             if metric == "euclidean":
-#                                 distance_ij = euclidean(X[i, :], centroid)
-#                             elif metric == "cityblock":
-#                                 distance_ij = cityblock(X[i, :], centroid)
-#                             elif metric == "mahalanobis":
-#                                 distance_ij = mahalanobis(X[i, :], centroid, cov)
-#                             else:
-#                                 raise ValueError(
-#                                     f'metric must be euclidean, cityblock, or mahalanobis, not {metric}')
-#                             distance_results.append(pd.DataFrame(
-#                                 {"grp_i": grp_i, "grp_j": grp_j, "obs_i": obs_i, "obs_j": obs_j,
-#                                  "distance_ij": distance_ij}, index=[f'{grp_i}_{grp_j}']))
-#         distance_results = pd.concat(distance_results, axis=0)
-#     return distance_results
-
 def get_distance(module_feature_object, method="euclidean"):
     """
     Get distance
@@ -1209,33 +1004,3 @@ def loocv_regression(module_feature_object, dose_dict, method="LinearRegression"
     y = np.array(y)
     sq_err = np.square(loocv_preds-y)
     return loocv_preds, sq_err
-
-# def get_usage_ssd(control_usage_feats, exp_usage_feats):
-#     """
-#     Get the time-resolved sum squared difference in module usage relative to a control distribution of usage.
-#
-#     :param control_usage_feats: output from analysis.get_usage_feats for the control group ONLY
-#     :param exp_usage_feats:
-#     :return:
-#     """
-#     control_usage_feats_df = control_usage_feats.to_df()
-#     exp_usage_df = exp_usage_feats.to_df()
-#     control_usage_feats_df.drop("group", axis=1, inplace=True)
-#     exp_usage_df.drop("group", axis=1, inplace=True)
-#     control_usage = control_usage_feats_df.mean(axis=0)
-#
-#     exp_usage_df_sqdiff = exp_usage_df.copy()
-#
-#     for module in control_usage.index:
-#         mod_cols = [i for i in exp_usage_df.columns if module + '_' in i]
-#         exp_usage_df_sqdiff[mod_cols] = np.square(exp_usage_df_sqdiff[mod_cols] - control_usage[module])
-#
-#     extracted = [col.split("_t")[1].split("-")[0] for col in exp_usage_df.columns]
-#     binstarts = pd.Series(extracted).unique()
-#     exp_usage_df_ssd = pd.DataFrame(index=exp_usage_df.index, columns=binstarts)
-#
-#     for i in range(len(exp_usage_df_ssd.index)):
-#         for bin in binstarts:
-#             exp_usage_df_ssd.iloc[i][bin] = np.sum(exp_usage_df_sqdiff.iloc[i].filter(like="_t" + bin + "-"))
-#
-#     return exp_usage_df_ssd
