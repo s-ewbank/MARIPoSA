@@ -27,6 +27,56 @@ class Application(tk.Tk):
         x = (screen_width - self.width) // 2
         y = (screen_height - self.height) // 2
         self.geometry(f'{self.width}x{self.height}+{x}+{y}')
+
+        # color pallete
+        bg_color = '#FDFDFF'
+        bg_color2 = '#EBEBFF' #radio hover
+        text_color = '#393D3F'
+        button_bg_color0 = '#CBCDE2'
+        button_bg_color2 = '#B1B4D3' #hover
+        button_bg_color1 = '#FFEF9F' #press
+        button_text_color = '#161827'
+
+        self.configure(bg=bg_color)  # slightly lighter than your current
+
+        style = ttk.Style(self)
+        style.theme_use('clam')
+
+        style.configure('TLabel',
+                        font=('Helvetica', 14),
+                        background=bg_color,
+                        foreground=text_color
+                        )
+
+        style.configure('TButton',
+                        font=('Helvetica', 14),
+                        padding=8,
+                        foreground=button_text_color,
+                        background=button_bg_color0  # modern blue
+                        )
+        style.map('TButton',
+                  foreground=[('pressed', button_text_color), ('active', button_text_color)],
+                  background=[('pressed', button_bg_color1), ('active', button_bg_color2)]
+                  )
+
+        style.configure('TRadiobutton',
+                        font=('Helvetica', 14),
+                        padding=8,
+                        background=bg_color,
+                        foreground=text_color
+                        )
+        style.map('TRadiobutton',
+                  foreground=[('active', text_color)],
+                  background=[('active', bg_color2)]
+                  )
+
+        style.configure('TRadiobutton',
+                        font=('Helvetica', 14),
+                        padding=8,
+                        background=bg_color,
+                        foreground=text_color
+                        )
+        
         self.projectstart_choice = tk.StringVar(value="New project")
         self.datatype = tk.StringVar(value="B-SOiD")
         self.config = None
@@ -55,7 +105,7 @@ class Application(tk.Tk):
         :return:
         """
         print(datetime.now().strftime("[%Y-%m-%d %H:%M:%S]")+' Error: '+message)
-        self.error_label = tk.Label(self, text=message, text_color="red", bg_color="#ffe5e3",anchor=tk.CENTER)
+        self.error_label = ttk.Label(self, text=message, text_color="red", bg_color="#ffe5e3",anchor=tk.CENTER)
         self.error_label.place(x=x,y=y,anchor=tk.CENTER)
         self.after(3000, lambda: self.error_label.configure(text="",bg_color="gray16"))
 
@@ -79,32 +129,32 @@ class Application(tk.Tk):
         self.clear_window()
 
         pil_img = Image.open('other/MARIPoSA_icon.png').resize((130, 130))
-        logo_img = ImageTk.PhotoImage(pil_img)
+        self.logo_img = ImageTk.PhotoImage(pil_img)
         self.projectstart_choice = tk.StringVar(value="New project")
-        tk.Label(self, text="MARIPoSA",
+        ttk.Label(self, text="MARIPoSA",
                                font=('Helvetica', 32, "bold")).place(x=int(self.width*0.5), y=int(self.height*0.1),anchor=tk.CENTER)
-        tk.Label(self, text="",image=logo_img).place(x=int(self.width*0.5), y=int(self.height*0.25),anchor=tk.CENTER)
-        tk.Label(self, text="Would you like to start a new project or load a previous project?",
-                               font=('Helvetica', 16)).place(x=int(self.width*0.5), y=int(self.height*0.4),anchor=tk.CENTER)
+        ttk.Label(self, image=self.logo_img).place(x=int(self.width*0.5), y=int(self.height*0.25),anchor=tk.CENTER)
+        ttk.Label(self, text="Would you like to start a new project or load a previous project?",
+                               ).place(x=int(self.width*0.5), y=int(self.height*0.4),anchor=tk.CENTER)
 
         # Radio buttons for starting new project or loading old project
         projectstart_options = ["New project","Load previous"]
         grid_last = 0
         for option in projectstart_options:
-            tk.Radiobutton(self, text=option, variable=self.projectstart_choice, value=option,
-                                         font=('Helvetica', 16)).place(x=int(self.width*0.2), y=int(self.height*(0.5+0.1*grid_last)))
+            ttk.Radiobutton(self, text=option, variable=self.projectstart_choice, value=option,
+                                         ).place(x=int(self.width*0.2), y=int(self.height*(0.5+0.1*grid_last)))
             grid_last = grid_last + 1
 
         # File path entry and Browse button
-        config_path_entry = tk.Entry(self)
+        config_path_entry = ttk.Entry(self)
         config_path_entry.insert(0, "/path/to/config.yaml")
         config_path_entry.place(x=int(self.width*0.4), y=int(self.height*0.6))
-        tk.Button(self,
+        ttk.Button(self,
                                 text="Browse",
                                 command=lambda: self.window_browse(config_path_entry, type="file")).place(x=int(self.width*0.6), y=int(self.height*0.6))
 
-        tk.Button(self, text="▶", command=lambda: self.make_or_load_project(config_path_entry.get()),
-                                font=('Helvetica', 16)).place(x=int(self.width*0.8), y=int(self.height*0.9))
+        ttk.Button(self, text="▶", command=lambda: self.make_or_load_project(config_path_entry.get())
+                   ).place(x=int(self.width*0.8), y=int(self.height*0.9))
 
     def make_or_load_project(self, config_path):
         if type(self.projectstart_choice)!=str:
@@ -124,135 +174,135 @@ class Application(tk.Tk):
     def window1b_projecttype(self):
         self.clear_window()
         self.projectstart_choice = tk.StringVar(value="New project")
-        tk.Label(self, text="Create a new project",
+        ttk.Label(self, text="Create a new project",
                                font=('Helvetica', 32, "bold")).place(x=int(self.width*0.5), y=int(self.height*0.1),anchor=tk.CENTER)
-        tk.Label(self, text="Will the data type for this new dataset be pose estimation or pose segmentation?",
-                               font=('Helvetica', 16)).place(x=int(self.width*0.5), y=int(self.height*0.3),anchor=tk.CENTER)
+        ttk.Label(self, text="Will the data type for this new dataset be pose estimation or pose segmentation?",
+                               ).place(x=int(self.width*0.5), y=int(self.height*0.3),anchor=tk.CENTER)
 
-        tk.Button(self, text="Pose estimation\n\n(DeepLabCut, SLEAP, or OpenFace)",
+        ttk.Button(self, text="Pose estimation\n\n(DeepLabCut, SLEAP, or OpenFace)",
                                 command=lambda: self.window2_makeproject("pose_estimation"),
-                                font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.6),height=int(self.height*0.25),width=int(self.width*0.35),anchor=tk.CENTER)
-        tk.Button(self, text="Pose segmentation\n\n(B-SOiD, VAME, or Keypoint-MoSeq)",
+                                ).place(x=int(self.width*0.3), y=int(self.height*0.6),height=int(self.height*0.25),width=int(self.width*0.35),anchor=tk.CENTER)
+        ttk.Button(self, text="Pose segmentation\n\n(B-SOiD, VAME, or Keypoint-MoSeq)",
                                 command=lambda: self.window2_makeproject("pose_segmentation"),
-                                font=('Helvetica', 16)).place(x=int(self.width*0.7), y=int(self.height*0.6),height=int(self.height*0.25),width=int(self.width*0.35),anchor=tk.CENTER)
+                                ).place(x=int(self.width*0.7), y=int(self.height*0.6),height=int(self.height*0.25),width=int(self.width*0.35),anchor=tk.CENTER)
 
-        tk.Button(self, text="◀", command=self.window1_start,
-                                font=('Helvetica', 16)).place(x=int(self.width * 0.1), y=int(self.height * 0.9))
+        ttk.Button(self, text="◀", command=self.window1_start,
+                                ).place(x=int(self.width * 0.1), y=int(self.height * 0.9))
 
     def window2_makeproject(self,type):
         if type=="pose_estimation":
             self.clear_window()
 
-            tk.Label(self, text="Create a new pose estimation project",
+            ttk.Label(self, text="Create a new pose estimation project",
                                    font=('Helvetica', 32, "bold")).place(x=int(self.width*0.5), y=int(self.height*0.08),anchor=tk.CENTER)
 
-            tk.Label(self, text="Project name",
-                                   font=('Helvetica', 16)).place(x=int(self.width*0.2), y=int(self.height*0.2))
-            tk.Entry(self).place(x=int(self.width*0.5), y=int(self.height*0.2))
+            ttk.Label(self, text="Project name",
+                                   ).place(x=int(self.width*0.2), y=int(self.height*0.2))
+            ttk.Entry(self).place(x=int(self.width*0.5), y=int(self.height*0.2))
 
             # Enter data directory
-            tk.Label(self, text="Path to data directory",
-                                   font=('Helvetica', 16)).place(x=int(self.width*0.2), y=int(self.height*0.3))
-            data_path_entry = tk.Entry(self)
+            ttk.Label(self, text="Path to data directory",
+                                   ).place(x=int(self.width*0.2), y=int(self.height*0.3))
+            data_path_entry = ttk.Entry(self)
             data_path_entry.place(x=int(self.width*0.5), y=int(self.height*0.3))
-            browse_button = tk.Button(self, text="Browse",
+            browse_button = ttk.Button(self, text="Browse",
                                                     command=lambda: self.window_browse(data_path_entry, type="directory"))
             browse_button.place(x=int(self.width*0.7), y=int(self.height*0.3))
 
             #Info about data
-            tk.Label(self, text="Source of data for new project",
-                                   font=('Helvetica', 16)).place(x=int(self.width*0.2), y=int(self.height*0.4))
+            ttk.Label(self, text="Source of data for new project",
+                                   ).place(x=int(self.width*0.2), y=int(self.height*0.4))
 
             # Radio buttons for starting new project or loading old project
             datatype_options = ["DeepLabCut", "SLEAP", "OpenFace"]
             for r, option in enumerate(datatype_options):
-                radio_btn = tk.Radiobutton(self, text=option, variable=self.datatype, value=option,
-                                                         font=('Helvetica', 16))
+                radio_btn = ttk.Radiobutton(self, text=option, variable=self.datatype, value=option,
+                                                         )
                 radio_btn.place(x=int(self.width*0.5), y=int(self.height*(0.4+r*0.1)))
 
-            tk.Label(self, text="Frames per second",
-                                   font=('Helvetica', 16)).place(x=int(self.width*0.2), y=int(self.height*0.7))
-            fps = tk.Entry(self)
+            ttk.Label(self, text="Frames per second",
+                                   ).place(x=int(self.width*0.2), y=int(self.height*0.7))
+            fps = ttk.Entry(self)
             fps.place(x=int(self.width*0.5), y=int(self.height*0.7))
 
             # Enter project directory
-            tk.Label(self, text="Destination path for MARIPoSA output",
-                                   font=('Helvetica', 16)).place(x=int(self.width*0.2), y=int(self.height*0.8))
-            project_path_entry = tk.Entry(self)
+            ttk.Label(self, text="Destination path for MARIPoSA output",
+                                   ).place(x=int(self.width*0.2), y=int(self.height*0.8))
+            project_path_entry = ttk.Entry(self)
             project_path_entry.place(x=int(self.width*0.5), y=int(self.height*0.8))
-            browse_button = tk.Button(self, text="Browse",
+            browse_button = ttk.Button(self, text="Browse",
                                                     command=lambda: self.window_browse(project_path_entry,
                                                                                        type="directory"))
             browse_button.place(x=int(self.width*0.7), y=int(self.height*0.8))
 
             # Back to the initial view
-            tk.Button(self, text="◀", command=self.window1_start,
-                                    font=('Helvetica', 16)).place(x=int(self.width*0.1), y=int(self.height*0.9))
-            tk.Button(self, text="▶",
+            ttk.Button(self, text="◀", command=self.window1_start,
+                                    ).place(x=int(self.width*0.1), y=int(self.height*0.9))
+            ttk.Button(self, text="▶",
                                     command=lambda: self.create_PE_project(
                                         project_name.get(), data_path_entry.get(), self.datatype.get(),
                                         project_path_entry.get(),fps.get()),
-                                    font=('Helvetica', 16)).place(x=int(self.width*0.8), y=int(self.height*0.9))
+                                    ).place(x=int(self.width*0.8), y=int(self.height*0.9))
         if type == "pose_segmentation":
             self.clear_window()
 
-            tk.Label(self, text="Create a new pose segmentation project",
+            ttk.Label(self, text="Create a new pose segmentation project",
                                    font=('Helvetica', 32, "bold")).place(x=int(self.width * 0.5),
                                                                          y=int(self.height * 0.08), anchor=tk.CENTER)
 
-            tk.Label(self, text="Project name",
-                                   font=('Helvetica', 16)).place(x=int(self.width * 0.2), y=int(self.height * 0.2))
-            project_name = tk.Entry(self)
+            ttk.Label(self, text="Project name",
+                                   ).place(x=int(self.width * 0.2), y=int(self.height * 0.2))
+            project_name = ttk.Entry(self)
             project_name.place(x=int(self.width * 0.5), y=int(self.height * 0.2))
 
             # Enter data directory
-            tk.Label(self, text="Path to data directory",
-                                   font=('Helvetica', 16)).place(x=int(self.width * 0.2), y=int(self.height * 0.28))
-            data_path_entry = tk.Entry(self)
+            ttk.Label(self, text="Path to data directory",
+                                   ).place(x=int(self.width * 0.2), y=int(self.height * 0.28))
+            data_path_entry = ttk.Entry(self)
             data_path_entry.place(x=int(self.width * 0.5), y=int(self.height * 0.28))
-            browse_button = tk.Button(self, text="Browse",
+            browse_button = ttk.Button(self, text="Browse",
                                                     command=lambda: self.window_browse(data_path_entry,
                                                                                        type="directory"))
             browse_button.place(x=int(self.width * 0.7), y=int(self.height * 0.28))
 
             # Info about data
-            tk.Label(self, text="Source of data for new project",
-                                   font=('Helvetica', 16)).place(x=int(self.width * 0.2), y=int(self.height * 0.36))
+            ttk.Label(self, text="Source of data for new project",
+                                   ).place(x=int(self.width * 0.2), y=int(self.height * 0.36))
 
             # Radio buttons for starting new project or loading old project
             datatype_options = ["B-SOiD", "VAME", "Keypoint-MoSeq"]
             for r, option in enumerate(datatype_options):
-                tk.Radiobutton(self, text=option, variable=self.datatype, value=option,
-                                                         font=('Helvetica', 16)).place(x=int(self.width * 0.5), y=int(self.height * (0.36 + r * 0.08)))
+                ttk.Radiobutton(self, text=option, variable=self.datatype, value=option,
+                                                         ).place(x=int(self.width * 0.5), y=int(self.height * (0.36 + r * 0.08)))
 
-            tk.Label(self, text="Frames per second",
-                                   font=('Helvetica', 16)).place(x=int(self.width * 0.2), y=int(self.height * 0.6))
-            fps = tk.Entry(self)
+            ttk.Label(self, text="Frames per second",
+                                   ).place(x=int(self.width * 0.2), y=int(self.height * 0.6))
+            fps = ttk.Entry(self)
             fps.place(x=int(self.width * 0.5), y=int(self.height * 0.6))
 
-            tk.Label(self, text="Number of modules",
-                                   font=('Helvetica', 16)).place(x=int(self.width * 0.2), y=int(self.height * 0.68))
-            n_modules = tk.Entry(self)
+            ttk.Label(self, text="Number of modules",
+                                   ).place(x=int(self.width * 0.2), y=int(self.height * 0.68))
+            n_modules = ttk.Entry(self)
             n_modules.place(x=int(self.width * 0.5), y=int(self.height * 0.68))
 
             # Enter project directory
-            tk.Label(self, text="Destination path for MARIPoSA output",
-                                   font=('Helvetica', 16)).place(x=int(self.width * 0.2), y=int(self.height * 0.75))
-            project_path_entry = tk.Entry(self)
+            ttk.Label(self, text="Destination path for MARIPoSA output",
+                                   ).place(x=int(self.width * 0.2), y=int(self.height * 0.75))
+            project_path_entry = ttk.Entry(self)
             project_path_entry.place(x=int(self.width * 0.5), y=int(self.height * 0.75))
-            browse_button = tk.Button(self, text="Browse",
+            browse_button = ttk.Button(self, text="Browse",
                                                     command=lambda: self.window_browse(project_path_entry,
                                                                                        type="directory"))
             browse_button.place(x=int(self.width * 0.7), y=int(self.height * 0.75))
 
             # Back to the initial view
-            tk.Button(self, text="◀", command=self.window1_start,
-                                    font=('Helvetica', 16)).place(x=int(self.width * 0.1), y=int(self.height * 0.9))
-            tk.Button(self, text="▶",
+            ttk.Button(self, text="◀", command=self.window1_start,
+                                    ).place(x=int(self.width * 0.1), y=int(self.height * 0.9))
+            ttk.Button(self, text="▶",
                                     command=lambda: self.create_PS_project(
                                         project_name.get(), data_path_entry.get(), self.datatype.get(),
                                         project_path_entry.get(), fps.get(), n_modules.get()),
-                                    font=('Helvetica', 16)).place(x=int(self.width * 0.8), y=int(self.height * 0.9))
+                                    ).place(x=int(self.width * 0.8), y=int(self.height * 0.9))
 
     def create_PE_project(self, project_name, data_directory, data_source, output_directory,fps):
         metadata.create_PE_project(project_name, data_directory, data_source, output_directory,fps)
@@ -287,6 +337,12 @@ class Application(tk.Tk):
         self.config = config
         self.window4b3_pose_vs_BORIS()
 
+    def load_project_mainmenu(self):
+        self.clear_window()
+        config = metadata.load_project(self.config_path)
+        self.config = config
+        self.window3b_PS_menu()
+
     def create_sidebar_widget(self):
 
         bar_width=self.width*0.25
@@ -316,19 +372,19 @@ class Application(tk.Tk):
         list_frame = tk.Frame(canvas)
         canvas.create_window((0, 0), window=list_frame, anchor=tk.NW)
 
-        tk.Label(list_frame, text="Config path", fg="#3a7ebf", font=('Helvetica', 16, "bold"),anchor="w",width=bar_width).pack(side=tk.TOP, fill=tk.X,padx=5)
-        tk.Label(list_frame, text=self.config["project_directory"], font=('Helvetica', 16),anchor="w",width=bar_width).pack(side=tk.TOP, fill=tk.X,padx=5)
-        tk.Label(list_frame, text="Data source", fg="#3a7ebf", font=('Helvetica', 16, "bold"),anchor="w",width=bar_width).pack(side=tk.TOP, fill=tk.X,padx=5)
-        tk.Label(list_frame, text=self.config["data_source"], font=('Helvetica', 16),anchor="w",width=bar_width).pack(side=tk.TOP, fill=tk.X,padx=5)
-        tk.Label(list_frame, text="Subgroups (" + str(len(self.config["subgroups"].keys())) + ")",
-                               fg="#3a7ebf", font=('Helvetica', 16, "bold"),anchor="w",width=bar_width).pack(side=tk.TOP, fill=tk.X,padx=5)
+        ttk.Label(list_frame, text="Config path",  font=('Helvetica', 16, "bold"),anchor="w",width=bar_width).pack(side=tk.TOP, fill=tk.X,padx=5)
+        ttk.Label(list_frame, text=self.config["project_directory"],anchor="w",width=bar_width).pack(side=tk.TOP, fill=tk.X,padx=5)
+        ttk.Label(list_frame, text="Data source",  font=('Helvetica', 16, "bold"),anchor="w",width=bar_width).pack(side=tk.TOP, fill=tk.X,padx=5)
+        ttk.Label(list_frame, text=self.config["data_source"],anchor="w",width=bar_width).pack(side=tk.TOP, fill=tk.X,padx=5)
+        ttk.Label(list_frame, text="Subgroups (" + str(len(self.config["subgroups"].keys())) + ")",
+                                font=('Helvetica', 16, "bold"),anchor="w",width=bar_width).pack(side=tk.TOP, fill=tk.X,padx=5)
         for key in list(self.config["subgroups"].keys()):
-            label = tk.Label(list_frame, text=str(key+" ("+str(len(self.config["subgroups"][key]))+")"),anchor="w",width=bar_width)
+            label = ttk.Label(list_frame, text=str(key+" ("+str(len(self.config["subgroups"][key]))+")"),anchor="w",width=bar_width)
             label.pack(anchor=tk.W,padx=5)
-        tk.Label(list_frame, text="Project Files (" + str(len(self.config["project_files"])) + ")",
-                               fg="#3a7ebf", font=('Helvetica', 16, "bold"),anchor="w",width=bar_width).pack(side=tk.TOP, fill=tk.X,padx=5)
+        ttk.Label(list_frame, text="Project Files (" + str(len(self.config["project_files"])) + ")",
+                                font=('Helvetica', 16, "bold"),anchor="w",width=bar_width).pack(side=tk.TOP, fill=tk.X,padx=5)
         for item in self.config["project_files"]:
-            label = tk.Label(list_frame, text=item, anchor="w", width=bar_width)
+            label = ttk.Label(list_frame, text=item, anchor="w", width=bar_width)
             label.pack(anchor=tk.W,padx=5)
 
         # Update scrollregion of the canvas
@@ -341,11 +397,11 @@ class Application(tk.Tk):
 
     def create_header(self, header_title, header_path=None):
         if header_path!=None:
-            tk.Label(self, text=header_path,
-                                   font=('Helvetica', 12),fg="#3a7ebf").place(x=int(self.width*0.3), y=int(self.height*0.02))
-        tk.Label(self, text=header_title,
+            ttk.Label(self, text=header_path,
+                                   font=('Helvetica', 12)).place(x=int(self.width*0.3), y=int(self.height*0.02))
+        ttk.Label(self, text=header_title,
                                font=('Helvetica', 32, "bold")).place(x=int(self.width*0.65), y=int(self.height*0.09),anchor=tk.CENTER)
-        tk.Label(self, text="Project "+self.config["project_name"],
+        ttk.Label(self, text="Project "+self.config["project_name"],
                                font=('Helvetica', 20, "bold")).place(x=int(self.width*0.65), y=int(self.height*0.16),anchor=tk.CENTER)
 
     def window3a_PE_menu(self):
@@ -354,79 +410,79 @@ class Application(tk.Tk):
         self.create_header("Analysis Menu")
         button_width=int(self.width*0.2)
         button_height=int(self.height*0.15)
-        tk.Label(self, text="Further configure project:",
-                               font=('Helvetica', 16)).place(x=int(self.width * 0.3), y=int(self.height * 0.2),width=button_width,height=button_height)
-        # tk.Button(self, text="Define subgroups \nwithin data",
+        ttk.Label(self, text="Further configure project:",
+                               ).place(x=int(self.width * 0.3), y=int(self.height * 0.2),width=button_width,height=button_height)
+        # ttk.Button(self, text="Define subgroups \nwithin data",
         #                         command=self.window4a_define_subgroups, image=subgroups_img,
-        #                         font=('Helvetica', 16),width=button_width,height=button_height).place(x=int(self.width*0.3), y=int(self.height*0.3))
-        # tk.Button(self, text="Compare modules to \nmanual scoring",
+        #                         width=button_width,height=button_height).place(x=int(self.width*0.3), y=int(self.height*0.3))
+        # ttk.Button(self, text="Compare modules to \nmanual scoring",
         #                         command=self.window4h_pose_vs_BORIS, image=remap_img,
-        #                         font=('Helvetica', 16),width=button_width,height=button_height).place(x=int(self.width*0.52), y=int(self.height*0.3))
-        # tk.Button(self, text="Manually combine \npose modules",
+        #                         width=button_width,height=button_height).place(x=int(self.width*0.52), y=int(self.height*0.3))
+        # ttk.Button(self, text="Manually combine \npose modules",
         #                         command=self.window1_start, image=remap_img,
-        #                         font=('Helvetica', 16),width=button_width,height=button_height).place(x=int(self.width*0.74), y=int(self.height*0.3))
+        #                         width=button_width,height=button_height).place(x=int(self.width*0.74), y=int(self.height*0.3))
 
-        tk.Label(self, text="Visualize and classify:",
-                               font=('Helvetica', 16),width=button_width,height=button_height).place(x=int(self.width * 0.3), y=int(self.height * 0.5))
-        # tk.Button(self, text="Analyze pose module \nusage and transitions",
+        ttk.Label(self, text="Visualize and classify:",
+                               width=button_width).place(x=int(self.width * 0.3), y=int(self.height * 0.5))
+        # ttk.Button(self, text="Analyze pose module \nusage and transitions",
         #                         command=self.window4b_usage_transitions_menu, image=usage_img,
-        #                         font=('Helvetica', 16),width=button_width,height=button_height).place(x=int(self.width*0.3), y=int(self.height*0.6))
-        # tk.Button(self, text="Embed and measure \ndistance between \ngroups",
+        #                         width=button_width,height=button_height).place(x=int(self.width*0.3), y=int(self.height*0.6))
+        # ttk.Button(self, text="Embed and measure \ndistance between \ngroups",
         #                         command=self.window4e_embed_menu, image=embed_img,
-        #                         font=('Helvetica', 16),width=button_width,height=button_height).place(x=int(self.width*0.52), y=int(self.height*0.6))
-        # tk.Button(self, text="Classify conditions",
+        #                         width=button_width,height=button_height).place(x=int(self.width*0.52), y=int(self.height*0.6))
+        # ttk.Button(self, text="Classify conditions",
         #                         command=self.window4g_classify_menu, image=classify_img,
-        #                         font=('Helvetica', 16),width=button_width,height=button_height).place(x=int(self.width*0.74), y=int(self.height*0.6))
+        #                         width=button_width,height=button_height).place(x=int(self.width*0.74), y=int(self.height*0.6))
 
-        tk.Button(self, text="◀◀ back to start", command=self.window1_start,
-                                font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.9))
+        ttk.Button(self, text="◀◀ back to start", command=self.window1_start,
+                                ).place(x=int(self.width*0.3), y=int(self.height*0.9))
 
     def window3b_PS_menu(self):
         self.clear_window()
         self.create_sidebar_widget()
         self.create_header("Analysis Menu")
 
-        menu_item_width=int(self.width*0.15)
+        menu_item_width=int(self.width*0.2)
         button_width=int(self.width*0.45)
-        button_height=int(self.height*0.05)
-        tk.Label(self, text="Further configure project:",
-                               font=('Helvetica', 16)).place(x=int(self.width * 0.3), y=int(self.height * 0.2),width=menu_item_width,height=button_height)
-        tk.Button(self, text="Define subgroups within data",
+        button_height=int(self.height*0.06)
+        ttk.Label(self, text="Further configure project:",
+                               ).place(x=int(self.width * 0.3), y=int(self.height * 0.2),width=menu_item_width,height=button_height)
+        ttk.Button(self, text="Define subgroups within data",
                                 command=self.window4a_define_subgroups,
-                                font=('Helvetica', 16)).place(x=int(self.width*0.5), y=int(self.height*0.2),width=button_width,height=button_height)
-        tk.Button(self, text="Compare modules to manual scoring",
+                                ).place(x=int(self.width*0.5), y=int(self.height*0.2),width=button_width,height=button_height)
+        ttk.Button(self, text="Compare modules to manual scoring",
                                 command=self.window4b_pose_vs_BORIS,
-                                font=('Helvetica', 16)).place(x=int(self.width*0.5), y=int(self.height*0.27),width=button_width,height=button_height)
-        tk.Button(self, text="Manually combine pose modules",
-                                command=self.window1_start,
-                                font=('Helvetica', 16)).place(x=int(self.width*0.5), y=int(self.height*0.34),width=button_width,height=button_height)
+                                ).place(x=int(self.width*0.5), y=int(self.height*0.27),width=button_width,height=button_height)
+        ttk.Button(self, text="Manually combine pose modules",
+                                command=self.window4c_manual_combine,
+                                ).place(x=int(self.width*0.5), y=int(self.height*0.34),width=button_width,height=button_height)
 
-        tk.Label(self, text="Analyze and visualize:",
-                               font=('Helvetica', 16)).place(x=int(self.width * 0.3), y=int(self.height * 0.44),width=menu_item_width,height=button_height)
-        tk.Button(self, text="Measure pose module usage and transitions",
+        ttk.Label(self, text="Analyze and visualize:",
+                               ).place(x=int(self.width * 0.3), y=int(self.height * 0.44),width=menu_item_width,height=button_height)
+        ttk.Button(self, text="Measure pose module usage and transitions",
                                 command=self.window5a_usage_transitions_menu,
-                                font=('Helvetica', 16)).place(x=int(self.width*0.5), y=int(self.height*0.44),width=button_width,height=button_height)
-        tk.Button(self, text="Embed and/or measure distance between groups",
+                                ).place(x=int(self.width*0.5), y=int(self.height*0.44),width=button_width,height=button_height)
+        ttk.Button(self, text="Embed and/or measure distance between groups",
                                 command=self.window5b_embed_distance_menu,
-                                font=('Helvetica', 16)).place(x=int(self.width*0.5), y=int(self.height*0.51),width=button_width,height=button_height)
-        tk.Button(self, text="Classify and/or regress conditions",
+                                ).place(x=int(self.width*0.5), y=int(self.height*0.51),width=button_width,height=button_height)
+        ttk.Button(self, text="Classify and/or regress conditions",
                                 command=self.window5c_classify_regress_menu,
-                                font=('Helvetica', 16)).place(x=int(self.width*0.5), y=int(self.height*0.58),width=button_width,height=button_height)
+                                ).place(x=int(self.width*0.5), y=int(self.height*0.58),width=button_width,height=button_height)
 
-        tk.Label(self, text="Model and simulate:",
-                               font=('Helvetica', 16)).place(x=int(self.width * 0.3), y=int(self.height * 0.68),width=menu_item_width,height=button_height)
-        tk.Button(self, text="Fit curve to within-session pose data",
+        ttk.Label(self, text="Model and simulate:",
+                               ).place(x=int(self.width * 0.3), y=int(self.height * 0.68),width=menu_item_width,height=button_height)
+        ttk.Button(self, text="Fit curve to within-session pose data",
                                 command=self.window6a_fit_curve_menu,
-                                font=('Helvetica', 16)).place(x=int(self.width*0.5), y=int(self.height*0.68),width=button_width,height=button_height)
-        tk.Button(self, text="Simulate module labels, usage, or transitions",
+                                ).place(x=int(self.width*0.5), y=int(self.height*0.68),width=button_width,height=button_height)
+        ttk.Button(self, text="Simulate module labels, usage, or transitions",
                                 command=self.window6b_simulate_menu,
-                                font=('Helvetica', 16)).place(x=int(self.width*0.5), y=int(self.height*0.75),width=button_width,height=button_height)
-        tk.Button(self, text="Get cumulative distribution function from real or simulated behavior",
+                                ).place(x=int(self.width*0.5), y=int(self.height*0.75),width=button_width,height=button_height)
+        ttk.Button(self, text="Get cumulative distribution function from real or simulated behavior",
                                 command=self.window6c_cdf_menu,
-                                font=('Helvetica', 16)).place(x=int(self.width*0.5), y=int(self.height*0.82),width=button_width,height=button_height)
+                                ).place(x=int(self.width*0.5), y=int(self.height*0.82),width=button_width,height=button_height)
 
-        tk.Button(self, text="◀◀ back to start", command=self.window1_start,
-                                font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.9))
+        ttk.Button(self, text="◀◀ back to start", command=self.window1_start,
+                                ).place(x=int(self.width*0.3), y=int(self.height*0.9))
 
     def window4a_define_subgroups(self):
         self.clear_window()
@@ -448,36 +504,33 @@ class Application(tk.Tk):
             - 'subj2_conditionB.csv'
 
         You can do it! You're doing great."""
-        instruction_block = tk.Label(self,text=instruction_text, wraplength=int(self.width * 0.65),
-            padx=10,pady=10,bg="darkgray",fg="white",justify=tk.LEFT)
+        instruction_block = ttk.Label(self,text=instruction_text, wraplength=int(self.width * 0.65),justify=tk.LEFT)
 
         # Place the label in the window
         instruction_block.place(x=int(self.width * 0.3),y=int(self.height * 0.22),anchor=tk.NW)
-        tk.Button(self,
-                                text="Edit config.yaml",font=('Helvetica', 16),
+        ttk.Button(self,
+                                text="Edit config.yaml",
                                 command=lambda: metadata.edit_config(self.config_path)).place(x=int(self.width*0.6), y=int(self.height*0.75))
         # Bottom back buttons
-        tk.Button(self, text="◀ back to analysis menu", command=self.window3b_PS_menu,
-                                font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.83))
-        tk.Button(self, text="◀◀ back to start", command=self.window1_start,
-                                font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.9))
+        ttk.Button(self, text="◀ back to analysis menu", command=self.window3b_PS_menu,).place(x=int(self.width*0.3), y=int(self.height*0.83))
+        ttk.Button(self, text="◀◀ back to start", command=self.window1_start,).place(x=int(self.width*0.3), y=int(self.height*0.9))
 
     def window4b_pose_vs_BORIS(self):
         self.clear_window()
         self.create_sidebar_widget()
         self.create_header("Compare Pose Data to Manual Scoring",header_path="Configure ▶ Manual scoring comparison")
 
-        tk.Button(self, text="Update config file with manual scoring info from BORIS",
+        ttk.Button(self, text="Update config file with manual scoring info from BORIS",
                                 command=self.window4b2_boris_config,
-                                font=('Helvetica', 16)).place(x=int(self.width*0.65), y=int(self.height*0.4,),height=int(self.width*0.1),width=int(self.width*0.6),anchor=tk.CENTER)
-        tk.Button(self, text="Get and plot pose module to BORIS comparison matrix",
+                                ).place(x=int(self.width*0.65), y=int(self.height*0.4,),height=int(self.width*0.1),width=int(self.width*0.6),anchor=tk.CENTER)
+        ttk.Button(self, text="Get and plot pose module to BORIS comparison matrix",
                                 command=self.window4b3_pose_vs_BORIS,
-                                font=('Helvetica', 16)).place(x=int(self.width*0.65), y=int(self.height*0.6),height=int(self.width*0.1),width=int(self.width*0.6),anchor=tk.CENTER)
+                                ).place(x=int(self.width*0.65), y=int(self.height*0.6),height=int(self.width*0.1),width=int(self.width*0.6),anchor=tk.CENTER)
         # Bottom back buttons
-        tk.Button(self, text="◀ back to analysis menu", command=self.window3b_PS_menu,
-                                font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.83))
-        tk.Button(self, text="◀◀ back to start", command=self.window1_start,
-                                font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.9))
+        ttk.Button(self, text="◀ back to analysis menu", command=self.window3b_PS_menu,
+                                ).place(x=int(self.width*0.3), y=int(self.height*0.83))
+        ttk.Button(self, text="◀◀ back to start", command=self.window1_start,
+                                ).place(x=int(self.width*0.3), y=int(self.height*0.9))
 
     def window4b2_boris_config(self):
         self.clear_window()
@@ -486,81 +539,106 @@ class Application(tk.Tk):
 
         instruction_text = """For this step, you will need to manually edit the config file, which you should be able to access by pressing the 'Edit config.yaml' button below.
         You'll have to edit the boris_directory and boris_to_pose_pairings."""
-        instruction_block = tk.Label(self,text=instruction_text, wraplength=int(self.width * 0.65),
-            padx=10,pady=10,bg="darkgray",fg="white",justify=tk.LEFT)
+        instruction_block = ttk.Label(self,text=instruction_text, wraplength=int(self.width * 0.65),justify=tk.LEFT)
 
         instruction_block.place(x=int(self.width * 0.3),y=int(self.height * 0.3),anchor=tk.NW)
-        tk.Button(self,
+        ttk.Button(self,
                                 text="Edit config.yaml",
-                                font=('Helvetica', 16),
-                                command=lambda: metadata.edit_config(self.config["project_directory"] + "/config.yaml")).place(x=int(self.width * 0.65),y=int(self.height * 0.6),anchor=tk.CENTER)
+                                command=lambda: metadata.edit_config(self.config["project_directory"] + "/config_PS.yaml")).place(x=int(self.width * 0.65),y=int(self.height * 0.6),anchor=tk.CENTER)
         # Bottom back buttons
-        tk.Button(self, text="◀ update config and go back to BORIS menu", command=self.load_project_BORIS,
-                                font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.76))
-        tk.Button(self, text="◀ back to analysis menu", command=self.window3b_PS_menu,
-                                font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.83))
-        tk.Button(self, text="◀◀ back to start", command=self.window1_start,
-                                font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.9))
+        ttk.Button(self, text="◀ update config and go back to BORIS menu", command=self.load_project_BORIS,
+                                ).place(x=int(self.width*0.3), y=int(self.height*0.76))
+        ttk.Button(self, text="◀ update config and go back to analysis menu", command=self.load_project_mainmenu,
+                                ).place(x=int(self.width*0.3), y=int(self.height*0.83))
+        ttk.Button(self, text="◀◀ back to start", command=self.window1_start,
+                                ).place(x=int(self.width*0.3), y=int(self.height*0.9))
 
     def window4b3_pose_vs_BORIS(self):
         self.clear_window()
         self.create_sidebar_widget()
         self.create_header("Compare Pose Data to Manual Scoring",header_path="Configure ▶ Manual scoring comparison ▶ Plot comparison matrix")
 
-        tk.Label(self, text="Get a matrix showing overlap between pose modules and behaviors manually scored in BORIS.",
-                               font=('Helvetica', 16)).place(x=int(self.width*0.65), y=int(self.height*0.4),anchor=tk.CENTER)
+        ttk.Label(self, text="Get a matrix showing overlap between pose modules and behaviors manually scored in BORIS.",
+                               ).place(x=int(self.width*0.65), y=int(self.height*0.4),anchor=tk.CENTER)
 
-        tk.Button(self, text="Compare!",
+        ttk.Button(self, text="Compare!",
                                 command=lambda: self.plot_pose_vs_BORIS(),
-                                font=('Helvetica', 16)).place(x=int(self.width*0.85), y=int(self.height*0.9))
+                                ).place(x=int(self.width*0.85), y=int(self.height*0.9))
         # Bottom back buttons
-        tk.Button(self, text="◀ back to analysis menu", command=self.window3b_PS_menu,
-                                font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.83))
-        tk.Button(self, text="◀◀ back to start", command=self.window1_start,
-                                font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.9))
+        ttk.Button(self, text="◀ back to analysis menu", command=self.window3b_PS_menu,
+                                ).place(x=int(self.width*0.3), y=int(self.height*0.83))
+        ttk.Button(self, text="◀◀ back to start", command=self.window1_start,
+                                ).place(x=int(self.width*0.3), y=int(self.height*0.9))
 
+    def window4c_manual_combine(self):
+        self.clear_window()
+        self.create_sidebar_widget()
+        self.create_header("Manually Combine Pose Modules",header_path="Configure ▶ Manually combine pose modules")
+
+        instruction_text = """For this step, you will need to manually edit the config file, which you should be able to access by pressing the 'Edit config.yaml' button below.
+        You'll have to edit the remappings section to contain, for each remapping, a list of modules to be remapped and what the combined class should be. Formatting should be as follows:
+        remappings:
+        - - [0,1,2,3]
+          - 'walking'
+        - - [4,5,6,7]
+          - 'resting'
+        - - [8]
+          - 'grooming'"""
+        instruction_block = ttk.Label(self,text=instruction_text, wraplength=int(self.width * 0.65),justify=tk.LEFT)
+
+        instruction_block.place(x=int(self.width * 0.3),y=int(self.height * 0.3),anchor=tk.NW)
+        ttk.Button(self,
+                                text="Edit config.yaml",
+                                command=lambda: metadata.edit_config(self.config["project_directory"] + "/config_PS.yaml")).place(x=int(self.width * 0.65),y=int(self.height * 0.7),anchor=tk.CENTER)
+        # Bottom back buttons
+        ttk.Button(self, text="◀ update config and go back to analysis menu", command=self.load_project_mainmenu,
+                                ).place(x=int(self.width*0.3), y=int(self.height*0.83))
+        ttk.Button(self, text="◀◀ back to start", command=self.window1_start,
+                                ).place(x=int(self.width*0.3), y=int(self.height*0.9))
     def window5a_usage_transitions_menu(self):
         self.clear_window()
         self.create_sidebar_widget()
         self.create_header("Pose Usage and Transition Analysis Menu",header_path="Viz & Analyze ▶ Usage & Transitions")
 
-        tk.Label(self, text="What kind of plot would you like to do?",
-                               font=('Helvetica', 16)).place(x=int(self.width*0.65), y=int(self.height*0.3),anchor=tk.CENTER)
+        ttk.Label(self, text="What kind of plot would you like to do?",
+                               ).place(x=int(self.width*0.65), y=int(self.height*0.3),anchor=tk.CENTER)
 
-        tk.Button(self, text="1. Get pose usage and transitions",
+        ttk.Button(self, text="1. Get pose usage and transitions",
                                 command=lambda: self.window5a1_get_usage_transitions(),
-                                font=('Helvetica', 16)).place(x=int(self.width*0.65), y=int(self.height*0.35),height=int(self.height*0.2),width=int(self.width*0.6),anchor=tk.CENTER)
-        tk.Button(self, text="2. Plot pose usage and/or transitions",
+                                ).place(x=int(self.width*0.65), y=int(self.height*0.35),height=int(self.height*0.2),width=int(self.width*0.6),anchor=tk.CENTER)
+        ttk.Button(self, text="2. Plot pose usage and/or transitions",
                                 command=lambda: self.window5a2_plot_usage_transitions(),
-                                font=('Helvetica', 16)).place(x=int(self.width*0.65), y=int(self.height*0.58),height=int(self.height*0.2),width=int(self.width*0.6),anchor=tk.CENTER)
+                                ).place(x=int(self.width*0.65), y=int(self.height*0.58),height=int(self.height*0.2),width=int(self.width*0.6),anchor=tk.CENTER)
 
-        tk.Button(self, text="◀ back to analysis menu", command=self.window3b_PS_menu,
-                                font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.83))
-        tk.Button(self, text="◀◀ back to start", command=self.window1_start,
-                                font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.9))
+        ttk.Button(self, text="◀ back to analysis menu", command=self.window3b_PS_menu,
+                                ).place(x=int(self.width*0.3), y=int(self.height*0.83))
+        ttk.Button(self, text="◀◀ back to start", command=self.window1_start,
+                                ).place(x=int(self.width*0.3), y=int(self.height*0.9))
+
+
     def window5a1_get_usage_transitions(self):
         self.clear_window()
         self.create_sidebar_widget()
         self.create_header("Measure Pose Usage and Transitions",header_path="Viz & Analyze ▶ Usage & Transitions ▶ Measure")
 
-        tk.Label(self, text="Enter info about your analysis.",
-                               font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.25))
+        ttk.Label(self, text="Enter info about your analysis.",
+                               ).place(x=int(self.width*0.3), y=int(self.height*0.25))
 
-        tk.Label(self, text="Start time (seconds)",
-                               font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.35))
-        start = tk.Entry(self)
+        ttk.Label(self, text="Start time (seconds)",
+                               ).place(x=int(self.width*0.3), y=int(self.height*0.35))
+        start = ttk.Entry(self)
         start.place(x=int(self.width*0.45), y=int(self.height*0.35))
-        tk.Label(self, text="End time (seconds)",
-                               font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.45))
-        end = tk.Entry(self)
+        ttk.Label(self, text="End time (seconds)",
+                               ).place(x=int(self.width*0.3), y=int(self.height*0.45))
+        end = ttk.Entry(self)
         end.place(x=int(self.width*0.45), y=int(self.height*0.45))
-        tk.Label(self, text="Data to include",
-                               font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.55))
+        ttk.Label(self, text="Data to include",
+                               ).place(x=int(self.width*0.3), y=int(self.height*0.55))
         dropdown = MultiDropDown(self,options=["all combined"]+list(self.config["subgroups"].keys()))
         dropdown.place(x=int(self.width*0.45), y=int(self.height*0.55))
-        tk.Label(self, text="Binsize (seconds; blank for no binning)",
-                               font=('Helvetica', 16)).place(x=int(self.width*0.65), y=int(self.height*0.35))
-        binsize = tk.Entry(self)
+        ttk.Label(self, text="Binsize (seconds; blank for no binning)",
+                               ).place(x=int(self.width*0.65), y=int(self.height*0.35))
+        binsize = ttk.Entry(self)
         binsize.place(x=int(self.width*0.65), y=int(self.height*0.45))
         save_option = tk.StringVar(value="scatter")
         save_options = ["Save to pickle (for further using in MARIPoSA)",
@@ -568,25 +646,25 @@ class Application(tk.Tk):
                          "Save to pickle AND csv"]
         style_vars = ["pickle", "csv", "both"]
         for s in range(len(style_vars)):
-            radio_btn = tk.Radiobutton(self, text=save_options[s],
+            radio_btn = ttk.Radiobutton(self, text=save_options[s],
                                                      variable=save_option, value=style_vars[s],
-                                                     font=('Helvetica', 16))
+                                                     )
             radio_btn.place(x=int(self.width*0.65), y=int(self.height*(0.55+0.08*s)))
-        tk.Button(self, text="Analyze & Save",
+        ttk.Button(self, text="Analyze & Save",
                                 command=lambda: self.save_usage_transitions(int(start.get()),
                                                                             int(end.get()),
                                                                             dropdown.get_selected_values(),
                                                                             binsize.get(),
                                                                             save_to=save_option.get()),
-                                font=('Helvetica', 16)).place(x=int(self.width*0.8), y=int(self.height*0.8))
-        tk.Button(self, text="Proceed to plotting",
+                                ).place(x=int(self.width*0.8), y=int(self.height*0.8))
+        ttk.Button(self, text="Proceed to plotting",
                                 command=lambda: self.window5a2_plot_usage_transitions(),
-                                font=('Helvetica', 16)).place(x=int(self.width*0.8), y=int(self.height*0.9))
+                                ).place(x=int(self.width*0.8), y=int(self.height*0.9))
         # Bottom back buttons
-        tk.Button(self, text="◀ back to analysis menu", command=self.window3b_PS_menu,
-                                font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.83))
-        tk.Button(self, text="◀◀ back to start", command=self.window1_start,
-                                font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.9))
+        ttk.Button(self, text="◀ back to analysis menu", command=self.window3b_PS_menu,
+                                ).place(x=int(self.width*0.3), y=int(self.height*0.83))
+        ttk.Button(self, text="◀◀ back to start", command=self.window1_start,
+                                ).place(x=int(self.width*0.3), y=int(self.height*0.9))
 
     def window5a2_plot_usage_transitions(self,pickle_path_prefill = "/path/to/usage.pickle",
                                          tx_pickle_path_prefill="/path/to/transitions.pickle",
@@ -596,51 +674,51 @@ class Application(tk.Tk):
         self.create_header("Get & Plot Pose Usage",
                            header_path="Viz & Analyze ▶ Usage & Transitions ▶ Plot")
 
-        tk.Label(self, text="Path to module usage .pickle:",
-                               font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.25))
-        pickle_path = tk.Entry(self)
+        ttk.Label(self, text="Path to module usage .pickle:",
+                               ).place(x=int(self.width*0.3), y=int(self.height*0.25))
+        pickle_path = ttk.Entry(self)
         pickle_path.insert(0, pickle_path_prefill)
         pickle_path.place(x=int(self.width*0.6), y=int(self.height*0.25))
-        tk.Button(self,
+        ttk.Button(self,
                                 text="Browse",
                                 command=lambda: self.window_browse(pickle_path, type="file")).place(x=int(self.width*0.8), y=int(self.height*0.25))
-        tk.Label(self, text="Path to module transitions .pickle:",
-                               font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.32))
-        tx_pickle_path = tk.Entry(self)
+        ttk.Label(self, text="Path to module transitions .pickle:",
+                               ).place(x=int(self.width*0.3), y=int(self.height*0.32))
+        tx_pickle_path = ttk.Entry(self)
         tx_pickle_path.insert(0, tx_pickle_path_prefill)
         tx_pickle_path.place(x=int(self.width*0.6), y=int(self.height*0.32))
-        tk.Button(self,
+        ttk.Button(self,
                                 text="Browse",
                                 command=lambda: self.window_browse(tx_pickle_path, type="file")).place(x=int(self.width*0.8), y=int(self.height*0.32))
         if plot_option==None:
-            tk.Label(self, text="What type of plot do you want to make?",
-                                   font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.4))
-            tk.Button(self, text="Usage comparison",
+            ttk.Label(self, text="What type of plot do you want to make?",
+                                   ).place(x=int(self.width*0.3), y=int(self.height*0.4))
+            ttk.Button(self, text="Usage comparison",
                                     command=lambda: self.window5a2_plot_usage_transitions(pickle_path_prefill=pickle_path.get(),
                                                                                           tx_pickle_path_prefill=tx_pickle_path.get(),
                                                                                           plot_option="usage"),
-                                    font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.45))
-            tk.Button(self, text="Pairwise network\ncomparison",
+                                    ).place(x=int(self.width*0.3), y=int(self.height*0.45))
+            ttk.Button(self, text="Pairwise network\ncomparison",
                                     command=lambda: self.window5a2_plot_usage_transitions(pickle_path_prefill=pickle_path.get(),
                                                                                           tx_pickle_path_prefill=tx_pickle_path.get(),
                                                                                           plot_option="network"),
-                                    font=('Helvetica', 16)).place(x=int(self.width*0.55), y=int(self.height*0.45))
-            tk.Button(self, text="Within-session\ntime dynamic usage",
+                                    ).place(x=int(self.width*0.55), y=int(self.height*0.45))
+            ttk.Button(self, text="Within-session\ntime dynamic usage",
                                     command=lambda: self.window5a2_plot_usage_transitions(pickle_path_prefill=pickle_path.get(),
                                                                                           tx_pickle_path_prefill=tx_pickle_path.get(),
                                                                                           plot_option="sandplot"),
-                                    font=('Helvetica', 16)).place(x=int(self.width*0.8), y=int(self.height*0.45))
+                                    ).place(x=int(self.width*0.8), y=int(self.height*0.45))
         elif plot_option=="usage":
-            tk.Label(self, text="Selected plot type: USAGE",
-                                   font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.4))
-            tk.Label(self, text="Colormap",
-                                   font=('Helvetica', 16)).place(x=int(self.width*0.65), y=int(self.height*0.5))
+            ttk.Label(self, text="Selected plot type: USAGE",
+                                   ).place(x=int(self.width*0.3), y=int(self.height*0.4))
+            ttk.Label(self, text="Colormap",
+                                   ).place(x=int(self.width*0.65), y=int(self.height*0.5))
             color = tk.ComboBox(self, values=["jet", "cividis", "viridis", "magma"])
             color.place(x=int(self.width*0.75), y=int(self.height*0.5))
             color.set("jet")
             # Choose style for plot
-            tk.Label(self, text="What should the usage plot style be?",
-                                   font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.5))
+            ttk.Label(self, text="What should the usage plot style be?",
+                                   ).place(x=int(self.width*0.3), y=int(self.height*0.5))
             style = tk.StringVar(value="scatter")
             style_options = ["Bar with scattered individual points",
                              "Bar with standard error of the mean",
@@ -648,36 +726,36 @@ class Application(tk.Tk):
                              "Stacked means"]
             style_vars = ["bar_scatter", "bar_error", "points", "stacked"]
             for s in range(len(style_vars)):
-                radio_btn = tk.Radiobutton(self, text=style_options[s],
+                radio_btn = ttk.Radiobutton(self, text=style_options[s],
                                                          variable=style, value=style_vars[s],
-                                                         font=('Helvetica', 16))
+                                                         )
                 radio_btn.place(x=int(self.width*0.3), y=int(self.height*(0.5+0.06*s)))
-            tk.Button(self, text="Plot it!",
+            ttk.Button(self, text="Plot it!",
                                     command=lambda: self.plot_usage(pickle_path.get(), style.get(), color.get()),
-                                    font=('Helvetica', 16)).place(x=int(self.width*0.8), y=int(self.height*0.9))
+                                    ).place(x=int(self.width*0.8), y=int(self.height*0.9))
 
         elif plot_option == "network":
-            tk.Label(self, text="Selected plot type: NETWORK",
-                                   font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.4))
-            tk.Label(self, text="Colormap",
-                                   font=('Helvetica', 16)).place(x=int(self.width*0.65), y=int(self.height*0.5))
+            ttk.Label(self, text="Selected plot type: NETWORK",
+                                   ).place(x=int(self.width*0.3), y=int(self.height*0.4))
+            ttk.Label(self, text="Colormap",
+                                   ).place(x=int(self.width*0.65), y=int(self.height*0.5))
             color = tk.Combobox(self, values=["bwr", "seismic", "PiYG", "BrBG", "PRGn"])
             color.place(x=int(self.width*0.75), y=int(self.height*0.5))
             color.set("bwr")
-            tk.Button(self, text="Plot it!",
+            ttk.Button(self, text="Plot it!",
                                     command=lambda: self.plot_network(pickle_path.get(), tx_pickle_path.get(), color.get()),
-                                    font=('Helvetica', 16)).place(x=int(self.width*0.8), y=int(self.height*0.9))
+                                    ).place(x=int(self.width*0.8), y=int(self.height*0.9))
         elif plot_option=="sandplot":
-            tk.Label(self, text="Selected plot type: SANDPLOT",
-                                   font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.4))
-            tk.Button(self, text="Plot it!",
+            ttk.Label(self, text="Selected plot type: SANDPLOT",
+                                   ).place(x=int(self.width*0.3), y=int(self.height*0.4))
+            ttk.Button(self, text="Plot it!",
                                     command=lambda: self.plot_sandplot(pickle_path.get()),
-                                    font=('Helvetica', 16)).place(x=int(self.width*0.8), y=int(self.height*0.9))
+                                    ).place(x=int(self.width*0.8), y=int(self.height*0.9))
         # Bottom back buttons
-        tk.Button(self, text="◀ back to analysis menu", command=self.window3b_PS_menu,
-                                font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.83))
-        tk.Button(self, text="◀◀ back to start", command=self.window1_start,
-                                font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.9))
+        ttk.Button(self, text="◀ back to analysis menu", command=self.window3b_PS_menu,
+                                ).place(x=int(self.width*0.3), y=int(self.height*0.83))
+        ttk.Button(self, text="◀◀ back to start", command=self.window1_start,
+                                ).place(x=int(self.width*0.3), y=int(self.height*0.9))
 
     def window5b_embed_distance_menu(self,pickle_path_prefill = "/path/to/file.pickle",
                                          emb_dist_option=None):
@@ -685,72 +763,72 @@ class Application(tk.Tk):
         self.create_sidebar_widget()
         self.create_header("Embed and Distance Menu",header_path="Viz & Analyze ▶ Embed")
 
-        tk.Label(self, text="Path to module feature object (transitions or usage) .pickle:",
-                               font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.25))
-        pickle_path = tk.Entry(self)
+        ttk.Label(self, text="Path to module feature object (transitions or usage) .pickle:",
+                               ).place(x=int(self.width*0.3), y=int(self.height*0.25))
+        pickle_path = ttk.Entry(self)
         pickle_path.insert(0, pickle_path_prefill)
         pickle_path.place(x=int(self.width*0.7), y=int(self.height*0.25))
-        tk.Button(self,
+        ttk.Button(self,
                                 text="Browse",
                                 command=lambda: self.window_browse(pickle_path, type="file")).place(x=int(self.width*0.85), y=int(self.height*0.25))
 
         if emb_dist_option is None:
-            tk.Label(self, text="Embed or measure distance between groups?",
-                                   font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.4))
-            tk.Button(self, text="Embed",
+            ttk.Label(self, text="Embed or measure distance between groups?",
+                                   ).place(x=int(self.width*0.3), y=int(self.height*0.4))
+            ttk.Button(self, text="Embed",
                                     command=lambda: self.window5b_embed_distance_menu(
                                         pickle_path_prefill=pickle_path.get(),
                                         emb_dist_option="embed"),
-                                    font=('Helvetica', 16)).place(x=int(self.width * 0.3), y=int(self.height * 0.45))
-            tk.Button(self, text="Distance",
+                                    ).place(x=int(self.width * 0.3), y=int(self.height * 0.45))
+            ttk.Button(self, text="Distance",
                                     command=lambda: self.window5b_embed_distance_menu(
                                         pickle_path_prefill=pickle_path.get(),
                                         emb_dist_option="distance"),
-                                    font=('Helvetica', 16)).place(x=int(self.width * 0.55), y=int(self.height * 0.45))
+                                    ).place(x=int(self.width * 0.55), y=int(self.height * 0.45))
         elif emb_dist_option=="embed":
-            tk.Label(self, text="Embed or measure distance option: EMBED",
-                                   font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.4))
-            tk.Label(self, text="Dimensionality reduction method",
-                                   font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.6))
+            ttk.Label(self, text="Embed or measure distance option: EMBED",
+                                   ).place(x=int(self.width*0.3), y=int(self.height*0.4))
+            ttk.Label(self, text="Dimensionality reduction method",
+                                   ).place(x=int(self.width*0.3), y=int(self.height*0.6))
             embedding_type = ttk.Combobox(self, values=["pca", "lda"])
             embedding_type.place(x=int(self.width*0.65), y=int(self.height*0.6))
             embedding_type.set("pca")
-            tk.Label(self, text="Colormap",
-                                   font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.7))
+            ttk.Label(self, text="Colormap",
+                                   ).place(x=int(self.width*0.3), y=int(self.height*0.7))
             color = ttk.Combobox(self, values=["jet", "cividis", "viridis", "magma"])
             color.place(x=int(self.width*0.65), y=int(self.height*0.7))
             color.set("jet")
-            tk.Button(self, text="Plot embeddings",
+            ttk.Button(self, text="Plot embeddings",
                                     command=lambda: self.embed_plot(pickle_path.get(), embedding_type.get(), color.get()),
-                                    font=('Helvetica', 16)).place(x=int(self.width*0.8), y=int(self.height*0.9))
+                                    ).place(x=int(self.width*0.8), y=int(self.height*0.9))
         elif emb_dist_option=="distance":
-            tk.Label(self, text="Embed or measure distance option: DISTANCE",
-                                   font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.4))
-            tk.Label(self, text="Distance metric to use",
-                                   font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.6))
+            ttk.Label(self, text="Embed or measure distance option: DISTANCE",
+                                   ).place(x=int(self.width*0.3), y=int(self.height*0.4))
+            ttk.Label(self, text="Distance metric to use",
+                                   ).place(x=int(self.width*0.3), y=int(self.height*0.6))
             dist_metric = ttk.Combobox(self, values=["euclidean","cityblock","correlation"])
             dist_metric.place(x=int(self.width*0.5), y=int(self.height*0.6))
             dist_metric.set("euclidean")
-            tk.Label(self, text="Pairwise or centroid",
-                                   font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.7))
+            ttk.Label(self, text="Pairwise or centroid",
+                                   ).place(x=int(self.width*0.3), y=int(self.height*0.7))
             pairwise_centroid_opt = ttk.Combobox(self, values=["pairwise", "centroid"])
             pairwise_centroid_opt.place(x=int(self.width*0.5), y=int(self.height*0.7))
             pairwise_centroid_opt.set("centroid")
-            tk.Label(self, text="Plot type",
-                                   font=('Helvetica', 16)).place(x=int(self.width*0.65), y=int(self.height*0.6))
+            ttk.Label(self, text="Plot type",
+                                   ).place(x=int(self.width*0.65), y=int(self.height*0.6))
             plot_type = ttk.Combobox(self, values=["boxplot", "heatmap"])
             plot_type.place(x=int(self.width*0.8), y=int(self.height*0.6))
             plot_type.set("heatmap")
-            tk.Button(self, text="Plot distance",
+            ttk.Button(self, text="Plot distance",
                                     command=lambda: self.distance_plot(pickle_path.get(), dist_metric.get(),
                                                                        pairwise_centroid_opt.get(),
                                                                        plot_type.get()),
-                                    font=('Helvetica', 16)).place(x=int(self.width*0.8), y=int(self.height*0.9))
+                                    ).place(x=int(self.width*0.8), y=int(self.height*0.9))
         # Bottom back buttons
-        tk.Button(self, text="◀ back to analysis menu", command=self.window3b_PS_menu,
-                                font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.83))
-        tk.Button(self, text="◀◀ back to start", command=self.window1_start,
-                                font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.9))
+        ttk.Button(self, text="◀ back to analysis menu", command=self.window3b_PS_menu,
+                                ).place(x=int(self.width*0.3), y=int(self.height*0.83))
+        ttk.Button(self, text="◀◀ back to start", command=self.window1_start,
+                                ).place(x=int(self.width*0.3), y=int(self.height*0.9))
 
 
     def window5c_classify_regress_menu(self,pickle_path_prefill="/path/to/file.pickle",classify_regress_opt=None):
@@ -758,49 +836,49 @@ class Application(tk.Tk):
         self.create_sidebar_widget()
         self.create_header("Classify and Embed Menu",header_path="Viz & Analyze ▶ Classify/Regress")
 
-        tk.Label(self, text="Path to module feature object (transitions or usage) .pickle:",
-                               font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.25))
-        pickle_path = tk.Entry(self)
+        ttk.Label(self, text="Path to module feature object (transitions or usage) .pickle:",
+                               ).place(x=int(self.width*0.3), y=int(self.height*0.25))
+        pickle_path = ttk.Entry(self)
         pickle_path.insert(0, pickle_path_prefill)
         pickle_path.place(x=int(self.width*0.7), y=int(self.height*0.25))
-        tk.Button(self,
+        ttk.Button(self,
                                 text="Browse",
                                 command=lambda: self.window_browse(pickle_path, type="file")).place(x=int(self.width*0.85), y=int(self.height*0.25))
         if classify_regress_opt is None:
-            tk.Label(self, text="Would you like to predict independent variable associated with subgroups using classification or regression?",
-                                   font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.4))
-            tk.Button(self, text="Classify",
+            ttk.Label(self, text="Would you like to predict independent variable associated with subgroups using classification or regression?",
+                                   ).place(x=int(self.width*0.3), y=int(self.height*0.4))
+            ttk.Button(self, text="Classify",
                                     command=lambda: self.window5c_classify_regress_menu(
                                         pickle_path_prefill=pickle_path.get(),
                                         classify_regress_opt="classify"),
-                                    font=('Helvetica', 16)).place(x=int(self.width * 0.3), y=int(self.height * 0.45))
-            tk.Button(self, text="Regress",
+                                    ).place(x=int(self.width * 0.3), y=int(self.height * 0.45))
+            ttk.Button(self, text="Regress",
                                     command=lambda: self.window5c_classify_regress_menu(
                                         pickle_path_prefill=pickle_path.get(),
                                         classify_regress_opt="regress"),
-                                    font=('Helvetica', 16)).place(x=int(self.width * 0.55), y=int(self.height * 0.45))
+                                    ).place(x=int(self.width * 0.55), y=int(self.height * 0.45))
         elif classify_regress_opt=="classify":
-            tk.Label(self, text="Classification method to use",
-                                   font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.6))
+            ttk.Label(self, text="Classification method to use",
+                                   ).place(x=int(self.width*0.3), y=int(self.height*0.6))
             method = tk.ComboBox(self, values=["LogisticRegression","LDA","MLP","NaiveBayes","KNN","RandomForest"])
             method.place(x=int(self.width*0.5), y=int(self.height*0.6))
             method.set("LogisticRegression")
-            tk.Label(self, text="Classify or regress option: CLASSIFY",
-                                   font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.4))
-            tk.Button(self, text="Leave-one-out-cross-validation (LOOCV)",
+            ttk.Label(self, text="Classify or regress option: CLASSIFY",
+                                   ).place(x=int(self.width*0.3), y=int(self.height*0.4))
+            ttk.Button(self, text="Leave-one-out-cross-validation (LOOCV)",
                                     command=lambda: self.classify(pickle_path.get(), method.get(), "loocv"),
-                                    font=('Helvetica', 16)).place(x=int(self.width*0.8), y=int(self.height*0.8))
-            tk.Button(self, text="Fit and save classifier",
+                                    ).place(x=int(self.width*0.8), y=int(self.height*0.8))
+            ttk.Button(self, text="Fit and save classifier",
                                     command=lambda: self.classify(pickle_path.get(), method.get(), "fullfit"),
-                                    font=('Helvetica', 16)).place(x=int(self.width*0.8), y=int(self.height*0.9))
+                                    ).place(x=int(self.width*0.8), y=int(self.height*0.9))
         elif classify_regress_opt=="regress":
-            tk.Label(self, text="Classify or regress option: REGRESS",
-                                   font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.4))
+            ttk.Label(self, text="Classify or regress option: REGRESS",
+                                   ).place(x=int(self.width*0.3), y=int(self.height*0.4))
         # Bottom back buttons
-        tk.Button(self, text="◀ back to analysis menu", command=self.window3b_PS_menu,
-                                font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.83))
-        tk.Button(self, text="◀◀ back to start", command=self.window1_start,
-                                font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.9))
+        ttk.Button(self, text="◀ back to analysis menu", command=self.window3b_PS_menu,
+                                ).place(x=int(self.width*0.3), y=int(self.height*0.83))
+        ttk.Button(self, text="◀◀ back to start", command=self.window1_start,
+                                ).place(x=int(self.width*0.3), y=int(self.height*0.9))
 
     def window6a_fit_curve_menu(self):
         self.clear_window()
@@ -808,10 +886,10 @@ class Application(tk.Tk):
         self.create_header("Fit a Curve",header_path="Model & Simulate ▶ Curve Fitting")
 
         # Bottom back buttons
-        tk.Button(self, text="◀ back to analysis menu", command=self.window3b_PS_menu,
-                                font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.83))
-        tk.Button(self, text="◀◀ back to start", command=self.window1_start,
-                                font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.9))
+        ttk.Button(self, text="◀ back to analysis menu", command=self.window3b_PS_menu,
+                                ).place(x=int(self.width*0.3), y=int(self.height*0.83))
+        ttk.Button(self, text="◀◀ back to start", command=self.window1_start,
+                                ).place(x=int(self.width*0.3), y=int(self.height*0.9))
 
     def window6b_simulate_menu(self):
         self.clear_window()
@@ -819,10 +897,10 @@ class Application(tk.Tk):
         self.create_header("Simulate Pose Data",header_path="Model & Simulate ▶ Simulate Data")
 
         # Bottom back buttons
-        tk.Button(self, text="◀ back to analysis menu", command=self.window3b_PS_menu,
-                                font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.83))
-        tk.Button(self, text="◀◀ back to start", command=self.window1_start,
-                                font=('Helvetica', 16)).place(x=int(self.width*0.3), y=int(self.height*0.9))
+        ttk.Button(self, text="◀ back to analysis menu", command=self.window3b_PS_menu,
+                                ).place(x=int(self.width*0.3), y=int(self.height*0.83))
+        ttk.Button(self, text="◀◀ back to start", command=self.window1_start,
+                                ).place(x=int(self.width*0.3), y=int(self.height*0.9))
 
     def window6c_cdf_menu(self):
         self.clear_window()
@@ -831,10 +909,10 @@ class Application(tk.Tk):
                            header_path="Model & Simulate ▶ Cumulative Distribution Function")
 
         # Bottom back buttons
-        tk.Button(self, text="◀ back to analysis menu", command=self.window3b_PS_menu,
-                                font=('Helvetica', 16)).place(x=int(self.width * 0.3), y=int(self.height * 0.83))
-        tk.Button(self, text="◀◀ back to start", command=self.window1_start,
-                                font=('Helvetica', 16)).place(x=int(self.width * 0.3), y=int(self.height * 0.9))
+        ttk.Button(self, text="◀ back to analysis menu", command=self.window3b_PS_menu,
+                                ).place(x=int(self.width * 0.3), y=int(self.height * 0.83))
+        ttk.Button(self, text="◀◀ back to start", command=self.window1_start,
+                                ).place(x=int(self.width * 0.3), y=int(self.height * 0.9))
 #
 
     def plot_pose_vs_BORIS(self):
@@ -981,7 +1059,7 @@ class MultiDropDown(tk.Frame):
         self.choices = {}
         self.menu_visible = False
 
-        self.menubutton = tk.Button(self, text="Select option(s) ▼", command=self.toggle_menu, width=25)
+        self.menubutton = ttk.Button(self, text="Select option(s) ▼", command=self.toggle_menu, width=25)
         self.menubutton.pack(fill="x")
 
         self.dropdown_win = None  # Will be created on first open
@@ -1077,7 +1155,7 @@ class PlotWindow(tk.Tk):
         canvas_widget.grid(row=0, column=0)
 
         # Add a button to save the plot
-        save_button = tk.Button(self, text="Save Plot", command=lambda: self.save_plot(self.fig))
+        save_button = ttk.Button(self, text="Save Plot", command=lambda: self.save_plot(self.fig))
         save_button.grid(row=1, column=0)
 
         self.grid_rowconfigure(0, weight=1)
