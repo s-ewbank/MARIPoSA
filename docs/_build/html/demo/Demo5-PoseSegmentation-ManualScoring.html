@@ -9,7 +9,7 @@
   <title>Demo 5: Comparing Pose Modules to Manual Scoring Data &mdash; MARIPoSA 0.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
-      <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css?v=be8a1c11" />
 
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
@@ -50,7 +50,8 @@
 <li class="toctree-l1"><a class="reference internal" href="Demo3-PoseSegmentation-Embed.html">Demo 3: Embedding of Pose Segmentation Data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Demo4-PoseSegmentation-ClassificationAndRegression.html">Demo 4: Regression and Classification of Group Conditions</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Demo 5: Comparing Pose Modules to Manual Scoring Data</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#incorporating-manual-scoring-data-from-boris">5.1: Incorporating manual scoring data from BORIS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#remapping-pose-modules-to-grouped-classes">5.1: Remapping pose modules to grouped classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#incorporating-manual-scoring-data-from-boris-to-remap-modules">5.2: Incorporating manual scoring data from BORIS to remap modules</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="Demo6-PoseSegmentation-Simulation.html">Demo 6: Simulating Pose Segmentation Data</a></li>
@@ -129,41 +130,1523 @@
 </div>
 </div>
 </div>
-<section id="incorporating-manual-scoring-data-from-boris">
-<h2>5.1: Incorporating manual scoring data from BORIS<a class="headerlink" href="#incorporating-manual-scoring-data-from-boris" title="Permalink to this heading"></a></h2>
+<section id="remapping-pose-modules-to-grouped-classes">
+<h2>5.1: Remapping pose modules to grouped classes<a class="headerlink" href="#remapping-pose-modules-to-grouped-classes" title="Permalink to this heading"></a></h2>
+<p>It is simple to remap pose modules to groups however you like - perhaps from visual inspection or some other approach to grouping. To do so, you just reset the “remappings” key from the config (either in python or directly in the config file). Then, when you create a labels_df object, use analyze.combine_pose_modules to remap modules to their assigned remapping class.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;remappings&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[[[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">7</span><span class="p">,</span><span class="mi">8</span><span class="p">,</span><span class="mi">9</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">11</span><span class="p">,</span><span class="mi">12</span><span class="p">,</span><span class="mi">13</span><span class="p">,</span><span class="mi">14</span><span class="p">],</span><span class="s2">&quot;modules_0-14&quot;</span><span class="p">],</span>
+                        <span class="p">[[</span><span class="mi">15</span><span class="p">,</span><span class="mi">16</span><span class="p">,</span><span class="mi">17</span><span class="p">,</span><span class="mi">18</span><span class="p">,</span><span class="mi">19</span><span class="p">,</span><span class="mi">20</span><span class="p">,</span><span class="mi">21</span><span class="p">,</span><span class="mi">22</span><span class="p">,</span><span class="mi">23</span><span class="p">,</span><span class="mi">24</span><span class="p">,</span><span class="mi">25</span><span class="p">,</span><span class="mi">26</span><span class="p">,</span><span class="mi">27</span><span class="p">,</span><span class="mi">28</span><span class="p">,</span><span class="mi">29</span><span class="p">],</span><span class="s2">&quot;modules_15-29&quot;</span><span class="p">]]</span>
+
+<span class="n">labels_df</span> <span class="o">=</span> <span class="n">analyze</span><span class="o">.</span><span class="n">get_module_labels</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1200</span><span class="p">,</span><span class="n">subgroups</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;sal&quot;</span><span class="p">,</span><span class="s2">&quot;k1&quot;</span><span class="p">,</span><span class="s2">&quot;k5&quot;</span><span class="p">,</span><span class="s2">&quot;k10&quot;</span><span class="p">])</span>
+<span class="n">display</span><span class="p">(</span><span class="n">labels_df</span><span class="p">)</span>
+<span class="n">module_usage</span> <span class="o">=</span> <span class="n">analyze</span><span class="o">.</span><span class="n">get_module_usage</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="n">labels_df</span><span class="p">)</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plot</span><span class="o">.</span><span class="n">plot_module_usage</span><span class="p">(</span><span class="n">config</span><span class="p">,</span>
+                             <span class="n">module_usage</span><span class="p">,</span>
+                             <span class="n">style</span><span class="o">=</span><span class="s2">&quot;bar_error&quot;</span><span class="p">,</span>
+                             <span class="n">figW</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
+                             <span class="n">figH</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+                             <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;viridis_r&quot;</span><span class="p">)</span>
+
+<span class="n">labels_df_remap</span> <span class="o">=</span> <span class="n">analyze</span><span class="o">.</span><span class="n">combine_pose_modules</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="n">labels_df</span><span class="p">)</span>
+<span class="n">display</span><span class="p">(</span><span class="n">labels_df_remap</span><span class="p">)</span>
+<span class="n">module_usage</span> <span class="o">=</span> <span class="n">analyze</span><span class="o">.</span><span class="n">get_module_usage</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="n">labels_df</span><span class="p">,</span><span class="n">modules_altered</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="c1"># you must set modules_altered = True to get the correct behavior if you have altered the modules, i.e. by remapping to manual scoring class</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plot</span><span class="o">.</span><span class="n">plot_module_usage</span><span class="p">(</span><span class="n">config</span><span class="p">,</span>
+                             <span class="n">module_usage</span><span class="p">,</span>
+                             <span class="n">style</span><span class="o">=</span><span class="s2">&quot;bar_error&quot;</span><span class="p">,</span>
+                             <span class="n">figW</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
+                             <span class="n">figH</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+                             <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;viridis_r&quot;</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">save</span><span class="p">:</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">save_path</span><span class="o">+</span><span class="s2">&quot;demo5-1_boris_remapped_usage.png&quot;</span><span class="p">,</span><span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead tr th {
+        text-align: left;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr>
+      <th></th>
+      <th colspan="7" halign="left">sal</th>
+      <th colspan="3" halign="left">k1</th>
+      <th>...</th>
+      <th colspan="3" halign="left">k5</th>
+      <th colspan="7" halign="left">k10</th>
+    </tr>
+    <tr>
+      <th></th>
+      <th>2023-06-15_21-28-12_bf04_salivDLC_resnet101_DevRats2Jul21shuffle1_500000</th>
+      <th>2023-06-15_22-01-50_bf03_salivDLC_resnet101_DevRats2Jul21shuffle1_500000</th>
+      <th>2023-06-20_15-41-01_bm03_salivDLC_resnet101_DevRats2Jul21shuffle1_500000</th>
+      <th>2023-06-20_16-13-48_bm04_salivDLC_resnet101_DevRats2Jul21shuffle1_500000</th>
+      <th>2023-06-20_17-21-51_bf02_salivDLC_resnet101_DevRats2Jul21shuffle1_500000</th>
+      <th>2023-07-03_16-15-21_bm02_salivDLC_resnet101_DevRats2Jul21shuffle1_500000</th>
+      <th>2023-07-03_19-20-49_bf01_salivDLC_resnet101_DevRats2Jul21shuffle1_500000</th>
+      <th>2023-06-20_19-10-38_bf04_k1ivDLC_resnet101_DevRats2Jul21shuffle1_500000</th>
+      <th>2023-06-26_15-35-45_bf01_k1ivDLC_resnet101_DevRats2Jul21shuffle1_500000</th>
+      <th>2023-06-26_19-00-05_bm02_k1ivDLC_resnet101_DevRats2Jul21shuffle1_500000</th>
+      <th>...</th>
+      <th>2023-07-08_16-19-27_bm02_k5ivDLC_resnet101_DevRats2Jul21shuffle1_500000</th>
+      <th>2023-07-14_16-25-47_bf01_k5ivDLC_resnet101_DevRats2Jul21shuffle1_500000</th>
+      <th>2023-07-18_19-35-14_bm03_k5ivDLC_resnet101_DevRats2Jul21shuffle1_500000</th>
+      <th>2023-05-15_16-47-52_bf03_k10ivDLC_resnet101_DevRats2Jul21shuffle1_500000</th>
+      <th>2023-05-15_18-18-22_bf04_k10ivDLC_resnet101_DevRats2Jul21shuffle1_500000</th>
+      <th>2023-05-25_14-30-54_bm02_k10ivDLC_resnet101_DevRats2Jul21shuffle1_500000</th>
+      <th>2023-05-31_17-08-06_bf01_k10ivDLC_resnet101_DevRats2Jul21shuffle1_500000</th>
+      <th>2023-07-13_15-45-26_bm03_k10ivDLC_resnet101_DevRats2Jul21shuffle1_500000</th>
+      <th>2023-07-14_13-56-09_bm01_k10ivDLC_resnet101_DevRats2Jul21shuffle1_500000</th>
+      <th>2023-07-18_18-19-50_bm04_k10ivDLC_resnet101_DevRats2Jul21shuffle1_500000</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0</td>
+      <td>9</td>
+      <td>0</td>
+      <td>10</td>
+      <td>17</td>
+      <td>17</td>
+      <td>20</td>
+      <td>9</td>
+      <td>9</td>
+      <td>23</td>
+      <td>...</td>
+      <td>5</td>
+      <td>2</td>
+      <td>19</td>
+      <td>0</td>
+      <td>12</td>
+      <td>12</td>
+      <td>0</td>
+      <td>19</td>
+      <td>12</td>
+      <td>12</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>0</td>
+      <td>9</td>
+      <td>0</td>
+      <td>10</td>
+      <td>17</td>
+      <td>17</td>
+      <td>20</td>
+      <td>9</td>
+      <td>9</td>
+      <td>23</td>
+      <td>...</td>
+      <td>5</td>
+      <td>2</td>
+      <td>19</td>
+      <td>0</td>
+      <td>12</td>
+      <td>12</td>
+      <td>0</td>
+      <td>19</td>
+      <td>12</td>
+      <td>12</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0</td>
+      <td>9</td>
+      <td>0</td>
+      <td>10</td>
+      <td>17</td>
+      <td>17</td>
+      <td>20</td>
+      <td>9</td>
+      <td>9</td>
+      <td>23</td>
+      <td>...</td>
+      <td>5</td>
+      <td>2</td>
+      <td>19</td>
+      <td>0</td>
+      <td>12</td>
+      <td>12</td>
+      <td>0</td>
+      <td>19</td>
+      <td>12</td>
+      <td>12</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>0</td>
+      <td>9</td>
+      <td>0</td>
+      <td>10</td>
+      <td>17</td>
+      <td>17</td>
+      <td>20</td>
+      <td>9</td>
+      <td>9</td>
+      <td>23</td>
+      <td>...</td>
+      <td>5</td>
+      <td>2</td>
+      <td>19</td>
+      <td>0</td>
+      <td>12</td>
+      <td>12</td>
+      <td>0</td>
+      <td>19</td>
+      <td>12</td>
+      <td>12</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>0</td>
+      <td>9</td>
+      <td>0</td>
+      <td>10</td>
+      <td>17</td>
+      <td>17</td>
+      <td>20</td>
+      <td>9</td>
+      <td>9</td>
+      <td>3</td>
+      <td>...</td>
+      <td>5</td>
+      <td>2</td>
+      <td>19</td>
+      <td>0</td>
+      <td>12</td>
+      <td>12</td>
+      <td>0</td>
+      <td>19</td>
+      <td>12</td>
+      <td>12</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>35995</th>
+      <td>17</td>
+      <td>27</td>
+      <td>13</td>
+      <td>13</td>
+      <td>12</td>
+      <td>13</td>
+      <td>27</td>
+      <td>25</td>
+      <td>8</td>
+      <td>1</td>
+      <td>...</td>
+      <td>1</td>
+      <td>27</td>
+      <td>27</td>
+      <td>28</td>
+      <td>13</td>
+      <td>4</td>
+      <td>8</td>
+      <td>3</td>
+      <td>8</td>
+      <td>8</td>
+    </tr>
+    <tr>
+      <th>35996</th>
+      <td>17</td>
+      <td>27</td>
+      <td>13</td>
+      <td>13</td>
+      <td>12</td>
+      <td>13</td>
+      <td>27</td>
+      <td>25</td>
+      <td>8</td>
+      <td>1</td>
+      <td>...</td>
+      <td>1</td>
+      <td>27</td>
+      <td>27</td>
+      <td>28</td>
+      <td>13</td>
+      <td>4</td>
+      <td>8</td>
+      <td>3</td>
+      <td>8</td>
+      <td>8</td>
+    </tr>
+    <tr>
+      <th>35997</th>
+      <td>17</td>
+      <td>27</td>
+      <td>13</td>
+      <td>13</td>
+      <td>12</td>
+      <td>13</td>
+      <td>27</td>
+      <td>25</td>
+      <td>8</td>
+      <td>1</td>
+      <td>...</td>
+      <td>1</td>
+      <td>27</td>
+      <td>27</td>
+      <td>10</td>
+      <td>13</td>
+      <td>4</td>
+      <td>8</td>
+      <td>3</td>
+      <td>8</td>
+      <td>8</td>
+    </tr>
+    <tr>
+      <th>35998</th>
+      <td>17</td>
+      <td>27</td>
+      <td>13</td>
+      <td>13</td>
+      <td>12</td>
+      <td>13</td>
+      <td>27</td>
+      <td>25</td>
+      <td>8</td>
+      <td>1</td>
+      <td>...</td>
+      <td>1</td>
+      <td>27</td>
+      <td>27</td>
+      <td>10</td>
+      <td>13</td>
+      <td>4</td>
+      <td>8</td>
+      <td>3</td>
+      <td>8</td>
+      <td>8</td>
+    </tr>
+    <tr>
+      <th>35999</th>
+      <td>17</td>
+      <td>27</td>
+      <td>13</td>
+      <td>13</td>
+      <td>12</td>
+      <td>13</td>
+      <td>27</td>
+      <td>25</td>
+      <td>8</td>
+      <td>1</td>
+      <td>...</td>
+      <td>1</td>
+      <td>27</td>
+      <td>27</td>
+      <td>10</td>
+      <td>13</td>
+      <td>4</td>
+      <td>1</td>
+      <td>3</td>
+      <td>8</td>
+      <td>8</td>
+    </tr>
+  </tbody>
+</table>
+<p>36000 rows × 26 columns</p>
+</div></div><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Applying 2 remapping rules from config.
+1 of 2: Remapping [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14] to modules_0-14
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2 of 2: Remapping [15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29] to modules_15-29
+</pre></div>
+</div>
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead tr th {
+        text-align: left;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr>
+      <th></th>
+      <th colspan="7" halign="left">sal</th>
+      <th colspan="3" halign="left">k1</th>
+      <th>...</th>
+      <th colspan="3" halign="left">k5</th>
+      <th colspan="7" halign="left">k10</th>
+    </tr>
+    <tr>
+      <th></th>
+      <th>2023-06-15_21-28-12_bf04_salivDLC_resnet101_DevRats2Jul21shuffle1_500000</th>
+      <th>2023-06-15_22-01-50_bf03_salivDLC_resnet101_DevRats2Jul21shuffle1_500000</th>
+      <th>2023-06-20_15-41-01_bm03_salivDLC_resnet101_DevRats2Jul21shuffle1_500000</th>
+      <th>2023-06-20_16-13-48_bm04_salivDLC_resnet101_DevRats2Jul21shuffle1_500000</th>
+      <th>2023-06-20_17-21-51_bf02_salivDLC_resnet101_DevRats2Jul21shuffle1_500000</th>
+      <th>2023-07-03_16-15-21_bm02_salivDLC_resnet101_DevRats2Jul21shuffle1_500000</th>
+      <th>2023-07-03_19-20-49_bf01_salivDLC_resnet101_DevRats2Jul21shuffle1_500000</th>
+      <th>2023-06-20_19-10-38_bf04_k1ivDLC_resnet101_DevRats2Jul21shuffle1_500000</th>
+      <th>2023-06-26_15-35-45_bf01_k1ivDLC_resnet101_DevRats2Jul21shuffle1_500000</th>
+      <th>2023-06-26_19-00-05_bm02_k1ivDLC_resnet101_DevRats2Jul21shuffle1_500000</th>
+      <th>...</th>
+      <th>2023-07-08_16-19-27_bm02_k5ivDLC_resnet101_DevRats2Jul21shuffle1_500000</th>
+      <th>2023-07-14_16-25-47_bf01_k5ivDLC_resnet101_DevRats2Jul21shuffle1_500000</th>
+      <th>2023-07-18_19-35-14_bm03_k5ivDLC_resnet101_DevRats2Jul21shuffle1_500000</th>
+      <th>2023-05-15_16-47-52_bf03_k10ivDLC_resnet101_DevRats2Jul21shuffle1_500000</th>
+      <th>2023-05-15_18-18-22_bf04_k10ivDLC_resnet101_DevRats2Jul21shuffle1_500000</th>
+      <th>2023-05-25_14-30-54_bm02_k10ivDLC_resnet101_DevRats2Jul21shuffle1_500000</th>
+      <th>2023-05-31_17-08-06_bf01_k10ivDLC_resnet101_DevRats2Jul21shuffle1_500000</th>
+      <th>2023-07-13_15-45-26_bm03_k10ivDLC_resnet101_DevRats2Jul21shuffle1_500000</th>
+      <th>2023-07-14_13-56-09_bm01_k10ivDLC_resnet101_DevRats2Jul21shuffle1_500000</th>
+      <th>2023-07-18_18-19-50_bm04_k10ivDLC_resnet101_DevRats2Jul21shuffle1_500000</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>modules_0-14</td>
+      <td>modules_0-14</td>
+      <td>modules_0-14</td>
+      <td>modules_0-14</td>
+      <td>modules_15-29</td>
+      <td>modules_15-29</td>
+      <td>modules_15-29</td>
+      <td>modules_0-14</td>
+      <td>modules_0-14</td>
+      <td>modules_15-29</td>
+      <td>...</td>
+      <td>modules_0-14</td>
+      <td>modules_0-14</td>
+      <td>modules_15-29</td>
+      <td>modules_0-14</td>
+      <td>modules_0-14</td>
+      <td>modules_0-14</td>
+      <td>modules_0-14</td>
+      <td>modules_15-29</td>
+      <td>modules_0-14</td>
+      <td>modules_0-14</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>modules_0-14</td>
+      <td>modules_0-14</td>
+      <td>modules_0-14</td>
+      <td>modules_0-14</td>
+      <td>modules_15-29</td>
+      <td>modules_15-29</td>
+      <td>modules_15-29</td>
+      <td>modules_0-14</td>
+      <td>modules_0-14</td>
+      <td>modules_15-29</td>
+      <td>...</td>
+      <td>modules_0-14</td>
+      <td>modules_0-14</td>
+      <td>modules_15-29</td>
+      <td>modules_0-14</td>
+      <td>modules_0-14</td>
+      <td>modules_0-14</td>
+      <td>modules_0-14</td>
+      <td>modules_15-29</td>
+      <td>modules_0-14</td>
+      <td>modules_0-14</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>modules_0-14</td>
+      <td>modules_0-14</td>
+      <td>modules_0-14</td>
+      <td>modules_0-14</td>
+      <td>modules_15-29</td>
+      <td>modules_15-29</td>
+      <td>modules_15-29</td>
+      <td>modules_0-14</td>
+      <td>modules_0-14</td>
+      <td>modules_15-29</td>
+      <td>...</td>
+      <td>modules_0-14</td>
+      <td>modules_0-14</td>
+      <td>modules_15-29</td>
+      <td>modules_0-14</td>
+      <td>modules_0-14</td>
+      <td>modules_0-14</td>
+      <td>modules_0-14</td>
+      <td>modules_15-29</td>
+      <td>modules_0-14</td>
+      <td>modules_0-14</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>modules_0-14</td>
+      <td>modules_0-14</td>
+      <td>modules_0-14</td>
+      <td>modules_0-14</td>
+      <td>modules_15-29</td>
+      <td>modules_15-29</td>
+      <td>modules_15-29</td>
+      <td>modules_0-14</td>
+      <td>modules_0-14</td>
+      <td>modules_15-29</td>
+      <td>...</td>
+      <td>modules_0-14</td>
+      <td>modules_0-14</td>
+      <td>modules_15-29</td>
+      <td>modules_0-14</td>
+      <td>modules_0-14</td>
+      <td>modules_0-14</td>
+      <td>modules_0-14</td>
+      <td>modules_15-29</td>
+      <td>modules_0-14</td>
+      <td>modules_0-14</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>modules_0-14</td>
+      <td>modules_0-14</td>
+      <td>modules_0-14</td>
+      <td>modules_0-14</td>
+      <td>modules_15-29</td>
+      <td>modules_15-29</td>
+      <td>modules_15-29</td>
+      <td>modules_0-14</td>
+      <td>modules_0-14</td>
+      <td>modules_0-14</td>
+      <td>...</td>
+      <td>modules_0-14</td>
+      <td>modules_0-14</td>
+      <td>modules_15-29</td>
+      <td>modules_0-14</td>
+      <td>modules_0-14</td>
+      <td>modules_0-14</td>
+      <td>modules_0-14</td>
+      <td>modules_15-29</td>
+      <td>modules_0-14</td>
+      <td>modules_0-14</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>35995</th>
+      <td>modules_15-29</td>
+      <td>modules_15-29</td>
+      <td>modules_0-14</td>
+      <td>modules_0-14</td>
+      <td>modules_0-14</td>
+      <td>modules_0-14</td>
+      <td>modules_15-29</td>
+      <td>modules_15-29</td>
+      <td>modules_0-14</td>
+      <td>modules_0-14</td>
+      <td>...</td>
+      <td>modules_0-14</td>
+      <td>modules_15-29</td>
+      <td>modules_15-29</td>
+      <td>modules_15-29</td>
+      <td>modules_0-14</td>
+      <td>modules_0-14</td>
+      <td>modules_0-14</td>
+      <td>modules_0-14</td>
+      <td>modules_0-14</td>
+      <td>modules_0-14</td>
+    </tr>
+    <tr>
+      <th>35996</th>
+      <td>modules_15-29</td>
+      <td>modules_15-29</td>
+      <td>modules_0-14</td>
+      <td>modules_0-14</td>
+      <td>modules_0-14</td>
+      <td>modules_0-14</td>
+      <td>modules_15-29</td>
+      <td>modules_15-29</td>
+      <td>modules_0-14</td>
+      <td>modules_0-14</td>
+      <td>...</td>
+      <td>modules_0-14</td>
+      <td>modules_15-29</td>
+      <td>modules_15-29</td>
+      <td>modules_15-29</td>
+      <td>modules_0-14</td>
+      <td>modules_0-14</td>
+      <td>modules_0-14</td>
+      <td>modules_0-14</td>
+      <td>modules_0-14</td>
+      <td>modules_0-14</td>
+    </tr>
+    <tr>
+      <th>35997</th>
+      <td>modules_15-29</td>
+      <td>modules_15-29</td>
+      <td>modules_0-14</td>
+      <td>modules_0-14</td>
+      <td>modules_0-14</td>
+      <td>modules_0-14</td>
+      <td>modules_15-29</td>
+      <td>modules_15-29</td>
+      <td>modules_0-14</td>
+      <td>modules_0-14</td>
+      <td>...</td>
+      <td>modules_0-14</td>
+      <td>modules_15-29</td>
+      <td>modules_15-29</td>
+      <td>modules_0-14</td>
+      <td>modules_0-14</td>
+      <td>modules_0-14</td>
+      <td>modules_0-14</td>
+      <td>modules_0-14</td>
+      <td>modules_0-14</td>
+      <td>modules_0-14</td>
+    </tr>
+    <tr>
+      <th>35998</th>
+      <td>modules_15-29</td>
+      <td>modules_15-29</td>
+      <td>modules_0-14</td>
+      <td>modules_0-14</td>
+      <td>modules_0-14</td>
+      <td>modules_0-14</td>
+      <td>modules_15-29</td>
+      <td>modules_15-29</td>
+      <td>modules_0-14</td>
+      <td>modules_0-14</td>
+      <td>...</td>
+      <td>modules_0-14</td>
+      <td>modules_15-29</td>
+      <td>modules_15-29</td>
+      <td>modules_0-14</td>
+      <td>modules_0-14</td>
+      <td>modules_0-14</td>
+      <td>modules_0-14</td>
+      <td>modules_0-14</td>
+      <td>modules_0-14</td>
+      <td>modules_0-14</td>
+    </tr>
+    <tr>
+      <th>35999</th>
+      <td>modules_15-29</td>
+      <td>modules_15-29</td>
+      <td>modules_0-14</td>
+      <td>modules_0-14</td>
+      <td>modules_0-14</td>
+      <td>modules_0-14</td>
+      <td>modules_15-29</td>
+      <td>modules_15-29</td>
+      <td>modules_0-14</td>
+      <td>modules_0-14</td>
+      <td>...</td>
+      <td>modules_0-14</td>
+      <td>modules_15-29</td>
+      <td>modules_15-29</td>
+      <td>modules_0-14</td>
+      <td>modules_0-14</td>
+      <td>modules_0-14</td>
+      <td>modules_0-14</td>
+      <td>modules_0-14</td>
+      <td>modules_0-14</td>
+      <td>modules_0-14</td>
+    </tr>
+  </tbody>
+</table>
+<p>36000 rows × 26 columns</p>
+</div></div><img alt="../_images/cef48d622af34c4902d9af5cae553c3d714d0909a91fb8ddbb41563a8f5840c1.png" src="../_images/cef48d622af34c4902d9af5cae553c3d714d0909a91fb8ddbb41563a8f5840c1.png" />
+<img alt="../_images/feca66d5b00abc41cae2c20f92fcfd2ffd2aa24afd832b8e65ccbebc6f5ddfaa.png" src="../_images/feca66d5b00abc41cae2c20f92fcfd2ffd2aa24afd832b8e65ccbebc6f5ddfaa.png" />
+</div>
+</div>
+</section>
+<section id="incorporating-manual-scoring-data-from-boris-to-remap-modules">
+<h2>5.2: Incorporating manual scoring data from BORIS to remap modules<a class="headerlink" href="#incorporating-manual-scoring-data-from-boris-to-remap-modules" title="Permalink to this heading"></a></h2>
 <p>The approach used in MARIPoSA for identifying the behaviors represented by pose modules is to compare to manual scoring data. We have found it is simplest to use manual scoring data incorporated from BORIS and exported in the frame rate of the video as one-hot encoded csv. We then need to set the BORIS csv directory path and the pairings of videos and their corresponding project file within the config.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Before editing (default):&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;boris_directory&#39;</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;boris_to_pose_pairings&#39;</span><span class="p">])</span>
+
+<span class="n">config</span><span class="p">[</span><span class="s1">&#39;boris_directory&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">demo_dir</span> <span class="o">+</span> <span class="s2">&quot;PS-TEST-25-03-31-ManualScoring/&quot;</span>
+<span class="n">config</span><span class="p">[</span><span class="s1">&#39;boris_to_pose_pairings&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">[</span><span class="s1">&#39;BINARY_2023-05-09_17-41-11_bf01_nal10k10.csv&#39;</span><span class="p">,</span><span class="s1">&#39;2023-05-09_17-41-11_bf01_nal10k10DLC_resnet101_DevRats2Jul21shuffle1_500000&#39;</span><span class="p">],</span>
+    <span class="p">[</span><span class="s1">&#39;BINARY_13-39-15_bm01_k25.csv&#39;</span><span class="p">,</span><span class="s1">&#39;2023-05-30_13-39-15_bm01_k25DLC_resnet101_DevRats2Jul21shuffle1_500000&#39;</span><span class="p">],</span>
+    <span class="p">[</span><span class="s1">&#39;BINARY_1_2023-05-31_12-02-23_bf02_coc.csv&#39;</span><span class="p">,</span><span class="s1">&#39;2023-05-31_12-02-23_bf02_cocDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;</span><span class="p">],</span>
+    <span class="p">[</span><span class="s1">&#39;BINARY_2023-06-15_19-15-24_bm04_nalket.csv&#39;</span><span class="p">,</span><span class="s1">&#39;2023-06-15_19-15-24_bm04_nalketDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;</span><span class="p">],</span>
+    <span class="p">[</span><span class="s1">&#39;BINARY_2023-06-15_17-16-18_bm01_k5iv.csv&#39;</span><span class="p">,</span><span class="s1">&#39;2023-06-15_17-16-18_bm01_k5ivDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;</span><span class="p">],</span>
+    <span class="p">[</span><span class="s1">&#39;BINARY_2023-06-09_18-18-49_bm02_k25.csv&#39;</span><span class="p">,</span><span class="s1">&#39;2023-06-09_18-18-49_bm02_k25DLC_resnet101_DevRats2Jul21shuffle1_500000&#39;</span><span class="p">],</span>
+    <span class="p">[</span><span class="s1">&#39;BINARY_2023-07-08_15-13-11_bf03_k25.csv&#39;</span><span class="p">,</span><span class="s1">&#39;2023-07-08_15-13-11_bf03_k25DLC_resnet101_DevRats2Jul21shuffle1_500000&#39;</span><span class="p">],</span>
+    <span class="p">[</span><span class="s1">&#39;BINARY_bf01_k5.csv&#39;</span><span class="p">,</span><span class="s1">&#39;2023-06-20_16-46-29_bf01_k5DLC_resnet101_DevRats2Jul21shuffle1_500000&#39;</span><span class="p">]</span>
+<span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;After editing:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;boris_directory&#39;</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;boris_to_pose_pairings&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Before editing (default):
+None
+[[None, None], [None, None], [None, None]]
+After editing:
+/Users/snewbank/Behavior/MARIPoSA_demo_data/PS-TEST-25-03-31-ManualScoring/
+[[&#39;BINARY_2023-05-09_17-41-11_bf01_nal10k10.csv&#39;, &#39;2023-05-09_17-41-11_bf01_nal10k10DLC_resnet101_DevRats2Jul21shuffle1_500000&#39;], [&#39;BINARY_13-39-15_bm01_k25.csv&#39;, &#39;2023-05-30_13-39-15_bm01_k25DLC_resnet101_DevRats2Jul21shuffle1_500000&#39;], [&#39;BINARY_1_2023-05-31_12-02-23_bf02_coc.csv&#39;, &#39;2023-05-31_12-02-23_bf02_cocDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;], [&#39;BINARY_2023-06-15_19-15-24_bm04_nalket.csv&#39;, &#39;2023-06-15_19-15-24_bm04_nalketDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;], [&#39;BINARY_2023-06-15_17-16-18_bm01_k5iv.csv&#39;, &#39;2023-06-15_17-16-18_bm01_k5ivDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;], [&#39;BINARY_2023-06-09_18-18-49_bm02_k25.csv&#39;, &#39;2023-06-09_18-18-49_bm02_k25DLC_resnet101_DevRats2Jul21shuffle1_500000&#39;], [&#39;BINARY_2023-07-08_15-13-11_bf03_k25.csv&#39;, &#39;2023-07-08_15-13-11_bf03_k25DLC_resnet101_DevRats2Jul21shuffle1_500000&#39;], [&#39;BINARY_bf01_k5.csv&#39;, &#39;2023-06-20_16-46-29_bf01_k5DLC_resnet101_DevRats2Jul21shuffle1_500000&#39;]]
+</pre></div>
+</div>
+</div>
+</div>
+<p>Once we have done that, we can then look at the overlap between manually scored behaviors and pose modules:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">BORIS_to_pose_mat</span><span class="p">,</span> <span class="n">BORIS_to_pose_mat_normalized</span><span class="p">,</span> <span class="n">loss</span> <span class="o">=</span> <span class="n">analyze</span><span class="o">.</span><span class="n">BORIS_to_pose</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
 <span class="n">fig</span> <span class="o">=</span> <span class="n">plot</span><span class="o">.</span><span class="n">BORIS_to_pose_matrix_plot</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">BORIS_to_pose_mat_normalized</span><span class="p">,</span> <span class="n">figW</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">figH</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;Greens&quot;</span><span class="p">,</span><span class="n">outline_top_match</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="k">if</span> <span class="n">save</span><span class="p">:</span>
-    <span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">save_path</span><span class="o">+</span><span class="s2">&quot;demo5-1_boris_to_pose_matrix.png&quot;</span><span class="p">,</span><span class="n">dpi</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">save_path</span><span class="o">+</span><span class="s2">&quot;demo5-2_boris_to_pose_matrix.png&quot;</span><span class="p">,</span><span class="n">dpi</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
-<span class="ne">UnboundLocalError</span><span class="g g-Whitespace">                         </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
-<span class="ne">----&gt; </span><span class="mi">1</span> <span class="n">BORIS_to_pose_mat</span><span class="p">,</span> <span class="n">BORIS_to_pose_mat_normalized</span><span class="p">,</span> <span class="n">loss</span> <span class="o">=</span> <span class="n">analyze</span><span class="o">.</span><span class="n">BORIS_to_pose</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
-<span class="g g-Whitespace">      </span><span class="mi">2</span> <span class="n">fig</span> <span class="o">=</span> <span class="n">plot</span><span class="o">.</span><span class="n">BORIS_to_pose_matrix_plot</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">BORIS_to_pose_mat_normalized</span><span class="p">,</span> <span class="n">figW</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">figH</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;Greens&quot;</span><span class="p">,</span><span class="n">outline_top_match</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="g g-Whitespace">      </span><span class="mi">3</span> <span class="k">if</span> <span class="n">save</span><span class="p">:</span>
-
-<span class="nn">File ~/PycharmProjects/MARIPoSA/utils/analyze.py:372,</span> in <span class="ni">BORIS_to_pose</span><span class="nt">(config, verbose)</span>
-<span class="g g-Whitespace">    </span><span class="mi">370</span> <span class="n">config_modulo</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">371</span> <span class="n">config_modulo</span><span class="p">[</span><span class="s2">&quot;project_files&quot;</span><span class="p">]</span><span class="o">=</span><span class="p">[</span><span class="n">pairing</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">pairing</span> <span class="ow">in</span> <span class="n">boris_to_pose_pairings</span> <span class="k">if</span> <span class="n">pairing</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">]</span>
-<span class="ne">--&gt; </span><span class="mi">372</span> <span class="n">labels_df</span> <span class="o">=</span> <span class="n">get_module_labels</span><span class="p">(</span><span class="n">config_modulo</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1200</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">373</span> <span class="n">labels_flat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">labels_df</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">374</span> <span class="n">labels_flat</span> <span class="o">=</span> <span class="p">[</span><span class="n">item</span> <span class="k">for</span> <span class="n">sublist</span> <span class="ow">in</span> <span class="n">labels_flat</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">sublist</span><span class="p">]</span>
-
-<span class="nn">File ~/PycharmProjects/MARIPoSA/utils/analyze.py:235,</span> in <span class="ni">get_module_labels</span><span class="nt">(config, start, stop, subgroups)</span>
-<span class="g g-Whitespace">    </span><span class="mi">233</span>                 <span class="n">count</span> <span class="o">=</span> <span class="n">count</span> <span class="o">+</span> <span class="mi">1</span>
-<span class="g g-Whitespace">    </span><span class="mi">234</span>         <span class="n">labels_df</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">header1</span><span class="p">,</span> <span class="n">header2</span><span class="p">]</span>
-<span class="ne">--&gt; </span><span class="mi">235</span> <span class="k">return</span> <span class="n">labels_df</span>
-
-<span class="ne">UnboundLocalError</span>: local variable &#39;labels_df&#39; referenced before assignment
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>done with [&#39;BINARY_2023-05-09_17-41-11_bf01_nal10k10.csv&#39;, &#39;2023-05-09_17-41-11_bf01_nal10k10DLC_resnet101_DevRats2Jul21shuffle1_500000&#39;]
+done with [&#39;BINARY_13-39-15_bm01_k25.csv&#39;, &#39;2023-05-30_13-39-15_bm01_k25DLC_resnet101_DevRats2Jul21shuffle1_500000&#39;]
 </pre></div>
 </div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>done with [&#39;BINARY_1_2023-05-31_12-02-23_bf02_coc.csv&#39;, &#39;2023-05-31_12-02-23_bf02_cocDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;]
+done with [&#39;BINARY_2023-06-15_19-15-24_bm04_nalket.csv&#39;, &#39;2023-06-15_19-15-24_bm04_nalketDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>done with [&#39;BINARY_2023-06-15_17-16-18_bm01_k5iv.csv&#39;, &#39;2023-06-15_17-16-18_bm01_k5ivDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;]
+done with [&#39;BINARY_2023-06-09_18-18-49_bm02_k25.csv&#39;, &#39;2023-06-09_18-18-49_bm02_k25DLC_resnet101_DevRats2Jul21shuffle1_500000&#39;]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>done with [&#39;BINARY_2023-07-08_15-13-11_bf03_k25.csv&#39;, &#39;2023-07-08_15-13-11_bf03_k25DLC_resnet101_DevRats2Jul21shuffle1_500000&#39;]
+done with [&#39;BINARY_bf01_k5.csv&#39;, &#39;2023-06-20_16-46-29_bf01_k5DLC_resnet101_DevRats2Jul21shuffle1_500000&#39;]
+VAME modules map onto scored behaviors with &#39;loss&#39; of 0.47849370930131485
+</pre></div>
+</div>
+<img alt="../_images/b8858a9398119205efa0299f6342822245303e826ecc08e0f039b65c1c47c279.png" src="../_images/b8858a9398119205efa0299f6342822245303e826ecc08e0f039b65c1c47c279.png" />
+</div>
+</div>
+<p>Once you have the manually scored class for each module, you can remap them to compare usage of grouped modules.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># First, we&#39;ll do our dose-response with modules not grouped:</span>
+<span class="n">labels_df</span> <span class="o">=</span> <span class="n">analyze</span><span class="o">.</span><span class="n">get_module_labels</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1200</span><span class="p">,</span><span class="n">subgroups</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;sal&quot;</span><span class="p">,</span><span class="s2">&quot;k1&quot;</span><span class="p">,</span><span class="s2">&quot;k5&quot;</span><span class="p">,</span><span class="s2">&quot;k10&quot;</span><span class="p">])</span>
+<span class="n">display</span><span class="p">(</span><span class="n">labels_df</span><span class="p">)</span>
+<span class="n">module_usage</span> <span class="o">=</span> <span class="n">analyze</span><span class="o">.</span><span class="n">get_module_usage</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="n">labels_df</span><span class="p">)</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plot</span><span class="o">.</span><span class="n">plot_module_usage</span><span class="p">(</span><span class="n">config</span><span class="p">,</span>
+                             <span class="n">module_usage</span><span class="p">,</span>
+                             <span class="n">style</span><span class="o">=</span><span class="s2">&quot;bar_error&quot;</span><span class="p">,</span>
+                             <span class="n">figW</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
+                             <span class="n">figH</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+                             <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;viridis_r&quot;</span><span class="p">)</span>
+
+<span class="c1"># Then we can look at our dose-response data with modules remapped to their manual score overlap</span>
+<span class="n">BORIS_to_pose_mat</span><span class="p">,</span> <span class="n">BORIS_to_pose_mat_normalized</span><span class="p">,</span> <span class="n">loss</span> <span class="o">=</span> <span class="n">analyze</span><span class="o">.</span><span class="n">BORIS_to_pose</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+<span class="n">labels_df_remap</span> <span class="o">=</span> <span class="n">analyze</span><span class="o">.</span><span class="n">make_remappings_from_BORIS</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="n">labels_df</span> <span class="o">=</span> <span class="n">labels_df</span><span class="p">,</span> <span class="n">BORIS_to_pose_mat</span> <span class="o">=</span> <span class="n">BORIS_to_pose_mat</span><span class="p">)</span>
+<span class="n">display</span><span class="p">(</span><span class="n">labels_df_remap</span><span class="p">)</span>
+
+<span class="n">module_usage</span> <span class="o">=</span> <span class="n">analyze</span><span class="o">.</span><span class="n">get_module_usage</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="n">labels_df</span><span class="p">,</span><span class="n">modules_altered</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="c1"># you must set modules_altered = True to get the correct behavior if you have altered the modules, i.e. by remapping to manual scoring class</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plot</span><span class="o">.</span><span class="n">plot_module_usage</span><span class="p">(</span><span class="n">config</span><span class="p">,</span>
+                             <span class="n">module_usage</span><span class="p">,</span>
+                             <span class="n">style</span><span class="o">=</span><span class="s2">&quot;bar_error&quot;</span><span class="p">,</span>
+                             <span class="n">figW</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
+                             <span class="n">figH</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+                             <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;viridis_r&quot;</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">save</span><span class="p">:</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">save_path</span><span class="o">+</span><span class="s2">&quot;demo5-3_boris_remapped_usage.png&quot;</span><span class="p">,</span><span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead tr th {
+        text-align: left;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr>
+      <th></th>
+      <th colspan="7" halign="left">sal</th>
+      <th colspan="3" halign="left">k1</th>
+      <th>...</th>
+      <th colspan="3" halign="left">k5</th>
+      <th colspan="7" halign="left">k10</th>
+    </tr>
+    <tr>
+      <th></th>
+      <th>2023-06-15_21-28-12_bf04_salivDLC_resnet101_DevRats2Jul21shuffle1_500000</th>
+      <th>2023-06-15_22-01-50_bf03_salivDLC_resnet101_DevRats2Jul21shuffle1_500000</th>
+      <th>2023-06-20_15-41-01_bm03_salivDLC_resnet101_DevRats2Jul21shuffle1_500000</th>
+      <th>2023-06-20_16-13-48_bm04_salivDLC_resnet101_DevRats2Jul21shuffle1_500000</th>
+      <th>2023-06-20_17-21-51_bf02_salivDLC_resnet101_DevRats2Jul21shuffle1_500000</th>
+      <th>2023-07-03_16-15-21_bm02_salivDLC_resnet101_DevRats2Jul21shuffle1_500000</th>
+      <th>2023-07-03_19-20-49_bf01_salivDLC_resnet101_DevRats2Jul21shuffle1_500000</th>
+      <th>2023-06-20_19-10-38_bf04_k1ivDLC_resnet101_DevRats2Jul21shuffle1_500000</th>
+      <th>2023-06-26_15-35-45_bf01_k1ivDLC_resnet101_DevRats2Jul21shuffle1_500000</th>
+      <th>2023-06-26_19-00-05_bm02_k1ivDLC_resnet101_DevRats2Jul21shuffle1_500000</th>
+      <th>...</th>
+      <th>2023-07-08_16-19-27_bm02_k5ivDLC_resnet101_DevRats2Jul21shuffle1_500000</th>
+      <th>2023-07-14_16-25-47_bf01_k5ivDLC_resnet101_DevRats2Jul21shuffle1_500000</th>
+      <th>2023-07-18_19-35-14_bm03_k5ivDLC_resnet101_DevRats2Jul21shuffle1_500000</th>
+      <th>2023-05-15_16-47-52_bf03_k10ivDLC_resnet101_DevRats2Jul21shuffle1_500000</th>
+      <th>2023-05-15_18-18-22_bf04_k10ivDLC_resnet101_DevRats2Jul21shuffle1_500000</th>
+      <th>2023-05-25_14-30-54_bm02_k10ivDLC_resnet101_DevRats2Jul21shuffle1_500000</th>
+      <th>2023-05-31_17-08-06_bf01_k10ivDLC_resnet101_DevRats2Jul21shuffle1_500000</th>
+      <th>2023-07-13_15-45-26_bm03_k10ivDLC_resnet101_DevRats2Jul21shuffle1_500000</th>
+      <th>2023-07-14_13-56-09_bm01_k10ivDLC_resnet101_DevRats2Jul21shuffle1_500000</th>
+      <th>2023-07-18_18-19-50_bm04_k10ivDLC_resnet101_DevRats2Jul21shuffle1_500000</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0</td>
+      <td>9</td>
+      <td>0</td>
+      <td>10</td>
+      <td>17</td>
+      <td>17</td>
+      <td>20</td>
+      <td>9</td>
+      <td>9</td>
+      <td>23</td>
+      <td>...</td>
+      <td>5</td>
+      <td>2</td>
+      <td>19</td>
+      <td>0</td>
+      <td>12</td>
+      <td>12</td>
+      <td>0</td>
+      <td>19</td>
+      <td>12</td>
+      <td>12</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>0</td>
+      <td>9</td>
+      <td>0</td>
+      <td>10</td>
+      <td>17</td>
+      <td>17</td>
+      <td>20</td>
+      <td>9</td>
+      <td>9</td>
+      <td>23</td>
+      <td>...</td>
+      <td>5</td>
+      <td>2</td>
+      <td>19</td>
+      <td>0</td>
+      <td>12</td>
+      <td>12</td>
+      <td>0</td>
+      <td>19</td>
+      <td>12</td>
+      <td>12</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0</td>
+      <td>9</td>
+      <td>0</td>
+      <td>10</td>
+      <td>17</td>
+      <td>17</td>
+      <td>20</td>
+      <td>9</td>
+      <td>9</td>
+      <td>23</td>
+      <td>...</td>
+      <td>5</td>
+      <td>2</td>
+      <td>19</td>
+      <td>0</td>
+      <td>12</td>
+      <td>12</td>
+      <td>0</td>
+      <td>19</td>
+      <td>12</td>
+      <td>12</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>0</td>
+      <td>9</td>
+      <td>0</td>
+      <td>10</td>
+      <td>17</td>
+      <td>17</td>
+      <td>20</td>
+      <td>9</td>
+      <td>9</td>
+      <td>23</td>
+      <td>...</td>
+      <td>5</td>
+      <td>2</td>
+      <td>19</td>
+      <td>0</td>
+      <td>12</td>
+      <td>12</td>
+      <td>0</td>
+      <td>19</td>
+      <td>12</td>
+      <td>12</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>0</td>
+      <td>9</td>
+      <td>0</td>
+      <td>10</td>
+      <td>17</td>
+      <td>17</td>
+      <td>20</td>
+      <td>9</td>
+      <td>9</td>
+      <td>3</td>
+      <td>...</td>
+      <td>5</td>
+      <td>2</td>
+      <td>19</td>
+      <td>0</td>
+      <td>12</td>
+      <td>12</td>
+      <td>0</td>
+      <td>19</td>
+      <td>12</td>
+      <td>12</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>35995</th>
+      <td>17</td>
+      <td>27</td>
+      <td>13</td>
+      <td>13</td>
+      <td>12</td>
+      <td>13</td>
+      <td>27</td>
+      <td>25</td>
+      <td>8</td>
+      <td>1</td>
+      <td>...</td>
+      <td>1</td>
+      <td>27</td>
+      <td>27</td>
+      <td>28</td>
+      <td>13</td>
+      <td>4</td>
+      <td>8</td>
+      <td>3</td>
+      <td>8</td>
+      <td>8</td>
+    </tr>
+    <tr>
+      <th>35996</th>
+      <td>17</td>
+      <td>27</td>
+      <td>13</td>
+      <td>13</td>
+      <td>12</td>
+      <td>13</td>
+      <td>27</td>
+      <td>25</td>
+      <td>8</td>
+      <td>1</td>
+      <td>...</td>
+      <td>1</td>
+      <td>27</td>
+      <td>27</td>
+      <td>28</td>
+      <td>13</td>
+      <td>4</td>
+      <td>8</td>
+      <td>3</td>
+      <td>8</td>
+      <td>8</td>
+    </tr>
+    <tr>
+      <th>35997</th>
+      <td>17</td>
+      <td>27</td>
+      <td>13</td>
+      <td>13</td>
+      <td>12</td>
+      <td>13</td>
+      <td>27</td>
+      <td>25</td>
+      <td>8</td>
+      <td>1</td>
+      <td>...</td>
+      <td>1</td>
+      <td>27</td>
+      <td>27</td>
+      <td>10</td>
+      <td>13</td>
+      <td>4</td>
+      <td>8</td>
+      <td>3</td>
+      <td>8</td>
+      <td>8</td>
+    </tr>
+    <tr>
+      <th>35998</th>
+      <td>17</td>
+      <td>27</td>
+      <td>13</td>
+      <td>13</td>
+      <td>12</td>
+      <td>13</td>
+      <td>27</td>
+      <td>25</td>
+      <td>8</td>
+      <td>1</td>
+      <td>...</td>
+      <td>1</td>
+      <td>27</td>
+      <td>27</td>
+      <td>10</td>
+      <td>13</td>
+      <td>4</td>
+      <td>8</td>
+      <td>3</td>
+      <td>8</td>
+      <td>8</td>
+    </tr>
+    <tr>
+      <th>35999</th>
+      <td>17</td>
+      <td>27</td>
+      <td>13</td>
+      <td>13</td>
+      <td>12</td>
+      <td>13</td>
+      <td>27</td>
+      <td>25</td>
+      <td>8</td>
+      <td>1</td>
+      <td>...</td>
+      <td>1</td>
+      <td>27</td>
+      <td>27</td>
+      <td>10</td>
+      <td>13</td>
+      <td>4</td>
+      <td>1</td>
+      <td>3</td>
+      <td>8</td>
+      <td>8</td>
+    </tr>
+  </tbody>
+</table>
+<p>36000 rows × 26 columns</p>
+</div></div><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>done with [&#39;BINARY_2023-05-09_17-41-11_bf01_nal10k10.csv&#39;, &#39;2023-05-09_17-41-11_bf01_nal10k10DLC_resnet101_DevRats2Jul21shuffle1_500000&#39;]
+done with [&#39;BINARY_13-39-15_bm01_k25.csv&#39;, &#39;2023-05-30_13-39-15_bm01_k25DLC_resnet101_DevRats2Jul21shuffle1_500000&#39;]
+done with [&#39;BINARY_1_2023-05-31_12-02-23_bf02_coc.csv&#39;, &#39;2023-05-31_12-02-23_bf02_cocDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;]
+done with [&#39;BINARY_2023-06-15_19-15-24_bm04_nalket.csv&#39;, &#39;2023-06-15_19-15-24_bm04_nalketDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>done with [&#39;BINARY_2023-06-15_17-16-18_bm01_k5iv.csv&#39;, &#39;2023-06-15_17-16-18_bm01_k5ivDLC_resnet101_DevRats2Jul21shuffle1_500000&#39;]
+done with [&#39;BINARY_2023-06-09_18-18-49_bm02_k25.csv&#39;, &#39;2023-06-09_18-18-49_bm02_k25DLC_resnet101_DevRats2Jul21shuffle1_500000&#39;]
+done with [&#39;BINARY_2023-07-08_15-13-11_bf03_k25.csv&#39;, &#39;2023-07-08_15-13-11_bf03_k25DLC_resnet101_DevRats2Jul21shuffle1_500000&#39;]
+done with [&#39;BINARY_bf01_k5.csv&#39;, &#39;2023-06-20_16-46-29_bf01_k5DLC_resnet101_DevRats2Jul21shuffle1_500000&#39;]
+VAME modules map onto scored behaviors with &#39;loss&#39; of 0.47849370930131485
+Applying 30 remapping rules from config.
+1 of 30: Remapping [0] to ataxic 1-2
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2 of 30: Remapping [1] to explore
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>3 of 30: Remapping [2] to ataxic 1-2
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>4 of 30: Remapping [3] to walk
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>5 of 30: Remapping [4] to explore
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>6 of 30: Remapping [5] to walk
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>7 of 30: Remapping [6] to groom
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>8 of 30: Remapping [7] to explore
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>9 of 30: Remapping [8] to explore
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10 of 30: Remapping [9] to explore
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>11 of 30: Remapping [10] to rest
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>12 of 30: Remapping [11] to rest
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>13 of 30: Remapping [12] to rest
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>14 of 30: Remapping [13] to rest
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>15 of 30: Remapping [14] to explore
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>16 of 30: Remapping [15] to walk
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>17 of 30: Remapping [16] to rest
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>18 of 30: Remapping [17] to explore
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>19 of 30: Remapping [18] to rest
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>20 of 30: Remapping [19] to explore
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>21 of 30: Remapping [20] to walk
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>22 of 30: Remapping [21] to ataxic 1-2
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>23 of 30: Remapping [22] to ataxic 1-2
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>24 of 30: Remapping [23] to walk
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>25 of 30: Remapping [24] to explore
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>26 of 30: Remapping [25] to rest
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>27 of 30: Remapping [26] to rest
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>28 of 30: Remapping [27] to rest
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>29 of 30: Remapping [28] to rest
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>30 of 30: Remapping [29] to explore
+</pre></div>
+</div>
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead tr th {
+        text-align: left;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr>
+      <th></th>
+      <th colspan="7" halign="left">sal</th>
+      <th colspan="3" halign="left">k1</th>
+      <th>...</th>
+      <th colspan="3" halign="left">k5</th>
+      <th colspan="7" halign="left">k10</th>
+    </tr>
+    <tr>
+      <th></th>
+      <th>2023-06-15_21-28-12_bf04_salivDLC_resnet101_DevRats2Jul21shuffle1_500000</th>
+      <th>2023-06-15_22-01-50_bf03_salivDLC_resnet101_DevRats2Jul21shuffle1_500000</th>
+      <th>2023-06-20_15-41-01_bm03_salivDLC_resnet101_DevRats2Jul21shuffle1_500000</th>
+      <th>2023-06-20_16-13-48_bm04_salivDLC_resnet101_DevRats2Jul21shuffle1_500000</th>
+      <th>2023-06-20_17-21-51_bf02_salivDLC_resnet101_DevRats2Jul21shuffle1_500000</th>
+      <th>2023-07-03_16-15-21_bm02_salivDLC_resnet101_DevRats2Jul21shuffle1_500000</th>
+      <th>2023-07-03_19-20-49_bf01_salivDLC_resnet101_DevRats2Jul21shuffle1_500000</th>
+      <th>2023-06-20_19-10-38_bf04_k1ivDLC_resnet101_DevRats2Jul21shuffle1_500000</th>
+      <th>2023-06-26_15-35-45_bf01_k1ivDLC_resnet101_DevRats2Jul21shuffle1_500000</th>
+      <th>2023-06-26_19-00-05_bm02_k1ivDLC_resnet101_DevRats2Jul21shuffle1_500000</th>
+      <th>...</th>
+      <th>2023-07-08_16-19-27_bm02_k5ivDLC_resnet101_DevRats2Jul21shuffle1_500000</th>
+      <th>2023-07-14_16-25-47_bf01_k5ivDLC_resnet101_DevRats2Jul21shuffle1_500000</th>
+      <th>2023-07-18_19-35-14_bm03_k5ivDLC_resnet101_DevRats2Jul21shuffle1_500000</th>
+      <th>2023-05-15_16-47-52_bf03_k10ivDLC_resnet101_DevRats2Jul21shuffle1_500000</th>
+      <th>2023-05-15_18-18-22_bf04_k10ivDLC_resnet101_DevRats2Jul21shuffle1_500000</th>
+      <th>2023-05-25_14-30-54_bm02_k10ivDLC_resnet101_DevRats2Jul21shuffle1_500000</th>
+      <th>2023-05-31_17-08-06_bf01_k10ivDLC_resnet101_DevRats2Jul21shuffle1_500000</th>
+      <th>2023-07-13_15-45-26_bm03_k10ivDLC_resnet101_DevRats2Jul21shuffle1_500000</th>
+      <th>2023-07-14_13-56-09_bm01_k10ivDLC_resnet101_DevRats2Jul21shuffle1_500000</th>
+      <th>2023-07-18_18-19-50_bm04_k10ivDLC_resnet101_DevRats2Jul21shuffle1_500000</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>ataxic 1-2</td>
+      <td>explore</td>
+      <td>ataxic 1-2</td>
+      <td>rest</td>
+      <td>explore</td>
+      <td>explore</td>
+      <td>walk</td>
+      <td>explore</td>
+      <td>explore</td>
+      <td>walk</td>
+      <td>...</td>
+      <td>walk</td>
+      <td>ataxic 1-2</td>
+      <td>explore</td>
+      <td>ataxic 1-2</td>
+      <td>rest</td>
+      <td>rest</td>
+      <td>ataxic 1-2</td>
+      <td>explore</td>
+      <td>rest</td>
+      <td>rest</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>ataxic 1-2</td>
+      <td>explore</td>
+      <td>ataxic 1-2</td>
+      <td>rest</td>
+      <td>explore</td>
+      <td>explore</td>
+      <td>walk</td>
+      <td>explore</td>
+      <td>explore</td>
+      <td>walk</td>
+      <td>...</td>
+      <td>walk</td>
+      <td>ataxic 1-2</td>
+      <td>explore</td>
+      <td>ataxic 1-2</td>
+      <td>rest</td>
+      <td>rest</td>
+      <td>ataxic 1-2</td>
+      <td>explore</td>
+      <td>rest</td>
+      <td>rest</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>ataxic 1-2</td>
+      <td>explore</td>
+      <td>ataxic 1-2</td>
+      <td>rest</td>
+      <td>explore</td>
+      <td>explore</td>
+      <td>walk</td>
+      <td>explore</td>
+      <td>explore</td>
+      <td>walk</td>
+      <td>...</td>
+      <td>walk</td>
+      <td>ataxic 1-2</td>
+      <td>explore</td>
+      <td>ataxic 1-2</td>
+      <td>rest</td>
+      <td>rest</td>
+      <td>ataxic 1-2</td>
+      <td>explore</td>
+      <td>rest</td>
+      <td>rest</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>ataxic 1-2</td>
+      <td>explore</td>
+      <td>ataxic 1-2</td>
+      <td>rest</td>
+      <td>explore</td>
+      <td>explore</td>
+      <td>walk</td>
+      <td>explore</td>
+      <td>explore</td>
+      <td>walk</td>
+      <td>...</td>
+      <td>walk</td>
+      <td>ataxic 1-2</td>
+      <td>explore</td>
+      <td>ataxic 1-2</td>
+      <td>rest</td>
+      <td>rest</td>
+      <td>ataxic 1-2</td>
+      <td>explore</td>
+      <td>rest</td>
+      <td>rest</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>ataxic 1-2</td>
+      <td>explore</td>
+      <td>ataxic 1-2</td>
+      <td>rest</td>
+      <td>explore</td>
+      <td>explore</td>
+      <td>walk</td>
+      <td>explore</td>
+      <td>explore</td>
+      <td>walk</td>
+      <td>...</td>
+      <td>walk</td>
+      <td>ataxic 1-2</td>
+      <td>explore</td>
+      <td>ataxic 1-2</td>
+      <td>rest</td>
+      <td>rest</td>
+      <td>ataxic 1-2</td>
+      <td>explore</td>
+      <td>rest</td>
+      <td>rest</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>35995</th>
+      <td>explore</td>
+      <td>rest</td>
+      <td>rest</td>
+      <td>rest</td>
+      <td>rest</td>
+      <td>rest</td>
+      <td>rest</td>
+      <td>rest</td>
+      <td>explore</td>
+      <td>explore</td>
+      <td>...</td>
+      <td>explore</td>
+      <td>rest</td>
+      <td>rest</td>
+      <td>rest</td>
+      <td>rest</td>
+      <td>explore</td>
+      <td>explore</td>
+      <td>walk</td>
+      <td>explore</td>
+      <td>explore</td>
+    </tr>
+    <tr>
+      <th>35996</th>
+      <td>explore</td>
+      <td>rest</td>
+      <td>rest</td>
+      <td>rest</td>
+      <td>rest</td>
+      <td>rest</td>
+      <td>rest</td>
+      <td>rest</td>
+      <td>explore</td>
+      <td>explore</td>
+      <td>...</td>
+      <td>explore</td>
+      <td>rest</td>
+      <td>rest</td>
+      <td>rest</td>
+      <td>rest</td>
+      <td>explore</td>
+      <td>explore</td>
+      <td>walk</td>
+      <td>explore</td>
+      <td>explore</td>
+    </tr>
+    <tr>
+      <th>35997</th>
+      <td>explore</td>
+      <td>rest</td>
+      <td>rest</td>
+      <td>rest</td>
+      <td>rest</td>
+      <td>rest</td>
+      <td>rest</td>
+      <td>rest</td>
+      <td>explore</td>
+      <td>explore</td>
+      <td>...</td>
+      <td>explore</td>
+      <td>rest</td>
+      <td>rest</td>
+      <td>rest</td>
+      <td>rest</td>
+      <td>explore</td>
+      <td>explore</td>
+      <td>walk</td>
+      <td>explore</td>
+      <td>explore</td>
+    </tr>
+    <tr>
+      <th>35998</th>
+      <td>explore</td>
+      <td>rest</td>
+      <td>rest</td>
+      <td>rest</td>
+      <td>rest</td>
+      <td>rest</td>
+      <td>rest</td>
+      <td>rest</td>
+      <td>explore</td>
+      <td>explore</td>
+      <td>...</td>
+      <td>explore</td>
+      <td>rest</td>
+      <td>rest</td>
+      <td>rest</td>
+      <td>rest</td>
+      <td>explore</td>
+      <td>explore</td>
+      <td>walk</td>
+      <td>explore</td>
+      <td>explore</td>
+    </tr>
+    <tr>
+      <th>35999</th>
+      <td>explore</td>
+      <td>rest</td>
+      <td>rest</td>
+      <td>rest</td>
+      <td>rest</td>
+      <td>rest</td>
+      <td>rest</td>
+      <td>rest</td>
+      <td>explore</td>
+      <td>explore</td>
+      <td>...</td>
+      <td>explore</td>
+      <td>rest</td>
+      <td>rest</td>
+      <td>rest</td>
+      <td>rest</td>
+      <td>explore</td>
+      <td>explore</td>
+      <td>walk</td>
+      <td>explore</td>
+      <td>explore</td>
+    </tr>
+  </tbody>
+</table>
+<p>36000 rows × 26 columns</p>
+</div></div><img alt="../_images/cef48d622af34c4902d9af5cae553c3d714d0909a91fb8ddbb41563a8f5840c1.png" src="../_images/cef48d622af34c4902d9af5cae553c3d714d0909a91fb8ddbb41563a8f5840c1.png" />
+<img alt="../_images/86d11045e5c494607092b3813dccc9ed92f21c1724178c1c6aa4e2ea273d0ab3.png" src="../_images/86d11045e5c494607092b3813dccc9ed92f21c1724178c1c6aa4e2ea273d0ab3.png" />
 </div>
 </div>
 </section>

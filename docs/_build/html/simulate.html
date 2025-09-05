@@ -9,7 +9,7 @@
   <title>Simulate &mdash; MARIPoSA 0.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
-      <link rel="stylesheet" type="text/css" href="_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+      <link rel="stylesheet" type="text/css" href="_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css?v=be8a1c11" />
 
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
@@ -56,6 +56,7 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Simulate</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#utils.simulate.generate_sequence"><code class="docutils literal notranslate"><span class="pre">generate_sequence()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#utils.simulate.generate_usage"><code class="docutils literal notranslate"><span class="pre">generate_usage()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#utils.simulate.generate_usage_labeled"><code class="docutils literal notranslate"><span class="pre">generate_usage_labeled()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -107,20 +108,43 @@
 
 <dl class="py function">
 <dt class="sig sig-object py" id="utils.simulate.generate_usage">
-<span class="sig-prename descclassname"><span class="pre">utils.simulate.</span></span><span class="sig-name descname"><span class="pre">generate_usage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">module_feature_object</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_samples</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_bootstraps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bootstrap_fraction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">42</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/utils/simulate.html#generate_usage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.simulate.generate_usage" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">utils.simulate.</span></span><span class="sig-name descname"><span class="pre">generate_usage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">module_feature_object</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_samples</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">42</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'log-normal'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/utils/simulate.html#generate_usage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.simulate.generate_usage" title="Permalink to this definition"></a></dt>
 <dd><p>Generate simulated pose module usage object</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>module_feature_object</strong> – module feature object of class ModuleUsage (from analyze.get_module_usage) or ModuleTransitions (from analyze.get_module_transitions)</p></li>
 <li><p><strong>n_samples</strong> – number of samples to generate</p></li>
-<li><p><strong>random_state</strong> – random state seed (default: 42</p></li>
+<li><p><strong>random_state</strong> – random state seed (default: 42)</p></li>
+<li><p><strong>mode</strong> – ‘log-normal’ or ‘multivariate_gaussian’; default log-normal</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>module_feature_object of the same style as the one input</p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="utils.simulate.generate_usage_labeled">
+<span class="sig-prename descclassname"><span class="pre">utils.simulate.</span></span><span class="sig-name descname"><span class="pre">generate_usage_labeled</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">module_feature_object</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_samples_per_bin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bins</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">regression</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'default'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">42</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'log-normal'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbosity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'medium'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/utils/simulate.html#generate_usage_labeled"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.simulate.generate_usage_labeled" title="Permalink to this definition"></a></dt>
+<dd><p>Generate simulated pose module usage object</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>module_feature_object</strong> – module feature object of class ModuleUsage (from analyze.get_module_usage) or</p>
+</dd>
+</dl>
+<p>ModuleTransitions (from analyze.get_module_transitions)
+:param n_samples_per_bin: number of samples to generate per bin in timebin
+:param bins: 2D array of bins containing upper and lower limit for each bin
+:param regression: regression model to label samples
+:param max_iters: number for how many iterations to attempt to generate samples; will raise an error if
+exceeded without generating enough samples; number or ‘default’ for n_samples_total*10
+:param random_state: random state seed (default: 42)
+:param mode: ‘log-normal’ or ‘multivariate_gaussian’; default log-normal
+:param scale: scaling factor for covariance in log-transformed approach
+:param verbosity: ‘low’,’medium’, or ‘high’
+:return: module_feature_object of the same style as the one input</p>
 </dd></dl>
 
 </section>
