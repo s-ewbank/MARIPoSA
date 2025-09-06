@@ -2,6 +2,7 @@ import numpy as np
 from utils import analyze
 from scipy.stats import multivariate_normal
 from scipy.special import softmax
+import pandas as pd
 
 def generate_usage(module_feature_object, n_samples, random_state=42, mode="log-normal", scale=10):
     """
@@ -192,13 +193,14 @@ def generate_usage_labeled(module_feature_object, n_samples_per_bin, bins, regre
             return analyze.ModuleTransitions(simulated_X, np.nan, group_labels,
                                              module_feature_object.feat_names, {i:i for i in bins[:,0]}, None)
 
-def generate_sequence(config, labels_df, T, random_state=42):
+def generate_sequence(config, labels_df, T, n_subjs = 1, random_state=42):
     """
     Generate individual simulated pose module label sequence of length T (noting that T = number of observations, not time)
 
     :param config: the config object
     :param labels_df: labels_df from analyze.get_module_labels
     :param T: length of sequence to be generated
+    :param n_subjs: number of subjects to generate (if labels_df has subgroups, will be number of subjects PER GROUP)
     :param random_state: random state seed (default: 42
     :return: sequence
 
@@ -206,15 +208,62 @@ def generate_sequence(config, labels_df, T, random_state=42):
     np.random.seed(random_state)
     module_usage = analyze.get_module_usage(config, labels_df)
     module_transitions = analyze.get_module_transitions(config, labels_df)
-    start_prob = np.mean(module_usage.label_counts,axis=0)
-    transition_mat = np.mean(module_transitions.transition_count_matrices,axis=0)
-    transition_mat = transition_mat / np.sum(transition_mat, axis=1, keepdims=True)
-    row_sums = np.sum(transition_mat, axis=1)
-    transition_mat = transition_mat / row_sums[:, np.newaxis]
-    transition_mat[np.abs(np.sum(transition_mat, axis=1) - 1) > 1e-6] = 1
-    current_state = np.random.choice(len(start_prob), p=start_prob)
-    sequence = [current_state]
-    for _ in range(1, T):
-        current_state = np.random.choice(len(transition_mat), p=transition_mat[current_state])
-        sequence.append(current_state)
-    return sequence
+    subgroups = np.unique(module_usage.group_labels)
+    n_subgroups = len(subgroups)
+    if n_subgroups==1:
+        start_prob = np.mean(module_usage.label_counts,axis=0)
+        transition_mat = np.mean(module_transitions.transition_count_matrices,axis=0)
+        transition_mat = transition_mat / np.sum(transition_mat, axis=1, keepdims=True)
+        row_sums = np.sum(transition_mat, axis=1)
+        transition_mat = transition_mat / row_sums[:, np.newaxis]
+        transition_mat[np.abs(np.sum(transition_mat, axis=1) - 1) > 1e-6] = 1
+        header = []
+        for i in range(n_subjs):
+            current_state = np.random.choice(len(start_prob), p=start_prob)
+            sequence = [current_state]
+            for _ in range(1, T):
+                current_state = np.random.choice(len(transition_mat), p=transition_mat[current_state])
+                sequence.append(current_state)
+            subj_i = f"subj_{i}"
+            header.append(subj_i)
+            labels_i = np.array(sequence)
+            if i == 0:
+                sim_labels_df = pd.DataFrame(labels_i, columns=[header])
+            else:
+                sim_labels_df.insert(loc=i, value=labels_i, column=subj_i)
+                sim_labels_df = sim_labels_df.copy()
+    else:
+        count=0
+        reverse_group_dict = {v: u for u, v in module_usage.group_dict.items()}
+        print(reverse_group_dict)
+        header1=[]
+        header2=[]
+        for g in range(n_subgroups):
+            start_prob = np.mean(module_usage.label_counts[np.array(module_usage.group_labels)==g],axis=0)
+            sub_transition_count_matrices = np.array(module_transitions.transition_count_matrices)[np.array(module_transitions.group_labels)==g,:,:]
+            transition_mat = np.mean(sub_transition_count_matrices,axis=0)
+            transition_mat = transition_mat / np.sum(transition_mat, axis=1, keepdims=True)
+            row_sums = np.sum(transition_mat, axis=1)
+            transition_mat = transition_mat / row_sums[:, np.newaxis]
+            transition_mat[np.abs(np.sum(transition_mat, axis=1) - 1) > 1e-6] = 1
+            group = f"{reverse_group_dict[g]}"
+            print(group)
+            for i in range(n_subjs):
+                subj_i = f"{group}_{i}"
+                header = subj_i
+                header2.append(header)
+                header1.append(group)
+                current_state = np.random.choice(len(start_prob), p=start_prob)
+                sequence = [current_state]
+                for _ in range(1, T):
+                    current_state = np.random.choice(len(transition_mat), p=transition_mat[current_state])
+                    sequence.append(current_state)
+                labels_i = np.array(sequence)
+                if count == 0:
+                    sim_labels_df = pd.DataFrame(labels_i, columns=[header])
+                else:
+                    sim_labels_df.insert(loc=count, value=labels_i, column=header)
+                    sim_labels_df = sim_labels_df.copy()
+                count+=1
+        sim_labels_df.columns = [header1, header2]
+    return sim_labels_df
