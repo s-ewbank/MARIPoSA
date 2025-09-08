@@ -89,7 +89,7 @@
 <span id="simulate"></span><h1>Simulate<a class="headerlink" href="#module-utils.simulate" title="Permalink to this heading"></a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="utils.simulate.generate_sequence">
-<span class="sig-prename descclassname"><span class="pre">utils.simulate.</span></span><span class="sig-name descname"><span class="pre">generate_sequence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">T</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">42</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/utils/simulate.html#generate_sequence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.simulate.generate_sequence" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">utils.simulate.</span></span><span class="sig-name descname"><span class="pre">generate_sequence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">T</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_subjs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">42</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/utils/simulate.html#generate_sequence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.simulate.generate_sequence" title="Permalink to this definition"></a></dt>
 <dd><p>Generate individual simulated pose module label sequence of length T (noting that T = number of observations, not time)</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -97,7 +97,9 @@
 <li><p><strong>config</strong> – the config object</p></li>
 <li><p><strong>labels_df</strong> – labels_df from analyze.get_module_labels</p></li>
 <li><p><strong>T</strong> – length of sequence to be generated</p></li>
-<li><p><strong>random_state</strong> – random state seed (default: 42</p></li>
+<li><p><strong>n_subjs</strong> – number of subjects to generate (if labels_df has subgroups, will be number of subjects PER GROUP)</p></li>
+<li><p><strong>random_state</strong> – random state seed (default: 42)</p></li>
+<li><p><strong>verbose</strong> – print progress (default: False)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -131,20 +133,22 @@
 <dd><p>Generate simulated pose module usage object</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>module_feature_object</strong> – module feature object of class ModuleUsage (from analyze.get_module_usage) or</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>module_feature_object</strong> – module feature object of class ModuleUsage (from analyze.get_module_usage) or ModuleTransitions (from analyze.get_module_transitions)</p></li>
+<li><p><strong>n_samples_per_bin</strong> – number of samples to generate per bin in timebin</p></li>
+<li><p><strong>bins</strong> – 2D array of bins containing upper and lower limit for each bin</p></li>
+<li><p><strong>regression</strong> – regression model to label samples</p></li>
+<li><p><strong>max_iters</strong> – number for how many iterations to attempt to generate samples; will raise an error if exceeded without generating enough samples; number or ‘default’ for n_samples_total*10</p></li>
+<li><p><strong>random_state</strong> – random state seed (default: 42)</p></li>
+<li><p><strong>mode</strong> – ‘log-normal’ or ‘multivariate_gaussian’; default log-normal</p></li>
+<li><p><strong>scale</strong> – scaling factor for covariance in log-transformed approach</p></li>
+<li><p><strong>verbosity</strong> – ‘low’,’medium’, or ‘high’</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>module_feature_object of the same style as the one input</p>
 </dd>
 </dl>
-<p>ModuleTransitions (from analyze.get_module_transitions)
-:param n_samples_per_bin: number of samples to generate per bin in timebin
-:param bins: 2D array of bins containing upper and lower limit for each bin
-:param regression: regression model to label samples
-:param max_iters: number for how many iterations to attempt to generate samples; will raise an error if
-exceeded without generating enough samples; number or ‘default’ for n_samples_total*10
-:param random_state: random state seed (default: 42)
-:param mode: ‘log-normal’ or ‘multivariate_gaussian’; default log-normal
-:param scale: scaling factor for covariance in log-transformed approach
-:param verbosity: ‘low’,’medium’, or ‘high’
-:return: module_feature_object of the same style as the one input</p>
 </dd></dl>
 
 </section>

@@ -69,13 +69,11 @@ def generate_usage_labeled(module_feature_object, n_samples_per_bin, bins, regre
     """
     Generate simulated pose module usage object
 
-    :param module_feature_object: module feature object of class ModuleUsage (from analyze.get_module_usage) or
-    ModuleTransitions (from analyze.get_module_transitions)
+    :param module_feature_object: module feature object of class ModuleUsage (from analyze.get_module_usage) or ModuleTransitions (from analyze.get_module_transitions)
     :param n_samples_per_bin: number of samples to generate per bin in timebin
     :param bins: 2D array of bins containing upper and lower limit for each bin
     :param regression: regression model to label samples
-    :param max_iters: number for how many iterations to attempt to generate samples; will raise an error if
-    exceeded without generating enough samples; number or 'default' for n_samples_total*10
+    :param max_iters: number for how many iterations to attempt to generate samples; will raise an error if exceeded without generating enough samples; number or 'default' for n_samples_total*10
     :param random_state: random state seed (default: 42)
     :param mode: 'log-normal' or 'multivariate_gaussian'; default log-normal
     :param scale: scaling factor for covariance in log-transformed approach
