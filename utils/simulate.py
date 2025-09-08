@@ -193,7 +193,7 @@ def generate_usage_labeled(module_feature_object, n_samples_per_bin, bins, regre
             return analyze.ModuleTransitions(simulated_X, np.nan, group_labels,
                                              module_feature_object.feat_names, {i:i for i in bins[:,0]}, None)
 
-def generate_sequence(config, labels_df, T, n_subjs = 1, random_state=42):
+def generate_sequence(config, labels_df, T, n_subjs = 1, random_state=42, verbose=False):
     """
     Generate individual simulated pose module label sequence of length T (noting that T = number of observations, not time)
 
@@ -201,10 +201,13 @@ def generate_sequence(config, labels_df, T, n_subjs = 1, random_state=42):
     :param labels_df: labels_df from analyze.get_module_labels
     :param T: length of sequence to be generated
     :param n_subjs: number of subjects to generate (if labels_df has subgroups, will be number of subjects PER GROUP)
-    :param random_state: random state seed (default: 42
+    :param random_state: random state seed (default: 42)
+    :param verbose: print progress (default: False)
     :return: sequence
 
     """
+    if verbose:
+        print("Analyzing input labels dataframe")
     np.random.seed(random_state)
     module_usage = analyze.get_module_usage(config, labels_df)
     module_transitions = analyze.get_module_transitions(config, labels_df)
@@ -219,6 +222,8 @@ def generate_sequence(config, labels_df, T, n_subjs = 1, random_state=42):
         transition_mat[np.abs(np.sum(transition_mat, axis=1) - 1) > 1e-6] = 1
         header = []
         for i in range(n_subjs):
+            if verbose:
+                print(f"Generating data for subject {i+1} of {n_subjs}")
             current_state = np.random.choice(len(start_prob), p=start_prob)
             sequence = [current_state]
             for _ in range(1, T):
@@ -234,8 +239,8 @@ def generate_sequence(config, labels_df, T, n_subjs = 1, random_state=42):
                 sim_labels_df = sim_labels_df.copy()
     else:
         count=0
+        total_subjs = int(n_subjs) * int(n_subgroups)
         reverse_group_dict = {v: u for u, v in module_usage.group_dict.items()}
-        print(reverse_group_dict)
         header1=[]
         header2=[]
         for g in range(n_subgroups):
@@ -247,9 +252,10 @@ def generate_sequence(config, labels_df, T, n_subjs = 1, random_state=42):
             transition_mat = transition_mat / row_sums[:, np.newaxis]
             transition_mat[np.abs(np.sum(transition_mat, axis=1) - 1) > 1e-6] = 1
             group = f"{reverse_group_dict[g]}"
-            print(group)
             for i in range(n_subjs):
                 subj_i = f"{group}_{i}"
+                if verbose:
+                    print(f"Generating data for {subj_i} ({count+1} of {total_subjs})")
                 header = subj_i
                 header2.append(header)
                 header1.append(group)
