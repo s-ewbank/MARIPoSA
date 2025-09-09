@@ -12,6 +12,7 @@ def generate_usage(module_feature_object, n_samples, random_state=42, mode="log-
     :param n_samples: number of samples to generate
     :param random_state: random state seed (default: 42)
     :param mode: 'log-normal' or 'multivariate_gaussian'; default log-normal
+    :param scale: scale factor for variance in log-normal mode (not needed for multivariate_gaussian mode)
     :return: module_feature_object of the same style as the one input
 
     """
