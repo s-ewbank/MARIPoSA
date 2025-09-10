@@ -66,6 +66,7 @@ Check out the demo scripts for a full analysis and plotting pipeline!
    demo/Demo4-PoseSegmentation-ClassificationAndRegression
    demo/Demo5-PoseSegmentation-ManualScoring
    demo/Demo6-PoseSegmentation-Simulation
+   demo/Demo7-PoseEstimation-KeypointTravel
    metadata
    analyze
    plot

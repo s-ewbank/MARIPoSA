@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Demo 4: Regression and Classification of Group Conditions &mdash; MARIPoSA 0.0 documentation</title>
+  <title>Demo 4 (PS): Regression and Classification of Group Conditions in Pose Segmentation Data &mdash; MARIPoSA 0.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
@@ -20,8 +20,8 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Demo 5: Comparing Pose Modules to Manual Scoring Data" href="Demo5-PoseSegmentation-ManualScoring.html" />
-    <link rel="prev" title="Demo 3: Embedding of Pose Segmentation Data" href="Demo3-PoseSegmentation-Embed.html" /> 
+    <link rel="next" title="Demo 5 (PS): Comparing Pose Modules to Manual Scoring Data" href="Demo5-PoseSegmentation-ManualScoring.html" />
+    <link rel="prev" title="Demo 3 (PS): Embedding of Pose Segmentation Data" href="Demo3-PoseSegmentation-Embed.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -45,16 +45,17 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="Demo1-ProjectCreation.html">Demo 1: Project Creation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Demo2-PoseSegmentation-Visualize.html">Demo 2: Visualization of Pose Module Usage</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Demo3-PoseSegmentation-Embed.html">Demo 3: Embedding of Pose Segmentation Data</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Demo 4: Regression and Classification of Group Conditions</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="Demo1-ProjectCreation.html">Demo 1 (PS/PE): Project Creation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Demo2-PoseSegmentation-Visualize.html">Demo 2 (PS): Visualization of Pose Module Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Demo3-PoseSegmentation-Embed.html">Demo 3 (PS): Embedding of Pose Segmentation Data</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Demo 4 (PS): Regression and Classification of Group Conditions in Pose Segmentation Data</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#classification">4.1: Classification</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#regression">4.2: Regression</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="Demo5-PoseSegmentation-ManualScoring.html">Demo 5: Comparing Pose Modules to Manual Scoring Data</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Demo6-PoseSegmentation-Simulation.html">Demo 6: Simulating Pose Segmentation Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Demo5-PoseSegmentation-ManualScoring.html">Demo 5 (PS): Comparing Pose Modules to Manual Scoring Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Demo6-PoseSegmentation-Simulation.html">Demo 6 (PS): Simulating Pose Segmentation Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Demo7-PoseEstimation-KeypointTravel.html">Demo 7 (PE): Analyzing Keypoint Displacement in Pose Estimation Data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../metadata.html">Metadata</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../analyze.html">Analyze</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../plot.html">Plot</a></li>
@@ -75,7 +76,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">Demo 4: Regression and Classification of Group Conditions</li>
+      <li class="breadcrumb-item active">Demo 4 (PS): Regression and Classification of Group Conditions in Pose Segmentation Data</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/demo/Demo4-PoseSegmentation-ClassificationAndRegression.ipynb.txt" rel="nofollow"> View page source</a>
       </li>
@@ -85,8 +86,8 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="demo-4-regression-and-classification-of-group-conditions">
-<h1>Demo 4: Regression and Classification of Group Conditions<a class="headerlink" href="#demo-4-regression-and-classification-of-group-conditions" title="Permalink to this heading"></a></h1>
+  <section id="demo-4-ps-regression-and-classification-of-group-conditions-in-pose-segmentation-data">
+<h1>Demo 4 (PS): Regression and Classification of Group Conditions in Pose Segmentation Data<a class="headerlink" href="#demo-4-ps-regression-and-classification-of-group-conditions-in-pose-segmentation-data" title="Permalink to this heading"></a></h1>
 <p><em>Written and last updated July 19, 2025 by Sedona Ewbank, snewbank&#64;stanford.edu</em></p>
 <p>The purpose of this demo is to demonstrate how to classify and/or regress group conditions from pose segmentation data.</p>
 <div class="cell docutils container">
@@ -248,10 +249,12 @@ Logistic regression LOOCV confusion matrix:
 </div>
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>NaiveBayes
 KNN
-RandomForest
 </pre></div>
 </div>
-<img alt="../_images/360b146b9938b150052562a5f984c41157cfbd4c79555963a359d6b3cfaa3d8a.png" src="../_images/360b146b9938b150052562a5f984c41157cfbd4c79555963a359d6b3cfaa3d8a.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>RandomForest
+</pre></div>
+</div>
+<img alt="../_images/392b6b99ff324b98a4cb43a55748aebf83d73f0505c0cb1888359a239f7c2d56.png" src="../_images/392b6b99ff324b98a4cb43a55748aebf83d73f0505c0cb1888359a239f7c2d56.png" />
 </div>
 </div>
 </section>
@@ -268,19 +271,28 @@ RandomForest
 <div class="cell_output docutils container">
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Help on function regress in module utils.analyze:
 
-regress(module_feature_object, dose_dict, method=&#39;LinearRegression&#39;, alpha=1)
+regress(module_feature_object, dose_dict, method=&#39;LinearRegression&#39;, degree=1, alpha=1)
+    Regress a continuous variable (e.g., dose, stimulus value) from a module or keypoint feature object
+    
+    :param module_feature_object: ModuleUsage, ModuleTransitions, or KeypointFeature object
+    :param dose_dict: dictionary with keys corresponding to subgroups and items corresponding to variable
+    :param method: method of regression; either &quot;LinearRegression&quot; (default) or &quot;Ridge&quot; or &quot;Lasso&quot;
+    :param degree: polynomial degree; default 1
+    :param alpha: alpha (default 1; only applies for regularized regression, i.e. Ridge and Lasso)
+    :return: regression model, dose_labels
 
 Help on function loocv_regression in module utils.analyze:
 
-loocv_regression(module_feature_object, dose_dict, method=&#39;LinearRegression&#39;, constrain_pos=True, alpha=1)
+loocv_regression(module_feature_object, dose_dict, method=&#39;LinearRegression&#39;, constrain_pos=True, degree=1, alpha=1)
     Perform LOOCV for linear regression
     
-    :param module_feature_object:
-    :param dose_dict:
-    :param method:
-    :param constrain_pos:
-    :param alpha:
-    :return:
+    :param module_feature_object: ModuleUsage, ModuleTransitions, or KeypointFeature object
+    :param dose_dict: dictionary with keys corresponding to subgroups and items corresponding to variable
+    :param method: method of regression; either &quot;LinearRegression&quot; (default) or &quot;Ridge&quot; or &quot;Lasso&quot;
+    :param constrain_pos: constrain to only positive values; true by default
+    :param degree: degree of polynomial (default 1)
+    :param alpha: alpha (default 1; only applies for regularized regression, i.e. Ridge and Lasso)
+    :return: held-out predictions, squared error
 </pre></div>
 </div>
 </div>
@@ -374,11 +386,13 @@ Usage Lasso, alpha 0.1 RMSE: 1.75
 Usage Lasso, alpha 0.5 RMSE: 1.88
 Usage Ridge, alpha 0.1 RMSE: 1.53
 Usage Ridge, alpha 0.5 RMSE: 1.52
-Tx LinearRegression, alpha nan RMSE: 1.30
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Tx Lasso, alpha 0.1 RMSE: 1.45
-Tx Lasso, alpha 0.5 RMSE: 1.98
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Tx LinearRegression, alpha nan RMSE: 1.30
+Tx Lasso, alpha 0.1 RMSE: 1.45
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Tx Lasso, alpha 0.5 RMSE: 1.98
 Tx Ridge, alpha 0.1 RMSE: 1.30
 Tx Ridge, alpha 0.5 RMSE: 1.30
 </pre></div>
@@ -393,8 +407,8 @@ Tx Ridge, alpha 0.5 RMSE: 1.30
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="Demo3-PoseSegmentation-Embed.html" class="btn btn-neutral float-left" title="Demo 3: Embedding of Pose Segmentation Data" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="Demo5-PoseSegmentation-ManualScoring.html" class="btn btn-neutral float-right" title="Demo 5: Comparing Pose Modules to Manual Scoring Data" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="Demo3-PoseSegmentation-Embed.html" class="btn btn-neutral float-left" title="Demo 3 (PS): Embedding of Pose Segmentation Data" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Demo5-PoseSegmentation-ManualScoring.html" class="btn btn-neutral float-right" title="Demo 5 (PS): Comparing Pose Modules to Manual Scoring Data" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

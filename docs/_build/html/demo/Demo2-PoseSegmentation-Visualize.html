@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Demo 2: Visualization of Pose Module Usage &mdash; MARIPoSA 0.0 documentation</title>
+  <title>Demo 2 (PS): Visualization of Pose Module Usage &mdash; MARIPoSA 0.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
@@ -20,8 +20,8 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Demo 3: Embedding of Pose Segmentation Data" href="Demo3-PoseSegmentation-Embed.html" />
-    <link rel="prev" title="Demo 1: Project Creation" href="Demo1-ProjectCreation.html" /> 
+    <link rel="next" title="Demo 3 (PS): Embedding of Pose Segmentation Data" href="Demo3-PoseSegmentation-Embed.html" />
+    <link rel="prev" title="Demo 1 (PS/PE): Project Creation" href="Demo1-ProjectCreation.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -45,8 +45,8 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="Demo1-ProjectCreation.html">Demo 1: Project Creation</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Demo 2: Visualization of Pose Module Usage</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="Demo1-ProjectCreation.html">Demo 1 (PS/PE): Project Creation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Demo 2 (PS): Visualization of Pose Module Usage</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#loading-data-and-simply-visualizing-usage-no-subgroups-or-time-binning">2.1: Loading data and simply visualizing usage (no subgroups or time binning)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#loading-data-and-visualizing-usage-by-subgroups">2.2: Loading data and visualizing usage by subgroups</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#a-visualize-usage-of-all-modules-across-subgroups-as-bar-point-plot">2.2a: Visualize usage of all modules across subgroups as bar/point plot</a></li>
@@ -56,10 +56,11 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="Demo3-PoseSegmentation-Embed.html">Demo 3: Embedding of Pose Segmentation Data</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Demo4-PoseSegmentation-ClassificationAndRegression.html">Demo 4: Regression and Classification of Group Conditions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Demo5-PoseSegmentation-ManualScoring.html">Demo 5: Comparing Pose Modules to Manual Scoring Data</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Demo6-PoseSegmentation-Simulation.html">Demo 6: Simulating Pose Segmentation Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Demo3-PoseSegmentation-Embed.html">Demo 3 (PS): Embedding of Pose Segmentation Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Demo4-PoseSegmentation-ClassificationAndRegression.html">Demo 4 (PS): Regression and Classification of Group Conditions in Pose Segmentation Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Demo5-PoseSegmentation-ManualScoring.html">Demo 5 (PS): Comparing Pose Modules to Manual Scoring Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Demo6-PoseSegmentation-Simulation.html">Demo 6 (PS): Simulating Pose Segmentation Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Demo7-PoseEstimation-KeypointTravel.html">Demo 7 (PE): Analyzing Keypoint Displacement in Pose Estimation Data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../metadata.html">Metadata</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../analyze.html">Analyze</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../plot.html">Plot</a></li>
@@ -80,7 +81,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">Demo 2: Visualization of Pose Module Usage</li>
+      <li class="breadcrumb-item active">Demo 2 (PS): Visualization of Pose Module Usage</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/demo/Demo2-PoseSegmentation-Visualize.ipynb.txt" rel="nofollow"> View page source</a>
       </li>
@@ -90,8 +91,8 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="demo-2-visualization-of-pose-module-usage">
-<h1>Demo 2: Visualization of Pose Module Usage<a class="headerlink" href="#demo-2-visualization-of-pose-module-usage" title="Permalink to this heading"></a></h1>
+  <section id="demo-2-ps-visualization-of-pose-module-usage">
+<h1>Demo 2 (PS): Visualization of Pose Module Usage<a class="headerlink" href="#demo-2-ps-visualization-of-pose-module-usage" title="Permalink to this heading"></a></h1>
 <p><em>Written and last updated July 19, 2025 by Sedona Ewbank, snewbank&#64;stanford.edu</em></p>
 <p>The purpose of this demo is to demonstrate how to load pose segmentation data and visualize pose module usage in various ways.</p>
 <div class="cell docutils container">
@@ -299,8 +300,8 @@ Getting module usage
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="Demo1-ProjectCreation.html" class="btn btn-neutral float-left" title="Demo 1: Project Creation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="Demo3-PoseSegmentation-Embed.html" class="btn btn-neutral float-right" title="Demo 3: Embedding of Pose Segmentation Data" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="Demo1-ProjectCreation.html" class="btn btn-neutral float-left" title="Demo 1 (PS/PE): Project Creation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Demo3-PoseSegmentation-Embed.html" class="btn btn-neutral float-right" title="Demo 3 (PS): Embedding of Pose Segmentation Data" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

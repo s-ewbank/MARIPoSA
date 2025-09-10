@@ -87,6 +87,13 @@ class KeypointFeature:
         return KeypointFeature(keypoint_feature_scaled, self.group_labels, self.observation_labels, self.feat_names,
                            self.group_dict, scaler)
 
+    def save(self, save_path):
+        if ((save_path.endswith(".pkl")==False) and (save_path.endswith(".pickle")==False)):
+            save_path+=".pickle"
+            print(f"Save path changed to {save_path}")
+        with open(save_path, 'wb') as file:
+            pickle.dump(self, file)
+
 
 def get_module_labels(config, start, stop, subgroups = None):
     """
@@ -912,6 +919,17 @@ def get_distance(module_feature_object, method="euclidean"):
     return dist_mat.T
 
 def regress(module_feature_object, dose_dict, method="LinearRegression", degree=1, alpha = 1):
+    """
+    Regress a continuous variable (e.g., dose, stimulus value) from a module or keypoint feature object
+
+    :param module_feature_object: ModuleUsage, ModuleTransitions, or KeypointFeature object
+    :param dose_dict: dictionary with keys corresponding to subgroups and items corresponding to variable
+    :param method: method of regression; either "LinearRegression" (default) or "Ridge" or "Lasso"
+    :param degree: polynomial degree; default 1
+    :param alpha: alpha (default 1; only applies for regularized regression, i.e. Ridge and Lasso)
+    :return: regression model, dose_labels
+
+    """
     if module_feature_object.__class__.__name__=="ModuleUsage":
         X=module_feature_object.label_counts
     elif module_feature_object.__class__.__name__=="ModuleTransitions":
@@ -948,12 +966,13 @@ def loocv_regression(module_feature_object, dose_dict, method="LinearRegression"
     """
     Perform LOOCV for linear regression
 
-    :param module_feature_object:
-    :param dose_dict:
-    :param method:
-    :param constrain_pos:
-    :param alpha:
-    :return:
+    :param module_feature_object: ModuleUsage, ModuleTransitions, or KeypointFeature object
+    :param dose_dict: dictionary with keys corresponding to subgroups and items corresponding to variable
+    :param method: method of regression; either "LinearRegression" (default) or "Ridge" or "Lasso"
+    :param constrain_pos: constrain to only positive values; true by default
+    :param degree: degree of polynomial (default 1)
+    :param alpha: alpha (default 1; only applies for regularized regression, i.e. Ridge and Lasso)
+    :return: held-out predictions, squared error
     """
     loocv_preds = []
     if module_feature_object.__class__.__name__=="ModuleUsage":

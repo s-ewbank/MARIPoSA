@@ -8,7 +8,7 @@
   <title>utils.analyze &mdash; MARIPoSA 0.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
-      <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css?v=be8a1c11" />
+      <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
 
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
@@ -42,12 +42,13 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../demo/Demo1-ProjectCreation.html">Demo 1: Project Creation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../demo/Demo2-PoseSegmentation-Visualize.html">Demo 2: Visualization of Pose Module Usage</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../demo/Demo3-PoseSegmentation-Embed.html">Demo 3: Embedding of Pose Segmentation Data</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../demo/Demo4-PoseSegmentation-ClassificationAndRegression.html">Demo 4: Regression and Classification of Group Conditions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../demo/Demo5-PoseSegmentation-ManualScoring.html">Demo 5: Comparing Pose Modules to Manual Scoring Data</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../demo/Demo6-PoseSegmentation-Simulation.html">Demo 6: Simulating Pose Segmentation Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../demo/Demo1-ProjectCreation.html">Demo 1 (PS/PE): Project Creation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../demo/Demo2-PoseSegmentation-Visualize.html">Demo 2 (PS): Visualization of Pose Module Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../demo/Demo3-PoseSegmentation-Embed.html">Demo 3 (PS): Embedding of Pose Segmentation Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../demo/Demo4-PoseSegmentation-ClassificationAndRegression.html">Demo 4 (PS): Regression and Classification of Group Conditions in Pose Segmentation Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../demo/Demo5-PoseSegmentation-ManualScoring.html">Demo 5 (PS): Comparing Pose Modules to Manual Scoring Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../demo/Demo6-PoseSegmentation-Simulation.html">Demo 6 (PS): Simulating Pose Segmentation Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../demo/Demo7-PoseEstimation-KeypointTravel.html">Demo 7 (PE): Analyzing Keypoint Displacement in Pose Estimation Data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../metadata.html">Metadata</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../analyze.html">Analyze</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../plot.html">Plot</a></li>
@@ -166,7 +167,14 @@
         <span class="n">scaler</span> <span class="o">=</span> <span class="n">StandardScaler</span><span class="p">()</span>
         <span class="n">keypoint_feature_scaled</span> <span class="o">=</span> <span class="n">scaler</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">keypoint_feature</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">KeypointFeature</span><span class="p">(</span><span class="n">keypoint_feature_scaled</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">group_labels</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">observation_labels</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">feat_names</span><span class="p">,</span>
-                           <span class="bp">self</span><span class="o">.</span><span class="n">group_dict</span><span class="p">,</span> <span class="n">scaler</span><span class="p">)</span></div></div>
+                           <span class="bp">self</span><span class="o">.</span><span class="n">group_dict</span><span class="p">,</span> <span class="n">scaler</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="KeypointFeature.save"><a class="viewcode-back" href="../../source/utils.html#utils.analyze.KeypointFeature.save">[docs]</a>    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">save_path</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">((</span><span class="n">save_path</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.pkl&quot;</span><span class="p">)</span><span class="o">==</span><span class="kc">False</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">save_path</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.pickle&quot;</span><span class="p">)</span><span class="o">==</span><span class="kc">False</span><span class="p">)):</span>
+            <span class="n">save_path</span><span class="o">+=</span><span class="s2">&quot;.pickle&quot;</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Save path changed to </span><span class="si">{</span><span class="n">save_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">save_path</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+            <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span></div></div>
 
 
 <div class="viewcode-block" id="get_module_labels"><a class="viewcode-back" href="../../source/utils.html#utils.analyze.get_module_labels">[docs]</a><span class="k">def</span> <span class="nf">get_module_labels</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">,</span> <span class="n">subgroups</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
@@ -993,6 +1001,17 @@
     <span class="k">return</span> <span class="n">dist_mat</span><span class="o">.</span><span class="n">T</span></div>
 
 <div class="viewcode-block" id="regress"><a class="viewcode-back" href="../../source/utils.html#utils.analyze.regress">[docs]</a><span class="k">def</span> <span class="nf">regress</span><span class="p">(</span><span class="n">module_feature_object</span><span class="p">,</span> <span class="n">dose_dict</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;LinearRegression&quot;</span><span class="p">,</span> <span class="n">degree</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">alpha</span> <span class="o">=</span> <span class="mi">1</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Regress a continuous variable (e.g., dose, stimulus value) from a module or keypoint feature object</span>
+
+<span class="sd">    :param module_feature_object: ModuleUsage, ModuleTransitions, or KeypointFeature object</span>
+<span class="sd">    :param dose_dict: dictionary with keys corresponding to subgroups and items corresponding to variable</span>
+<span class="sd">    :param method: method of regression; either &quot;LinearRegression&quot; (default) or &quot;Ridge&quot; or &quot;Lasso&quot;</span>
+<span class="sd">    :param degree: polynomial degree; default 1</span>
+<span class="sd">    :param alpha: alpha (default 1; only applies for regularized regression, i.e. Ridge and Lasso)</span>
+<span class="sd">    :return: regression model, dose_labels</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">module_feature_object</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="o">==</span><span class="s2">&quot;ModuleUsage&quot;</span><span class="p">:</span>
         <span class="n">X</span><span class="o">=</span><span class="n">module_feature_object</span><span class="o">.</span><span class="n">label_counts</span>
     <span class="k">elif</span> <span class="n">module_feature_object</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="o">==</span><span class="s2">&quot;ModuleTransitions&quot;</span><span class="p">:</span>
@@ -1029,12 +1048,13 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Perform LOOCV for linear regression</span>
 
-<span class="sd">    :param module_feature_object:</span>
-<span class="sd">    :param dose_dict:</span>
-<span class="sd">    :param method:</span>
-<span class="sd">    :param constrain_pos:</span>
-<span class="sd">    :param alpha:</span>
-<span class="sd">    :return:</span>
+<span class="sd">    :param module_feature_object: ModuleUsage, ModuleTransitions, or KeypointFeature object</span>
+<span class="sd">    :param dose_dict: dictionary with keys corresponding to subgroups and items corresponding to variable</span>
+<span class="sd">    :param method: method of regression; either &quot;LinearRegression&quot; (default) or &quot;Ridge&quot; or &quot;Lasso&quot;</span>
+<span class="sd">    :param constrain_pos: constrain to only positive values; true by default</span>
+<span class="sd">    :param degree: degree of polynomial (default 1)</span>
+<span class="sd">    :param alpha: alpha (default 1; only applies for regularized regression, i.e. Ridge and Lasso)</span>
+<span class="sd">    :return: held-out predictions, squared error</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">loocv_preds</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">if</span> <span class="n">module_feature_object</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="o">==</span><span class="s2">&quot;ModuleUsage&quot;</span><span class="p">:</span>

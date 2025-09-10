@@ -3,7 +3,7 @@
   {
    "cell_type": "markdown",
    "source": [
-    "# Demo 4: Regression and Classification of Group Conditions\n",
+    "# Demo 4 (PS): Regression and Classification of Group Conditions in Pose Segmentation Data\n",
     "\n",
     "*Written and last updated July 19, 2025 by Sedona Ewbank, snewbank@stanford.edu*\n",
     "\n",

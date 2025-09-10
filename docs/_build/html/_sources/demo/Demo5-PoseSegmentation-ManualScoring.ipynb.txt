@@ -3,7 +3,7 @@
   {
    "cell_type": "markdown",
    "source": [
-    "# Demo 5: Comparing Pose Modules to Manual Scoring Data\n",
+    "# Demo 5 (PS): Comparing Pose Modules to Manual Scoring Data\n",
     "\n",
     "*Written and last updated September 4, 2025 by Sedona Ewbank, snewbank@stanford.edu*\n",
     "\n",

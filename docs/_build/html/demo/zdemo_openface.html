@@ -9,7 +9,7 @@
   <title>&lt;no title&gt; &mdash; MARIPoSA 0.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
-      <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css?v=be8a1c11" />
+      <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
 
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
@@ -43,12 +43,13 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="Demo1-ProjectCreation.html">Demo 1: Project Creation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Demo2-PoseSegmentation-Visualize.html">Demo 2: Visualization of Pose Module Usage</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Demo3-PoseSegmentation-Embed.html">Demo 3: Embedding of Pose Segmentation Data</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Demo4-PoseSegmentation-ClassificationAndRegression.html">Demo 4: Regression and Classification of Group Conditions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Demo5-PoseSegmentation-ManualScoring.html">Demo 5: Comparing Pose Modules to Manual Scoring Data</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Demo6-PoseSegmentation-Simulation.html">Demo 6: Simulating Pose Segmentation Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Demo1-ProjectCreation.html">Demo 1 (PS/PE): Project Creation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Demo2-PoseSegmentation-Visualize.html">Demo 2 (PS): Visualization of Pose Module Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Demo3-PoseSegmentation-Embed.html">Demo 3 (PS): Embedding of Pose Segmentation Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Demo4-PoseSegmentation-ClassificationAndRegression.html">Demo 4 (PS): Regression and Classification of Group Conditions in Pose Segmentation Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Demo5-PoseSegmentation-ManualScoring.html">Demo 5 (PS): Comparing Pose Modules to Manual Scoring Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Demo6-PoseSegmentation-Simulation.html">Demo 6 (PS): Simulating Pose Segmentation Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Demo7-PoseEstimation-KeypointTravel.html">Demo 7 (PE): Analyzing Keypoint Displacement in Pose Estimation Data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../metadata.html">Metadata</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../analyze.html">Analyze</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../plot.html">Plot</a></li>
@@ -87,8 +88,14 @@
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">ttest_ind</span>
 <span class="kn">from</span> <span class="nn">sklearn.decomposition</span> <span class="kn">import</span> <span class="n">PCA</span>
-<span class="kn">from</span> <span class="nn">utils</span> <span class="kn">import</span> <span class="n">analyze</span><span class="p">,</span> <span class="n">plot</span><span class="p">,</span> <span class="n">metadata</span>
+<span class="kn">from</span> <span class="nn">utils</span> <span class="kn">import</span> <span class="n">analyze</span><span class="p">,</span> <span class="n">plot</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">simulate</span>
 <span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">importlib</span>
+
+<span class="n">importlib</span><span class="o">.</span><span class="n">reload</span><span class="p">(</span><span class="n">metadata</span><span class="p">)</span>
+<span class="n">importlib</span><span class="o">.</span><span class="n">reload</span><span class="p">(</span><span class="n">analyze</span><span class="p">)</span>
+<span class="n">importlib</span><span class="o">.</span><span class="n">reload</span><span class="p">(</span><span class="n">plot</span><span class="p">)</span>
+<span class="n">importlib</span><span class="o">.</span><span class="n">reload</span><span class="p">(</span><span class="n">simulate</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -98,10 +105,30 @@
 <span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">line</span> <span class="mi">7</span>
 <span class="g g-Whitespace">      </span><span class="mi">5</span> <span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">ttest_ind</span>
 <span class="g g-Whitespace">      </span><span class="mi">6</span> <span class="kn">from</span> <span class="nn">sklearn.decomposition</span> <span class="kn">import</span> <span class="n">PCA</span>
-<span class="ne">----&gt; </span><span class="mi">7</span> <span class="kn">from</span> <span class="nn">utils</span> <span class="kn">import</span> <span class="n">analyze</span><span class="p">,</span> <span class="n">plot</span><span class="p">,</span> <span class="n">metadata</span>
+<span class="ne">----&gt; </span><span class="mi">7</span> <span class="kn">from</span> <span class="nn">utils</span> <span class="kn">import</span> <span class="n">analyze</span><span class="p">,</span> <span class="n">plot</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">simulate</span>
 <span class="g g-Whitespace">      </span><span class="mi">8</span> <span class="kn">import</span> <span class="nn">json</span>
+<span class="g g-Whitespace">      </span><span class="mi">9</span> <span class="kn">import</span> <span class="nn">importlib</span>
 
 <span class="ne">ModuleNotFoundError</span>: No module named &#39;utils&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">test</span> <span class="o">=</span> <span class="s2">&quot;{&#39;hello&#39;:1,&#39;hi&#39;:2}&quot;</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">test</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">ValueError</span><span class="g g-Whitespace">                                </span>Traceback (most recent call last)
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">21</span><span class="p">],</span> <span class="n">line</span> <span class="mi">2</span>
+<span class="g g-Whitespace">      </span><span class="mi">1</span> <span class="n">test</span> <span class="o">=</span> <span class="s2">&quot;{&#39;hello&#39;:1,&#39;hi&#39;:2}&quot;</span>
+<span class="ne">----&gt; </span><span class="mi">2</span> <span class="nb">print</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">test</span><span class="p">))</span>
+
+<span class="ne">ValueError</span>: dictionary update sequence element #0 has length 1; 2 is required
 </pre></div>
 </div>
 </div>
@@ -274,6 +301,55 @@
 <span class="n">config</span> <span class="o">=</span> <span class="n">metadata</span><span class="o">.</span><span class="n">load_project</span><span class="p">(</span><span class="n">config_path</span><span class="p">)</span>
 </pre></div>
 </div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">test_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;data_directory&quot;</span><span class="p">]</span><span class="o">+</span><span class="s2">&quot;/&quot;</span><span class="o">+</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;project_files&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+<span class="n">test_df</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">test_df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+<span class="n">x_coords</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">test_df</span><span class="o">.</span><span class="n">columns</span> <span class="k">if</span> <span class="n">i</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;X_&quot;</span><span class="p">)]</span>
+<span class="n">y_coords</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">test_df</span><span class="o">.</span><span class="n">columns</span> <span class="k">if</span> <span class="n">i</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;Y_&quot;</span><span class="p">)]</span>
+<span class="n">keypoints</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;kp&quot;</span><span class="o">+</span><span class="n">i</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;Y&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">y_coords</span><span class="p">]</span>
+<span class="n">kp_dict</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">kp_dict</span><span class="p">[</span><span class="s2">&quot;chin&quot;</span><span class="p">]</span><span class="o">=</span><span class="p">[]</span>
+<span class="n">kp_dict</span><span class="p">[</span><span class="s2">&quot;eyebrows&quot;</span><span class="p">]</span><span class="o">=</span><span class="p">[]</span>
+<span class="n">kp_dict</span><span class="p">[</span><span class="s2">&quot;eyes&quot;</span><span class="p">]</span><span class="o">=</span><span class="p">[]</span>
+<span class="n">kp_dict</span><span class="p">[</span><span class="s2">&quot;nose&quot;</span><span class="p">]</span><span class="o">=</span><span class="p">[]</span>
+<span class="n">kp_dict</span><span class="p">[</span><span class="s2">&quot;mouth&quot;</span><span class="p">]</span><span class="o">=</span><span class="p">[]</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="mi">4</span><span class="p">),</span><span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">keypoints</span><span class="p">)):</span>
+    <span class="n">x_col</span> <span class="o">=</span> <span class="s2">&quot;X&quot;</span><span class="o">+</span><span class="n">keypoints</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;kp&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">y_col</span> <span class="o">=</span> <span class="s2">&quot;Y&quot;</span><span class="o">+</span><span class="n">keypoints</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;kp&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">if</span> <span class="mi">0</span><span class="o">&lt;=</span><span class="n">i</span><span class="o">&lt;=</span><span class="mi">16</span><span class="p">:</span>
+        <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span>
+        <span class="n">kp_dict</span><span class="p">[</span><span class="s2">&quot;chin&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">x_col</span><span class="p">,</span><span class="n">y_col</span><span class="p">])</span>
+    <span class="k">elif</span> <span class="mi">17</span><span class="o">&lt;=</span><span class="n">i</span><span class="o">&lt;=</span><span class="mi">26</span><span class="p">:</span>
+        <span class="n">color</span><span class="o">=</span><span class="s2">&quot;orange&quot;</span>
+        <span class="n">kp_dict</span><span class="p">[</span><span class="s2">&quot;eyebrows&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">x_col</span><span class="p">,</span><span class="n">y_col</span><span class="p">])</span>
+    <span class="k">elif</span> <span class="mi">27</span><span class="o">&lt;=</span><span class="n">i</span><span class="o">&lt;=</span><span class="mi">35</span><span class="p">:</span>
+        <span class="n">color</span><span class="o">=</span><span class="s2">&quot;green&quot;</span>
+        <span class="n">kp_dict</span><span class="p">[</span><span class="s2">&quot;nose&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">x_col</span><span class="p">,</span><span class="n">y_col</span><span class="p">])</span>
+    <span class="k">elif</span> <span class="mi">36</span><span class="o">&lt;=</span><span class="n">i</span><span class="o">&lt;=</span><span class="mi">47</span><span class="p">:</span>
+        <span class="n">color</span><span class="o">=</span><span class="s2">&quot;blue&quot;</span>
+        <span class="n">kp_dict</span><span class="p">[</span><span class="s2">&quot;eyes&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">x_col</span><span class="p">,</span><span class="n">y_col</span><span class="p">])</span>
+    <span class="k">elif</span> <span class="mi">48</span><span class="o">&lt;=</span><span class="n">i</span><span class="p">:</span>
+        <span class="n">color</span><span class="o">=</span><span class="s2">&quot;purple&quot;</span>
+        <span class="n">kp_dict</span><span class="p">[</span><span class="s2">&quot;mouth&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">x_col</span><span class="p">,</span><span class="n">y_col</span><span class="p">])</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">test_df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="n">x_col</span><span class="p">]</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="mi">0</span><span class="o">-</span><span class="n">test_df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="n">y_col</span><span class="p">]</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span><span class="n">edgecolor</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">x_coords</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">)</span>
+    
+<span class="nb">print</span><span class="p">(</span><span class="n">kp_dict</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{&#39;chin&#39;: [[&#39;X_0&#39;, &#39;Y_0&#39;], [&#39;X_1&#39;, &#39;Y_1&#39;], [&#39;X_2&#39;, &#39;Y_2&#39;], [&#39;X_3&#39;, &#39;Y_3&#39;], [&#39;X_4&#39;, &#39;Y_4&#39;], [&#39;X_5&#39;, &#39;Y_5&#39;], [&#39;X_6&#39;, &#39;Y_6&#39;], [&#39;X_7&#39;, &#39;Y_7&#39;], [&#39;X_8&#39;, &#39;Y_8&#39;], [&#39;X_9&#39;, &#39;Y_9&#39;], [&#39;X_10&#39;, &#39;Y_10&#39;], [&#39;X_11&#39;, &#39;Y_11&#39;], [&#39;X_12&#39;, &#39;Y_12&#39;], [&#39;X_13&#39;, &#39;Y_13&#39;], [&#39;X_14&#39;, &#39;Y_14&#39;], [&#39;X_15&#39;, &#39;Y_15&#39;], [&#39;X_16&#39;, &#39;Y_16&#39;]], &#39;eyebrows&#39;: [[&#39;X_17&#39;, &#39;Y_17&#39;], [&#39;X_18&#39;, &#39;Y_18&#39;], [&#39;X_19&#39;, &#39;Y_19&#39;], [&#39;X_20&#39;, &#39;Y_20&#39;], [&#39;X_21&#39;, &#39;Y_21&#39;], [&#39;X_22&#39;, &#39;Y_22&#39;], [&#39;X_23&#39;, &#39;Y_23&#39;], [&#39;X_24&#39;, &#39;Y_24&#39;], [&#39;X_25&#39;, &#39;Y_25&#39;], [&#39;X_26&#39;, &#39;Y_26&#39;]], &#39;eyes&#39;: [[&#39;X_36&#39;, &#39;Y_36&#39;], [&#39;X_37&#39;, &#39;Y_37&#39;], [&#39;X_38&#39;, &#39;Y_38&#39;], [&#39;X_39&#39;, &#39;Y_39&#39;], [&#39;X_40&#39;, &#39;Y_40&#39;], [&#39;X_41&#39;, &#39;Y_41&#39;], [&#39;X_42&#39;, &#39;Y_42&#39;], [&#39;X_43&#39;, &#39;Y_43&#39;], [&#39;X_44&#39;, &#39;Y_44&#39;], [&#39;X_45&#39;, &#39;Y_45&#39;], [&#39;X_46&#39;, &#39;Y_46&#39;], [&#39;X_47&#39;, &#39;Y_47&#39;]], &#39;nose&#39;: [[&#39;X_27&#39;, &#39;Y_27&#39;], [&#39;X_28&#39;, &#39;Y_28&#39;], [&#39;X_29&#39;, &#39;Y_29&#39;], [&#39;X_30&#39;, &#39;Y_30&#39;], [&#39;X_31&#39;, &#39;Y_31&#39;], [&#39;X_32&#39;, &#39;Y_32&#39;], [&#39;X_33&#39;, &#39;Y_33&#39;], [&#39;X_34&#39;, &#39;Y_34&#39;], [&#39;X_35&#39;, &#39;Y_35&#39;]], &#39;mouth&#39;: [[&#39;X_48&#39;, &#39;Y_48&#39;], [&#39;X_49&#39;, &#39;Y_49&#39;], [&#39;X_50&#39;, &#39;Y_50&#39;], [&#39;X_51&#39;, &#39;Y_51&#39;], [&#39;X_52&#39;, &#39;Y_52&#39;], [&#39;X_53&#39;, &#39;Y_53&#39;], [&#39;X_54&#39;, &#39;Y_54&#39;], [&#39;X_55&#39;, &#39;Y_55&#39;], [&#39;X_56&#39;, &#39;Y_56&#39;], [&#39;X_57&#39;, &#39;Y_57&#39;], [&#39;X_58&#39;, &#39;Y_58&#39;], [&#39;X_59&#39;, &#39;Y_59&#39;], [&#39;X_60&#39;, &#39;Y_60&#39;], [&#39;X_61&#39;, &#39;Y_61&#39;], [&#39;X_62&#39;, &#39;Y_62&#39;], [&#39;X_63&#39;, &#39;Y_63&#39;], [&#39;X_64&#39;, &#39;Y_64&#39;], [&#39;X_65&#39;, &#39;Y_65&#39;], [&#39;X_66&#39;, &#39;Y_66&#39;], [&#39;X_67&#39;, &#39;Y_67&#39;]]}
+</pre></div>
+</div>
+<img alt="../_images/d31814ccf605df4fdef5b7f1077b88a841172c2bad995849432c7973e9610873.png" src="../_images/d31814ccf605df4fdef5b7f1077b88a841172c2bad995849432c7973e9610873.png" />
 </div>
 </div>
 <div class="cell docutils container">

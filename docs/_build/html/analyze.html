@@ -9,7 +9,7 @@
   <title>Analyze &mdash; MARIPoSA 0.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
-      <link rel="stylesheet" type="text/css" href="_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css?v=be8a1c11" />
+      <link rel="stylesheet" type="text/css" href="_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
 
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
@@ -45,12 +45,13 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="demo/Demo1-ProjectCreation.html">Demo 1: Project Creation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="demo/Demo2-PoseSegmentation-Visualize.html">Demo 2: Visualization of Pose Module Usage</a></li>
-<li class="toctree-l1"><a class="reference internal" href="demo/Demo3-PoseSegmentation-Embed.html">Demo 3: Embedding of Pose Segmentation Data</a></li>
-<li class="toctree-l1"><a class="reference internal" href="demo/Demo4-PoseSegmentation-ClassificationAndRegression.html">Demo 4: Regression and Classification of Group Conditions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="demo/Demo5-PoseSegmentation-ManualScoring.html">Demo 5: Comparing Pose Modules to Manual Scoring Data</a></li>
-<li class="toctree-l1"><a class="reference internal" href="demo/Demo6-PoseSegmentation-Simulation.html">Demo 6: Simulating Pose Segmentation Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="demo/Demo1-ProjectCreation.html">Demo 1 (PS/PE): Project Creation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="demo/Demo2-PoseSegmentation-Visualize.html">Demo 2 (PS): Visualization of Pose Module Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="demo/Demo3-PoseSegmentation-Embed.html">Demo 3 (PS): Embedding of Pose Segmentation Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="demo/Demo4-PoseSegmentation-ClassificationAndRegression.html">Demo 4 (PS): Regression and Classification of Group Conditions in Pose Segmentation Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="demo/Demo5-PoseSegmentation-ManualScoring.html">Demo 5 (PS): Comparing Pose Modules to Manual Scoring Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="demo/Demo6-PoseSegmentation-Simulation.html">Demo 6 (PS): Simulating Pose Segmentation Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="demo/Demo7-PoseEstimation-KeypointTravel.html">Demo 7 (PE): Analyzing Keypoint Displacement in Pose Estimation Data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="metadata.html">Metadata</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Analyze</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#utils.analyze.BORIS_to_pose"><code class="docutils literal notranslate"><span class="pre">BORIS_to_pose()</span></code></a></li>
@@ -65,6 +66,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#utils.analyze.loocv"><code class="docutils literal notranslate"><span class="pre">loocv()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#utils.analyze.loocv_regression"><code class="docutils literal notranslate"><span class="pre">loocv_regression()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#utils.analyze.make_remappings_from_BORIS"><code class="docutils literal notranslate"><span class="pre">make_remappings_from_BORIS()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#utils.analyze.regress"><code class="docutils literal notranslate"><span class="pre">regress()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="plot.html">Plot</a></li>
@@ -286,15 +288,16 @@ line up with what pose modules</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>module_feature_object</strong> – </p></li>
-<li><p><strong>dose_dict</strong> – </p></li>
-<li><p><strong>method</strong> – </p></li>
-<li><p><strong>constrain_pos</strong> – </p></li>
-<li><p><strong>alpha</strong> – </p></li>
+<li><p><strong>module_feature_object</strong> – ModuleUsage, ModuleTransitions, or KeypointFeature object</p></li>
+<li><p><strong>dose_dict</strong> – dictionary with keys corresponding to subgroups and items corresponding to variable</p></li>
+<li><p><strong>method</strong> – method of regression; either “LinearRegression” (default) or “Ridge” or “Lasso”</p></li>
+<li><p><strong>constrain_pos</strong> – constrain to only positive values; true by default</p></li>
+<li><p><strong>degree</strong> – degree of polynomial (default 1)</p></li>
+<li><p><strong>alpha</strong> – alpha (default 1; only applies for regularized regression, i.e. Ridge and Lasso)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p></p>
+<dd class="field-even"><p>held-out predictions, squared error</p>
 </dd>
 </dl>
 </dd></dl>
@@ -313,6 +316,26 @@ line up with what pose modules</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="utils.analyze.regress">
+<span class="sig-prename descclassname"><span class="pre">utils.analyze.</span></span><span class="sig-name descname"><span class="pre">regress</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">module_feature_object</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dose_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'LinearRegression'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">degree</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/utils/analyze.html#regress"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.analyze.regress" title="Permalink to this definition"></a></dt>
+<dd><p>Regress a continuous variable (e.g., dose, stimulus value) from a module or keypoint feature object</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>module_feature_object</strong> – ModuleUsage, ModuleTransitions, or KeypointFeature object</p></li>
+<li><p><strong>dose_dict</strong> – dictionary with keys corresponding to subgroups and items corresponding to variable</p></li>
+<li><p><strong>method</strong> – method of regression; either “LinearRegression” (default) or “Ridge” or “Lasso”</p></li>
+<li><p><strong>degree</strong> – polynomial degree; default 1</p></li>
+<li><p><strong>alpha</strong> – alpha (default 1; only applies for regularized regression, i.e. Ridge and Lasso)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>regression model, dose_labels</p>
 </dd>
 </dl>
 </dd></dl>

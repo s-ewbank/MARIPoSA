@@ -3,6 +3,8 @@ from datetime import datetime
 import yaml
 import subprocess
 import sys
+import pandas as pd
+import numpy as np
 
 def create_PS_project(project_name,data_directory,data_source,output_directory,fps,n_modules):
     """
@@ -79,10 +81,18 @@ def create_PE_project(project_name,data_directory,data_source,output_directory,f
     """
     if data_source=="DeepLabCut":
         project_files=[i for i in sorted(os.listdir(data_directory)) if i.endswith(".csv")]
+        test_df = pd.read_csv(data_directory + "/" + project_files[0], header=[0, 1, 2])
+        keypoints = [str(i) for i in np.unique([i[1] for i in test_df.columns])]
+        print(keypoints)
     elif data_source=="SLEAP":
         project_files=sorted(os.listdir(data_directory))
+        keypoints=[]
     elif data_source=="OpenFace":
         project_files=[i for i in sorted(os.listdir(data_directory)) if i.endswith(".csv")]
+        test_df = pd.read_csv(data_directory+"/"+project_files[0])
+        test_df.columns = test_df.columns.str.replace(' ', '')
+        y_coords = [i for i in test_df.columns if i.startswith("Y_")]
+        keypoints = ["kp" + i.split("Y")[1] for i in y_coords]
     project_directory=str(output_directory+"/"+datetime.now().strftime('%y%m%d_')+project_name)
     if os.path.exists(project_directory):
         print(f"[{datetime.now()}] Warning - the path '{project_directory}' exists - a config will still be made (possible overwrite).")
@@ -96,6 +106,7 @@ def create_PE_project(project_name,data_directory,data_source,output_directory,f
     PE_config["data_type"]="Pose estimation"
     PE_config["data_source"]=str(data_source)
     PE_config["fps"]=str(fps)
+    PE_config["keypoints"]=keypoints
     PE_config["project_files"]=project_files
     PE_config["subgroups"]={"group1" : project_files}
     with open(project_directory+"/config_PE.yaml", "w") as outfile:
