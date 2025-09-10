@@ -218,6 +218,7 @@ def generate_sequence(config, labels_df, T, n_subjs = 1, random_state=42, verbos
         transition_mat = transition_mat / np.sum(transition_mat, axis=1, keepdims=True)
         row_sums = np.sum(transition_mat, axis=1)
         transition_mat = transition_mat / row_sums[:, np.newaxis]
+        transition_mat = np.nan_to_num(transition_mat,nan=1e-6)
         transition_mat[np.abs(np.sum(transition_mat, axis=1) - 1) > 1e-6] = 1
         header = []
         for i in range(n_subjs):
@@ -226,8 +227,11 @@ def generate_sequence(config, labels_df, T, n_subjs = 1, random_state=42, verbos
             current_state = np.random.choice(len(start_prob), p=start_prob)
             sequence = [current_state]
             for _ in range(1, T):
-                current_state = np.random.choice(len(transition_mat), p=transition_mat[current_state])
-                sequence.append(current_state)
+                try:
+                    current_state = np.random.choice(len(transition_mat), p=transition_mat[current_state])
+                    sequence.append(current_state)
+                except ValueError:
+                    sequence.append(np.random.choice(len(start_prob), p=start_prob))
             subj_i = f"subj_{i}"
             header.append(subj_i)
             labels_i = np.array(sequence)
@@ -249,6 +253,7 @@ def generate_sequence(config, labels_df, T, n_subjs = 1, random_state=42, verbos
             transition_mat = transition_mat / np.sum(transition_mat, axis=1, keepdims=True)
             row_sums = np.sum(transition_mat, axis=1)
             transition_mat = transition_mat / row_sums[:, np.newaxis]
+            transition_mat = np.nan_to_num(transition_mat,nan=1e-6)
             transition_mat[np.abs(np.sum(transition_mat, axis=1) - 1) > 1e-6] = 1
             group = f"{reverse_group_dict[g]}"
             for i in range(n_subjs):
@@ -261,8 +266,11 @@ def generate_sequence(config, labels_df, T, n_subjs = 1, random_state=42, verbos
                 current_state = np.random.choice(len(start_prob), p=start_prob)
                 sequence = [current_state]
                 for _ in range(1, T):
-                    current_state = np.random.choice(len(transition_mat), p=transition_mat[current_state])
-                    sequence.append(current_state)
+                    try:
+                        current_state = np.random.choice(len(transition_mat), p=transition_mat[current_state])
+                        sequence.append(current_state)
+                    except ValueError:
+                        sequence.append(np.random.choice(len(start_prob), p=start_prob))
                 labels_i = np.array(sequence)
                 if count == 0:
                     sim_labels_df = pd.DataFrame(labels_i, columns=[header])
