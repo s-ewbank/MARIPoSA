@@ -1,0 +1,411 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Demo 8 (PE): Analyzing Keypoint Displacement and Action Units in human facial pose data from OpenFace &mdash; MARIPoSA 0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=44496db0"></script>
+      <script src="../_static/doctools.js?v=888ff710"></script>
+      <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Metadata" href="../metadata.html" />
+    <link rel="prev" title="Demo 7 (PE): Analyzing Keypoint Displacement in Pose Estimation Data" href="Demo7-PoseEstimation-KeypointTravel.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            MARIPoSA
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="Demo1-ProjectCreation.html">Demo 1 (PS/PE): Project Creation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Demo2-PoseSegmentation-Visualize.html">Demo 2 (PS): Visualization of Pose Module Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Demo3-PoseSegmentation-Embed.html">Demo 3 (PS): Embedding of Pose Segmentation Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Demo4-PoseSegmentation-ClassificationAndRegression.html">Demo 4 (PS): Regression and Classification of Group Conditions in Pose Segmentation Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Demo5-PoseSegmentation-ManualScoring.html">Demo 5 (PS): Comparing Pose Modules to Manual Scoring Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Demo6-PoseSegmentation-Simulation.html">Demo 6 (PS): Simulating Pose Segmentation Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Demo7-PoseEstimation-KeypointTravel.html">Demo 7 (PE): Analyzing Keypoint Displacement in Pose Estimation Data</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Demo 8 (PE): Analyzing Keypoint Displacement and Action Units in human facial pose data from OpenFace</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#getting-familiar-with-openface-data">8.0: Getting familiar with OpenFace data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#measuring-and-analyzing-keypoint-travel-in-openface-data">8.1 Measuring and Analyzing Keypoint Travel in OpenFace Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#working-with-action-units">8.2 Working with Action Units</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../metadata.html">Metadata</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../analyze.html">Analyze</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../plot.html">Plot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../simulate.html">Simulate</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">MARIPoSA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Demo 8 (PE): Analyzing Keypoint Displacement and Action Units in human facial pose data from OpenFace</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/demo/Demo8-PoseEstimation-OpenFace.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="demo-8-pe-analyzing-keypoint-displacement-and-action-units-in-human-facial-pose-data-from-openface">
+<h1>Demo 8 (PE): Analyzing Keypoint Displacement and Action Units in human facial pose data from OpenFace<a class="headerlink" href="#demo-8-pe-analyzing-keypoint-displacement-and-action-units-in-human-facial-pose-data-from-openface" title="Permalink to this heading"></a></h1>
+<p><em>Written and last updated September 10, 2025 by Sedona Ewbank, snewbank&#64;stanford.edu</em></p>
+<p>The purpose of this demo is to demonstrate how to measure and plot keypoint travel and action unit usage from OpenFace data. The citation for OpenFace is given below - note that this notebook includes some instructions for how to acquire MARIPoSA-compatible facial pose data using OpenFace:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>T. Baltrušaitis, P. Robinson and L. -P. Morency, &quot;OpenFace: An open source facial behavior analysis toolkit,&quot; 2016 IEEE Winter Conference on Applications of Computer Vision (WACV), Lake Placid, NY, USA, 2016, pp. 1-10, doi: 10.1109/WACV.2016.7477553.
+</pre></div>
+</div>
+<p>The source video data for this demo notebook, analyzed in OpenFace, is a subset of the CelebV-HQ dataset (reference below). Accordingly, the config file with online video identifiers and their emotion annoations, as provided in the CelebV-HQ dataset, is not reproduced in the demo source data but may be acquired by following the authors’ instructions.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>Zhu, H., et al.: CelebV-HQ: a large-scale video facial attributes dataset. In: Avidan, S., Brostow, G., Cissé, M., Farinella, G.M., Hassner, T. (eds.) ECCV 2022. LNCS, vol. 13667, pp. 650–667. Springer, Cham (2022). https://doi.org/10.1007/978-3-031-20071-7_38
+</pre></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">ttest_ind</span>
+<span class="kn">from</span> <span class="nn">sklearn.decomposition</span> <span class="kn">import</span> <span class="n">PCA</span>
+<span class="kn">from</span> <span class="nn">utils</span> <span class="kn">import</span> <span class="n">analyze</span><span class="p">,</span> <span class="n">plot</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">simulate</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">importlib</span>
+
+<span class="n">importlib</span><span class="o">.</span><span class="n">reload</span><span class="p">(</span><span class="n">metadata</span><span class="p">)</span>
+<span class="n">importlib</span><span class="o">.</span><span class="n">reload</span><span class="p">(</span><span class="n">analyze</span><span class="p">)</span>
+<span class="n">importlib</span><span class="o">.</span><span class="n">reload</span><span class="p">(</span><span class="n">plot</span><span class="p">)</span>
+<span class="n">importlib</span><span class="o">.</span><span class="n">reload</span><span class="p">(</span><span class="n">simulate</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">ModuleNotFoundError</span><span class="g g-Whitespace">                       </span>Traceback (most recent call last)
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">line</span> <span class="mi">7</span>
+<span class="g g-Whitespace">      </span><span class="mi">5</span> <span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">ttest_ind</span>
+<span class="g g-Whitespace">      </span><span class="mi">6</span> <span class="kn">from</span> <span class="nn">sklearn.decomposition</span> <span class="kn">import</span> <span class="n">PCA</span>
+<span class="ne">----&gt; </span><span class="mi">7</span> <span class="kn">from</span> <span class="nn">utils</span> <span class="kn">import</span> <span class="n">analyze</span><span class="p">,</span> <span class="n">plot</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">simulate</span>
+<span class="g g-Whitespace">      </span><span class="mi">8</span> <span class="kn">import</span> <span class="nn">json</span>
+<span class="g g-Whitespace">      </span><span class="mi">9</span> <span class="kn">import</span> <span class="nn">importlib</span>
+
+<span class="ne">ModuleNotFoundError</span>: No module named &#39;utils&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<section id="getting-familiar-with-openface-data">
+<h2>8.0: Getting familiar with OpenFace data<a class="headerlink" href="#getting-familiar-with-openface-data" title="Permalink to this heading"></a></h2>
+<p>Before starting keypoint or action unit analysis, it is worthwhile to get acquainted with the indexing of keypoints and action units in data output by OpenFace. For analysis with MARIPoSA, it is probably best to analyze videos in OpenFace with the FeatureExtraction command using flags “-2Dfp -pose -aus -gaze -tracked -f”.</p>
+<p>Below, once the config for the demo project is loaded, the keypoints in an individual video frame tracked by OpenFace are plotted with indices overlaid to see what keypoint information is gained.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">config</span> <span class="o">=</span> <span class="n">metadata</span><span class="o">.</span><span class="n">load_project</span><span class="p">(</span><span class="s1">&#39;/Volumes/snewbank_drive/CelebV-HQ-main//250911_CelebOF-mariposa/config_PE.yaml&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">test_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;data_directory&quot;</span><span class="p">]</span><span class="o">+</span><span class="s2">&quot;/&quot;</span><span class="o">+</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;project_files&quot;</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
+<span class="n">test_df</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">test_df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+<span class="n">x_coords</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">test_df</span><span class="o">.</span><span class="n">columns</span> <span class="k">if</span> <span class="n">i</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;x_&quot;</span><span class="p">)]</span>
+<span class="n">y_coords</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">test_df</span><span class="o">.</span><span class="n">columns</span> <span class="k">if</span> <span class="n">i</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;y_&quot;</span><span class="p">)]</span>
+<span class="n">keypoints</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;kp&quot;</span><span class="o">+</span><span class="n">i</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">y_coords</span><span class="p">]</span>
+<span class="n">kp_dict</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">kp_dict</span><span class="p">[</span><span class="s2">&quot;chin&quot;</span><span class="p">]</span><span class="o">=</span><span class="p">[]</span>
+<span class="n">kp_dict</span><span class="p">[</span><span class="s2">&quot;eyebrows&quot;</span><span class="p">]</span><span class="o">=</span><span class="p">[]</span>
+<span class="n">kp_dict</span><span class="p">[</span><span class="s2">&quot;eyes&quot;</span><span class="p">]</span><span class="o">=</span><span class="p">[]</span>
+<span class="n">kp_dict</span><span class="p">[</span><span class="s2">&quot;nose&quot;</span><span class="p">]</span><span class="o">=</span><span class="p">[]</span>
+<span class="n">kp_dict</span><span class="p">[</span><span class="s2">&quot;mouth&quot;</span><span class="p">]</span><span class="o">=</span><span class="p">[]</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="mi">4</span><span class="p">),</span><span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">keypoints</span><span class="p">)):</span>
+    <span class="n">x_col</span> <span class="o">=</span> <span class="s2">&quot;x&quot;</span><span class="o">+</span><span class="n">keypoints</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;kp&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">y_col</span> <span class="o">=</span> <span class="s2">&quot;y&quot;</span><span class="o">+</span><span class="n">keypoints</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;kp&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">if</span> <span class="mi">0</span><span class="o">&lt;=</span><span class="n">i</span><span class="o">&lt;=</span><span class="mi">16</span><span class="p">:</span>
+        <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span>
+        <span class="n">kp_dict</span><span class="p">[</span><span class="s2">&quot;chin&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">x_col</span><span class="p">,</span><span class="n">y_col</span><span class="p">])</span>
+    <span class="k">elif</span> <span class="mi">17</span><span class="o">&lt;=</span><span class="n">i</span><span class="o">&lt;=</span><span class="mi">26</span><span class="p">:</span>
+        <span class="n">color</span><span class="o">=</span><span class="s2">&quot;orange&quot;</span>
+        <span class="n">kp_dict</span><span class="p">[</span><span class="s2">&quot;eyebrows&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">x_col</span><span class="p">,</span><span class="n">y_col</span><span class="p">])</span>
+    <span class="k">elif</span> <span class="mi">27</span><span class="o">&lt;=</span><span class="n">i</span><span class="o">&lt;=</span><span class="mi">35</span><span class="p">:</span>
+        <span class="n">color</span><span class="o">=</span><span class="s2">&quot;green&quot;</span>
+        <span class="n">kp_dict</span><span class="p">[</span><span class="s2">&quot;nose&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">x_col</span><span class="p">,</span><span class="n">y_col</span><span class="p">])</span>
+    <span class="k">elif</span> <span class="mi">36</span><span class="o">&lt;=</span><span class="n">i</span><span class="o">&lt;=</span><span class="mi">47</span><span class="p">:</span>
+        <span class="n">color</span><span class="o">=</span><span class="s2">&quot;blue&quot;</span>
+        <span class="n">kp_dict</span><span class="p">[</span><span class="s2">&quot;eyes&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">x_col</span><span class="p">,</span><span class="n">y_col</span><span class="p">])</span>
+    <span class="k">elif</span> <span class="mi">48</span><span class="o">&lt;=</span><span class="n">i</span><span class="p">:</span>
+        <span class="n">color</span><span class="o">=</span><span class="s2">&quot;purple&quot;</span>
+        <span class="n">kp_dict</span><span class="p">[</span><span class="s2">&quot;mouth&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">x_col</span><span class="p">,</span><span class="n">y_col</span><span class="p">])</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">test_df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="n">x_col</span><span class="p">]</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="mi">0</span><span class="o">-</span><span class="n">test_df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="n">y_col</span><span class="p">]</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span><span class="n">edgecolor</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">x_coords</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">],</span><span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span><span class="n">size</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span><span class="n">ha</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span><span class="n">va</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span><span class="n">rotation</span><span class="o">=</span><span class="mi">45</span><span class="p">,</span><span class="n">weight</span><span class="o">=</span><span class="s2">&quot;bold&quot;</span><span class="p">)</span>
+    
+<span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">kp_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">kp_dict</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>chin
+[[&#39;x_0&#39;, &#39;y_0&#39;], [&#39;x_1&#39;, &#39;y_1&#39;], [&#39;x_2&#39;, &#39;y_2&#39;], [&#39;x_3&#39;, &#39;y_3&#39;], [&#39;x_4&#39;, &#39;y_4&#39;], [&#39;x_5&#39;, &#39;y_5&#39;], [&#39;x_6&#39;, &#39;y_6&#39;], [&#39;x_7&#39;, &#39;y_7&#39;], [&#39;x_8&#39;, &#39;y_8&#39;], [&#39;x_9&#39;, &#39;y_9&#39;], [&#39;x_10&#39;, &#39;y_10&#39;], [&#39;x_11&#39;, &#39;y_11&#39;], [&#39;x_12&#39;, &#39;y_12&#39;], [&#39;x_13&#39;, &#39;y_13&#39;], [&#39;x_14&#39;, &#39;y_14&#39;], [&#39;x_15&#39;, &#39;y_15&#39;], [&#39;x_16&#39;, &#39;y_16&#39;]]
+eyebrows
+[[&#39;x_17&#39;, &#39;y_17&#39;], [&#39;x_18&#39;, &#39;y_18&#39;], [&#39;x_19&#39;, &#39;y_19&#39;], [&#39;x_20&#39;, &#39;y_20&#39;], [&#39;x_21&#39;, &#39;y_21&#39;], [&#39;x_22&#39;, &#39;y_22&#39;], [&#39;x_23&#39;, &#39;y_23&#39;], [&#39;x_24&#39;, &#39;y_24&#39;], [&#39;x_25&#39;, &#39;y_25&#39;], [&#39;x_26&#39;, &#39;y_26&#39;]]
+eyes
+[[&#39;x_36&#39;, &#39;y_36&#39;], [&#39;x_37&#39;, &#39;y_37&#39;], [&#39;x_38&#39;, &#39;y_38&#39;], [&#39;x_39&#39;, &#39;y_39&#39;], [&#39;x_40&#39;, &#39;y_40&#39;], [&#39;x_41&#39;, &#39;y_41&#39;], [&#39;x_42&#39;, &#39;y_42&#39;], [&#39;x_43&#39;, &#39;y_43&#39;], [&#39;x_44&#39;, &#39;y_44&#39;], [&#39;x_45&#39;, &#39;y_45&#39;], [&#39;x_46&#39;, &#39;y_46&#39;], [&#39;x_47&#39;, &#39;y_47&#39;]]
+nose
+[[&#39;x_27&#39;, &#39;y_27&#39;], [&#39;x_28&#39;, &#39;y_28&#39;], [&#39;x_29&#39;, &#39;y_29&#39;], [&#39;x_30&#39;, &#39;y_30&#39;], [&#39;x_31&#39;, &#39;y_31&#39;], [&#39;x_32&#39;, &#39;y_32&#39;], [&#39;x_33&#39;, &#39;y_33&#39;], [&#39;x_34&#39;, &#39;y_34&#39;], [&#39;x_35&#39;, &#39;y_35&#39;]]
+mouth
+[[&#39;x_48&#39;, &#39;y_48&#39;], [&#39;x_49&#39;, &#39;y_49&#39;], [&#39;x_50&#39;, &#39;y_50&#39;], [&#39;x_51&#39;, &#39;y_51&#39;], [&#39;x_52&#39;, &#39;y_52&#39;], [&#39;x_53&#39;, &#39;y_53&#39;], [&#39;x_54&#39;, &#39;y_54&#39;], [&#39;x_55&#39;, &#39;y_55&#39;], [&#39;x_56&#39;, &#39;y_56&#39;], [&#39;x_57&#39;, &#39;y_57&#39;], [&#39;x_58&#39;, &#39;y_58&#39;], [&#39;x_59&#39;, &#39;y_59&#39;], [&#39;x_60&#39;, &#39;y_60&#39;], [&#39;x_61&#39;, &#39;y_61&#39;], [&#39;x_62&#39;, &#39;y_62&#39;], [&#39;x_63&#39;, &#39;y_63&#39;], [&#39;x_64&#39;, &#39;y_64&#39;], [&#39;x_65&#39;, &#39;y_65&#39;], [&#39;x_66&#39;, &#39;y_66&#39;], [&#39;x_67&#39;, &#39;y_67&#39;]]
+</pre></div>
+</div>
+<img alt="../_images/604e2b5b672997d9a0b994bdc4d3e8a7174953df4fca16fd29244c694e894231.png" src="../_images/604e2b5b672997d9a0b994bdc4d3e8a7174953df4fca16fd29244c694e894231.png" />
+</div>
+</div>
+</section>
+<section id="measuring-and-analyzing-keypoint-travel-in-openface-data">
+<h2>8.1 Measuring and Analyzing Keypoint Travel in OpenFace Data<a class="headerlink" href="#measuring-and-analyzing-keypoint-travel-in-openface-data" title="Permalink to this heading"></a></h2>
+<p>MARIPoSA can be used to track movement of a specified keypoint in the OpenFace data over time across groups. Depending on how the experiment is designed, this could reflect either overall movement of the head and face or movement of just the facial keypoint. Our face video clip dataset from the CelebV-HQ dataset contains annotations as follows:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;subgroups&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;subgroups&#39;</span><span class="p">][</span><span class="n">key</span><span class="p">])</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>neutral: 1085
+happy: 164
+fear: 11
+surprise: 13
+sadness: 96
+disgust: 1
+anger: 76
+contempt: 15
+</pre></div>
+</div>
+</div>
+</div>
+<p>So, we will proceed with comparing the three largest emotion classes (sadness, happy, and anger). First, we look at the travel of a keypoint representing the corner of the lip, and its utility for embedding and classifying the emotional states.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">kp_travel</span> <span class="o">=</span> <span class="n">analyze</span><span class="o">.</span><span class="n">get_keypoint_travel</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="s2">&quot;kp_48&quot;</span><span class="p">,</span>
+                                    <span class="mi">0</span><span class="p">,</span>
+                                    <span class="mi">3</span><span class="p">,</span>
+                                    <span class="n">binsize</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+                                    <span class="n">thresh</span><span class="o">=</span><span class="mf">1e80</span><span class="p">,</span>
+                                    <span class="n">selected_subgroups</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;sadness&quot;</span><span class="p">,</span><span class="s2">&quot;happy&quot;</span><span class="p">,</span><span class="s2">&quot;anger&quot;</span><span class="p">],</span>
+                                    <span class="n">return_as_df</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="n">plot</span><span class="o">.</span><span class="n">plot_keypoint_travel</span><span class="p">(</span><span class="n">kp_travel</span><span class="p">,</span><span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;rainbow&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/b9394f5524699d55f1d4d6ce71fc7e2e0e00d16c2e088285fe3e24304a20e085.png" src="../_images/b9394f5524699d55f1d4d6ce71fc7e2e0e00d16c2e088285fe3e24304a20e085.png" />
+<img alt="../_images/b9394f5524699d55f1d4d6ce71fc7e2e0e00d16c2e088285fe3e24304a20e085.png" src="../_images/b9394f5524699d55f1d4d6ce71fc7e2e0e00d16c2e088285fe3e24304a20e085.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">kp_travel</span> <span class="o">=</span> <span class="n">analyze</span><span class="o">.</span><span class="n">get_keypoint_travel</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="s2">&quot;kp_48&quot;</span><span class="p">,</span>
+                                    <span class="mi">0</span><span class="p">,</span>
+                                    <span class="mi">3</span><span class="p">,</span>
+                                    <span class="n">binsize</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                                    <span class="n">thresh</span><span class="o">=</span><span class="mf">1e80</span><span class="p">,</span>
+                                    <span class="n">selected_subgroups</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;sadness&quot;</span><span class="p">,</span><span class="s2">&quot;happy&quot;</span><span class="p">,</span><span class="s2">&quot;anger&quot;</span><span class="p">],</span>
+                                    <span class="n">return_as_df</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="n">emb_pca</span> <span class="o">=</span> <span class="n">analyze</span><span class="o">.</span><span class="n">embed</span><span class="p">(</span><span class="n">kp_travel</span><span class="p">,</span><span class="n">method</span><span class="o">=</span><span class="s2">&quot;pca&quot;</span><span class="p">)</span>
+<span class="n">plot</span><span class="o">.</span><span class="n">plot_embeddings</span><span class="p">(</span><span class="n">kp_travel</span><span class="p">,</span><span class="n">emb_pca</span><span class="p">,</span><span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;rainbow&quot;</span><span class="p">)</span>
+
+<span class="n">emb_lda</span> <span class="o">=</span> <span class="n">analyze</span><span class="o">.</span><span class="n">embed</span><span class="p">(</span><span class="n">kp_travel</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;lda&quot;</span><span class="p">)</span>
+<span class="n">plot</span><span class="o">.</span><span class="n">plot_embeddings</span><span class="p">(</span><span class="n">kp_travel</span><span class="p">,</span> <span class="n">emb_lda</span><span class="p">,</span><span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;rainbow&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Ellipse only drawn for embeddings_object of class LDA, not &lt;class &#39;sklearn.decomposition._pca.PCA&#39;&gt;
+</pre></div>
+</div>
+<img alt="../_images/b9ca530661f547b5f50ca4de4f09f8a3d5b9d7c184fb15cfaf612d12db7d1444.png" src="../_images/b9ca530661f547b5f50ca4de4f09f8a3d5b9d7c184fb15cfaf612d12db7d1444.png" />
+<img alt="../_images/bc2206ae97005ffe83b7e736cb2c79b979319622f4ef85b58c3de29a5dc3076b.png" src="../_images/bc2206ae97005ffe83b7e736cb2c79b979319622f4ef85b58c3de29a5dc3076b.png" />
+<img alt="../_images/b9ca530661f547b5f50ca4de4f09f8a3d5b9d7c184fb15cfaf612d12db7d1444.png" src="../_images/b9ca530661f547b5f50ca4de4f09f8a3d5b9d7c184fb15cfaf612d12db7d1444.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">accuracy</span><span class="p">,</span> <span class="n">conf</span> <span class="o">=</span> <span class="n">analyze</span><span class="o">.</span><span class="n">loocv</span><span class="p">(</span><span class="n">kp_travel</span><span class="p">,</span><span class="n">method</span><span class="o">=</span><span class="s2">&quot;LogisticRegression&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">accuracy</span><span class="p">)</span>
+
+<span class="n">conf_sum</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">mask</span> <span class="o">=</span> <span class="p">(</span><span class="n">conf_sum</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+<span class="n">conf_sum</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">conf_norm</span> <span class="o">=</span> <span class="n">conf</span> <span class="o">/</span> <span class="n">conf_sum</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span><span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">conf_norm</span><span class="p">,</span><span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;Greens&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">()</span>
+<span class="n">groups</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">kp_travel</span><span class="o">.</span><span class="n">group_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">groups</span><span class="p">),</span><span class="mi">1</span><span class="p">),</span><span class="n">labels</span><span class="o">=</span><span class="n">groups</span><span class="p">,</span><span class="n">rotation</span><span class="o">=</span><span class="mi">90</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">yticks</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">groups</span><span class="p">),</span><span class="mi">1</span><span class="p">),</span><span class="n">labels</span><span class="o">=</span><span class="n">groups</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.49107142857142855
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>([&lt;matplotlib.axis.YTick at 0x7f8f40cafd00&gt;,
+  &lt;matplotlib.axis.YTick at 0x7f8f40cb5130&gt;,
+  &lt;matplotlib.axis.YTick at 0x7f8f40cc9bb0&gt;],
+ [Text(0, 0, &#39;sadness&#39;), Text(0, 1, &#39;happy&#39;), Text(0, 2, &#39;anger&#39;)])
+</pre></div>
+</div>
+<img alt="../_images/22e7f077710e2093940c2e334ea7e27cb8516c3b8e08b776e1afa51cded11e3c.png" src="../_images/22e7f077710e2093940c2e334ea7e27cb8516c3b8e08b776e1afa51cded11e3c.png" />
+</div>
+</div>
+</section>
+<section id="working-with-action-units">
+<h2>8.2 Working with Action Units<a class="headerlink" href="#working-with-action-units" title="Permalink to this heading"></a></h2>
+<p>Next, we can look at action units, which are indexed metrics describing use of particular muscles on the face. This form of data has its own class called ActionUnits which can also be embedded, classified, and visualized like other forms of data extracted from video analyses in MARIPoSA.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">start</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">end</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="n">binsize</span> <span class="o">=</span> <span class="mi">3</span>
+
+<span class="n">selected_subgroups</span><span class="o">=</span><span class="kc">None</span>
+
+<span class="n">au</span> <span class="o">=</span> <span class="n">analyze</span><span class="o">.</span><span class="n">get_action_units</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="n">start</span><span class="p">,</span><span class="n">end</span><span class="p">,</span><span class="n">binsize</span><span class="o">=</span><span class="n">binsize</span><span class="p">,</span><span class="n">selected_subgroups</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;sadness&quot;</span><span class="p">,</span><span class="s2">&quot;happy&quot;</span><span class="p">,</span><span class="s2">&quot;anger&quot;</span><span class="p">],)</span>
+<span class="n">au</span> <span class="o">=</span> <span class="n">au</span><span class="o">.</span><span class="n">scale</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">emb_pca</span> <span class="o">=</span> <span class="n">analyze</span><span class="o">.</span><span class="n">embed</span><span class="p">(</span><span class="n">au</span><span class="p">,</span><span class="n">method</span><span class="o">=</span><span class="s2">&quot;pca&quot;</span><span class="p">)</span>
+<span class="n">plot</span><span class="o">.</span><span class="n">plot_embeddings</span><span class="p">(</span><span class="n">au</span><span class="p">,</span><span class="n">emb_pca</span><span class="p">,</span><span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;rainbow&quot;</span><span class="p">)</span>
+<span class="n">emb_lda</span> <span class="o">=</span> <span class="n">analyze</span><span class="o">.</span><span class="n">embed</span><span class="p">(</span><span class="n">au</span><span class="p">,</span><span class="n">method</span><span class="o">=</span><span class="s2">&quot;lda&quot;</span><span class="p">)</span>
+<span class="n">plot</span><span class="o">.</span><span class="n">plot_embeddings</span><span class="p">(</span><span class="n">au</span><span class="p">,</span><span class="n">emb_lda</span><span class="p">,</span><span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;rainbow&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Ellipse only drawn for embeddings_object of class LDA, not &lt;class &#39;sklearn.decomposition._pca.PCA&#39;&gt;
+</pre></div>
+</div>
+<img alt="../_images/1af37b2db1fc3f0281953ecc5cbcdbc3aaa2650a917297a28544f6f5f36dade6.png" src="../_images/1af37b2db1fc3f0281953ecc5cbcdbc3aaa2650a917297a28544f6f5f36dade6.png" />
+<img alt="../_images/b8360059d107ccd25651e590d6a66a8dc63070f96c3bab4317c9be0e8d60fc4f.png" src="../_images/b8360059d107ccd25651e590d6a66a8dc63070f96c3bab4317c9be0e8d60fc4f.png" />
+<img alt="../_images/1af37b2db1fc3f0281953ecc5cbcdbc3aaa2650a917297a28544f6f5f36dade6.png" src="../_images/1af37b2db1fc3f0281953ecc5cbcdbc3aaa2650a917297a28544f6f5f36dade6.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">accuracy</span><span class="p">,</span> <span class="n">conf</span> <span class="o">=</span> <span class="n">analyze</span><span class="o">.</span><span class="n">loocv</span><span class="p">(</span><span class="n">au</span><span class="p">,</span><span class="n">method</span><span class="o">=</span><span class="s2">&quot;randomforest&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">accuracy</span><span class="p">)</span>
+<span class="n">conf_sum</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">mask</span> <span class="o">=</span> <span class="p">(</span><span class="n">conf_sum</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+<span class="n">conf_sum</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">conf_norm</span> <span class="o">=</span> <span class="n">conf</span> <span class="o">/</span> <span class="n">conf_sum</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span><span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">conf_norm</span><span class="p">,</span><span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;Greens&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">()</span>
+<span class="n">groups</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">kp_travel</span><span class="o">.</span><span class="n">group_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">groups</span><span class="p">),</span><span class="mi">1</span><span class="p">),</span><span class="n">labels</span><span class="o">=</span><span class="n">groups</span><span class="p">,</span><span class="n">rotation</span><span class="o">=</span><span class="mi">90</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">yticks</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">groups</span><span class="p">),</span><span class="mi">1</span><span class="p">),</span><span class="n">labels</span><span class="o">=</span><span class="n">groups</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.5863095238095238
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>([&lt;matplotlib.axis.YTick at 0x7f8f51ae17c0&gt;,
+  &lt;matplotlib.axis.YTick at 0x7f8f40ceeeb0&gt;,
+  &lt;matplotlib.axis.YTick at 0x7f8f51b1a760&gt;],
+ [Text(0, 0, &#39;sadness&#39;), Text(0, 1, &#39;happy&#39;), Text(0, 2, &#39;anger&#39;)])
+</pre></div>
+</div>
+<img alt="../_images/bd8822523686e702500efddcbe7154e5d02c249b1e84e3ee7890b7f33ccc24fe.png" src="../_images/bd8822523686e702500efddcbe7154e5d02c249b1e84e3ee7890b7f33ccc24fe.png" />
+</div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="Demo7-PoseEstimation-KeypointTravel.html" class="btn btn-neutral float-left" title="Demo 7 (PE): Analyzing Keypoint Displacement in Pose Estimation Data" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../metadata.html" class="btn btn-neutral float-right" title="Metadata" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Sedona Ewbank.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

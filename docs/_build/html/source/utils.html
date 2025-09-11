@@ -50,6 +50,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../demo/Demo5-PoseSegmentation-ManualScoring.html">Demo 5 (PS): Comparing Pose Modules to Manual Scoring Data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../demo/Demo6-PoseSegmentation-Simulation.html">Demo 6 (PS): Simulating Pose Segmentation Data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../demo/Demo7-PoseEstimation-KeypointTravel.html">Demo 7 (PE): Analyzing Keypoint Displacement in Pose Estimation Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../demo/Demo8-PoseEstimation-OpenFace.html">Demo 8 (PE): Analyzing Keypoint Displacement and Action Units in human facial pose data from OpenFace</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../metadata.html">Metadata</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../analyze.html">Analyze</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../plot.html">Plot</a></li>
@@ -87,6 +88,27 @@
 </section>
 <section id="module-utils.analyze">
 <span id="utils-analyze-module"></span><h2>utils.analyze module<a class="headerlink" href="#module-utils.analyze" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="utils.analyze.ActionUnits">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">utils.analyze.</span></span><span class="sig-name descname"><span class="pre">ActionUnits</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">action_units</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group_labels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">observation_labels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feat_names</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scaler</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/utils/analyze.html#ActionUnits"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.analyze.ActionUnits" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="utils.analyze.ActionUnits.save">
+<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">save_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/utils/analyze.html#ActionUnits.save"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.analyze.ActionUnits.save" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="utils.analyze.ActionUnits.scale">
+<span class="sig-name descname"><span class="pre">scale</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/utils/analyze.html#ActionUnits.scale"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.analyze.ActionUnits.scale" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="utils.analyze.ActionUnits.to_df">
+<span class="sig-name descname"><span class="pre">to_df</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/utils/analyze.html#ActionUnits.to_df"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.analyze.ActionUnits.to_df" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 <dl class="py function">
 <dt class="sig sig-object py" id="utils.analyze.BORIS_to_pose">
 <span class="sig-prename descclassname"><span class="pre">utils.analyze.</span></span><span class="sig-name descname"><span class="pre">BORIS_to_pose</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/utils/analyze.html#BORIS_to_pose"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.analyze.BORIS_to_pose" title="Permalink to this definition"></a></dt>
@@ -236,6 +258,11 @@ line up with what pose modules</p>
 </dd>
 </dl>
 </dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="utils.analyze.get_action_units">
+<span class="sig-prename descclassname"><span class="pre">utils.analyze.</span></span><span class="sig-name descname"><span class="pre">get_action_units</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">binsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">selected_subgroups</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/utils/analyze.html#get_action_units"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.analyze.get_action_units" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="utils.analyze.get_distance">

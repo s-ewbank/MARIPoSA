@@ -91,8 +91,8 @@ def create_PE_project(project_name,data_directory,data_source,output_directory,f
         project_files=[i for i in sorted(os.listdir(data_directory)) if i.endswith(".csv")]
         test_df = pd.read_csv(data_directory+"/"+project_files[0])
         test_df.columns = test_df.columns.str.replace(' ', '')
-        y_coords = [i for i in test_df.columns if i.startswith("Y_")]
-        keypoints = ["kp" + i.split("Y")[1] for i in y_coords]
+        y_coords = [i for i in test_df.columns if i.lower().startswith("y_")]
+        keypoints = ["kp_" + i[i.lower().index("y_") + 2:] for i in y_coords]
     project_directory=str(output_directory+"/"+datetime.now().strftime('%y%m%d_')+project_name)
     if os.path.exists(project_directory):
         print(f"[{datetime.now()}] Warning - the path '{project_directory}' exists - a config will still be made (possible overwrite).")

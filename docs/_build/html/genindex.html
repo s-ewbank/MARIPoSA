@@ -49,6 +49,7 @@
 <li class="toctree-l1"><a class="reference internal" href="demo/Demo5-PoseSegmentation-ManualScoring.html">Demo 5 (PS): Comparing Pose Modules to Manual Scoring Data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="demo/Demo6-PoseSegmentation-Simulation.html">Demo 6 (PS): Simulating Pose Segmentation Data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="demo/Demo7-PoseEstimation-KeypointTravel.html">Demo 7 (PE): Analyzing Keypoint Displacement in Pose Estimation Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="demo/Demo8-PoseEstimation-OpenFace.html">Demo 8 (PE): Analyzing Keypoint Displacement and Action Units in human facial pose data from OpenFace</a></li>
 <li class="toctree-l1"><a class="reference internal" href="metadata.html">Metadata</a></li>
 <li class="toctree-l1"><a class="reference internal" href="analyze.html">Analyze</a></li>
 <li class="toctree-l1"><a class="reference internal" href="plot.html">Plot</a></li>
@@ -102,6 +103,10 @@
 </div>
 <h2 id="A">A</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="source/utils.html#utils.analyze.ActionUnits">ActionUnits (class in utils.analyze)</a>
+</li>
+  </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="source/utils.html#utils.analyze.ModuleUsage.apply_picks">apply_picks() (utils.analyze.ModuleUsage method)</a>
 </li>
@@ -171,10 +176,12 @@
 </li>
       <li><a href="simulate.html#utils.simulate.generate_usage_labeled">generate_usage_labeled() (in module utils.simulate)</a>, <a href="source/utils.html#utils.simulate.generate_usage_labeled">[1]</a>
 </li>
-      <li><a href="analyze.html#utils.analyze.get_distance">get_distance() (in module utils.analyze)</a>, <a href="source/utils.html#utils.analyze.get_distance">[1]</a>
+      <li><a href="source/utils.html#utils.analyze.get_action_units">get_action_units() (in module utils.analyze)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="analyze.html#utils.analyze.get_distance">get_distance() (in module utils.analyze)</a>, <a href="source/utils.html#utils.analyze.get_distance">[1]</a>
+</li>
       <li><a href="analyze.html#utils.analyze.get_keypoint_travel">get_keypoint_travel() (in module utils.analyze)</a>, <a href="source/utils.html#utils.analyze.get_keypoint_travel">[1]</a>
 </li>
       <li><a href="analyze.html#utils.analyze.get_module_labels">get_module_labels() (in module utils.analyze)</a>, <a href="source/utils.html#utils.analyze.get_module_labels">[1]</a>
@@ -302,9 +309,11 @@
 <h2 id="S">S</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="source/utils.html#utils.analyze.KeypointFeature.save">save() (utils.analyze.KeypointFeature method)</a>
+      <li><a href="source/utils.html#utils.analyze.ActionUnits.save">save() (utils.analyze.ActionUnits method)</a>
 
       <ul>
+        <li><a href="source/utils.html#utils.analyze.KeypointFeature.save">(utils.analyze.KeypointFeature method)</a>
+</li>
         <li><a href="source/utils.html#utils.analyze.ModuleTransitions.save">(utils.analyze.ModuleTransitions method)</a>
 </li>
         <li><a href="source/utils.html#utils.analyze.ModuleUsage.save">(utils.analyze.ModuleUsage method)</a>
@@ -314,9 +323,11 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="metadata.html#utils.metadata.save_edited_project">save_edited_project() (in module utils.metadata)</a>, <a href="source/utils.html#utils.metadata.save_edited_project">[1]</a>
 </li>
-      <li><a href="source/utils.html#utils.analyze.KeypointFeature.scale">scale() (utils.analyze.KeypointFeature method)</a>
+      <li><a href="source/utils.html#utils.analyze.ActionUnits.scale">scale() (utils.analyze.ActionUnits method)</a>
 
       <ul>
+        <li><a href="source/utils.html#utils.analyze.KeypointFeature.scale">(utils.analyze.KeypointFeature method)</a>
+</li>
         <li><a href="source/utils.html#utils.analyze.ModuleTransitions.scale">(utils.analyze.ModuleTransitions method)</a>
 </li>
         <li><a href="source/utils.html#utils.analyze.ModuleUsage.scale">(utils.analyze.ModuleUsage method)</a>
@@ -328,9 +339,11 @@
 <h2 id="T">T</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="source/utils.html#utils.analyze.KeypointFeature.to_df">to_df() (utils.analyze.KeypointFeature method)</a>
+      <li><a href="source/utils.html#utils.analyze.ActionUnits.to_df">to_df() (utils.analyze.ActionUnits method)</a>
 
       <ul>
+        <li><a href="source/utils.html#utils.analyze.KeypointFeature.to_df">(utils.analyze.KeypointFeature method)</a>
+</li>
         <li><a href="source/utils.html#utils.analyze.ModuleTransitions.to_df">(utils.analyze.ModuleTransitions method)</a>
 </li>
         <li><a href="source/utils.html#utils.analyze.ModuleUsage.to_df">(utils.analyze.ModuleUsage method)</a>

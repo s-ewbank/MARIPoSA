@@ -275,8 +275,12 @@ def get_keypoint_travel(PE_config,
         for s, sess in enumerate(PE_config["subgroups"][group]):
             observation_labels.append(sess)
             group_labels.append(group_dict[group])
-            filepath = PE_config["data_directory"]+sess
-            data = pd.read_csv(filepath, header=[1, 2])
+            filepath = PE_config["data_directory"]+"/"+sess
+            if PE_config["data_source"]=="DeepLabCut":
+                data = pd.read_csv(filepath, header=[1, 2])
+            elif PE_config["data_source"]=="OpenFace":
+                data = pd.read_csv(filepath)
+                data.columns = data.columns.str.replace(' ', '')
             if binsize == None:
                 binsize = end - start
                 nbins = 1
@@ -285,8 +289,22 @@ def get_keypoint_travel(PE_config,
             dist_i = np.zeros(nbins)
             fps = int(PE_config["fps"])
             for b in range(nbins):
-                x = np.array(data[keypoint]['x'])[(start + b * binsize) * fps:(start + (b + 1) * binsize) * fps]
-                y = np.array(data[keypoint]['y'])[(start + b * binsize) * fps:(start + (b + 1) * binsize) * fps]
+                if PE_config["data_source"]=="DeepLabCut":
+                    x = np.array(data[keypoint]['x'])[(start + b * binsize) * fps:(start + (b + 1) * binsize) * fps]
+                    y = np.array(data[keypoint]['y'])[(start + b * binsize) * fps:(start + (b + 1) * binsize) * fps]
+                elif PE_config["data_source"]=="OpenFace":
+                    x_col_lower = "x"+keypoint.split("kp")[1]
+                    y_col_lower = "y"+keypoint.split("kp")[1]
+                    x_col_upper = "X"+keypoint.split("kp")[1]
+                    y_col_upper = "Y"+keypoint.split("kp")[1]
+                    if x_col_upper in data.columns and y_col_upper in data.columns:
+                        x_col = x_col_upper
+                        y_col = y_col_upper
+                    elif x_col_lower in data.columns and y_col_lower in data.columns:
+                        x_col = x_col_lower
+                        y_col = y_col_lower
+                    x = np.array(data[x_col])[(start + b * binsize) * fps:(start + (b + 1) * binsize) * fps]
+                    y = np.array(data[y_col])[(start + b * binsize) * fps:(start + (b + 1) * binsize) * fps]
                 for i in range(len(x) - 1):
                     if np.absolute(x[i + 1] - x[i]) > thresh:
                         x[i + 1] = x[i]
@@ -305,6 +323,124 @@ def get_keypoint_travel(PE_config,
         return kf_df
     else:
         return KeypointFeature(travel_data, group_labels, observation_labels, feat_names, group_dict, None)
+
+
+class ActionUnits:
+    def __init__(self, action_units, group_labels, observation_labels, feat_names, group_dict, scaler):
+        self.action_units = action_units
+        self.group_labels = group_labels
+        self.observation_labels = observation_labels
+        self.feat_names = feat_names
+        self.group_dict = group_dict
+        self.scaler = scaler
+        mean_check = np.allclose(np.mean(action_units, axis=0), 0, atol=0.1)
+        std_check = np.allclose(np.std(action_units, axis=0), 1, atol=0.1)
+        self.scaled = mean_check and std_check
+
+    def to_df(self):
+        colnames = []
+        flip_group_dict = {v: k for k, v in self.group_dict.items()}
+        bad_group_labels = []
+        for i in self.group_labels:
+            if i in flip_group_dict.keys():
+                colnames.append(flip_group_dict[i])
+            else:
+                colnames.append("none")
+                bad_group_labels.append(i)
+        if len(bad_group_labels) > 0:
+            bad_group_labels = list(np.unique(bad_group_labels))
+            print(f"Warning: the following groups were not detected in the config and were labeled 'none'; continuing:\n{bad_group_labels}")
+        df = pd.DataFrame(self.action_units, columns=self.feat_names, index=self.observation_labels)
+        df["group"] = colnames
+        return df
+
+    def scale(self):
+        scaler = StandardScaler()
+        action_units_scaled = scaler.fit_transform(self.action_units)
+        return ActionUnits(action_units_scaled, self.group_labels, self.observation_labels, self.feat_names,
+                           self.group_dict, scaler)
+
+    def save(self, save_path):
+        if ((save_path.endswith(".pkl")==False) and (save_path.endswith(".pickle")==False)):
+            save_path+=".pickle"
+            print(f"Save path changed to {save_path}")
+        with open(save_path, 'wb') as file:
+            pickle.dump(self, file)
+
+
+def get_action_units(config, start, end, binsize=None, selected_subgroups=None):
+    all_au_data = {}
+    group_labels = []
+    observation_labels = []
+
+    if binsize == None:
+        binsize = end - start
+        nbins = 1
+    else:
+        nbins = int((end - start) / binsize)
+
+    if selected_subgroups == None:
+        group_dict = {"no_assigned_subgroup": 0}
+        for subj in config["project_files"]:
+            df = pd.read_csv(config["data_directory"] + "/" + subj)
+            df.columns = df.columns.str.replace(' ', '')
+            au_cols = [i for i in df.columns if ((i.startswith("AU")) and (i.endswith("r")))]
+            au_df = df[au_cols]
+
+            au_data = None
+            for b in range(nbins):
+                df_i = au_df.iloc[int(int(config["fps"]) * (start + b) * binsize):int(
+                    int(config["fps"]) * (start + b + 1) * binsize)].mean(axis=0)
+                df_i.index = [i + "_t" + str((start + b) * binsize) + "-t" + str((start + b + 1) * binsize) for i in
+                              list(df_i.index)]
+                if type(au_data) is type(None):
+                    au_data = df_i
+                else:
+                    au_data = pd.concat([au_data, df_i])
+
+            all_au_data[subj] = au_data
+            group_labels.append(0)
+            observation_labels.append(subj)
+
+        au_df = pd.DataFrame(all_au_data)
+        au_arr = np.array(au_df.T)
+        feat_names = list(au_df.index)
+
+    else:
+        group_dict = {}
+        for g, group in enumerate(selected_subgroups):
+            group_dict[group] = g
+            for subj in config["subgroups"][group]:
+                df = pd.read_csv(config["data_directory"] + "/" + subj)
+                df.columns = df.columns.str.replace(' ', '')
+                au_cols = [i for i in df.columns if ((i.startswith("AU")) and (i.endswith("r")))]
+                au_df = df[au_cols]
+
+                if binsize == None:
+                    binsize = end - start
+                    nbins = 1
+                else:
+                    nbins = int((end - start) / binsize)
+
+                au_data = None
+                for b in range(nbins):
+                    df_i = au_df.iloc[int(int(config["fps"]) * (start + b) * binsize):int(
+                        int(config["fps"]) * (start + b + 1) * binsize)].mean(axis=0)
+                    df_i.index = [i + "_t" + str((start + b) * binsize) + "-t" + str((start + b + 1) * binsize) for i in
+                                  list(df_i.index)]
+                    if type(au_data) is type(None):
+                        au_data = df_i
+                    else:
+                        au_data = pd.concat([au_data, df_i])
+
+                all_au_data[subj] = au_data
+                group_labels.append(g)
+                observation_labels.append(subj)
+            au_df = pd.DataFrame(all_au_data)
+            au_arr = np.array(au_df.T)
+            feat_names = list(au_df.index)
+
+    return ActionUnits(au_arr, group_labels, observation_labels, feat_names, group_dict, None)
 
 
 def BORIS_to_pose(config, verbose = True):
@@ -765,6 +901,10 @@ def embed(module_feature_object,method="lda",n_components=2):
         X=module_feature_object.keypoint_feature
         y=module_feature_object.group_labels
         obj_type="keypoint feature"
+    elif module_feature_object.__class__.__name__=="ActionUnits":
+        X=module_feature_object.action_units
+        y=module_feature_object.group_labels
+        obj_type="action units"
     else:
         raise ValueError(f'module_feature_object class must be ModuleUsage or ModuleTransitions or KeypointFeature, not {module_feature_object.__class__}')
 
@@ -797,6 +937,10 @@ def classify(module_feature_object, method="lda"):
         X=module_feature_object.keypoint_feature
         y=module_feature_object.group_labels
         obj_type="keypoint feature"
+    elif module_feature_object.__class__.__name__=="ActionUnits":
+        X=module_feature_object.action_units
+        y=module_feature_object.group_labels
+        obj_type="action units"
     else:
         raise ValueError(f'module_feature_object class must be ModuleUsage or ModuleTransitions or KeypointFeature, not {module_feature_object.__class__}')
 
@@ -842,6 +986,10 @@ def loocv(module_feature_object, method="lda"):
         X=module_feature_object.keypoint_feature
         y=module_feature_object.group_labels
         obj_type="keypoint feature"
+    elif module_feature_object.__class__.__name__=="ActionUnits":
+        X=module_feature_object.action_units
+        y=module_feature_object.group_labels
+        obj_type="action units"
     else:
         raise ValueError(f'module_feature_object class must be ModuleUsage or ModuleTransitions or KeypointFeature, not {module_feature_object.__class__}')
     for obs in range(len(y)):

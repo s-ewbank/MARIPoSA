@@ -629,7 +629,7 @@ def plot_keypoint_travel(keypoint_feature, cmap="viridis", plottype="band", figW
             if g == len(groups) - 1:
                 ax.set_xticks(xticks)
                 ax.set_xticklabels(groups)
-    ax.set_ylabel("Locomotion (pix)")
+    ax.set_ylabel("Keypoint travel (pix)")
     return fig
 
 def plot_embeddings(module_feature_object, embeddings_object, figW=3, figH=3, cmap="viridis",title=None,legend=False,draw_ellipse=True,alt_legend=None):
@@ -652,6 +652,8 @@ def plot_embeddings(module_feature_object, embeddings_object, figW=3, figH=3, cm
         X_tfm = embeddings_object.transform(module_feature_object.transition_counts)
     elif module_feature_object.__class__.__name__=="KeypointFeature":
         X_tfm = embeddings_object.transform(module_feature_object.keypoint_feature)
+    elif module_feature_object.__class__.__name__=="ActionUnits":
+        X_tfm = embeddings_object.transform(module_feature_object.action_units)
     y=module_feature_object.group_labels
     cmap = plt.get_cmap(cmap)
     colors=[cmap([i]) for i in np.arange(0,len(np.unique(y)),1/(len(np.unique(y))-0.9))]

@@ -1,0 +1,1351 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Demo 7 (PE): Analyzing Keypoint Displacement in Pose Estimation Data &mdash; MARIPoSA 0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=44496db0"></script>
+      <script src="../_static/doctools.js?v=888ff710"></script>
+      <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Demo 8 (PE): Analyzing Keypoint Displacement and Action Units in human facial pose data from OpenFace" href="Demo8-PoseEstimation-OpenFace.html" />
+    <link rel="prev" title="Demo 6 (PS): Simulating Pose Segmentation Data" href="Demo6-PoseSegmentation-Simulation.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            MARIPoSA
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="Demo1-ProjectCreation.html">Demo 1 (PS/PE): Project Creation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Demo2-PoseSegmentation-Visualize.html">Demo 2 (PS): Visualization of Pose Module Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Demo3-PoseSegmentation-Embed.html">Demo 3 (PS): Embedding of Pose Segmentation Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Demo4-PoseSegmentation-ClassificationAndRegression.html">Demo 4 (PS): Regression and Classification of Group Conditions in Pose Segmentation Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Demo5-PoseSegmentation-ManualScoring.html">Demo 5 (PS): Comparing Pose Modules to Manual Scoring Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Demo6-PoseSegmentation-Simulation.html">Demo 6 (PS): Simulating Pose Segmentation Data</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Demo 7 (PE): Analyzing Keypoint Displacement in Pose Estimation Data</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#measuring-and-plotting-keypoint-travel-in-animals">7.1: Measuring and plotting keypoint travel in animals</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#using-keypoint-travel-in-animals-for-embedding-and-classification">7.2 Using keypoint travel in animals for embedding and classification</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="Demo8-PoseEstimation-OpenFace.html">Demo 8 (PE): Analyzing Keypoint Displacement and Action Units in human facial pose data from OpenFace</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../metadata.html">Metadata</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../analyze.html">Analyze</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../plot.html">Plot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../simulate.html">Simulate</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">MARIPoSA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Demo 7 (PE): Analyzing Keypoint Displacement in Pose Estimation Data</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/demo/Demo7-PoseEstimation-KeypointTravel.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="demo-7-pe-analyzing-keypoint-displacement-in-pose-estimation-data">
+<h1>Demo 7 (PE): Analyzing Keypoint Displacement in Pose Estimation Data<a class="headerlink" href="#demo-7-pe-analyzing-keypoint-displacement-in-pose-estimation-data" title="Permalink to this heading"></a></h1>
+<p><em>Written and last updated September 10, 2025 by Sedona Ewbank, snewbank&#64;stanford.edu</em></p>
+<p>The purpose of this demo is to demonstrate how to measure and plot keypoint travel in pose estimation data types typically associated with animal experiments (DLC, SLEAP) in MARIPoSA.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">importlib</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="c1">#This block only important for running as script</span>
+<span class="c1">#script_dir = os.path.dirname(os.path.abspath(__file__))</span>
+<span class="n">mariposa_dir</span> <span class="o">=</span> <span class="s2">&quot;/Users/snewbank/PycharmProjects/MARIPoSA&quot;</span>
+<span class="n">utils_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">mariposa_dir</span><span class="p">,</span> <span class="s1">&#39;utils&#39;</span><span class="p">)</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">utils_dir</span><span class="p">)</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mariposa_dir</span><span class="p">)</span>
+
+<span class="c1">#import utils</span>
+<span class="kn">from</span> <span class="nn">utils</span> <span class="kn">import</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">analyze</span><span class="p">,</span> <span class="n">plot</span><span class="p">,</span> <span class="n">simulate</span>
+
+<span class="n">importlib</span><span class="o">.</span><span class="n">reload</span><span class="p">(</span><span class="n">metadata</span><span class="p">)</span>
+<span class="n">importlib</span><span class="o">.</span><span class="n">reload</span><span class="p">(</span><span class="n">analyze</span><span class="p">)</span>
+<span class="n">importlib</span><span class="o">.</span><span class="n">reload</span><span class="p">(</span><span class="n">plot</span><span class="p">)</span>
+<span class="n">importlib</span><span class="o">.</span><span class="n">reload</span><span class="p">(</span><span class="n">simulate</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;module &#39;utils.simulate&#39; from &#39;/Users/snewbank/PycharmProjects/MARIPoSA/utils/simulate.py&#39;&gt;
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">demo_dir</span><span class="o">=</span><span class="s2">&quot;/Users/snewbank/Behavior/MARIPoSA_demo_data/&quot;</span>
+<span class="n">config</span><span class="o">=</span><span class="n">metadata</span><span class="o">.</span><span class="n">load_project</span><span class="p">(</span><span class="n">demo_dir</span><span class="o">+</span><span class="s2">&quot;250910_test_PE/config_PE.yaml&quot;</span><span class="p">)</span>
+<span class="n">save</span><span class="o">=</span><span class="kc">True</span>
+<span class="n">save_path</span> <span class="o">=</span> <span class="n">demo_dir</span><span class="o">+</span><span class="s2">&quot;demo_figures/&quot;</span>
+<span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">save_path</span><span class="p">):</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">save_path</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<section id="measuring-and-plotting-keypoint-travel-in-animals">
+<h2>7.1: Measuring and plotting keypoint travel in animals<a class="headerlink" href="#measuring-and-plotting-keypoint-travel-in-animals" title="Permalink to this heading"></a></h2>
+<p>The purpose of this mode of analysis is to measure how much a keypoint has travelled during a recording, with or without time binning. This could reflect locomotion (e.g., in an open field recording approach) or overall movement of a keypoint in a confined assay (e.g., a reaching task). We obtain this with analyze.get_keypoint_travel, which will return a KeypointTravel object that we can then use for further analysis. Note the threshold parameter of this function, which optionally “cleans” the data; it can be disabled by setting it to None.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">help</span><span class="p">(</span><span class="n">analyze</span><span class="o">.</span><span class="n">get_keypoint_travel</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Help on function get_keypoint_travel in module utils.analyze:
+
+get_keypoint_travel(PE_config, keypoint, start, end, binsize=None, thresh=70, selected_subgroups=&#39;all&#39;, return_as_df=True)
+    Measure keypodint distance travelled across group of subjects
+    
+    :param PE_config: pose estimation config - used for FPS only
+    :param keypoint: name of keypoint
+    :param start: start time in seconds
+    :param end: end time in seconds
+    :param binsize: if binned output is desired, size of timebins (default is None for no binning)
+    :param thresh: threshold for when distance &#39;jump&#39; is too large and should be excluded; default 70
+    :param selected_subgroups: subgroups to analyze as defined in config; default &quot;all&quot;
+    :param return_as_df: return as a dataframe or return as KeypointTravel class (for embedding, classification)
+    :return:
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">kp_travel</span> <span class="o">=</span> <span class="n">analyze</span><span class="o">.</span><span class="n">get_keypoint_travel</span><span class="p">(</span><span class="n">config</span><span class="p">,</span>
+                                        <span class="s2">&quot;tailbase&quot;</span><span class="p">,</span>
+                                        <span class="mi">0</span><span class="p">,</span><span class="mi">1200</span><span class="p">,</span>
+                                        <span class="n">selected_subgroups</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;sal&quot;</span><span class="p">,</span><span class="s2">&quot;k1&quot;</span><span class="p">,</span><span class="s2">&quot;k5&quot;</span><span class="p">,</span><span class="s2">&quot;k10&quot;</span><span class="p">],</span>
+                                        <span class="n">return_as_df</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="n">kp_travel_df</span> <span class="o">=</span> <span class="n">kp_travel</span><span class="o">.</span><span class="n">to_df</span><span class="p">()</span>
+<span class="n">display</span><span class="p">(</span><span class="n">kp_travel_df</span><span class="p">)</span>
+<span class="n">plot</span><span class="o">.</span><span class="n">plot_keypoint_travel</span><span class="p">(</span><span class="n">kp_travel</span><span class="p">,</span><span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;viridis_r&quot;</span><span class="p">,</span><span class="n">plottype</span><span class="o">=</span><span class="s2">&quot;bar&quot;</span><span class="p">)</span>
+
+<span class="n">kp_travel</span> <span class="o">=</span> <span class="n">analyze</span><span class="o">.</span><span class="n">get_keypoint_travel</span><span class="p">(</span><span class="n">config</span><span class="p">,</span>
+                                        <span class="s2">&quot;tailbase&quot;</span><span class="p">,</span>
+                                        <span class="mi">0</span><span class="p">,</span><span class="mi">1200</span><span class="p">,</span>
+                                        <span class="n">binsize</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span>
+                                        <span class="n">selected_subgroups</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;sal&quot;</span><span class="p">,</span><span class="s2">&quot;k1&quot;</span><span class="p">,</span><span class="s2">&quot;k5&quot;</span><span class="p">,</span><span class="s2">&quot;k10&quot;</span><span class="p">],</span>
+                                        <span class="n">return_as_df</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="n">kp_travel_df</span> <span class="o">=</span> <span class="n">kp_travel</span><span class="o">.</span><span class="n">to_df</span><span class="p">()</span>
+<span class="n">display</span><span class="p">(</span><span class="n">kp_travel_df</span><span class="p">)</span>
+<span class="n">plot</span><span class="o">.</span><span class="n">plot_keypoint_travel</span><span class="p">(</span><span class="n">kp_travel</span><span class="p">,</span><span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;viridis_r&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>0.0</th>
+      <th>group</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>2023-06-15_21-28-12_bf04_salivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv</th>
+      <td>76585.673549</td>
+      <td>sal</td>
+    </tr>
+    <tr>
+      <th>2023-06-15_22-01-50_bf03_salivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv</th>
+      <td>77601.985038</td>
+      <td>sal</td>
+    </tr>
+    <tr>
+      <th>2023-06-20_15-41-01_bm03_salivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv</th>
+      <td>21844.904953</td>
+      <td>sal</td>
+    </tr>
+    <tr>
+      <th>2023-06-20_16-13-48_bm04_salivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv</th>
+      <td>46279.020517</td>
+      <td>sal</td>
+    </tr>
+    <tr>
+      <th>2023-06-20_17-21-51_bf02_salivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv</th>
+      <td>69155.547166</td>
+      <td>sal</td>
+    </tr>
+    <tr>
+      <th>2023-07-03_16-15-21_bm02_salivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv</th>
+      <td>60179.625151</td>
+      <td>sal</td>
+    </tr>
+    <tr>
+      <th>2023-07-03_19-20-49_bf01_salivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv</th>
+      <td>74034.204420</td>
+      <td>sal</td>
+    </tr>
+    <tr>
+      <th>2023-06-20_19-10-38_bf04_k1ivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv</th>
+      <td>88946.845156</td>
+      <td>k1</td>
+    </tr>
+    <tr>
+      <th>2023-06-26_15-35-45_bf01_k1ivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv</th>
+      <td>85649.979937</td>
+      <td>k1</td>
+    </tr>
+    <tr>
+      <th>2023-06-26_19-00-05_bm02_k1ivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv</th>
+      <td>92955.598550</td>
+      <td>k1</td>
+    </tr>
+    <tr>
+      <th>2023-06-27_10-47-10_bm04_k1ivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv</th>
+      <td>22429.103784</td>
+      <td>k1</td>
+    </tr>
+    <tr>
+      <th>2023-07-08_14-42-24_bf02_k1ivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv</th>
+      <td>101134.822510</td>
+      <td>k1</td>
+    </tr>
+    <tr>
+      <th>2023-07-08_15-47-29_bm01_k1ivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv</th>
+      <td>70294.549563</td>
+      <td>k1</td>
+    </tr>
+    <tr>
+      <th>2023-06-15_17-16-18_bm01_k5ivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv</th>
+      <td>99097.355864</td>
+      <td>k5</td>
+    </tr>
+    <tr>
+      <th>2023-06-26_16-15-58_bf02_k5ivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv</th>
+      <td>117117.595734</td>
+      <td>k5</td>
+    </tr>
+    <tr>
+      <th>2023-07-03_20-27-25_bf03_k5ivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv</th>
+      <td>174943.106781</td>
+      <td>k5</td>
+    </tr>
+    <tr>
+      <th>2023-07-08_16-19-27_bm02_k5ivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv</th>
+      <td>154678.418900</td>
+      <td>k5</td>
+    </tr>
+    <tr>
+      <th>2023-07-14_16-25-47_bf01_k5ivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv</th>
+      <td>147305.238791</td>
+      <td>k5</td>
+    </tr>
+    <tr>
+      <th>2023-07-18_19-35-14_bm03_k5ivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv</th>
+      <td>121408.153258</td>
+      <td>k5</td>
+    </tr>
+    <tr>
+      <th>2023-05-15_16-47-52_bf03_k10ivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv</th>
+      <td>178874.593599</td>
+      <td>k10</td>
+    </tr>
+    <tr>
+      <th>2023-05-15_18-18-22_bf04_k10ivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv</th>
+      <td>163772.740151</td>
+      <td>k10</td>
+    </tr>
+    <tr>
+      <th>2023-05-25_14-30-54_bm02_k10ivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv</th>
+      <td>146356.555059</td>
+      <td>k10</td>
+    </tr>
+    <tr>
+      <th>2023-05-31_17-08-06_bf01_k10ivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv</th>
+      <td>256202.052488</td>
+      <td>k10</td>
+    </tr>
+    <tr>
+      <th>2023-07-13_15-45-26_bm03_k10ivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv</th>
+      <td>162133.395129</td>
+      <td>k10</td>
+    </tr>
+    <tr>
+      <th>2023-07-14_13-56-09_bm01_k10ivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv</th>
+      <td>140856.419448</td>
+      <td>k10</td>
+    </tr>
+    <tr>
+      <th>2023-07-18_18-19-50_bm04_k10ivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv</th>
+      <td>156764.561502</td>
+      <td>k10</td>
+    </tr>
+  </tbody>
+</table>
+</div></div><div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>0.0</th>
+      <th>1.0</th>
+      <th>2.0</th>
+      <th>3.0</th>
+      <th>4.0</th>
+      <th>5.0</th>
+      <th>6.0</th>
+      <th>7.0</th>
+      <th>8.0</th>
+      <th>9.0</th>
+      <th>...</th>
+      <th>11.0</th>
+      <th>12.0</th>
+      <th>13.0</th>
+      <th>14.0</th>
+      <th>15.0</th>
+      <th>16.0</th>
+      <th>17.0</th>
+      <th>18.0</th>
+      <th>19.0</th>
+      <th>group</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>2023-06-15_21-28-12_bf04_salivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv</th>
+      <td>8880.331395</td>
+      <td>3351.100258</td>
+      <td>1587.052168</td>
+      <td>2750.742715</td>
+      <td>6399.252095</td>
+      <td>3460.315582</td>
+      <td>1016.990993</td>
+      <td>2570.881432</td>
+      <td>5468.918087</td>
+      <td>6059.387430</td>
+      <td>...</td>
+      <td>1104.964260</td>
+      <td>1500.049482</td>
+      <td>3898.298124</td>
+      <td>6544.453556</td>
+      <td>4779.386395</td>
+      <td>3759.273735</td>
+      <td>2990.124814</td>
+      <td>1878.317699</td>
+      <td>6675.841174</td>
+      <td>sal</td>
+    </tr>
+    <tr>
+      <th>2023-06-15_22-01-50_bf03_salivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv</th>
+      <td>8071.237357</td>
+      <td>6181.385243</td>
+      <td>7522.841487</td>
+      <td>3543.876735</td>
+      <td>3620.211232</td>
+      <td>5351.320313</td>
+      <td>6009.554638</td>
+      <td>3952.848740</td>
+      <td>5135.739960</td>
+      <td>2218.138347</td>
+      <td>...</td>
+      <td>2122.939566</td>
+      <td>2672.667907</td>
+      <td>4010.858900</td>
+      <td>3015.353875</td>
+      <td>1996.782716</td>
+      <td>2114.914108</td>
+      <td>2257.268367</td>
+      <td>2296.118505</td>
+      <td>2669.904618</td>
+      <td>sal</td>
+    </tr>
+    <tr>
+      <th>2023-06-20_15-41-01_bm03_salivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv</th>
+      <td>2660.048643</td>
+      <td>1383.006506</td>
+      <td>1059.346533</td>
+      <td>1503.847833</td>
+      <td>1535.395087</td>
+      <td>1002.214252</td>
+      <td>1054.906797</td>
+      <td>1108.866013</td>
+      <td>998.275640</td>
+      <td>1074.835503</td>
+      <td>...</td>
+      <td>929.709634</td>
+      <td>910.307825</td>
+      <td>925.516701</td>
+      <td>768.447314</td>
+      <td>859.197324</td>
+      <td>803.552190</td>
+      <td>912.919929</td>
+      <td>705.072034</td>
+      <td>681.108369</td>
+      <td>sal</td>
+    </tr>
+    <tr>
+      <th>2023-06-20_16-13-48_bm04_salivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv</th>
+      <td>5485.073029</td>
+      <td>1319.469199</td>
+      <td>3407.583833</td>
+      <td>3389.185426</td>
+      <td>2014.415106</td>
+      <td>2541.982760</td>
+      <td>2881.827623</td>
+      <td>2246.780758</td>
+      <td>3373.222174</td>
+      <td>1624.433605</td>
+      <td>...</td>
+      <td>2263.354499</td>
+      <td>2712.941823</td>
+      <td>1787.785253</td>
+      <td>2965.370830</td>
+      <td>1906.642921</td>
+      <td>792.458697</td>
+      <td>1058.076463</td>
+      <td>1420.924233</td>
+      <td>1579.055731</td>
+      <td>sal</td>
+    </tr>
+    <tr>
+      <th>2023-06-20_17-21-51_bf02_salivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv</th>
+      <td>7938.195203</td>
+      <td>6110.713672</td>
+      <td>5439.324565</td>
+      <td>4607.947223</td>
+      <td>3910.104986</td>
+      <td>3904.234479</td>
+      <td>3953.831284</td>
+      <td>4420.781394</td>
+      <td>2795.601820</td>
+      <td>2183.251945</td>
+      <td>...</td>
+      <td>1217.639745</td>
+      <td>1699.270851</td>
+      <td>1403.652257</td>
+      <td>5089.822149</td>
+      <td>4489.189921</td>
+      <td>1268.897918</td>
+      <td>1459.432966</td>
+      <td>1557.146247</td>
+      <td>3414.117895</td>
+      <td>sal</td>
+    </tr>
+    <tr>
+      <th>2023-07-03_16-15-21_bm02_salivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv</th>
+      <td>7048.375661</td>
+      <td>5818.277145</td>
+      <td>5278.729134</td>
+      <td>6021.514273</td>
+      <td>4386.361838</td>
+      <td>4524.004535</td>
+      <td>2291.139233</td>
+      <td>1999.318602</td>
+      <td>4098.064644</td>
+      <td>1537.187124</td>
+      <td>...</td>
+      <td>3163.314795</td>
+      <td>1602.690430</td>
+      <td>1330.173334</td>
+      <td>1244.696870</td>
+      <td>1295.699150</td>
+      <td>1398.134903</td>
+      <td>1399.431639</td>
+      <td>1282.853249</td>
+      <td>1105.019397</td>
+      <td>sal</td>
+    </tr>
+    <tr>
+      <th>2023-07-03_19-20-49_bf01_salivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv</th>
+      <td>8241.668408</td>
+      <td>4963.881674</td>
+      <td>5521.215270</td>
+      <td>3499.214739</td>
+      <td>3161.170596</td>
+      <td>5903.910838</td>
+      <td>3711.337363</td>
+      <td>2840.721863</td>
+      <td>4470.272583</td>
+      <td>4842.918753</td>
+      <td>...</td>
+      <td>2164.682111</td>
+      <td>2000.644887</td>
+      <td>1889.692155</td>
+      <td>3446.230399</td>
+      <td>3064.598552</td>
+      <td>2689.005167</td>
+      <td>2111.795295</td>
+      <td>2750.955661</td>
+      <td>1497.574769</td>
+      <td>sal</td>
+    </tr>
+    <tr>
+      <th>2023-06-20_19-10-38_bf04_k1ivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv</th>
+      <td>8845.988403</td>
+      <td>7188.888682</td>
+      <td>8933.440687</td>
+      <td>7737.247830</td>
+      <td>7132.427277</td>
+      <td>5154.259105</td>
+      <td>6499.133309</td>
+      <td>4838.891810</td>
+      <td>4362.034290</td>
+      <td>7835.191761</td>
+      <td>...</td>
+      <td>1406.535741</td>
+      <td>1084.069936</td>
+      <td>1088.998064</td>
+      <td>1959.846857</td>
+      <td>1817.340613</td>
+      <td>1521.430826</td>
+      <td>1497.603369</td>
+      <td>3469.641220</td>
+      <td>2591.058581</td>
+      <td>k1</td>
+    </tr>
+    <tr>
+      <th>2023-06-26_15-35-45_bf01_k1ivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv</th>
+      <td>11838.689804</td>
+      <td>8031.028128</td>
+      <td>8091.465003</td>
+      <td>4083.950757</td>
+      <td>6227.053949</td>
+      <td>8353.814333</td>
+      <td>6247.864234</td>
+      <td>4675.471830</td>
+      <td>1606.425168</td>
+      <td>3986.807139</td>
+      <td>...</td>
+      <td>1737.062475</td>
+      <td>2822.933304</td>
+      <td>2976.058980</td>
+      <td>3062.887893</td>
+      <td>2957.368912</td>
+      <td>1436.065023</td>
+      <td>1788.045139</td>
+      <td>1733.746204</td>
+      <td>1242.606624</td>
+      <td>k1</td>
+    </tr>
+    <tr>
+      <th>2023-06-26_19-00-05_bm02_k1ivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv</th>
+      <td>20724.839634</td>
+      <td>10159.438676</td>
+      <td>6694.307894</td>
+      <td>5773.045308</td>
+      <td>5343.981806</td>
+      <td>3339.687841</td>
+      <td>2991.561963</td>
+      <td>4323.656226</td>
+      <td>4578.547308</td>
+      <td>1474.808605</td>
+      <td>...</td>
+      <td>1333.393782</td>
+      <td>2728.749019</td>
+      <td>1169.581962</td>
+      <td>2477.143336</td>
+      <td>4004.994848</td>
+      <td>2404.780803</td>
+      <td>3424.785899</td>
+      <td>4033.969786</td>
+      <td>4708.006492</td>
+      <td>k1</td>
+    </tr>
+    <tr>
+      <th>2023-06-27_10-47-10_bm04_k1ivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv</th>
+      <td>766.578810</td>
+      <td>5014.383998</td>
+      <td>2207.256298</td>
+      <td>1714.152071</td>
+      <td>574.814660</td>
+      <td>541.741661</td>
+      <td>554.249522</td>
+      <td>614.487656</td>
+      <td>553.554121</td>
+      <td>541.568858</td>
+      <td>...</td>
+      <td>528.902945</td>
+      <td>550.459444</td>
+      <td>640.761410</td>
+      <td>1896.750790</td>
+      <td>1001.235900</td>
+      <td>1147.860654</td>
+      <td>1184.954039</td>
+      <td>1046.978826</td>
+      <td>828.924569</td>
+      <td>k1</td>
+    </tr>
+    <tr>
+      <th>2023-07-08_14-42-24_bf02_k1ivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv</th>
+      <td>9507.050556</td>
+      <td>7019.303165</td>
+      <td>5778.522216</td>
+      <td>5275.720184</td>
+      <td>4803.188901</td>
+      <td>5795.852212</td>
+      <td>5318.264303</td>
+      <td>5055.511504</td>
+      <td>5197.850531</td>
+      <td>6794.038094</td>
+      <td>...</td>
+      <td>4213.263493</td>
+      <td>3866.977180</td>
+      <td>5637.361996</td>
+      <td>3318.199933</td>
+      <td>2946.646448</td>
+      <td>5080.904185</td>
+      <td>2982.917208</td>
+      <td>4375.070269</td>
+      <td>3004.641604</td>
+      <td>k1</td>
+    </tr>
+    <tr>
+      <th>2023-07-08_15-47-29_bm01_k1ivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv</th>
+      <td>11255.983932</td>
+      <td>9795.427056</td>
+      <td>6615.669842</td>
+      <td>5953.572622</td>
+      <td>3314.193903</td>
+      <td>1333.949901</td>
+      <td>3547.871827</td>
+      <td>1639.513297</td>
+      <td>3787.331547</td>
+      <td>3724.773400</td>
+      <td>...</td>
+      <td>4079.358745</td>
+      <td>2304.345840</td>
+      <td>1021.318289</td>
+      <td>987.000722</td>
+      <td>818.526623</td>
+      <td>749.524446</td>
+      <td>924.008889</td>
+      <td>3083.640126</td>
+      <td>2089.798243</td>
+      <td>k1</td>
+    </tr>
+    <tr>
+      <th>2023-06-15_17-16-18_bm01_k5ivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv</th>
+      <td>1016.139535</td>
+      <td>5548.329124</td>
+      <td>11221.154090</td>
+      <td>15577.294241</td>
+      <td>15856.303259</td>
+      <td>10550.382890</td>
+      <td>9436.532736</td>
+      <td>5250.601216</td>
+      <td>3021.957967</td>
+      <td>2782.403189</td>
+      <td>...</td>
+      <td>1332.521919</td>
+      <td>5352.297650</td>
+      <td>1572.111102</td>
+      <td>982.383516</td>
+      <td>938.435036</td>
+      <td>1005.328986</td>
+      <td>1043.020094</td>
+      <td>1489.830168</td>
+      <td>3975.452915</td>
+      <td>k5</td>
+    </tr>
+    <tr>
+      <th>2023-06-26_16-15-58_bf02_k5ivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv</th>
+      <td>14258.394307</td>
+      <td>12114.657011</td>
+      <td>9102.119472</td>
+      <td>11990.647150</td>
+      <td>9855.363540</td>
+      <td>7376.524999</td>
+      <td>7655.121246</td>
+      <td>7192.705189</td>
+      <td>5686.557703</td>
+      <td>4683.214772</td>
+      <td>...</td>
+      <td>2190.526606</td>
+      <td>3091.146136</td>
+      <td>1633.545223</td>
+      <td>1219.133549</td>
+      <td>2513.966949</td>
+      <td>3797.668741</td>
+      <td>5044.993972</td>
+      <td>822.887972</td>
+      <td>1084.662132</td>
+      <td>k5</td>
+    </tr>
+    <tr>
+      <th>2023-07-03_20-27-25_bf03_k5ivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv</th>
+      <td>18483.803942</td>
+      <td>19748.594069</td>
+      <td>13540.708424</td>
+      <td>13838.397015</td>
+      <td>13980.386907</td>
+      <td>12579.660954</td>
+      <td>11937.358990</td>
+      <td>10741.868081</td>
+      <td>10516.169960</td>
+      <td>6999.421026</td>
+      <td>...</td>
+      <td>4401.776608</td>
+      <td>6663.845579</td>
+      <td>4579.081683</td>
+      <td>6278.084118</td>
+      <td>4725.643728</td>
+      <td>2439.890701</td>
+      <td>2259.074760</td>
+      <td>1876.957914</td>
+      <td>1750.146493</td>
+      <td>k5</td>
+    </tr>
+    <tr>
+      <th>2023-07-08_16-19-27_bm02_k5ivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv</th>
+      <td>16611.210569</td>
+      <td>19548.541040</td>
+      <td>19658.044198</td>
+      <td>17814.095713</td>
+      <td>15492.194395</td>
+      <td>10945.722452</td>
+      <td>7707.970097</td>
+      <td>6223.306978</td>
+      <td>4704.248748</td>
+      <td>1756.926066</td>
+      <td>...</td>
+      <td>2511.241484</td>
+      <td>4233.279650</td>
+      <td>4207.197429</td>
+      <td>2686.937615</td>
+      <td>3080.327208</td>
+      <td>2562.255531</td>
+      <td>2879.748576</td>
+      <td>4858.737555</td>
+      <td>3996.036978</td>
+      <td>k5</td>
+    </tr>
+    <tr>
+      <th>2023-07-14_16-25-47_bf01_k5ivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv</th>
+      <td>16263.232968</td>
+      <td>17443.119375</td>
+      <td>22803.236161</td>
+      <td>12280.329026</td>
+      <td>11375.300372</td>
+      <td>9175.033094</td>
+      <td>7663.504950</td>
+      <td>6023.044032</td>
+      <td>3156.044494</td>
+      <td>5384.563438</td>
+      <td>...</td>
+      <td>4284.413765</td>
+      <td>4759.089020</td>
+      <td>3107.118211</td>
+      <td>2045.449778</td>
+      <td>1671.686457</td>
+      <td>3081.160518</td>
+      <td>2499.152466</td>
+      <td>4010.878733</td>
+      <td>3482.302331</td>
+      <td>k5</td>
+    </tr>
+    <tr>
+      <th>2023-07-18_19-35-14_bm03_k5ivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv</th>
+      <td>3141.386064</td>
+      <td>8431.135309</td>
+      <td>11445.512440</td>
+      <td>15631.544467</td>
+      <td>13700.836614</td>
+      <td>11320.928608</td>
+      <td>10849.105647</td>
+      <td>9040.392641</td>
+      <td>6958.009582</td>
+      <td>9139.713930</td>
+      <td>...</td>
+      <td>1920.523942</td>
+      <td>2250.660670</td>
+      <td>3657.893139</td>
+      <td>1732.058743</td>
+      <td>1268.457942</td>
+      <td>1951.751149</td>
+      <td>979.272468</td>
+      <td>891.367322</td>
+      <td>1445.491110</td>
+      <td>k5</td>
+    </tr>
+    <tr>
+      <th>2023-05-15_16-47-52_bf03_k10ivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv</th>
+      <td>4540.862776</td>
+      <td>5761.342404</td>
+      <td>5972.096308</td>
+      <td>9212.996149</td>
+      <td>11265.014433</td>
+      <td>12343.530581</td>
+      <td>13109.885729</td>
+      <td>14265.232545</td>
+      <td>12622.386646</td>
+      <td>14532.162772</td>
+      <td>...</td>
+      <td>9880.460142</td>
+      <td>9848.548262</td>
+      <td>8212.565308</td>
+      <td>6903.801921</td>
+      <td>5536.163377</td>
+      <td>4185.685251</td>
+      <td>5688.052096</td>
+      <td>6323.492953</td>
+      <td>4504.421440</td>
+      <td>k10</td>
+    </tr>
+    <tr>
+      <th>2023-05-15_18-18-22_bf04_k10ivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv</th>
+      <td>1384.384759</td>
+      <td>1561.798339</td>
+      <td>5305.881105</td>
+      <td>6953.295808</td>
+      <td>11953.262476</td>
+      <td>15763.644870</td>
+      <td>17379.785409</td>
+      <td>16629.811314</td>
+      <td>16709.346509</td>
+      <td>15048.740676</td>
+      <td>...</td>
+      <td>7703.680453</td>
+      <td>5275.320585</td>
+      <td>7444.790561</td>
+      <td>5507.504817</td>
+      <td>1817.069497</td>
+      <td>1802.525010</td>
+      <td>2997.591737</td>
+      <td>5776.201930</td>
+      <td>2934.882903</td>
+      <td>k10</td>
+    </tr>
+    <tr>
+      <th>2023-05-25_14-30-54_bm02_k10ivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv</th>
+      <td>1667.979021</td>
+      <td>1379.497290</td>
+      <td>1663.627196</td>
+      <td>3107.784112</td>
+      <td>4318.061746</td>
+      <td>7187.792082</td>
+      <td>9062.464735</td>
+      <td>10455.246228</td>
+      <td>14283.478704</td>
+      <td>11130.539709</td>
+      <td>...</td>
+      <td>13852.193039</td>
+      <td>14019.179637</td>
+      <td>11930.154609</td>
+      <td>6806.428533</td>
+      <td>3768.340484</td>
+      <td>6354.961249</td>
+      <td>5443.839714</td>
+      <td>2999.410224</td>
+      <td>1938.707364</td>
+      <td>k10</td>
+    </tr>
+    <tr>
+      <th>2023-05-31_17-08-06_bf01_k10ivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv</th>
+      <td>11082.830746</td>
+      <td>15343.322621</td>
+      <td>18279.907887</td>
+      <td>17224.223559</td>
+      <td>23570.051169</td>
+      <td>18951.071018</td>
+      <td>16536.410407</td>
+      <td>14840.127977</td>
+      <td>15261.406690</td>
+      <td>16009.304633</td>
+      <td>...</td>
+      <td>11787.589473</td>
+      <td>10134.122145</td>
+      <td>8567.505371</td>
+      <td>10117.137028</td>
+      <td>8937.780320</td>
+      <td>6922.975225</td>
+      <td>5773.762636</td>
+      <td>5015.415782</td>
+      <td>7104.784164</td>
+      <td>k10</td>
+    </tr>
+    <tr>
+      <th>2023-07-13_15-45-26_bm03_k10ivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv</th>
+      <td>3318.773423</td>
+      <td>4584.927267</td>
+      <td>6942.028511</td>
+      <td>10606.361780</td>
+      <td>13405.089466</td>
+      <td>14297.165685</td>
+      <td>19119.371373</td>
+      <td>18978.367552</td>
+      <td>17304.071745</td>
+      <td>11322.589042</td>
+      <td>...</td>
+      <td>8377.923276</td>
+      <td>4126.843001</td>
+      <td>7022.605035</td>
+      <td>3799.446167</td>
+      <td>6055.594219</td>
+      <td>3491.997983</td>
+      <td>1980.469115</td>
+      <td>1970.568348</td>
+      <td>1237.739002</td>
+      <td>k10</td>
+    </tr>
+    <tr>
+      <th>2023-07-14_13-56-09_bm01_k10ivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv</th>
+      <td>1094.347692</td>
+      <td>821.769350</td>
+      <td>947.428873</td>
+      <td>995.894179</td>
+      <td>878.307377</td>
+      <td>850.194499</td>
+      <td>800.261095</td>
+      <td>2530.965888</td>
+      <td>3584.427386</td>
+      <td>6113.109571</td>
+      <td>...</td>
+      <td>13742.433401</td>
+      <td>9811.396039</td>
+      <td>15422.909725</td>
+      <td>16949.204517</td>
+      <td>9715.071936</td>
+      <td>8837.586482</td>
+      <td>8954.368748</td>
+      <td>12788.630333</td>
+      <td>10803.153588</td>
+      <td>k10</td>
+    </tr>
+    <tr>
+      <th>2023-07-18_18-19-50_bm04_k10ivDLC_resnet101_DevRats2Jul21shuffle1_500000.csv</th>
+      <td>977.064278</td>
+      <td>792.373003</td>
+      <td>2147.504600</td>
+      <td>4129.242798</td>
+      <td>5808.968030</td>
+      <td>7137.626090</td>
+      <td>11072.575732</td>
+      <td>9573.996864</td>
+      <td>10198.357200</td>
+      <td>11214.199924</td>
+      <td>...</td>
+      <td>15963.185520</td>
+      <td>12328.413572</td>
+      <td>11840.693869</td>
+      <td>10454.337927</td>
+      <td>9633.147720</td>
+      <td>8050.751995</td>
+      <td>3756.558807</td>
+      <td>3974.695994</td>
+      <td>4693.074698</td>
+      <td>k10</td>
+    </tr>
+  </tbody>
+</table>
+<p>26 rows × 21 columns</p>
+</div></div><img alt="../_images/386a06529ba2abad61a5376c45c2f73027f38da2a93fcf82630669dc8964272f.png" src="../_images/386a06529ba2abad61a5376c45c2f73027f38da2a93fcf82630669dc8964272f.png" />
+<img alt="../_images/c8a8c4992bef3d9b28f08bdce8e3a6ec1b7c7725fd63dba1bc2ef31487333a33.png" src="../_images/c8a8c4992bef3d9b28f08bdce8e3a6ec1b7c7725fd63dba1bc2ef31487333a33.png" />
+<img alt="../_images/386a06529ba2abad61a5376c45c2f73027f38da2a93fcf82630669dc8964272f.png" src="../_images/386a06529ba2abad61a5376c45c2f73027f38da2a93fcf82630669dc8964272f.png" />
+</div>
+</div>
+</section>
+<section id="using-keypoint-travel-in-animals-for-embedding-and-classification">
+<h2>7.2 Using keypoint travel in animals for embedding and classification<a class="headerlink" href="#using-keypoint-travel-in-animals-for-embedding-and-classification" title="Permalink to this heading"></a></h2>
+<p>The KeypointTravel class has many of the same attributes and use cases as pose segmentation data object classes (ModuleUsage and ModuleTransitions), and thus we can use the same embedding, classification, and regression functions as we do for pose segmentation data.
+It is worth noting that travel of a single keypoint only has sufficient dimensionality for some methods (e.g., PCA) if time binning is applied, otherwise it is a point value rather than a time series.
+We can start by looking at embedding the data with PCA or LDA.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pca_emb</span> <span class="o">=</span> <span class="n">analyze</span><span class="o">.</span><span class="n">embed</span><span class="p">(</span><span class="n">kp_travel</span><span class="p">,</span><span class="n">method</span><span class="o">=</span><span class="s2">&quot;pca&quot;</span><span class="p">)</span>
+<span class="n">plot</span><span class="o">.</span><span class="n">plot_embeddings</span><span class="p">(</span><span class="n">kp_travel</span><span class="p">,</span><span class="n">pca_emb</span><span class="p">)</span>
+<span class="n">lda_emb</span> <span class="o">=</span> <span class="n">analyze</span><span class="o">.</span><span class="n">embed</span><span class="p">(</span><span class="n">kp_travel</span><span class="p">,</span><span class="n">method</span><span class="o">=</span><span class="s2">&quot;lda&quot;</span><span class="p">)</span>
+<span class="n">plot</span><span class="o">.</span><span class="n">plot_embeddings</span><span class="p">(</span><span class="n">kp_travel</span><span class="p">,</span><span class="n">lda_emb</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Ellipse only drawn for embeddings_object of class LDA, not &lt;class &#39;sklearn.decomposition._pca.PCA&#39;&gt;
+</pre></div>
+</div>
+<img alt="../_images/7f4f7c35e664d4aac79b371e737c670ad55c87026ba71d05e08260fba9100087.png" src="../_images/7f4f7c35e664d4aac79b371e737c670ad55c87026ba71d05e08260fba9100087.png" />
+<img alt="../_images/30f8933b91af6eb6359e6d83781500963a110c1e9a61bc857558b36336238762.png" src="../_images/30f8933b91af6eb6359e6d83781500963a110c1e9a61bc857558b36336238762.png" />
+<img alt="../_images/7f4f7c35e664d4aac79b371e737c670ad55c87026ba71d05e08260fba9100087.png" src="../_images/7f4f7c35e664d4aac79b371e737c670ad55c87026ba71d05e08260fba9100087.png" />
+</div>
+</div>
+<p>Next, we can look at classification with logistic regression - here shown with training a classifier on the full dataset and leave-one-out cross-validation to test performance on a subset of samples.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">clf</span> <span class="o">=</span> <span class="n">analyze</span><span class="o">.</span><span class="n">classify</span><span class="p">(</span><span class="n">kp_travel</span><span class="p">,</span><span class="n">method</span><span class="o">=</span><span class="s2">&quot;LogisticRegression&quot;</span><span class="p">)</span>
+<span class="n">accuracy</span><span class="p">,</span> <span class="n">conf_mat</span> <span class="o">=</span> <span class="n">analyze</span><span class="o">.</span><span class="n">loocv</span><span class="p">(</span><span class="n">kp_travel</span><span class="p">,</span><span class="n">method</span><span class="o">=</span><span class="s2">&quot;LogisticRegression&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span><span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">conf_mat</span><span class="p">,</span><span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;Greens&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span><span class="n">labels</span><span class="o">=</span><span class="n">kp_travel</span><span class="o">.</span><span class="n">group_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">yticks</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span><span class="n">labels</span><span class="o">=</span><span class="n">kp_travel</span><span class="o">.</span><span class="n">group_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Confusion Matrix&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/anaconda3/envs/mariposa/lib/python3.8/site-packages/sklearn/linear_model/_logistic.py:460: ConvergenceWarning: lbfgs failed to converge (status=1):
+STOP: TOTAL NO. of ITERATIONS REACHED LIMIT.
+
+Increase the number of iterations (max_iter) or scale the data as shown in:
+    https://scikit-learn.org/stable/modules/preprocessing.html
+Please also refer to the documentation for alternative solver options:
+    https://scikit-learn.org/stable/modules/linear_model.html#logistic-regression
+  n_iter_i = _check_optimize_result(
+/opt/anaconda3/envs/mariposa/lib/python3.8/site-packages/sklearn/linear_model/_logistic.py:460: ConvergenceWarning: lbfgs failed to converge (status=1):
+STOP: TOTAL NO. of ITERATIONS REACHED LIMIT.
+
+Increase the number of iterations (max_iter) or scale the data as shown in:
+    https://scikit-learn.org/stable/modules/preprocessing.html
+Please also refer to the documentation for alternative solver options:
+    https://scikit-learn.org/stable/modules/linear_model.html#logistic-regression
+  n_iter_i = _check_optimize_result(
+/opt/anaconda3/envs/mariposa/lib/python3.8/site-packages/sklearn/linear_model/_logistic.py:460: ConvergenceWarning: lbfgs failed to converge (status=1):
+STOP: TOTAL NO. of ITERATIONS REACHED LIMIT.
+
+Increase the number of iterations (max_iter) or scale the data as shown in:
+    https://scikit-learn.org/stable/modules/preprocessing.html
+Please also refer to the documentation for alternative solver options:
+    https://scikit-learn.org/stable/modules/linear_model.html#logistic-regression
+  n_iter_i = _check_optimize_result(
+/opt/anaconda3/envs/mariposa/lib/python3.8/site-packages/sklearn/linear_model/_logistic.py:460: ConvergenceWarning: lbfgs failed to converge (status=1):
+STOP: TOTAL NO. of ITERATIONS REACHED LIMIT.
+
+Increase the number of iterations (max_iter) or scale the data as shown in:
+    https://scikit-learn.org/stable/modules/preprocessing.html
+Please also refer to the documentation for alternative solver options:
+    https://scikit-learn.org/stable/modules/linear_model.html#logistic-regression
+  n_iter_i = _check_optimize_result(
+/opt/anaconda3/envs/mariposa/lib/python3.8/site-packages/sklearn/linear_model/_logistic.py:460: ConvergenceWarning: lbfgs failed to converge (status=1):
+STOP: TOTAL NO. of ITERATIONS REACHED LIMIT.
+
+Increase the number of iterations (max_iter) or scale the data as shown in:
+    https://scikit-learn.org/stable/modules/preprocessing.html
+Please also refer to the documentation for alternative solver options:
+    https://scikit-learn.org/stable/modules/linear_model.html#logistic-regression
+  n_iter_i = _check_optimize_result(
+/opt/anaconda3/envs/mariposa/lib/python3.8/site-packages/sklearn/linear_model/_logistic.py:460: ConvergenceWarning: lbfgs failed to converge (status=1):
+STOP: TOTAL NO. of ITERATIONS REACHED LIMIT.
+
+Increase the number of iterations (max_iter) or scale the data as shown in:
+    https://scikit-learn.org/stable/modules/preprocessing.html
+Please also refer to the documentation for alternative solver options:
+    https://scikit-learn.org/stable/modules/linear_model.html#logistic-regression
+  n_iter_i = _check_optimize_result(
+/opt/anaconda3/envs/mariposa/lib/python3.8/site-packages/sklearn/linear_model/_logistic.py:460: ConvergenceWarning: lbfgs failed to converge (status=1):
+STOP: TOTAL NO. of ITERATIONS REACHED LIMIT.
+
+Increase the number of iterations (max_iter) or scale the data as shown in:
+    https://scikit-learn.org/stable/modules/preprocessing.html
+Please also refer to the documentation for alternative solver options:
+    https://scikit-learn.org/stable/modules/linear_model.html#logistic-regression
+  n_iter_i = _check_optimize_result(
+/opt/anaconda3/envs/mariposa/lib/python3.8/site-packages/sklearn/linear_model/_logistic.py:460: ConvergenceWarning: lbfgs failed to converge (status=1):
+STOP: TOTAL NO. of ITERATIONS REACHED LIMIT.
+
+Increase the number of iterations (max_iter) or scale the data as shown in:
+    https://scikit-learn.org/stable/modules/preprocessing.html
+Please also refer to the documentation for alternative solver options:
+    https://scikit-learn.org/stable/modules/linear_model.html#logistic-regression
+  n_iter_i = _check_optimize_result(
+/opt/anaconda3/envs/mariposa/lib/python3.8/site-packages/sklearn/linear_model/_logistic.py:460: ConvergenceWarning: lbfgs failed to converge (status=1):
+STOP: TOTAL NO. of ITERATIONS REACHED LIMIT.
+
+Increase the number of iterations (max_iter) or scale the data as shown in:
+    https://scikit-learn.org/stable/modules/preprocessing.html
+Please also refer to the documentation for alternative solver options:
+    https://scikit-learn.org/stable/modules/linear_model.html#logistic-regression
+  n_iter_i = _check_optimize_result(
+/opt/anaconda3/envs/mariposa/lib/python3.8/site-packages/sklearn/linear_model/_logistic.py:460: ConvergenceWarning: lbfgs failed to converge (status=1):
+STOP: TOTAL NO. of ITERATIONS REACHED LIMIT.
+
+Increase the number of iterations (max_iter) or scale the data as shown in:
+    https://scikit-learn.org/stable/modules/preprocessing.html
+Please also refer to the documentation for alternative solver options:
+    https://scikit-learn.org/stable/modules/linear_model.html#logistic-regression
+  n_iter_i = _check_optimize_result(
+/opt/anaconda3/envs/mariposa/lib/python3.8/site-packages/sklearn/linear_model/_logistic.py:460: ConvergenceWarning: lbfgs failed to converge (status=1):
+STOP: TOTAL NO. of ITERATIONS REACHED LIMIT.
+
+Increase the number of iterations (max_iter) or scale the data as shown in:
+    https://scikit-learn.org/stable/modules/preprocessing.html
+Please also refer to the documentation for alternative solver options:
+    https://scikit-learn.org/stable/modules/linear_model.html#logistic-regression
+  n_iter_i = _check_optimize_result(
+/opt/anaconda3/envs/mariposa/lib/python3.8/site-packages/sklearn/linear_model/_logistic.py:460: ConvergenceWarning: lbfgs failed to converge (status=1):
+STOP: TOTAL NO. of ITERATIONS REACHED LIMIT.
+
+Increase the number of iterations (max_iter) or scale the data as shown in:
+    https://scikit-learn.org/stable/modules/preprocessing.html
+Please also refer to the documentation for alternative solver options:
+    https://scikit-learn.org/stable/modules/linear_model.html#logistic-regression
+  n_iter_i = _check_optimize_result(
+/opt/anaconda3/envs/mariposa/lib/python3.8/site-packages/sklearn/linear_model/_logistic.py:460: ConvergenceWarning: lbfgs failed to converge (status=1):
+STOP: TOTAL NO. of ITERATIONS REACHED LIMIT.
+
+Increase the number of iterations (max_iter) or scale the data as shown in:
+    https://scikit-learn.org/stable/modules/preprocessing.html
+Please also refer to the documentation for alternative solver options:
+    https://scikit-learn.org/stable/modules/linear_model.html#logistic-regression
+  n_iter_i = _check_optimize_result(
+/opt/anaconda3/envs/mariposa/lib/python3.8/site-packages/sklearn/linear_model/_logistic.py:460: ConvergenceWarning: lbfgs failed to converge (status=1):
+STOP: TOTAL NO. of ITERATIONS REACHED LIMIT.
+
+Increase the number of iterations (max_iter) or scale the data as shown in:
+    https://scikit-learn.org/stable/modules/preprocessing.html
+Please also refer to the documentation for alternative solver options:
+    https://scikit-learn.org/stable/modules/linear_model.html#logistic-regression
+  n_iter_i = _check_optimize_result(
+/opt/anaconda3/envs/mariposa/lib/python3.8/site-packages/sklearn/linear_model/_logistic.py:460: ConvergenceWarning: lbfgs failed to converge (status=1):
+STOP: TOTAL NO. of ITERATIONS REACHED LIMIT.
+
+Increase the number of iterations (max_iter) or scale the data as shown in:
+    https://scikit-learn.org/stable/modules/preprocessing.html
+Please also refer to the documentation for alternative solver options:
+    https://scikit-learn.org/stable/modules/linear_model.html#logistic-regression
+  n_iter_i = _check_optimize_result(
+/opt/anaconda3/envs/mariposa/lib/python3.8/site-packages/sklearn/linear_model/_logistic.py:460: ConvergenceWarning: lbfgs failed to converge (status=1):
+STOP: TOTAL NO. of ITERATIONS REACHED LIMIT.
+
+Increase the number of iterations (max_iter) or scale the data as shown in:
+    https://scikit-learn.org/stable/modules/preprocessing.html
+Please also refer to the documentation for alternative solver options:
+    https://scikit-learn.org/stable/modules/linear_model.html#logistic-regression
+  n_iter_i = _check_optimize_result(
+/opt/anaconda3/envs/mariposa/lib/python3.8/site-packages/sklearn/linear_model/_logistic.py:460: ConvergenceWarning: lbfgs failed to converge (status=1):
+STOP: TOTAL NO. of ITERATIONS REACHED LIMIT.
+
+Increase the number of iterations (max_iter) or scale the data as shown in:
+    https://scikit-learn.org/stable/modules/preprocessing.html
+Please also refer to the documentation for alternative solver options:
+    https://scikit-learn.org/stable/modules/linear_model.html#logistic-regression
+  n_iter_i = _check_optimize_result(
+/opt/anaconda3/envs/mariposa/lib/python3.8/site-packages/sklearn/linear_model/_logistic.py:460: ConvergenceWarning: lbfgs failed to converge (status=1):
+STOP: TOTAL NO. of ITERATIONS REACHED LIMIT.
+
+Increase the number of iterations (max_iter) or scale the data as shown in:
+    https://scikit-learn.org/stable/modules/preprocessing.html
+Please also refer to the documentation for alternative solver options:
+    https://scikit-learn.org/stable/modules/linear_model.html#logistic-regression
+  n_iter_i = _check_optimize_result(
+/opt/anaconda3/envs/mariposa/lib/python3.8/site-packages/sklearn/linear_model/_logistic.py:460: ConvergenceWarning: lbfgs failed to converge (status=1):
+STOP: TOTAL NO. of ITERATIONS REACHED LIMIT.
+
+Increase the number of iterations (max_iter) or scale the data as shown in:
+    https://scikit-learn.org/stable/modules/preprocessing.html
+Please also refer to the documentation for alternative solver options:
+    https://scikit-learn.org/stable/modules/linear_model.html#logistic-regression
+  n_iter_i = _check_optimize_result(
+/opt/anaconda3/envs/mariposa/lib/python3.8/site-packages/sklearn/linear_model/_logistic.py:460: ConvergenceWarning: lbfgs failed to converge (status=1):
+STOP: TOTAL NO. of ITERATIONS REACHED LIMIT.
+
+Increase the number of iterations (max_iter) or scale the data as shown in:
+    https://scikit-learn.org/stable/modules/preprocessing.html
+Please also refer to the documentation for alternative solver options:
+    https://scikit-learn.org/stable/modules/linear_model.html#logistic-regression
+  n_iter_i = _check_optimize_result(
+/opt/anaconda3/envs/mariposa/lib/python3.8/site-packages/sklearn/linear_model/_logistic.py:460: ConvergenceWarning: lbfgs failed to converge (status=1):
+STOP: TOTAL NO. of ITERATIONS REACHED LIMIT.
+
+Increase the number of iterations (max_iter) or scale the data as shown in:
+    https://scikit-learn.org/stable/modules/preprocessing.html
+Please also refer to the documentation for alternative solver options:
+    https://scikit-learn.org/stable/modules/linear_model.html#logistic-regression
+  n_iter_i = _check_optimize_result(
+/opt/anaconda3/envs/mariposa/lib/python3.8/site-packages/sklearn/linear_model/_logistic.py:460: ConvergenceWarning: lbfgs failed to converge (status=1):
+STOP: TOTAL NO. of ITERATIONS REACHED LIMIT.
+
+Increase the number of iterations (max_iter) or scale the data as shown in:
+    https://scikit-learn.org/stable/modules/preprocessing.html
+Please also refer to the documentation for alternative solver options:
+    https://scikit-learn.org/stable/modules/linear_model.html#logistic-regression
+  n_iter_i = _check_optimize_result(
+/opt/anaconda3/envs/mariposa/lib/python3.8/site-packages/sklearn/linear_model/_logistic.py:460: ConvergenceWarning: lbfgs failed to converge (status=1):
+STOP: TOTAL NO. of ITERATIONS REACHED LIMIT.
+
+Increase the number of iterations (max_iter) or scale the data as shown in:
+    https://scikit-learn.org/stable/modules/preprocessing.html
+Please also refer to the documentation for alternative solver options:
+    https://scikit-learn.org/stable/modules/linear_model.html#logistic-regression
+  n_iter_i = _check_optimize_result(
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/anaconda3/envs/mariposa/lib/python3.8/site-packages/sklearn/linear_model/_logistic.py:460: ConvergenceWarning: lbfgs failed to converge (status=1):
+STOP: TOTAL NO. of ITERATIONS REACHED LIMIT.
+
+Increase the number of iterations (max_iter) or scale the data as shown in:
+    https://scikit-learn.org/stable/modules/preprocessing.html
+Please also refer to the documentation for alternative solver options:
+    https://scikit-learn.org/stable/modules/linear_model.html#logistic-regression
+  n_iter_i = _check_optimize_result(
+/opt/anaconda3/envs/mariposa/lib/python3.8/site-packages/sklearn/linear_model/_logistic.py:460: ConvergenceWarning: lbfgs failed to converge (status=1):
+STOP: TOTAL NO. of ITERATIONS REACHED LIMIT.
+
+Increase the number of iterations (max_iter) or scale the data as shown in:
+    https://scikit-learn.org/stable/modules/preprocessing.html
+Please also refer to the documentation for alternative solver options:
+    https://scikit-learn.org/stable/modules/linear_model.html#logistic-regression
+  n_iter_i = _check_optimize_result(
+/opt/anaconda3/envs/mariposa/lib/python3.8/site-packages/sklearn/linear_model/_logistic.py:460: ConvergenceWarning: lbfgs failed to converge (status=1):
+STOP: TOTAL NO. of ITERATIONS REACHED LIMIT.
+
+Increase the number of iterations (max_iter) or scale the data as shown in:
+    https://scikit-learn.org/stable/modules/preprocessing.html
+Please also refer to the documentation for alternative solver options:
+    https://scikit-learn.org/stable/modules/linear_model.html#logistic-regression
+  n_iter_i = _check_optimize_result(
+/opt/anaconda3/envs/mariposa/lib/python3.8/site-packages/sklearn/linear_model/_logistic.py:460: ConvergenceWarning: lbfgs failed to converge (status=1):
+STOP: TOTAL NO. of ITERATIONS REACHED LIMIT.
+
+Increase the number of iterations (max_iter) or scale the data as shown in:
+    https://scikit-learn.org/stable/modules/preprocessing.html
+Please also refer to the documentation for alternative solver options:
+    https://scikit-learn.org/stable/modules/linear_model.html#logistic-regression
+  n_iter_i = _check_optimize_result(
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.colorbar.Colorbar at 0x7fcfca7bbf70&gt;
+</pre></div>
+</div>
+<img alt="../_images/19c1dd9a9f83478cb3b154fba9a4a62d9f9fd34d0886866c4db28518e3c35aa9.png" src="../_images/19c1dd9a9f83478cb3b154fba9a4a62d9f9fd34d0886866c4db28518e3c35aa9.png" />
+</div>
+</div>
+<p>And now we can take a look at using regression on a KeypointTravel class object.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Training regression model and doing LOOCV</span>
+<span class="n">dose_dict</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;sal&quot;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span><span class="s2">&quot;k1&quot;</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span><span class="s2">&quot;k5&quot;</span><span class="p">:</span><span class="mi">5</span><span class="p">,</span><span class="s2">&quot;k10&quot;</span><span class="p">:</span><span class="mi">10</span><span class="p">}</span>
+<span class="n">reg</span><span class="p">,</span> <span class="n">dose_labels</span> <span class="o">=</span> <span class="n">analyze</span><span class="o">.</span><span class="n">regress</span><span class="p">(</span><span class="n">kp_travel</span><span class="p">,</span><span class="n">dose_dict</span><span class="p">)</span>
+<span class="n">y_preds</span><span class="p">,</span> <span class="n">sq_err</span> <span class="o">=</span> <span class="n">analyze</span><span class="o">.</span><span class="n">loocv_regression</span><span class="p">(</span><span class="n">kp_travel</span><span class="p">,</span><span class="n">dose_dict</span><span class="p">)</span>
+
+<span class="c1"># Plotting results for held-out samples</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span><span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
+<span class="n">cmap</span> <span class="o">=</span> <span class="s2">&quot;viridis_r&quot;</span>
+<span class="n">cmap</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">get_cmap</span><span class="p">(</span><span class="n">cmap</span><span class="p">)</span>
+<span class="n">colors</span> <span class="o">=</span> <span class="p">[</span><span class="n">cmap</span><span class="p">([</span><span class="n">i</span><span class="o">/</span><span class="mi">4</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">)]</span>
+<span class="k">for</span> <span class="n">d</span><span class="p">,</span><span class="n">dose</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">dose_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">dose_dict</span><span class="p">[</span><span class="n">dose</span><span class="p">]</span>
+    <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">kp_travel</span><span class="o">.</span><span class="n">group_labels</span><span class="p">)</span><span class="o">==</span><span class="n">kp_travel</span><span class="o">.</span><span class="n">group_dict</span><span class="p">[</span><span class="n">dose</span><span class="p">]</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">y_preds</span><span class="p">[</span><span class="n">mask</span><span class="p">])</span>
+    <span class="n">sd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">y_preds</span><span class="p">[</span><span class="n">mask</span><span class="p">])</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">errorbar</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">m</span><span class="p">,</span><span class="n">yerr</span><span class="o">=</span><span class="n">sd</span><span class="p">,</span><span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">,</span><span class="n">marker</span><span class="o">=</span><span class="s2">&quot;o&quot;</span><span class="p">,</span><span class="n">color</span><span class="o">=</span><span class="n">colors</span><span class="p">[</span><span class="n">d</span><span class="p">],</span><span class="n">capsize</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Real dose (mg/kg)&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Predicted dose (mg/kg)&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Text(0, 0.5, &#39;Predicted dose (mg/kg)&#39;)
+</pre></div>
+</div>
+<img alt="../_images/5e2680464b329eb1a417b3b2f5fc27351a5d8a6feacddf63e280f151f13f499b.png" src="../_images/5e2680464b329eb1a417b3b2f5fc27351a5d8a6feacddf63e280f151f13f499b.png" />
+</div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="Demo6-PoseSegmentation-Simulation.html" class="btn btn-neutral float-left" title="Demo 6 (PS): Simulating Pose Segmentation Data" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Demo8-PoseEstimation-OpenFace.html" class="btn btn-neutral float-right" title="Demo 8 (PE): Analyzing Keypoint Displacement and Action Units in human facial pose data from OpenFace" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Sedona Ewbank.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

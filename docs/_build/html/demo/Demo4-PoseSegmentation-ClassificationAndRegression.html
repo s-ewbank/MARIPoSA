@@ -56,6 +56,7 @@
 <li class="toctree-l1"><a class="reference internal" href="Demo5-PoseSegmentation-ManualScoring.html">Demo 5 (PS): Comparing Pose Modules to Manual Scoring Data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Demo6-PoseSegmentation-Simulation.html">Demo 6 (PS): Simulating Pose Segmentation Data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Demo7-PoseEstimation-KeypointTravel.html">Demo 7 (PE): Analyzing Keypoint Displacement in Pose Estimation Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Demo8-PoseEstimation-OpenFace.html">Demo 8 (PE): Analyzing Keypoint Displacement and Action Units in human facial pose data from OpenFace</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../metadata.html">Metadata</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../analyze.html">Analyze</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../plot.html">Plot</a></li>
@@ -242,19 +243,15 @@ Logistic regression LOOCV confusion matrix:
 </pre></div>
 </div>
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>LDA
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>MLP
+MLP
 </pre></div>
 </div>
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>NaiveBayes
 KNN
+RandomForest
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>RandomForest
-</pre></div>
-</div>
-<img alt="../_images/392b6b99ff324b98a4cb43a55748aebf83d73f0505c0cb1888359a239f7c2d56.png" src="../_images/392b6b99ff324b98a4cb43a55748aebf83d73f0505c0cb1888359a239f7c2d56.png" />
+<img alt="../_images/3e4a3a6d72da8be96e60a8692fdd37bbeb8c8b102168ca6a1635d5768139565f.png" src="../_images/3e4a3a6d72da8be96e60a8692fdd37bbeb8c8b102168ca6a1635d5768139565f.png" />
 </div>
 </div>
 </section>
@@ -386,13 +383,11 @@ Usage Lasso, alpha 0.1 RMSE: 1.75
 Usage Lasso, alpha 0.5 RMSE: 1.88
 Usage Ridge, alpha 0.1 RMSE: 1.53
 Usage Ridge, alpha 0.5 RMSE: 1.52
+Tx LinearRegression, alpha nan RMSE: 1.30
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Tx LinearRegression, alpha nan RMSE: 1.30
-Tx Lasso, alpha 0.1 RMSE: 1.45
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Tx Lasso, alpha 0.5 RMSE: 1.98
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Tx Lasso, alpha 0.1 RMSE: 1.45
+Tx Lasso, alpha 0.5 RMSE: 1.98
 Tx Ridge, alpha 0.1 RMSE: 1.30
 Tx Ridge, alpha 0.5 RMSE: 1.30
 </pre></div>
