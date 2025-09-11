@@ -572,13 +572,13 @@ class Application(tk.Tk):
                                ).place(x=int(self.width * 0.3), y=int(self.height * 0.44),width=menu_item_width,height=button_height)
         ttk.Button(self, text="Measure keypoint displacement (e.g., locomotion)",
                                 command=self.window5d_keypoint_displacement_menu,
+                                ).place(x=int(self.width * 0.5), y=int(self.height * 0.44),width=button_width,height=button_height)
+        ttk.Button(self, text="Embed and/or measure distance between groups",
+                                command=self.window5b_embed_distance_menu,
                                 ).place(x=int(self.width*0.5), y=int(self.height*0.51),width=button_width,height=button_height)
-        # ttk.Button(self, text="Embed and/or measure distance between groups",
-        #                         command=self.window5b_embed_distance_menu,
-        #                         ).place(x=int(self.width*0.5), y=int(self.height*0.58),width=button_width,height=button_height)
-        # ttk.Button(self, text="Classify and/or regress conditions",
-        #                         command=self.window5c_classify_regress_menu,
-        #                         ).place(x=int(self.width*0.5), y=int(self.height*0.65),width=button_width,height=button_height)
+        ttk.Button(self, text="Classify and/or regress conditions",
+                                command=self.window5c_classify_regress_menu,
+                                ).place(x=int(self.width*0.5), y=int(self.height*0.58),width=button_width,height=button_height)
 
         # ttk.Label(self, text="Model and simulate:",
         #                        ).place(x=int(self.width * 0.3), y=int(self.height * 0.75),width=menu_item_width,height=button_height)
@@ -637,12 +637,12 @@ class Application(tk.Tk):
         ttk.Button(self, text="Simulate module labels, usage, or transitions",
                                 command=self.window6a_simulate_menu,
                                 ).place(x=int(self.width*0.5), y=int(self.height*0.75),width=button_width,height=button_height)
-        ttk.Button(self, text="Fit curve to within-session pose data",
-                                command=self.window6b_fit_curve_menu,
-                                ).place(x=int(self.width*0.5), y=int(self.height*0.82),width=button_width,height=button_height)
-        ttk.Button(self, text="Get cumulative distribution function from real or simulated behavior",
-                                command=self.window6c_cdf_menu,
-                                ).place(x=int(self.width*0.5), y=int(self.height*0.89),width=button_width,height=button_height)
+        # ttk.Button(self, text="Fit curve to within-session pose data",
+        #                         command=self.window6b_fit_curve_menu,
+        #                         ).place(x=int(self.width*0.5), y=int(self.height*0.82),width=button_width,height=button_height)
+        # ttk.Button(self, text="Get cumulative distribution function from real or simulated behavior",
+        #                         command=self.window6c_cdf_menu,
+        #                         ).place(x=int(self.width*0.5), y=int(self.height*0.89),width=button_width,height=button_height)
 
         ttk.Button(self, text="◀◀ back to start", command=self.window1_start,
                                 ).place(x=int(self.width*0.3), y=int(self.height*0.9))
@@ -990,7 +990,12 @@ class Application(tk.Tk):
         self.create_sidebar_widget()
         self.create_header("Embed and Distance Menu",header_path="Viz & Analyze ▶ Embed")
 
-        ttk.Label(self, text="Path to module feature object (transitions or usage) .pickle:",
+        if self.config["data_type"]=="Pose segmentation":
+            pickle_text = "Path to module feature object (transitions or usage) .pickle:"
+        elif self.config["data_type"]=="Pose estimation":
+            pickle_text = "Path to keypoint travel object .pickle:"
+
+        ttk.Label(self, text=pickle_text,
                                ).place(x=int(self.width*0.3), y=int(self.height*0.25))
         self.pickle_path_5b = ttk.Entry(self)
         self.pickle_path_5b.insert(0, pickle_path_prefill)
@@ -1018,11 +1023,12 @@ class Application(tk.Tk):
         # Initial content
         self.window5b_embed_distance_menu_udpate()
 
-        # Bottom back buttons
-        ttk.Button(self, text="◀ back to analysis menu", command=self.window3b_PS_menu,
-                                ).place(x=int(self.width*0.3), y=int(self.height*0.83))
-        ttk.Button(self, text="◀◀ back to start", command=self.window1_start,
-                                ).place(x=int(self.width*0.3), y=int(self.height*0.9))
+        if self.config["data_type"]=="Pose segmentation":
+            destination = self.window3b_PS_menu
+        elif self.config["data_type"]=="Pose estimation":
+            destination = self.window3a_PE_menu
+        ttk.Button(self, text="◀ back to analysis menu", command=destination).place(x=int(self.width*0.3), y=int(self.height*0.83))
+        ttk.Button(self, text="◀◀ back to start", command=self.window1_start,).place(x=int(self.width*0.3), y=int(self.height*0.9))
 
     def window5b_embed_distance_menu_udpate(self):
 
@@ -1077,7 +1083,12 @@ class Application(tk.Tk):
         self.create_sidebar_widget()
         self.create_header("Classify and Embed Menu",header_path="Viz & Analyze ▶ Classify/Regress")
 
-        ttk.Label(self, text="Path to module feature object (transitions or usage) .pickle:",
+        if self.config["data_type"]=="Pose segmentation":
+            pickle_text = "Path to module feature object (transitions or usage) .pickle:"
+        elif self.config["data_type"]=="Pose estimation":
+            pickle_text = "Path to keypoint travel object .pickle:"
+
+        ttk.Label(self, text=pickle_text,
                                ).place(x=int(self.width*0.3), y=int(self.height*0.25))
         self.pickle_path_5c = ttk.Entry(self)
         self.pickle_path_5c.insert(0, pickle_path_prefill)
@@ -1101,11 +1112,12 @@ class Application(tk.Tk):
         self.frame_5c.place(x=0, y=0, relwidth=1, relheight=1)
         self.frame_5c.lower()
 
-        # Bottom back buttons
-        ttk.Button(self, text="◀ back to analysis menu", command=self.window3b_PS_menu,
-                                ).place(x=int(self.width*0.3), y=int(self.height*0.83))
-        ttk.Button(self, text="◀◀ back to start", command=self.window1_start,
-                                ).place(x=int(self.width*0.3), y=int(self.height*0.9))
+        if self.config["data_type"]=="Pose segmentation":
+            destination = self.window3b_PS_menu
+        elif self.config["data_type"]=="Pose estimation":
+            destination = self.window3a_PE_menu
+        ttk.Button(self, text="◀ back to analysis menu", command=destination).place(x=int(self.width*0.3), y=int(self.height*0.83))
+        ttk.Button(self, text="◀◀ back to start", command=self.window1_start,).place(x=int(self.width*0.3), y=int(self.height*0.9))
 
         # Initial content
         self.window5c_classify_regress_menu_update()
