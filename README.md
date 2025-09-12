@@ -2,7 +2,16 @@
 <img src="other/MARIPoSA_icon.png" alt="alt text" width="150" height="150">
 
 ### Description
-MARIPoSA (Manageable And Reproducible Integrated Pose Segmentation Analysis) is a platform for unified analysis of naturalistic animal and human behavior data in the native formats of a variety of open source tools. Computational pose analysis represents a promising future direction in both animal and human research; however, tools for investigation in this area generally output raw data in non-interchangeable formats, leaving researchers without a clear direction for interpreting their data and comparing with what exists in the literature. The purpose of MARIPoSA is to provide a resource for analyzing and visualizing naturalistic behavioral data while also promoting the creation of robust shared technical practices for the field at large.
+**What?** MARIPoSA (Manageable And Reproducible Integrated Pose Segmentation Analysis) is a platform for unified analysis of naturalistic animal and human behavior data in the native formats of a variety of open source tools. 
+
+**How?** Using the MARIPoSA toolkit, you can create a project with your pose estimation or segmentation data and subsequently define subgroups, implement behavioral summary statistics, classify or regress conditions, perform simulations, or execute other advanced analytical techniques. The toolkit is currently equipped for analysis of data output from the following softwares:
+* Variational Animal Motion Embedding (VAME)
+* Keypoint-MoSeq
+* DeepLabCut
+* SLEAP
+* OpenFace
+
+**Why?** Computational pose analysis represents a promising future direction in both animal and human research; however, tools for investigation in this area generally output raw data in non-interchangeable formats, leaving researchers without a clear direction for interpreting their data and comparing with what exists in the literature. The purpose of MARIPoSA is to provide a resource for analyzing and visualizing naturalistic behavioral data while also promoting the creation of robust shared technical practices for the field at large.
 
 ### Installation
 Installing the conda environment:
