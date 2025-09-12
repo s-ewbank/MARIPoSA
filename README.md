@@ -2,7 +2,7 @@
 <img src="other/MARIPoSA_icon.png" alt="alt text" width="150" height="150">
 
 ### Description
-A platform for Manageable And Reproducible Integrated Pose Segmentation Analysis (MARIPoSA).
+MARIPoSA (Manageable And Reproducible Integrated Pose Segmentation Analysis) is a platform for unified analysis of naturalistic animal and human behavior data in the native formats of a variety of open source tools. Computational pose analysis represents a promising future direction in both animal and human research; however, tools for investigation in this area generally output raw data in non-interchangeable formats, leaving researchers without a clear direction for interpreting their data and comparing with what exists in the literature. The purpose of MARIPoSA is to provide a resource for analyzing and visualizing naturalistic behavioral data while also promoting the creation of robust shared technical practices for the field at large.
 
 ### Installation
 Installing the conda environment:
@@ -30,7 +30,10 @@ Activate the newly installed conda environment
 
     conda activate mariposa
 
-And you are ready to start analyzing some data. The MARIPoSA python command utilities can be learned from three main resources:
+And you are ready to start analyzing some data. 
+
+### Learning to use MARIPoSA
+The MARIPoSA python command utilities can be learned from three main resources:
 1. Reading the function docstrings
 2. The console log window of the GUI, which records the functions being executed in the GUI and can be exported to a text file for not only reviewing executed analyses but also learning the python command structure
 3. The Jupyter notebook demos!
