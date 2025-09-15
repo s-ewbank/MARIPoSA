@@ -489,7 +489,10 @@ class Application(tk.Tk):
         config = metadata.load_project(self.config_path)
         self.append_log(f"config = metadata.load_project('{self.config_path}')")
         self.config = config
-        self.window3b_PS_menu()
+        if self.config["data_type"]=="Pose estimation":
+            self.window3a_PE_menu()
+        elif self.config["data_type"]=="Pose segmentation":
+            self.window3b_PS_menu()
 
     def create_sidebar_widget(self):
 
@@ -677,12 +680,8 @@ class Application(tk.Tk):
                                 text="Edit config.yaml",
                                 command=lambda: metadata.edit_config(self.config_path)).place(x=int(self.width*0.6), y=int(self.height*0.75))
         # Bottom back buttons
-        if self.config["data_type"]=="Pose segmentation":
-            destination = self.window3b_PS_menu
-        elif self.config["data_type"]=="Pose estimation":
-            destination = self.window3a_PE_menu
-        ttk.Button(self, text="◀ back to analysis menu", command=destination).place(x=int(self.width*0.3), y=int(self.height*0.83))
-        ttk.Button(self, text="◀◀ back to start", command=self.window1_start,).place(x=int(self.width*0.3), y=int(self.height*0.9))
+        ttk.Button(self, text="◀ back to analysis menu", command=self.load_project_mainmenu).place(x=int(self.width*0.3), y=int(self.height*0.83))
+        ttk.Button(self, text="◀◀ back to start", command=self.window1_start).place(x=int(self.width*0.3), y=int(self.height*0.9))
 
     def window4b_pose_vs_BORIS(self):
         self.clear_window()
@@ -1400,7 +1399,7 @@ class Application(tk.Tk):
             rs.place(x=int(self.width*0.8), y=int(self.height*0.6))
 
             ttk.Button(self.frame_6a, text="Simulate!",
-                                    command=lambda: self.simulate_usage_labeled(pickle_path.get(), self.option_simmode.get(), n_samples.get(), rs.get()),
+                                    command=lambda: self.simulate_usage_unlabeled(pickle_path.get(), self.option_simmode.get(), n_samples.get(), rs.get()),
                                     ).place(x=int(self.width*0.8), y=int(self.height*0.9))
 
 
@@ -1490,7 +1489,7 @@ class Application(tk.Tk):
                                                                     ("All Files", "*.*")])
                 labels_df.to_csv(file_path)
                 self.append_log(f"labels_df = analyze.get_module_labels(config, {start}, {end}")
-                self.append_log(f"labels_df.to_csv({file_path})")
+                self.append_log(f"labels_df.to_csv('{file_path}')")
             else:
                 selected_subgroups=[i for i in subgroups if (i!="all combined")]
                 labels_df = analyze.get_module_labels(self.config, start, end, subgroups=selected_subgroups)
@@ -1499,7 +1498,7 @@ class Application(tk.Tk):
                                                                     ("All Files", "*.*")])
                 labels_df.to_csv(file_path)
                 self.append_log(f"labels_df = analyze.get_module_labels(config, {start}, {end}, subgroups={selected_subgroups})")
-                self.append_log(f"labels_df.to_csv({file_path})")
+                self.append_log(f"labels_df.to_csv('{file_path}')")
         except Exception as e:
             self.error_window(e)
 
@@ -1897,9 +1896,13 @@ class MultiDropDown(ttk.Frame):
 
         # Bind resizing event to update scroll region
         checkbox_frame.bind("<Configure>", self._update_scrollregion)
+        self.dropdown_win.bind_all("<Button-1>", self._on_global_click, "+")
 
-        # Optional: hide when clicking outside
-        self.dropdown_win.bind("<FocusOut>", self.hide_menu)
+    def _on_global_click(self, event):
+        # Check if the click is outside the dropdown
+        widget = event.widget
+        if not self.dropdown_win.winfo_containing(event.x_root, event.y_root):
+            self.hide_menu()
 
     def _update_scrollregion(self, event=None):
         """ Updates the scroll region whenever the checkboxes change size. """
