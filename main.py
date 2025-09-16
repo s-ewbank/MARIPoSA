@@ -573,15 +573,23 @@ class Application(tk.Tk):
 
         ttk.Label(self, text="Analyze and visualize:",
                                ).place(x=int(self.width * 0.3), y=int(self.height * 0.44),width=menu_item_width,height=button_height)
-        ttk.Button(self, text="Measure keypoint displacement (e.g., locomotion)",
+        ttk.Button(self, text="Measure keypoint travel (e.g., locomotion)",
                                 command=self.window5d_keypoint_displacement_menu,
                                 ).place(x=int(self.width * 0.5), y=int(self.height * 0.44),width=button_width,height=button_height)
+        if self.config["data_source"]=="OpenFace":
+            last_menu_item_pos=0.51
+            ttk.Button(self, text="Measure action units",
+                       command=self.window5e_action_units_menu,
+                       ).place(x=int(self.width * 0.5), y=int(self.height * last_menu_item_pos), width=button_width,
+                               height=button_height)
+        else:
+            last_menu_item_pos=0.44
         ttk.Button(self, text="Embed and/or measure distance between groups",
                                 command=self.window5b_embed_distance_menu,
-                                ).place(x=int(self.width*0.5), y=int(self.height*0.51),width=button_width,height=button_height)
+                                ).place(x=int(self.width*0.5), y=int(self.height*(last_menu_item_pos+0.07)),width=button_width,height=button_height)
         ttk.Button(self, text="Classify and/or regress conditions",
                                 command=self.window5c_classify_regress_menu,
-                                ).place(x=int(self.width*0.5), y=int(self.height*0.58),width=button_width,height=button_height)
+                                ).place(x=int(self.width*0.5), y=int(self.height*(last_menu_item_pos+0.14)),width=button_width,height=button_height)
 
         # ttk.Label(self, text="Model and simulate:",
         #                        ).place(x=int(self.width * 0.3), y=int(self.height * 0.75),width=menu_item_width,height=button_height)
@@ -920,6 +928,22 @@ class Application(tk.Tk):
                 color = ttk.Combobox(self.frame_5a, values=["jet", "cividis", "viridis", "magma"])
                 color.place(x=int(self.width*0.75), y=int(self.height*0.5))
                 color.set("jet")
+                legend_bool = tk.BooleanVar()
+                legend_button = ttk.Checkbutton(self.frame_5a, text="Legend", variable=legend_bool)
+                legend_button.place(x=int(self.width*0.65), y=int(self.height*0.58))
+                legend_bool.set(True)
+                ttk.Label(self.frame_5a, text="Figure dimensions",
+                                       ).place(x=int(self.width*0.65), y=int(self.height*0.66))
+                ttk.Label(self.frame_5a, text="H",
+                                       ).place(x=int(self.width*0.65), y=int(self.height*0.72))
+                figH = ttk.Entry(self.frame_5a)
+                figH.insert(0, "3")
+                figH.place(x=int(self.width*0.67), y=int(self.height*0.72), relwidth=0.05)
+                ttk.Label(self.frame_5a, text="W",
+                                       ).place(x=int(self.width*0.8), y=int(self.height*0.72))
+                figW = ttk.Entry(self.frame_5a)
+                figW.insert(0, "6")
+                figW.place(x=int(self.width*0.82), y=int(self.height*0.72), relwidth=0.05)
                 # Choose style for plot
                 ttk.Label(self.frame_5a, text="What should the usage plot style be?",
                                        ).place(x=int(self.width*0.3), y=int(self.height*0.5))
@@ -933,9 +957,9 @@ class Application(tk.Tk):
                     radio_btn = ttk.Radiobutton(self.frame_5a, text=style_options[s],
                                                              variable=style, value=style_vars[s],
                                                              )
-                    radio_btn.place(x=int(self.width*0.3), y=int(self.height*(0.5+0.06*s)))
+                    radio_btn.place(x=int(self.width*0.3), y=int(self.height*(0.56+0.05*s)))
                 ttk.Button(self.frame_5a, text="Plot it!",
-                                        command=lambda: self.plot_usage(pickle_path.get(), style.get(), color.get()),
+                                        command=lambda: self.plot_usage(pickle_path.get(), style.get(), color.get(), legend_bool.get(), self.try_float(figH.get()), self.try_float(figW.get())),
                                         ).place(x=int(self.width*0.8), y=int(self.height*0.9))
 
             elif plot_option == "network":
@@ -998,7 +1022,7 @@ class Application(tk.Tk):
                                ).place(x=int(self.width*0.3), y=int(self.height*0.25))
         self.pickle_path_5b = ttk.Entry(self)
         self.pickle_path_5b.insert(0, pickle_path_prefill)
-        self.pickle_path_5b.place(x=int(self.width*0.7), y=int(self.height*0.25))
+        self.pickle_path_5b.place(x=int(self.width*0.65), y=int(self.height*0.25))
         ttk.Button(self,
                                 text="Browse",
                                 command=lambda: self.window_browse(self.pickle_path_5b, type="file")).place(x=int(self.width*0.85), y=int(self.height*0.25))
@@ -1040,31 +1064,47 @@ class Application(tk.Tk):
 
         if selected=="embed":
             ttk.Label(self.frame_5b, text="Dimensionality reduction method",
-                                   ).place(x=int(self.width*0.3), y=int(self.height*0.6))
+                                   ).place(x=int(self.width*0.3), y=int(self.height*0.53))
             embedding_type = ttk.Combobox(self.frame_5b, values=["pca", "lda"])
-            embedding_type.place(x=int(self.width*0.65), y=int(self.height*0.6))
+            embedding_type.place(x=int(self.width*0.3), y=int(self.height*0.59))
             embedding_type.set("pca")
             ttk.Label(self.frame_5b, text="Colormap",
-                                   ).place(x=int(self.width*0.3), y=int(self.height*0.7))
+                                   ).place(x=int(self.width*0.3), y=int(self.height*0.65))
             color = ttk.Combobox(self.frame_5b, values=["jet", "cividis", "viridis", "magma"])
-            color.place(x=int(self.width*0.65), y=int(self.height*0.7))
+            color.place(x=int(self.width*0.3), y=int(self.height*0.71))
             color.set("jet")
+            legend_bool = tk.BooleanVar()
+            legend_button = ttk.Checkbutton(self.frame_5b, text="Legend", variable=legend_bool)
+            legend_button.place(x=int(self.width*0.65), y=int(self.height*0.58))
+            legend_bool.set(True)
+            ttk.Label(self.frame_5b, text="Figure dimensions",
+                                   ).place(x=int(self.width*0.65), y=int(self.height*0.66))
+            ttk.Label(self.frame_5b, text="H",
+                                   ).place(x=int(self.width*0.65), y=int(self.height*0.72))
+            figH = ttk.Entry(self.frame_5b)
+            figH.insert(0, "3")
+            figH.place(x=int(self.width*0.67), y=int(self.height*0.72), relwidth=0.05)
+            ttk.Label(self.frame_5b, text="W",
+                                   ).place(x=int(self.width*0.8), y=int(self.height*0.72))
+            figW = ttk.Entry(self.frame_5b)
+            figW.insert(0, "6")
+            figW.place(x=int(self.width*0.82), y=int(self.height*0.72), relwidth=0.05)
             ttk.Button(self.frame_5b, text="Plot embeddings",
-                                    command=lambda: self.embed_plot(self.pickle_path_5b.get(), embedding_type.get(), color.get()),
+                                    command=lambda: self.embed_plot(self.pickle_path_5b.get(), embedding_type.get(), color.get(), legend_bool.get(), self.try_float(figH.get()), self.try_float(figW.get())),
                                     ).place(x=int(self.width*0.8), y=int(self.height*0.9))
         elif selected=="distance":
             ttk.Label(self.frame_5b, text="Distance metric to use",
                                    ).place(x=int(self.width*0.3), y=int(self.height*0.6))
             dist_metric = ttk.Combobox(self.frame_5b, values=["euclidean","cityblock","correlation"])
-            dist_metric.place(x=int(self.width*0.5), y=int(self.height*0.6))
+            dist_metric.place(x=int(self.width*0.45), y=int(self.height*0.6))
             dist_metric.set("euclidean")
             ttk.Label(self.frame_5b, text="Pairwise or centroid",
                                    ).place(x=int(self.width*0.3), y=int(self.height*0.7))
             pairwise_centroid_opt = ttk.Combobox(self.frame_5b, values=["pairwise", "centroid"])
-            pairwise_centroid_opt.place(x=int(self.width*0.5), y=int(self.height*0.7))
+            pairwise_centroid_opt.place(x=int(self.width*0.45), y=int(self.height*0.7))
             pairwise_centroid_opt.set("centroid")
             ttk.Label(self.frame_5b, text="Plot type",
-                                   ).place(x=int(self.width*0.65), y=int(self.height*0.6))
+                                   ).place(x=int(self.width*0.7), y=int(self.height*0.6))
             plot_type = ttk.Combobox(self.frame_5b, values=["boxplot", "heatmap"])
             plot_type.place(x=int(self.width*0.8), y=int(self.height*0.6))
             plot_type.set("heatmap")
@@ -1091,7 +1131,7 @@ class Application(tk.Tk):
                                ).place(x=int(self.width*0.3), y=int(self.height*0.25))
         self.pickle_path_5c = ttk.Entry(self)
         self.pickle_path_5c.insert(0, pickle_path_prefill)
-        self.pickle_path_5c.place(x=int(self.width*0.7), y=int(self.height*0.25))
+        self.pickle_path_5c.place(x=int(self.width*0.65), y=int(self.height*0.25))
         ttk.Button(self,
                                 text="Browse",
                                 command=lambda: self.window_browse(self.pickle_path_5c, type="file")).place(x=int(self.width*0.85), y=int(self.height*0.25))
@@ -1211,11 +1251,11 @@ class Application(tk.Tk):
         self.create_header("Keypoint Displacment Menu",header_path="Viz & Analyze ▶ Keypoint Displacement")
         self.option_5d = tk.StringVar(value="")
 
-        ttk.Radiobutton(self, text="Get keypoint displacement",
+        ttk.Radiobutton(self, text="Get keypoint travel",
                         command=lambda: self.window5d_keypoint_displacement_menu_update(),
                         variable=self.option_5d, value="Get displacement",
                         ).place(x=int(self.width*0.3), y=int(self.height*0.2))
-        ttk.Radiobutton(self, text="Plot keypoint displacement",
+        ttk.Radiobutton(self, text="Plot keypoint travel",
                         command=lambda: self.window5d_keypoint_displacement_menu_update(),
                         variable=self.option_5d, value="Plot displacement",
                         ).place(x=int(self.width*0.65), y=int(self.height*0.2))
@@ -1319,9 +1359,131 @@ class Application(tk.Tk):
                 radio_btn = ttk.Radiobutton(self.frame_5d, text=style_options[s],
                                                          variable=style, value=style_vars[s],
                                                          )
-                radio_btn.place(x=int(self.width*0.3), y=int(self.height*(0.5+0.06*s)))
+                radio_btn.place(x=int(self.width*0.3), y=int(self.height*(0.56+0.06*s)))
             ttk.Button(self.frame_5d, text="Plot it!",
                        command=lambda: self.plot_keypoint_travel(pickle_path.get(), color.get(), style.get()),
+                       ).place(x=int(self.width*0.8), y=int(self.height*0.9))
+
+
+        ttk.Button(self, text="◀ back to analysis menu", command=self.window3a_PE_menu,
+                                ).place(x=int(self.width*0.3), y=int(self.height*0.83))
+        ttk.Button(self, text="◀◀ back to start", command=self.window1_start,
+                                ).place(x=int(self.width*0.3), y=int(self.height*0.9))
+
+    def window5e_action_units_menu(self):
+        self.clear_window()
+        ttk.Button(self, text="Log", command=self.log_window,
+                                ).place(x=int(self.width * 0.94), y=int(self.height * 0.02),relwidth=0.05)
+        self.create_sidebar_widget()
+        self.create_header("Action Units Menu",header_path="Viz & Analyze ▶ Action Units")
+        self.option_5e = tk.StringVar(value="")
+
+        ttk.Radiobutton(self, text="Get action units",
+                        command=lambda: self.window5e_action_units_menu_update(),
+                        variable=self.option_5e, value="Get AU",
+                        ).place(x=int(self.width*0.3), y=int(self.height*0.2))
+        ttk.Radiobutton(self, text="Plot action units",
+                        command=lambda: self.window5e_action_units_menu_update(),
+                        variable=self.option_5e, value="Plot AU",
+                        ).place(x=int(self.width*0.65), y=int(self.height*0.2))
+
+        # Frame that will contain the dynamic content
+        self.frame_5e = ttk.Frame(self)
+        self.frame_5e.place(x=0, y=0, relwidth=1, relheight=1)
+        self.frame_5e.lower()
+
+        # Initial content
+        self.window5e_action_units_menu_update()
+
+        ttk.Button(self, text="◀ back to analysis menu", command=self.window3a_PE_menu,
+                                ).place(x=int(self.width*0.3), y=int(self.height*0.83))
+        ttk.Button(self, text="◀◀ back to start", command=self.window1_start,
+                                ).place(x=int(self.width*0.3), y=int(self.height*0.9))
+
+
+    def window5e_action_units_menu_update(self,pickle_path_prefill = "/path/to/usage.pickle",
+                                               tx_pickle_path_prefill="/path/to/transitions.pickle",
+                                               plot_option=None):
+
+        # Clear existing content in the frame
+        for widget in self.frame_5e.winfo_children():
+            widget.destroy()
+
+        # Load content based on the selected option
+        selected = self.option_5e.get()
+
+        if selected=="Get AU":
+            ttk.Label(self.frame_5e, text="Enter info about your analysis.",
+                                   ).place(x=int(self.width*0.3), y=int(self.height*0.3))
+
+            ttk.Label(self.frame_5e, text="Start time (seconds)",
+                                   ).place(x=int(self.width*0.3), y=int(self.height*0.38))
+            start = ttk.Entry(self.frame_5e)
+            start.place(x=int(self.width*0.3), y=int(self.height*0.43))
+            ttk.Label(self.frame_5e, text="End time (seconds)",
+                                   ).place(x=int(self.width*0.3), y=int(self.height*0.51))
+            end = ttk.Entry(self.frame_5e)
+            end.place(x=int(self.width*0.3), y=int(self.height*0.56))
+            ttk.Label(self.frame_5e, text="Binsize (seconds; blank for no binning)",
+                                   ).place(x=int(self.width*0.3), y=int(self.height*0.64))
+            binsize = ttk.Entry(self.frame_5e)
+            binsize.place(x=int(self.width*0.3), y=int(self.height*0.69))
+            ttk.Label(self.frame_5e, text="Data to include",
+                                   ).place(x=int(self.width*0.65), y=int(self.height*0.38))
+            dropdown = MultiDropDown(self.frame_5e,options=["all combined"]+list(self.config["subgroups"].keys()),
+                                     x=int(self.width*0.65), y=int(self.height*0.43))
+            dropdown.place(x=int(self.width*0.65), y=int(self.height*0.43))
+
+            save_option = tk.StringVar(value="scatter")
+            save_options = ["pickle (for further use in MARIPoSA)",
+                             "csv (for external use)",
+                             "pickle AND csv"]
+            style_vars = ["pickle", "csv", "both"]
+            ttk.Label(self.frame_5e, text="How should the data be saved?",
+                                   ).place(x=int(self.width*0.65), y=int(self.height*0.6))
+            for s in range(len(style_vars)):
+                radio_btn = ttk.Radiobutton(self.frame_5e, text=save_options[s],
+                                                         variable=save_option, value=style_vars[s],
+                                                         )
+                radio_btn.place(x=int(self.width*0.65), y=int(self.height*(0.67+0.05*s)))
+
+            ttk.Button(self.frame_5e, text="Analyze & Save",
+                                    command=lambda: self.save_action_units(self.try_int(start.get()),
+                                                                              self.try_int(end.get()),
+                                                                              dropdown.get_selected_options(),
+                                                                              binsize.get(),
+                                                                              save_to=save_option.get()),
+                                    ).place(x=int(self.width*0.8), y=int(self.height*0.9))
+
+        elif selected=="Plot AU":
+            ttk.Label(self.frame_5e, text="Path to keypoint displacement .pickle:",
+                                   ).place(x=int(self.width*0.3), y=int(self.height*0.42))
+            pickle_path = ttk.Entry(self.frame_5e)
+            pickle_path.insert(0, pickle_path_prefill)
+            pickle_path.place(x=int(self.width*0.6), y=int(self.height*0.42))
+            ttk.Button(self.frame_5e,
+                                    text="Browse",
+                                    command=lambda: self.window_browse(pickle_path, type="file")).place(x=int(self.width*0.8), y=int(self.height*0.42))
+            ttk.Label(self.frame_5e, text="Colormap",
+                                   ).place(x=int(self.width*0.65), y=int(self.height*0.5))
+            color = ttk.Combobox(self.frame_5e, values=["jet", "cividis", "viridis", "magma"])
+            color.place(x=int(self.width*0.75), y=int(self.height*0.5))
+            color.set("jet")
+            # Choose style for plot
+            ttk.Label(self.frame_5e, text="What should the usage plot style be?",
+                                   ).place(x=int(self.width*0.3), y=int(self.height*0.5))
+            style = tk.StringVar(value="scatter")
+            style_options = ["Bar (for no timebins)",
+                             "Trace with error bar",
+                             "Trace with error band"]
+            style_vars = ["bar","errorbar","band"]
+            for s in range(len(style_vars)):
+                radio_btn = ttk.Radiobutton(self.frame_5e, text=style_options[s],
+                                                         variable=style, value=style_vars[s],
+                                                         )
+                radio_btn.place(x=int(self.width*0.3), y=int(self.height*(0.5+0.06*s)))
+            ttk.Button(self.frame_5e, text="Plot it!",
+                       command=lambda: self.plot_action_units(pickle_path.get(), color.get(), style.get()),
                        ).place(x=int(self.width*0.8), y=int(self.height*0.9))
 
 
@@ -1635,11 +1797,50 @@ class Application(tk.Tk):
                 self.append_log(f"kf_df = keypoint_travel.to_df()")
                 self.append_log(f"kf_df.to_csv('{file_path}_KEYPOINT_TRAVEL.csv')")
 
+    def save_action_units(self, start, end, subgroups, binsize, save_to):
+        if len(binsize)>0:
+            bin = True
+            binsize = int(binsize)
+        else:
+            bin = False
+        if subgroups == ["all combined"]:
+            if bin:
+                au = analyze.get_action_units(self.config, start, end, binsize=binsize)
+                self.append_log(f"au = analyze.get_action_units(config, {start}, {end}, binsize={binsize})")
+            else:
+                au = analyze.get_action_units(self.config, start, end)
+                self.append_log(f"au = analyze.get_action_units(config, {start}, {end})")
+        else:
+            selected_subgroups=[i for i in subgroups if (i!="all combined")]
+            if bin:
+                au = analyze.get_action_units(self.config, start, end, binsize=binsize,selected_subgroups=selected_subgroups)
+                self.append_log(f"au = analyze.get_action_units(config, {start}, {end}, binsize={binsize},selected_subgroups={selected_subgroups})")
+            else:
+                au = analyze.get_action_units(self.config, start, end, selected_subgroups=selected_subgroups)
+                self.append_log(f"au = analyze.get_action_units(config, {start}, {end}, selected_subgroups={selected_subgroups})")
+            file_path = filedialog.asksaveasfilename(defaultextension='.pickle',
+                                                     filetypes=[("pickle files", "*.pickle"),
+                                                                ("All Files", "*.*")])
+            if save_to=="pickle":
+                au.save(file_path+"_ACTION_UNITS.pickle")
+                self.append_log(f"au.save('{file_path}_ACTION_UNITS.pickle')")
+            elif save_to=="csv":
+                au_df = au.to_df()
+                au_df.to_csv(file_path+"_ACTION_UNITS.csv")
+                self.append_log(f"au_df = au.to_df()")
+                self.append_log(f"au_df.to_csv('{file_path}_ACTION_UNITS.csv')")
+            elif save_to=="both":
+                au.save(file_path+"_ACTION_UNITS.pickle")
+                self.append_log(f"au.save('{file_path}_ACTION_UNITS.pickle')")
+                au_df = au.to_df()
+                au_df.to_csv(file_path+"_ACTION_UNITS.csv")
+                self.append_log(f"au_df = au.to_df()")
+                self.append_log(f"au_df.to_csv('{file_path}_ACTION_UNITS.csv')")
 
-    def plot_usage(self, pickle_path, style, color):
+    def plot_usage(self, pickle_path, style, color, legend_TF, figH, figW):
         try:
             module_usage = analyze.load_module_feature_object(pickle_path)
-            fig = plot.plot_module_usage(self.config, module_usage, style=style, cmap=color)
+            fig = plot.plot_module_usage(self.config, module_usage, style=style, cmap=color, legend=legend_TF, figH=figH, figW=figW)
             self.plots_generated = self.plots_generated + 1
             self.plot_window = PlotWindow(fig = fig, plot_number = self.plots_generated, master = self)
             self.plot_window.mainloop()
@@ -1684,11 +1885,11 @@ class Application(tk.Tk):
         except Exception as e:
             self.error_window(e)
 
-    def embed_plot(self, pickle_path, embedding_type, color):
+    def embed_plot(self, pickle_path, embedding_type, color, legend_TF, figH, figW):
         try:
             module_feature_object = analyze.load_module_feature_object(pickle_path)
             emb = analyze.embed(module_feature_object, method=embedding_type, n_components=2)
-            fig = plot.plot_embeddings(module_feature_object, emb, cmap=color)
+            fig = plot.plot_embeddings(module_feature_object, emb, cmap=color, legend=legend_TF, figH=figH, figW=figW)
             self.append_log(f"module_feature_object = analyze.load_module_feature_object('{pickle_path}')")
             self.append_log(f"emb = analyze.embed(module_feature_object, method='{embedding_type}', n_components=2)")
             self.append_log(f"fig = plot.plot_embeddings(module_feature_object, emb, cmap='{color}')")
