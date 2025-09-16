@@ -1046,6 +1046,10 @@ def get_distance(module_feature_object, method="euclidean"):
         X=module_feature_object.keypoint_feature
         y=module_feature_object.group_labels
         obj_type="keypoint feature"
+    elif module_feature_object.__class__.__name__=="ActionUnits":
+        X=module_feature_object.action_units
+        y=module_feature_object.group_labels
+        obj_type="keypoint feature"
     else:
         raise ValueError(f'module_feature_object class must be ModuleUsage or ModuleTransitions or KeypointFeature, not {module_feature_object.__class__}')
     centroids = np.zeros([len(np.unique(X)), len(module_feature_object.feat_names)])
