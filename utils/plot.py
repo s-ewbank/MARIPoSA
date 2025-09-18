@@ -47,7 +47,7 @@ def plot_module_usage(config,
                       figH=2,
                       style="bar_scatter",
                       cmap="jet",
-                      legend_pos="outside",
+                      legend_pos="outside_right",
                       remap=False,
                       legend=True,
                       long_legend=False,
@@ -65,7 +65,7 @@ def plot_module_usage(config,
     :param style: plot style; "bar_scatter", "bar_error", "points", or "stacked"
     :param cmap: colormap (default: jet)
     :param legend_pos: legend position (default: outside)
-    :param BORIS_to_pose_mat: BORIS_to_pose_mat (default: None)
+    :param remap: whether to remap modules acording to config["remappings"] (default: False)
     :param legend: boolean to include or not include legend (default: False)
     :param long_legend: long legend (default: False)
     :param alt_labels: alternative group label dictionary (default: None)
@@ -213,8 +213,13 @@ def plot_module_usage(config,
             if legend:
                 if legend_pos == "inside":
                     ax.legend()
-                elif legend_pos == "outside":
+                elif legend_pos == "outside_right":
                     ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+                elif legend_pos == "outside_above":
+                    ax.legend(loc='upper center', bbox_to_anchor=(0.5, 1.2), ncol=4)
+                else:
+                    print("Warning - invalid legend position given (should be inside, outside_right, or outside_above), using default")
+                    ax.legend()
 
             ax.set_xlabel(config["data_source"] + ' Pose Label')
             ax.set_ylabel('Usage')
@@ -269,7 +274,7 @@ def plot_module_usage(config,
                 leg_handles_col1 = []
                 leg_labels = [""] * n_behaviors
                 bottom = True
-                cm_list = ['magma', 'YlOrBr', 'Blues', 'copper', 'Greys_r', 'BuGn', 'Reds_r', 'magma_r', 'Purples', 'YlGn',
+                cm_list = ['magma', 'YlOrBr', 'Blues', 'copper', 'BuGn', 'Greys_r', 'Reds_r', 'magma_r', 'Purples', 'YlGn',
                            'YlGnBu', 'YlOrRd']
                 modules_plotted=[] #To account for modules not seen in remapping
                 for remap in range(n_behaviors):
@@ -329,6 +334,213 @@ def plot_module_usage(config,
             plt.tight_layout()
     return fig
 
+
+def plot_action_units(config,
+                      action_units,
+                      figW=4,
+                      figH=2,
+                      style="bar_scatter",
+                      cmap="jet",
+                      legend_pos="outside_right",
+                      legend=True,
+                      alt_labels=None,
+                      alt_xticks=None,
+                      title=None,
+                      plot_stats=False):
+    """
+    Plot mean action units
+
+    :param config: config
+    :param action_units: output of analyze.get_action_units
+    :param figW: figure width (default: 4)
+    :param figH: figure height (default: 2)
+    :param style: plot style; "bar_scatter", "bar_error", "points"
+    :param cmap: colormap (default: jet)
+    :param legend_pos: legend position (default: outside)
+    :param legend: boolean to include or not include legend (default: False)
+    :param alt_labels: alternative group label dictionary (default: None)
+    :param alt_xticks: alternative xticklabels (list), for stacked plot style only (default: None)
+    :param title: plot title (default: None)
+    :param plot_stats: include stats on plot (default: False)
+    :return: fig
+
+    """
+    if ((style!="bar_scatter") and (style!="bar_error") and (style!="points")):
+        raise ValueError(f'style must be one of "bar_scatter", "bar_error", or "points", not {style}')
+
+    if len(np.unique(action_units.group_labels)) == 1:
+        data_subgrouped = False
+    else:
+        data_subgrouped = True
+
+    if not data_subgrouped:
+        usage_df = action_units.to_df()
+        usage_df.drop("group", axis=1, inplace=True)
+
+        modules = action_units.feat_names
+        n_modules = len(modules)
+
+        bar_heights = np.mean(usage_df, axis=0)
+        bar_sems = np.std(usage_df, axis=0) / np.sqrt(usage_df.shape[1])
+
+        fig, ax = plt.subplots(figsize=(figW, figH), dpi=100)
+        cmap = plt.get_cmap(cmap)
+        if ((style == "bar_scatter") or (style == "bar_error")):
+            ax.bar(
+                x=np.arange(0, n_modules, 1),
+                height=bar_heights,
+                width=0.8,
+                alpha=0.5,
+                color=cmap([0.1])
+            )
+            if style == "bar_scatter":
+                for i in range(len(usage_df.index)):
+                    ax.scatter(np.arange(0, n_modules, 1) + np.random.normal(0, 0.01, n_modules),
+                               usage_df.iloc[i],
+                               color="black",
+                               s=0.5
+                               )
+            elif style == "bar_error":
+                ax.errorbar(
+                    x=np.arange(0, n_modules, 1),
+                    y=bar_heights,
+                    yerr=bar_sems,
+                    linestyle="none", linewidth=0.6,
+                    color="black", capsize=1, markeredgewidth=0.75
+                )
+        elif style == "points":
+            ax.errorbar(
+                x=np.arange(0, n_modules, 1),
+                y=bar_heights,
+                yerr=bar_sems,
+                color=cmap([0.1]),
+                linestyle="none",
+                marker="o", markersize=2.5, linewidth=0.75,
+                capsize=2, markeredgewidth=0.75
+            )
+        ax.set_xlabel(config["data_source"] + ' Pose Label')
+        ax.set_ylabel('Usage')
+        ax.set_xticks(np.arange(0, n_modules, 1), labels=[i.split("module")[1] for i in modules])
+        ax.tick_params(axis='x', rotation=90, labelsize=plt.rcParams['font.size'] * 0.5, pad=2)
+        plt.tight_layout()
+
+    else:
+        # To get groupnames in order
+        groupnames = list(action_units.group_dict.keys())
+        n_groups = len(groupnames)
+
+        usage_df = action_units.to_df()
+
+        modules = action_units.feat_names
+        n_modules = len(modules)
+
+        bar_heights = np.zeros([n_groups, n_modules])
+        bar_sems = np.zeros([n_groups, n_modules])
+
+        for g, group in enumerate(groupnames):
+            subgroup_usage = usage_df[usage_df["group"] == group].copy()
+            subgroup_usage.drop("group", axis=1, inplace=True)
+            bar_heights[g, :] = subgroup_usage.mean(axis=0)
+            bar_sems[g, :] = subgroup_usage.std(axis=0) / np.sqrt(subgroup_usage.shape[0])
+        fig, ax = plt.subplots(figsize=(figW, figH), dpi=100)
+        scale = 1 / (n_groups + .7)
+        cmap = plt.get_cmap(cmap)
+        colors = [cmap([i]) for i in np.linspace(0, 1, n_groups)]
+        if ((style == "bar_scatter") or (style == "bar_error")):
+            if style == "bar_scatter":
+                for g, group in enumerate(groupnames):
+                    subgroup_usage = usage_df[usage_df["group"] == group].copy()
+                    subgroup_usage.drop("group", axis=1, inplace=True)
+                    for i in subgroup_usage.index:
+                        ax.scatter(
+                            np.arange(0 + scale * g, n_modules + scale * g, 1) + np.random.normal(0, 0.1 * scale,
+                                                                                                  n_modules),
+                            subgroup_usage.loc[i],
+                            color="black",
+                            s=0.5
+                        )
+                bar_alpha = 0.5
+            elif style == "bar_error":
+                for g in range(n_groups):
+                    ax.errorbar(
+                        x=np.arange(0 + scale * g, n_modules + scale * g, 1),
+                        y=bar_heights[g],
+                        yerr=bar_sems[g],
+                        linestyle="none", linewidth=0.6,
+                        color="black", capsize=0.3, markeredgewidth=0.75, alpha=0.8
+                    )
+                bar_alpha = 0.85
+            for g in range(n_groups):
+                if alt_labels is not None:
+                    label_g = alt_labels[groupnames[g]]
+                else:
+                    label_g = groupnames[g]
+                ax.bar(
+                    x=np.arange(0 + scale * g, n_modules + scale * g, 1),
+                    height=bar_heights[g],
+                    width=scale,
+                    alpha=bar_alpha,
+                    color=colors[g],
+                    label=label_g
+                )
+        elif style == "points":
+            for g in range(n_groups):
+                if alt_labels is not None:
+                    label_g = alt_labels[groupnames[g]]
+                else:
+                    label_g = groupnames[g]
+                ax.errorbar(
+                    x=np.arange(0, n_modules, 1),
+                    y=bar_heights[g],
+                    yerr=bar_sems[g],
+                    color=colors[g],
+                    label=groupnames[g],
+                    linestyle="none",
+                    marker="o", markersize=4, linewidth=0.75,
+                    capsize=2, markeredgewidth=0.75
+                )
+
+        if legend:
+            if legend_pos == "inside":
+                ax.legend()
+            elif legend_pos == "outside_right":
+                ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+            elif legend_pos == "outside_above":
+                ax.legend(loc='upper center', bbox_to_anchor=(0.5, 1.2), ncol=4)
+            else:
+                print("Warning - invalid legend position given (should be inside, outside_right, or outside_above), using default")
+                ax.legend()
+
+        ax.set_xlabel(config["data_source"] + ' Action Unit')
+        ax.set_ylabel('Mean Score')
+        all_num_modules = np.sum([isinstance(module, str) for module in modules]) == 0
+        if ((all_num_modules) and (n_modules >= 20)):
+            xticks = np.arange(0, n_modules, 5, dtype=int)
+            ax.set_xticks(xticks)
+            ax.set_xticklabels(modules[xticks])
+        else:
+            ax.set_xticks(np.arange(0, n_modules, 1))
+            try:
+                ax.set_xticklabels([i.split("_")[0].split("AU")[1] for i in modules])
+            except:
+                ax.set_xticklabels(modules)
+        ax.tick_params(axis='x', rotation=90, labelsize=plt.rcParams['font.size'] * 0.2 * n_groups, pad=2)
+        if plot_stats:
+            ylim = plt.ylim()
+            plt.ylim(ylim[0], ylim[1] * 1.2)
+            stat_result = action_units.f_oneway()
+            for m, module in enumerate(stat_result["module"]):
+                if stat_result[stat_result["module"] == module]["p_uncorr"].values[0] < 0.001:
+                    plt.plot([m - 0.1, m + 0.7], [ylim[1] * 1.05] * 2, color="black", linewidth=0.5)
+                    plt.text(m + 0.3, ylim[1] * 1.08, "***", ha="center")
+                elif stat_result[stat_result["module"] == module]["p_uncorr"].values[0] < 0.01:
+                    plt.plot([m - 0.1, m + 0.7], [ylim[1] * 1.05] * 2, color="black", linewidth=0.5)
+                    plt.text(m + 0.3, ylim[1] * 1.08, "**", ha="center")
+                elif stat_result[stat_result["module"] == module]["p_uncorr"].values[0] < 0.05:
+                    plt.plot([m - 0.1, m + 0.7], [ylim[1] * 1.05] * 2, color="black", linewidth=0.5)
+                    plt.text(m + 0.3, ylim[1] * 1.08, "*", ha="center")
+        plt.tight_layout()
+    return fig
 
 def plot_distance_results(module_feature_object,
                           distance_results,
@@ -549,7 +761,7 @@ def module_usage_sandplot(config,
         leg_handles_col0 = []
         leg_handles_col1 = []
         leg_labels = [""] * n_behaviors
-        cm_list = ['magma', 'YlOrBr', 'Blues', 'copper', 'Greys_r', 'BuGn', 'Reds_r', 'magma_r', 'Purples', 'YlGn',
+        cm_list = ['magma', 'YlOrBr', 'Blues', 'copper', 'BuGn', 'Greys_r', 'Reds_r', 'magma_r', 'Purples', 'YlGn',
                    'YlGnBu', 'YlOrRd']
         modules_plotted = []  # To account for modules not seen in remapping
         for remap in range(n_behaviors):
