@@ -368,7 +368,18 @@ class ActionUnits:
             pickle.dump(self, file)
 
 
-def get_action_units(config, start, end, binsize=None, selected_subgroups=None):
+def get_action_units(config, start, end, binsize=None, selected_subgroups=None, aus_to_include="all"):
+    """
+    Function for getting mean action units
+    :param config: project config
+    :param start: start time (in s)
+    :param end: end time (in s)
+    :param binsize: optional - temporal bin size (default None for no binning)
+    :param selected_subgroups: otpional - selected subgroups
+    :param aus_to_include: list of integers corresponding to action units to include, or "all" for all; default "all"
+    :return: ActionUnits
+
+    """
     all_au_data = {}
     group_labels = []
     observation_labels = []
@@ -380,11 +391,25 @@ def get_action_units(config, start, end, binsize=None, selected_subgroups=None):
         nbins = int((end - start) / binsize)
 
     if selected_subgroups == None:
+        warning_printed=False
         group_dict = {"no_assigned_subgroup": 0}
         for subj in config["project_files"]:
             df = pd.read_csv(config["data_directory"] + "/" + subj)
             df.columns = df.columns.str.replace(' ', '')
             au_cols = [i for i in df.columns if ((i.startswith("AU")) and (i.endswith("r")))]
+            if aus_to_include!="all":
+                au_cols_subset = []
+                full_au_cols = au_cols.copy()
+                bad_aus = []
+                for au_idx in aus_to_include:
+                    au_to_add = [au_i for au_i in au_cols if ((au_i.lower()==f"au{int(au_idx)}_r") or (au_i.lower()==f"au0{int(au_idx)}_r"))]
+                    au_cols_subset+=au_to_add
+                    if len(au_to_add)==0:
+                        bad_aus.append(au_idx)
+                if ((len(bad_aus)>0) and (warning_printed==False)):
+                    print(f"Warning - the following AUs were not included as they were not found in the dataset: {bad_aus}; valid AUs are {full_au_cols}")
+                    warning_printed=True
+                au_cols = au_cols_subset
             au_df = df[au_cols]
 
             au_data = None
@@ -408,12 +433,26 @@ def get_action_units(config, start, end, binsize=None, selected_subgroups=None):
 
     else:
         group_dict = {}
+        warning_printed = False
         for g, group in enumerate(selected_subgroups):
             group_dict[group] = g
             for subj in config["subgroups"][group]:
                 df = pd.read_csv(config["data_directory"] + "/" + subj)
                 df.columns = df.columns.str.replace(' ', '')
                 au_cols = [i for i in df.columns if ((i.startswith("AU")) and (i.endswith("r")))]
+                if aus_to_include!="all":
+                    au_cols_subset = []
+                    full_au_cols = au_cols.copy()
+                    bad_aus = []
+                    for au_idx in aus_to_include:
+                        au_to_add = [au_i for au_i in au_cols if ((au_i.lower()==f"au{int(au_idx)}_r") or (au_i.lower()==f"au0{int(au_idx)}_r"))]
+                        au_cols_subset+=au_to_add
+                        if len(au_to_add)==0:
+                            bad_aus.append(au_idx)
+                    if ((len(bad_aus)>0) and (warning_printed==False)):
+                        print(f"Warning - the following AUs were not included as they were not found in the dataset: {bad_aus}; valid AUs are {full_au_cols}")
+                        warning_printed=True
+                    au_cols = au_cols_subset
                 au_df = df[au_cols]
 
                 if binsize == None:
@@ -811,8 +850,8 @@ def get_module_transitions(config, labels_df, modules_altered=False):
     :param config: config object
     :param labels_df: labels dataframe from label_counter_subgroups
     :param binsize: width of bins in seconds; if None, no binning is performed
-    :param selected_subgroups:
     :return:
+
     """
     data_subgrouped = False
     try:
