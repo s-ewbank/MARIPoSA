@@ -325,6 +325,156 @@ def get_keypoint_travel(PE_config,
         return KeypointFeature(travel_data, group_labels, observation_labels, feat_names, group_dict, None)
 
 
+def ego_center(config, data, keypoint_ego1, keypoint_ego2):
+    """
+    Ego centering a single pose estimation dataframe
+
+    :param config: config
+    :param data: pose estimation pandas dataframe in DLC format
+    :param keypoint_ego1: first keypoint to use for establishing egocentric alignment axis
+    :param keypoint_ego2: second keypoint to use for establishing egocentric alignment axis
+    :return: ego_centered pandas dataframe
+
+    """
+    x_coords = data.xs("x", level=1, axis=1)
+    y_coords = data.xs("y", level=1, axis=1)
+    ego1 = np.stack([x_coords[keypoint_ego1], y_coords[keypoint_ego1]], axis=-1)
+    ego2 = np.stack([x_coords[keypoint_ego2], y_coords[keypoint_ego2]], axis=-1)
+    origin = (ego1 + ego2) / 2
+    delta = ego2 - ego1
+    theta = np.arctan2(delta[:, 0], delta[:, 1])
+    sin_theta = np.sin(theta)
+    cos_theta = np.cos(theta)
+    new_data = {}
+
+    for keypoint in config["keypoints"]:
+        point = np.stack([x_coords[keypoint], y_coords[keypoint]], axis=-1)
+        new_point = point - origin
+        rot_x = new_point[:, 0] * cos_theta - new_point[:, 1] * sin_theta
+        rot_y = new_point[:, 0] * sin_theta + new_point[:, 1] * cos_theta
+        new_data[(keypoint, "x")] = rot_x
+        new_data[(keypoint, "y")] = rot_y
+
+    return pd.DataFrame(new_data, index=data.index)
+
+def read_openface_csv(of_config, filepath):
+    data = pd.read_csv(filepath)
+    data.columns = data.columns.str.replace(' ', '')
+
+    data_dlc = {}
+    for keypoint in of_config["keypoints"]:
+        keypoints_x = ["x" + keypoint.split("kp")[1], "X" + keypoint.split("kp")[1]]
+        keypoints_x = [i for i in keypoints_x if i in data.columns]
+        data_dlc[(keypoint, "x")] = data[keypoints_x].to_numpy().T[0]
+        keypoints_y = ["y" + keypoint.split("kp")[1], "Y" + keypoint.split("kp")[1]]
+        keypoints_y = [i for i in keypoints_y if i in data.columns]
+        data_dlc[(keypoint, "y")] = data[keypoints_y].to_numpy().T[0]
+
+    return pd.DataFrame(data_dlc)
+def get_keypoint_kinematics(PE_config,
+                            keypoint_ego1,
+                            keypoint_ego2,
+                            start,
+                            end,
+                            binsize=None,
+                            metric="angle",
+                            thresh=70,
+                            selected_subgroups="all",
+                            return_as_df=True, verbose=False):
+    """
+    Measure keypoint kinematics (egocentrically aligned angle, distance, and travel of keypoints) across group of subjects
+
+    :param PE_config: pose estimation config - used for FPS only
+    :param keypoint1: first keypoint to use for establishing egocentric alignment axis
+    :param keypoint2: second keypoint to use for establishing egocentric alignment axis
+    :param start: start time in seconds
+    :param end: end time in seconds
+    :param binsize: if binned output is desired, size of timebins (default is None for no binning)
+    :param metric: metric to assess for all non-keypoint1/2 keypoints; must be "angle", "distance", or "travel"
+    :param thresh: threshold for when distance 'jump' is too large and should be excluded; default 70
+    :param selected_subgroups: subgroups to analyze as defined in config; default "all"
+    :param return_as_df: return as a dataframe or return as KeypointTravel class (for embedding, classification)
+    :return:
+
+    """
+
+    if selected_subgroups == "all":
+        selected_subgroups = PE_config["subgroups"].keys()
+
+    group_dict = {selected_subgroups[i]: i for i in range(len(selected_subgroups))}
+
+    non_ego_keypoints = [i for i in PE_config["keypoints"] if ((i != keypoint_ego1) and (i != keypoint_ego2))]
+
+    group_labels = []
+    kinematic_data = []
+    observation_labels = []
+
+    n_observations = np.sum([len(PE_config["subgroups"][group]) for group in selected_subgroups])
+
+    count = 0
+    for g, group in enumerate(selected_subgroups):
+        for s, sess in enumerate(PE_config["subgroups"][group]):
+            count += 1
+            observation_labels.append(sess)
+            if verbose:
+                print(f"Working on {metric} kinematics for observation {count} of {n_observations}")
+            group_labels.append(group_dict[group])
+            filepath = PE_config["data_directory"] + "/" + sess
+            if PE_config["data_source"] == "DeepLabCut":
+                data = pd.read_csv(filepath, header=[1, 2])
+                if verbose:
+                    print("Ego-centering")
+                data_new = ego_center(PE_config, data, keypoint_ego1, keypoint_ego2)
+                data = data_new
+            elif PE_config["data_source"] == "OpenFace":
+                data = read_openface_csv(PE_config,filepath)
+                if verbose:
+                    print("Ego-centering")
+                data_new = ego_center(PE_config, data, keypoint_ego1, keypoint_ego2)
+                data = data_new
+            if binsize == None:
+                binsize = end - start
+                nbins = 1
+            else:
+                nbins = int((end - start) / binsize)
+            kin_i = np.zeros(nbins * len(non_ego_keypoints))
+            fps = int(PE_config["fps"])
+
+            if verbose:
+                print(f"Computing {metric}")
+            for kp, keypoint in enumerate(non_ego_keypoints):
+                for b in range(nbins):
+                    x = np.array(data[keypoint]['x'])[(start + b * binsize) * fps:(start + (b + 1) * binsize) * fps]
+                    y = np.array(data[keypoint]['y'])[(start + b * binsize) * fps:(start + (b + 1) * binsize) * fps]
+                    for i in range(len(x) - 1):
+                        if np.absolute(x[i + 1] - x[i]) > thresh:
+                            x[i + 1] = x[i]
+                        if np.absolute(y[i + 1] - y[i]) > thresh:
+                            y[i + 1] = y[i]
+                        if metric == "travel":
+                            kin_i[(kp * nbins) + b] = kin_i[(kp * nbins) + b] + np.sqrt(
+                                (x[i + 1] - x[i]) ** 2 + (y[i + 1] - y[i]) ** 2)
+                    if metric == "angle":
+                        kin_i[(kp * nbins) + b] = np.mean(np.arctan2(y, x))
+                    elif metric == "distance":
+                        kin_i[(kp * nbins) + b] = np.mean(np.sqrt((x ** 2) + (y ** 2)))
+            kinematic_data.append(kin_i)
+    kinematic_data = np.array(kinematic_data)
+    feat_names = []
+    for kp in non_ego_keypoints:
+        if binsize is not None:
+            feat_name_kp = np.arange(start / 60, end / 60, binsize / 60)
+            feat_names += [metric + "_" + kp + "_" + str(i) for i in feat_name_kp]
+        else:
+            feat_names.append(metric + "_" + kp)
+    if return_as_df:
+        kf = KeypointFeature(kinematic_data, group_labels, observation_labels, feat_names, group_dict, None)
+        kf_df = kf.to_df()
+        return kf_df
+    else:
+        return KeypointFeature(kinematic_data, group_labels, observation_labels, feat_names, group_dict, None)
+
+
 class ActionUnits:
     def __init__(self, action_units, group_labels, observation_labels, feat_names, group_dict, scaler):
         self.action_units = action_units
