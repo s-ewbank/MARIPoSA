@@ -82,7 +82,7 @@ def create_PE_project(project_name,data_directory,data_source,output_directory,f
     if data_source=="DeepLabCut":
         project_files=[i for i in sorted(os.listdir(data_directory)) if i.endswith(".csv")]
         test_df = pd.read_csv(data_directory + "/" + project_files[0], header=[0, 1, 2])
-        keypoints = [str(i) for i in np.unique([i[1] for i in test_df.columns])]
+        keypoints = [str(i) for i in np.unique([i[1] for i in test_df.columns]) if str(i)!="bodyparts"]
         print(keypoints)
     elif data_source=="SLEAP":
         project_files=sorted(os.listdir(data_directory))
