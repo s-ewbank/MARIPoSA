@@ -232,7 +232,7 @@ line up with what pose modules</p>
 <li><p><strong>start</strong> – start time in seconds</p></li>
 <li><p><strong>end</strong> – end time in seconds</p></li>
 <li><p><strong>binsize</strong> – if binned output is desired, size of timebins (default is None for no binning)</p></li>
-<li><p><strong>metric</strong> – metric to assess for all non-keypoint1/2 keypoints; must be “angle”, “distance”, or “travel”</p></li>
+<li><p><strong>metric</strong> – metric to assess for all non-keypoint1/2 keypoints; options are “angle_m” (for mean angle), “angle_sd” (for std deviation of angle), “distance_m” (for mean distance of keypoints to ego-center), “distance_sd” (for std deviation of distance of keypoints to ego-center), or “travel” (for movement of keypoints relative to ego-center)</p></li>
 <li><p><strong>thresh</strong> – threshold for when distance ‘jump’ is too large and should be excluded; default 70</p></li>
 <li><p><strong>selected_subgroups</strong> – subgroups to analyze as defined in config; default “all”</p></li>
 <li><p><strong>return_as_df</strong> – return as a dataframe or return as KeypointTravel class (for embedding, classification)</p></li>

@@ -91,7 +91,7 @@
              
   <section id="demo-8-pe-analyzing-keypoint-displacement-and-action-units-in-human-facial-pose-data-from-openface">
 <h1>Demo 8 (PE): Analyzing Keypoint Displacement and Action Units in human facial pose data from OpenFace<a class="headerlink" href="#demo-8-pe-analyzing-keypoint-displacement-and-action-units-in-human-facial-pose-data-from-openface" title="Permalink to this heading"></a></h1>
-<p><em>Written and last updated September 10, 2025 by Sedona Ewbank, snewbank&#64;stanford.edu</em></p>
+<p><em>Written and last updated September 18, 2025 by Sedona Ewbank, snewbank&#64;stanford.edu</em></p>
 <p>The purpose of this demo is to demonstrate how to measure and plot keypoint travel and action unit usage from OpenFace data. The citation for OpenFace is given below - note that this notebook includes some instructions for how to acquire MARIPoSA-compatible facial pose data using OpenFace:</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>T. Baltrušaitis, P. Robinson and L. -P. Morency, &quot;OpenFace: An open source facial behavior analysis toolkit,&quot; 2016 IEEE Winter Conference on Applications of Computer Vision (WACV), Lake Placid, NY, USA, 2016, pp. 1-10, doi: 10.1109/WACV.2016.7477553.
 </pre></div>
@@ -301,9 +301,9 @@ contempt: 15
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.49107142857142855
 </pre></div>
 </div>
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>([&lt;matplotlib.axis.YTick at 0x7fe87c20f0a0&gt;,
-  &lt;matplotlib.axis.YTick at 0x7fe87c2043d0&gt;,
-  &lt;matplotlib.axis.YTick at 0x7fe869b51a90&gt;],
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>([&lt;matplotlib.axis.YTick at 0x7fd6fc1b30d0&gt;,
+  &lt;matplotlib.axis.YTick at 0x7fd6fc1b3310&gt;,
+  &lt;matplotlib.axis.YTick at 0x7fd6fc1b1760&gt;],
  [Text(0, 0, &#39;sadness&#39;), Text(0, 1, &#39;happy&#39;), Text(0, 2, &#39;anger&#39;)])
 </pre></div>
 </div>
@@ -550,42 +550,42 @@ input[type=range].anim-slider {
 </style>
 
 <div class="animation">
-  <img id="_anim_img9340cc1deac04606b46b98650325a867">
+  <img id="_anim_imgdbbbed0c68a943738b336cf85156768a">
   <div class="anim-controls">
-    <input id="_anim_slider9340cc1deac04606b46b98650325a867" type="range" class="anim-slider"
+    <input id="_anim_sliderdbbbed0c68a943738b336cf85156768a" type="range" class="anim-slider"
            name="points" min="0" max="1" step="1" value="0"
-           oninput="anim9340cc1deac04606b46b98650325a867.set_frame(parseInt(this.value));">
+           oninput="animdbbbed0c68a943738b336cf85156768a.set_frame(parseInt(this.value));">
     <div class="anim-buttons">
-      <button title="Decrease speed" aria-label="Decrease speed" onclick="anim9340cc1deac04606b46b98650325a867.slower()">
+      <button title="Decrease speed" aria-label="Decrease speed" onclick="animdbbbed0c68a943738b336cf85156768a.slower()">
           <i class="fa fa-minus"></i></button>
-      <button title="First frame" aria-label="First frame" onclick="anim9340cc1deac04606b46b98650325a867.first_frame()">
+      <button title="First frame" aria-label="First frame" onclick="animdbbbed0c68a943738b336cf85156768a.first_frame()">
         <i class="fa fa-fast-backward"></i></button>
-      <button title="Previous frame" aria-label="Previous frame" onclick="anim9340cc1deac04606b46b98650325a867.previous_frame()">
+      <button title="Previous frame" aria-label="Previous frame" onclick="animdbbbed0c68a943738b336cf85156768a.previous_frame()">
           <i class="fa fa-step-backward"></i></button>
-      <button title="Play backwards" aria-label="Play backwards" onclick="anim9340cc1deac04606b46b98650325a867.reverse_animation()">
+      <button title="Play backwards" aria-label="Play backwards" onclick="animdbbbed0c68a943738b336cf85156768a.reverse_animation()">
           <i class="fa fa-play fa-flip-horizontal"></i></button>
-      <button title="Pause" aria-label="Pause" onclick="anim9340cc1deac04606b46b98650325a867.pause_animation()">
+      <button title="Pause" aria-label="Pause" onclick="animdbbbed0c68a943738b336cf85156768a.pause_animation()">
           <i class="fa fa-pause"></i></button>
-      <button title="Play" aria-label="Play" onclick="anim9340cc1deac04606b46b98650325a867.play_animation()">
+      <button title="Play" aria-label="Play" onclick="animdbbbed0c68a943738b336cf85156768a.play_animation()">
           <i class="fa fa-play"></i></button>
-      <button title="Next frame" aria-label="Next frame" onclick="anim9340cc1deac04606b46b98650325a867.next_frame()">
+      <button title="Next frame" aria-label="Next frame" onclick="animdbbbed0c68a943738b336cf85156768a.next_frame()">
           <i class="fa fa-step-forward"></i></button>
-      <button title="Last frame" aria-label="Last frame" onclick="anim9340cc1deac04606b46b98650325a867.last_frame()">
+      <button title="Last frame" aria-label="Last frame" onclick="animdbbbed0c68a943738b336cf85156768a.last_frame()">
           <i class="fa fa-fast-forward"></i></button>
-      <button title="Increase speed" aria-label="Increase speed" onclick="anim9340cc1deac04606b46b98650325a867.faster()">
+      <button title="Increase speed" aria-label="Increase speed" onclick="animdbbbed0c68a943738b336cf85156768a.faster()">
           <i class="fa fa-plus"></i></button>
     </div>
-    <form title="Repetition mode" aria-label="Repetition mode" action="#n" name="_anim_loop_select9340cc1deac04606b46b98650325a867"
+    <form title="Repetition mode" aria-label="Repetition mode" action="#n" name="_anim_loop_selectdbbbed0c68a943738b336cf85156768a"
           class="anim-state">
-      <input type="radio" name="state" value="once" id="_anim_radio1_9340cc1deac04606b46b98650325a867"
+      <input type="radio" name="state" value="once" id="_anim_radio1_dbbbed0c68a943738b336cf85156768a"
              >
-      <label for="_anim_radio1_9340cc1deac04606b46b98650325a867">Once</label>
-      <input type="radio" name="state" value="loop" id="_anim_radio2_9340cc1deac04606b46b98650325a867"
+      <label for="_anim_radio1_dbbbed0c68a943738b336cf85156768a">Once</label>
+      <input type="radio" name="state" value="loop" id="_anim_radio2_dbbbed0c68a943738b336cf85156768a"
              checked>
-      <label for="_anim_radio2_9340cc1deac04606b46b98650325a867">Loop</label>
-      <input type="radio" name="state" value="reflect" id="_anim_radio3_9340cc1deac04606b46b98650325a867"
+      <label for="_anim_radio2_dbbbed0c68a943738b336cf85156768a">Loop</label>
+      <input type="radio" name="state" value="reflect" id="_anim_radio3_dbbbed0c68a943738b336cf85156768a"
              >
-      <label for="_anim_radio3_9340cc1deac04606b46b98650325a867">Reflect</label>
+      <label for="_anim_radio3_dbbbed0c68a943738b336cf85156768a">Reflect</label>
     </form>
   </div>
 </div>
@@ -595,9 +595,9 @@ input[type=range].anim-slider {
   /* Instantiate the Animation class. */
   /* The IDs given should match those used in the template above. */
   (function() {
-    var img_id = "_anim_img9340cc1deac04606b46b98650325a867";
-    var slider_id = "_anim_slider9340cc1deac04606b46b98650325a867";
-    var loop_select_id = "_anim_loop_select9340cc1deac04606b46b98650325a867";
+    var img_id = "_anim_imgdbbbed0c68a943738b336cf85156768a";
+    var slider_id = "_anim_sliderdbbbed0c68a943738b336cf85156768a";
+    var loop_select_id = "_anim_loop_selectdbbbed0c68a943738b336cf85156768a";
     var frames = new Array(100);
     
   frames[0] = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAfQAAAH0CAYAAADL1t+KAAAAOXRFWHRTb2Z0d2FyZQBNYXRwbG90\
@@ -30842,7 +30842,7 @@ ALAAgQ4AgAUIdAAALECgAwBgAQIdAAALEOgAAFiAQAcAwAL/H5ChuuLkhu6TAAAAAElFTkSuQmCC\
     /* set a timeout to make sure all the above elements are created before
        the object is initialized. */
     setTimeout(function() {
-        anim9340cc1deac04606b46b98650325a867 = new Animation(frames, img_id, slider_id, 50.0,
+        animdbbbed0c68a943738b336cf85156768a = new Animation(frames, img_id, slider_id, 50.0,
                                  loop_select_id);
     }, 0);
   })()
@@ -30854,13 +30854,13 @@ ALAAgQ4AgAUIdAAALECgAwBgAQIdAAALEOgAAFiAQAcAwAL/H5ChuuLkhu6TAAAAAElFTkSuQmCC\
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Getting angle kinematics ...&quot;</span><span class="p">)</span>
 <span class="n">angle</span> <span class="o">=</span> <span class="n">analyze</span><span class="o">.</span><span class="n">get_keypoint_kinematics</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="s2">&quot;kp_27&quot;</span><span class="p">,</span><span class="s2">&quot;kp_33&quot;</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span>
-                            <span class="n">metric</span><span class="o">=</span><span class="s2">&quot;angle&quot;</span><span class="p">,</span>
+                            <span class="n">metric</span><span class="o">=</span><span class="s2">&quot;angle_m&quot;</span><span class="p">,</span>
                             <span class="n">thresh</span><span class="o">=</span><span class="mi">70</span><span class="p">,</span>
                             <span class="n">selected_subgroups</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;contempt&quot;</span><span class="p">,</span><span class="s2">&quot;surprise&quot;</span><span class="p">,</span><span class="s2">&quot;happy&quot;</span><span class="p">,</span><span class="s2">&quot;anger&quot;</span><span class="p">,</span><span class="s2">&quot;sadness&quot;</span><span class="p">],</span>
                             <span class="n">return_as_df</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Getting distance kinematics ...&quot;</span><span class="p">)</span>
 <span class="n">distance</span> <span class="o">=</span> <span class="n">analyze</span><span class="o">.</span><span class="n">get_keypoint_kinematics</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="s2">&quot;kp_27&quot;</span><span class="p">,</span><span class="s2">&quot;kp_33&quot;</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span>
-                            <span class="n">metric</span><span class="o">=</span><span class="s2">&quot;distance&quot;</span><span class="p">,</span>
+                            <span class="n">metric</span><span class="o">=</span><span class="s2">&quot;distance_m&quot;</span><span class="p">,</span>
                             <span class="n">thresh</span><span class="o">=</span><span class="mi">70</span><span class="p">,</span>
                             <span class="n">selected_subgroups</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;contempt&quot;</span><span class="p">,</span><span class="s2">&quot;surprise&quot;</span><span class="p">,</span><span class="s2">&quot;happy&quot;</span><span class="p">,</span><span class="s2">&quot;anger&quot;</span><span class="p">,</span><span class="s2">&quot;sadness&quot;</span><span class="p">],</span>
                             <span class="n">return_as_df</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
@@ -30883,7 +30883,7 @@ Getting travel kinematics ...
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot</span><span class="o">.</span><span class="n">plot_module_usage</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="n">angle</span><span class="p">,</span><span class="n">figW</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span><span class="n">figH</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span><span class="n">style</span><span class="o">=</span><span class="s2">&quot;points&quot;</span><span class="p">,</span><span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;turbo&quot;</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot</span><span class="o">.</span><span class="n">plot_keypoint_kinematics</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="n">angle</span><span class="p">,</span><span class="n">figW</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span><span class="n">figH</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span><span class="n">style</span><span class="o">=</span><span class="s2">&quot;points&quot;</span><span class="p">,</span><span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;turbo&quot;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Ego-centered Keypoint Angle&quot;</span><span class="p">)</span>
 
 <span class="n">emb</span> <span class="o">=</span> <span class="n">analyze</span><span class="o">.</span><span class="n">embed</span><span class="p">(</span><span class="n">angle</span><span class="p">)</span>
@@ -30905,14 +30905,14 @@ Getting travel kinematics ...
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Accuracy: 0.4532967032967033
 </pre></div>
 </div>
-<img alt="../_images/bc76d66bc8fa9500c20e3e837be6ce5159acdd537dbf1ab1d350969a7e48db5a.png" src="../_images/bc76d66bc8fa9500c20e3e837be6ce5159acdd537dbf1ab1d350969a7e48db5a.png" />
+<img alt="../_images/b73e860a91f58116869a2f0213bec07e94fd1000cc54da0c0662cdfdd581142d.png" src="../_images/b73e860a91f58116869a2f0213bec07e94fd1000cc54da0c0662cdfdd581142d.png" />
 <img alt="../_images/41762efdca7e77b39cb31c2c240dd881af386b112ce6da906688dfad4f844d68.png" src="../_images/41762efdca7e77b39cb31c2c240dd881af386b112ce6da906688dfad4f844d68.png" />
 <img alt="../_images/2d901d1de045a6fb03dc99d88e368961d4b477f2121dd71912346a1e55a84fe8.png" src="../_images/2d901d1de045a6fb03dc99d88e368961d4b477f2121dd71912346a1e55a84fe8.png" />
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot</span><span class="o">.</span><span class="n">plot_module_usage</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="n">distance</span><span class="p">,</span><span class="n">figW</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span><span class="n">figH</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span><span class="n">style</span><span class="o">=</span><span class="s2">&quot;points&quot;</span><span class="p">,</span><span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;turbo&quot;</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot</span><span class="o">.</span><span class="n">plot_keypoint_kinematics</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="n">distance</span><span class="p">,</span><span class="n">figW</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span><span class="n">figH</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span><span class="n">style</span><span class="o">=</span><span class="s2">&quot;points&quot;</span><span class="p">,</span><span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;turbo&quot;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Ego-centered Keypoint Location&quot;</span><span class="p">)</span>
 
 <span class="n">emb</span> <span class="o">=</span> <span class="n">analyze</span><span class="o">.</span><span class="n">embed</span><span class="p">(</span><span class="n">distance</span><span class="p">)</span>
@@ -30934,14 +30934,14 @@ Getting travel kinematics ...
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Accuracy: 0.5054945054945055
 </pre></div>
 </div>
-<img alt="../_images/5816bc530f5f78474ef6e2c165b0a34fcf60505674c62807530c884f87a584ee.png" src="../_images/5816bc530f5f78474ef6e2c165b0a34fcf60505674c62807530c884f87a584ee.png" />
+<img alt="../_images/594dc6fd00af5d0cae3af698419e91a8cbcf5e235948bfd8187e9e2e1ed906e5.png" src="../_images/594dc6fd00af5d0cae3af698419e91a8cbcf5e235948bfd8187e9e2e1ed906e5.png" />
 <img alt="../_images/bfa42b692ac85eb56f268db7cb9087703668ed2a4647aa97adfc4df8707e1def.png" src="../_images/bfa42b692ac85eb56f268db7cb9087703668ed2a4647aa97adfc4df8707e1def.png" />
 <img alt="../_images/8641dc3e874c644de181fca0ae253c9c53778de4abc593ffa9270062995636a1.png" src="../_images/8641dc3e874c644de181fca0ae253c9c53778de4abc593ffa9270062995636a1.png" />
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot</span><span class="o">.</span><span class="n">plot_module_usage</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="n">travel</span><span class="p">,</span><span class="n">figW</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span><span class="n">figH</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span><span class="n">style</span><span class="o">=</span><span class="s2">&quot;points&quot;</span><span class="p">,</span><span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;turbo&quot;</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot</span><span class="o">.</span><span class="n">plot_keypoint_kinematics</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="n">travel</span><span class="p">,</span><span class="n">figW</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span><span class="n">figH</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span><span class="n">style</span><span class="o">=</span><span class="s2">&quot;points&quot;</span><span class="p">,</span><span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;turbo&quot;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Ego-centered Keypoint Travel&quot;</span><span class="p">)</span>
 
 <span class="n">emb</span> <span class="o">=</span> <span class="n">analyze</span><span class="o">.</span><span class="n">embed</span><span class="p">(</span><span class="n">travel</span><span class="p">)</span>
@@ -30963,7 +30963,7 @@ Getting travel kinematics ...
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Accuracy: 0.45054945054945056
 </pre></div>
 </div>
-<img alt="../_images/d41483a4d289f92eaeac93048f36ee9b64570cdd94d65f1b08f6d67493fc9222.png" src="../_images/d41483a4d289f92eaeac93048f36ee9b64570cdd94d65f1b08f6d67493fc9222.png" />
+<img alt="../_images/4eccdd7da29a73bc558a1c2765dbe18f5ac74aecb7fff33e919d7b4d93bc2eb1.png" src="../_images/4eccdd7da29a73bc558a1c2765dbe18f5ac74aecb7fff33e919d7b4d93bc2eb1.png" />
 <img alt="../_images/7892df87cedfaf65e4f67f1bb33d1b6165d7b649e998f64adbff74cb695d9ad1.png" src="../_images/7892df87cedfaf65e4f67f1bb33d1b6165d7b649e998f64adbff74cb695d9ad1.png" />
 <img alt="../_images/611098f8a4c31be4437491911fc6c627c41e44205ad4ce91248e8c79c4152ff5.png" src="../_images/611098f8a4c31be4437491911fc6c627c41e44205ad4ce91248e8c79c4152ff5.png" />
 </div>
@@ -31023,16 +31023,16 @@ Getting travel kinematics ...
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.5863095238095238
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.5892857142857143
 </pre></div>
 </div>
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>([&lt;matplotlib.axis.YTick at 0x7f8f51ae17c0&gt;,
-  &lt;matplotlib.axis.YTick at 0x7f8f40ceeeb0&gt;,
-  &lt;matplotlib.axis.YTick at 0x7f8f51b1a760&gt;],
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>([&lt;matplotlib.axis.YTick at 0x7fd6d03bfe20&gt;,
+  &lt;matplotlib.axis.YTick at 0x7fd6d03bf730&gt;,
+  &lt;matplotlib.axis.YTick at 0x7fd6d03bf490&gt;],
  [Text(0, 0, &#39;sadness&#39;), Text(0, 1, &#39;happy&#39;), Text(0, 2, &#39;anger&#39;)])
 </pre></div>
 </div>
-<img alt="../_images/bd8822523686e702500efddcbe7154e5d02c249b1e84e3ee7890b7f33ccc24fe.png" src="../_images/bd8822523686e702500efddcbe7154e5d02c249b1e84e3ee7890b7f33ccc24fe.png" />
+<img alt="../_images/54b6fedade12cc193097ab5d28e4addfcab917711334fdda77edd6087e0bf36e.png" src="../_images/54b6fedade12cc193097ab5d28e4addfcab917711334fdda77edd6087e0bf36e.png" />
 </div>
 </div>
 </section>

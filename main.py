@@ -572,17 +572,20 @@ class Application(tk.Tk):
 
         ttk.Label(self, text="Analyze and visualize:",
                                ).place(x=int(self.width * 0.3), y=int(self.height * 0.44),width=menu_item_width,height=button_height)
-        ttk.Button(self, text="Measure keypoint travel (e.g., locomotion)",
+        ttk.Button(self, text="Measure and plot keypoint travel (e.g., locomotion)",
                                 command=self.window5d_keypoint_displacement_menu,
                                 ).place(x=int(self.width * 0.5), y=int(self.height * 0.44),width=button_width,height=button_height)
+        ttk.Button(self, text="Measure and plot ego-centered keypoint kinematics (e.g., angle)",
+                                command=self.window5f_kinematics_menu,
+                                ).place(x=int(self.width * 0.5), y=int(self.height * 0.51),width=button_width,height=button_height)
         if self.config["data_source"]=="OpenFace":
-            last_menu_item_pos=0.51
+            last_menu_item_pos=0.58
             ttk.Button(self, text="Measure action units",
                        command=self.window5e_action_units_menu,
                        ).place(x=int(self.width * 0.5), y=int(self.height * last_menu_item_pos), width=button_width,
                                height=button_height)
         else:
-            last_menu_item_pos=0.44
+            last_menu_item_pos=0.51
         ttk.Button(self, text="Embed and/or measure distance between groups",
                                 command=self.window5b_embed_distance_menu,
                                 ).place(x=int(self.width*0.5), y=int(self.height*(last_menu_item_pos+0.07)),width=button_width,height=button_height)
@@ -632,7 +635,7 @@ class Application(tk.Tk):
         ttk.Button(self, text="Get streamlined pose module label sequence file",
                                 command=self.window5d_get_modlabels,
                                 ).place(x=int(self.width*0.5), y=int(self.height*0.44),width=button_width,height=button_height)
-        ttk.Button(self, text="Measure pose module usage and transitions",
+        ttk.Button(self, text="Measure and plot pose module usage and transitions",
                                 command=self.window5a_usage_transitions_menu,
                                 ).place(x=int(self.width*0.5), y=int(self.height*0.51),width=button_width,height=button_height)
         ttk.Button(self, text="Embed and/or measure distance between groups",
@@ -725,12 +728,50 @@ class Application(tk.Tk):
                                 text="Edit config.yaml",
                                 command=lambda: metadata.edit_config(self.config["project_directory"] + "/config_PS.yaml")).place(x=int(self.width * 0.65),y=int(self.height * 0.6),anchor=tk.CENTER)
         # Bottom back buttons
-        ttk.Button(self, text="◀ update config and go back to BORIS menu", command=self.window4b_pose_vs_BORIS,
+        ttk.Button(self, text="◀ update config and go back to BORIS menu", command=self.load_project_remap_BORISmenu_4b,
                                 ).place(x=int(self.width*0.3), y=int(self.height*0.76))
-        ttk.Button(self, text="◀ update config and go back to analysis menu", command=self.load_project_mainmenu,
+        ttk.Button(self, text="◀ update config and go back to analysis menu", command=self.load_project_remap_mainmenu,
                                 ).place(x=int(self.width*0.3), y=int(self.height*0.83))
         ttk.Button(self, text="◀◀ back to start", command=self.window1_start,
                                 ).place(x=int(self.width*0.3), y=int(self.height*0.9))
+
+    def load_project_remap_mainmenu(self):
+        self.clear_window()
+        try:
+            config = metadata.load_project(self.config_path)
+            _, BORIS_to_pose_mat, loss_score = analyze.BORIS_to_pose(config, verbose = True)
+            config = analyze.make_remappings_from_BORIS(config, BORIS_to_pose_mat=BORIS_to_pose_mat)
+            metadata.save_edited_project(config, self.config_path)
+            self.append_log(f"config = metadata.load_project('{self.config_path}')")
+            self.append_log(f"_, BORIS_to_pose_mat, loss_score = analyze.BORIS_to_pose(config, verbose = True)")
+            self.append_log(f"config = analyze.make_remappings_from_BORIS(config)")
+            self.append_log(f"metadata.save_edited_project(config, '{self.config_path}')")
+            self.config = config
+        except:
+            print("Issue applying remappings, loading new config only")
+            config = metadata.load_project(self.config_path)
+            self.append_log(f"config = metadata.load_project('{self.config_path}')")
+            self.config = config
+        self.window3b_PS_menu()
+
+    def load_project_remap_BORISmenu_4b(self):
+        self.clear_window()
+        try:
+            config = metadata.load_project(self.config_path)
+            _, BORIS_to_pose_mat, loss_score = analyze.BORIS_to_pose(config, verbose = True)
+            config = analyze.make_remappings_from_BORIS(config, BORIS_to_pose_mat=BORIS_to_pose_mat)
+            metadata.save_edited_project(config, self.config_path)
+            self.append_log(f"config = metadata.load_project('{self.config_path}')")
+            self.append_log(f"_, BORIS_to_pose_mat, loss_score = analyze.BORIS_to_pose(config, verbose = True)")
+            self.append_log(f"config = analyze.make_remappings_from_BORIS(config)")
+            self.append_log(f"metadata.save_edited_project(config, '{self.config_path}')")
+            self.config = config
+        except:
+            print("Issue applying remappings, loading new config only")
+            config = metadata.load_project(self.config_path)
+            self.append_log(f"config = metadata.load_project('{self.config_path}')")
+            self.config = config
+        self.window4b_pose_vs_BORIS()
 
     def window4b3_pose_vs_BORIS(self):
         self.clear_window()
@@ -943,7 +984,10 @@ class Application(tk.Tk):
                 figW = ttk.Entry(self.frame_5a)
                 figW.insert(0, "6")
                 figW.place(x=int(self.width*0.82), y=int(self.height*0.72), relwidth=0.05)
-                # Choose style for plot
+                remap_bool = tk.BooleanVar()
+                remap_button = ttk.Checkbutton(self.frame_5a, text="Apply config remappings", variable=remap_bool)
+                remap_button.place(x=int(self.width*0.65), y=int(self.height*0.79))
+                remap_bool.set(False)
                 ttk.Label(self.frame_5a, text="What should the usage plot style be?",
                                        ).place(x=int(self.width*0.3), y=int(self.height*0.5))
                 style = tk.StringVar(value="scatter")
@@ -958,7 +1002,7 @@ class Application(tk.Tk):
                                                              )
                     radio_btn.place(x=int(self.width*0.3), y=int(self.height*(0.56+0.05*s)))
                 ttk.Button(self.frame_5a, text="Plot it!",
-                                        command=lambda: self.plot_usage(pickle_path.get(), style.get(), color.get(), legend_bool.get(), self.try_float(figH.get()), self.try_float(figW.get())),
+                                        command=lambda: self.plot_usage(pickle_path.get(), style.get(), color.get(), legend_bool.get(), remap_bool.get(), self.try_float(figH.get()), self.try_float(figW.get())),
                                         ).place(x=int(self.width*0.8), y=int(self.height*0.9))
 
             elif plot_option == "network":
@@ -995,8 +1039,28 @@ class Application(tk.Tk):
                 ttk.Button(self.frame_5a,
                                         text="Browse",
                                         command=lambda: self.window_browse(pickle_path, type="file")).place(x=int(self.width*0.8), y=int(self.height*0.42))
+                legend_bool = tk.BooleanVar()
+                legend_button = ttk.Checkbutton(self.frame_5a, text="Legend", variable=legend_bool)
+                legend_button.place(x=int(self.width*0.65), y=int(self.height*0.58))
+                legend_bool.set(True)
+                ttk.Label(self.frame_5a, text="Figure dimensions",
+                                       ).place(x=int(self.width*0.65), y=int(self.height*0.66))
+                ttk.Label(self.frame_5a, text="H",
+                                       ).place(x=int(self.width*0.65), y=int(self.height*0.72))
+                figH = ttk.Entry(self.frame_5a)
+                figH.insert(0, "3")
+                figH.place(x=int(self.width*0.67), y=int(self.height*0.72), relwidth=0.05)
+                ttk.Label(self.frame_5a, text="W",
+                                       ).place(x=int(self.width*0.8), y=int(self.height*0.72))
+                figW = ttk.Entry(self.frame_5a)
+                figW.insert(0, "6")
+                figW.place(x=int(self.width*0.82), y=int(self.height*0.72), relwidth=0.05)
+                remap_bool = tk.BooleanVar()
+                remap_button = ttk.Checkbutton(self.frame_5a, text="Apply config remappings", variable=remap_bool)
+                remap_button.place(x=int(self.width*0.65), y=int(self.height*0.79))
+                remap_bool.set(False)
                 ttk.Button(self.frame_5a, text="Plot it!",
-                                        command=lambda: self.plot_sandplot(pickle_path.get()),
+                                        command=lambda: self.plot_sandplot(pickle_path.get(),remap_bool.get(),self.try_float(figH.get()),self.try_float(figW.get())),
                                         ).place(x=int(self.width*0.8), y=int(self.height*0.9))
             # Bottom back buttons
         ttk.Button(self, text="◀ back to analysis menu", command=self.window3b_PS_menu,
@@ -1294,7 +1358,6 @@ class Application(tk.Tk):
                                                          )
                 radio_btn.place(x=int(self.width*0.65), y=int(self.height*(0.73+0.05*s)))
 
-            keypoint="tailbase"
             thresh=70
 
             ttk.Button(self.frame_5d, text="Analyze & Save",
@@ -1484,6 +1547,171 @@ class Application(tk.Tk):
                     radio_btn.place(x=int(self.width*0.3), y=int(self.height*(0.56+0.05*s)))
                 ttk.Button(self.frame_5e, text="Plot it!",
                                         command=lambda: self.plot_action_units(pickle_path.get(), style.get(), color.get(), legend_bool.get(), self.try_float(figH.get()), self.try_float(figW.get())),
+                                        ).place(x=int(self.width*0.8), y=int(self.height*0.9))
+
+
+        ttk.Button(self, text="◀ back to analysis menu", command=self.window3a_PE_menu,
+                                ).place(x=int(self.width*0.3), y=int(self.height*0.83))
+        ttk.Button(self, text="◀◀ back to start", command=self.window1_start,
+                                ).place(x=int(self.width*0.3), y=int(self.height*0.9))
+
+
+    def window5f_kinematics_menu(self):
+        self.clear_window()
+        ttk.Button(self, text="Log", command=self.log_window,
+                                ).place(x=int(self.width * 0.94), y=int(self.height * 0.02),relwidth=0.05)
+        self.create_sidebar_widget()
+        self.create_header("Kinematics Menu",header_path="Viz & Analyze ▶ Kinematics")
+        self.option_5f = tk.StringVar(value="")
+
+        ttk.Radiobutton(self, text="Get keypoint kinematics",
+                        command=lambda: self.window5f_kinematics_menu_update(),
+                        variable=self.option_5f, value="Get kinematics",
+                        ).place(x=int(self.width*0.3), y=int(self.height*0.2))
+        ttk.Radiobutton(self, text="Plot kinematics",
+                        command=lambda: self.window5f_kinematics_menu_update(),
+                        variable=self.option_5f, value="Plot kinematics",
+                        ).place(x=int(self.width*0.65), y=int(self.height*0.2))
+
+        # Frame that will contain the dynamic content
+        self.frame_5f = ttk.Frame(self)
+        self.frame_5f.place(x=0, y=0, relwidth=1, relheight=1)
+        self.frame_5f.lower()
+
+        # Initial content
+        self.window5f_kinematics_menu_update()
+
+        ttk.Button(self, text="◀ back to analysis menu", command=self.window3a_PE_menu,
+                                ).place(x=int(self.width*0.3), y=int(self.height*0.83))
+        ttk.Button(self, text="◀◀ back to start", command=self.window1_start,
+                                ).place(x=int(self.width*0.3), y=int(self.height*0.9))
+
+
+    def window5f_kinematics_menu_update(self,pickle_path_prefill = "/path/to/kinematics.pickle",
+                                               tx_pickle_path_prefill="/path/to/transitions.pickle",
+                                               plot_option=None):
+
+        # Clear existing content in the frame
+        for widget in self.frame_5f.winfo_children():
+            widget.destroy()
+
+        # Load content based on the selected option
+        selected = self.option_5f.get()
+
+        if selected=="Get kinematics":
+            ttk.Label(self.frame_5f, text="Enter info about your analysis.",
+                                   ).place(x=int(self.width*0.3), y=int(self.height*0.27))
+
+            ttk.Label(self.frame_5f, text="Start time (seconds)",
+                                   ).place(x=int(self.width*0.3), y=int(self.height*0.35))
+            start = ttk.Entry(self.frame_5f)
+            start.place(x=int(self.width*0.3), y=int(self.height*0.4))
+            ttk.Label(self.frame_5f, text="End time (seconds)",
+                                   ).place(x=int(self.width*0.3), y=int(self.height*0.47))
+            end = ttk.Entry(self.frame_5f)
+            end.place(x=int(self.width*0.3), y=int(self.height*0.52))
+            ttk.Label(self.frame_5f, text="Binsize (seconds; blank for no binning)",
+                                   ).place(x=int(self.width*0.3), y=int(self.height*0.59))
+            binsize = ttk.Entry(self.frame_5f)
+            binsize.place(x=int(self.width*0.3), y=int(self.height*0.64))
+            ttk.Label(self.frame_5f, text="Data to include",
+                                   ).place(x=int(self.width*0.65), y=int(self.height*0.27))
+            dropdown = MultiDropDown(self.frame_5f,options=["all combined"]+list(self.config["subgroups"].keys()),
+                                     x=int(self.width*0.65), y=int(self.height*0.32))
+            dropdown.place(x=int(self.width*0.65), y=int(self.height*0.32))
+            ttk.Label(self.frame_5f, text="Kinematic feature to extract",
+                                   ).place(x=int(self.width*0.65), y=int(self.height*0.39))
+            dropdown_kin = SingleDropDown(self.frame_5f,
+                                         options=["Travel relative to ego-center",
+                                                  "Mean angle relative to ego-center",
+                                                  "Std devation angle relative to ego-center",
+                                                  "Mean keypoint distance from ego-center",
+                                                  "Std devation keypoint distance from ego-center"],
+                                     x=int(self.width*0.65), y=int(self.height*0.44))
+            dropdown_kin.place(x=int(self.width*0.65), y=int(self.height*0.44))
+
+            ttk.Label(self.frame_5f, text="Keypoint for ego-centering",
+                                   ).place(x=int(self.width*0.65), y=int(self.height*0.51))
+            ttk.Label(self.frame_5f, text="1",
+                                   ).place(x=int(self.width*0.65), y=int(self.height*0.56))
+            dropdown_kp1 = SingleDropDown(self.frame_5f,options=self.config["keypoints"],
+                                     x=int(self.width*0.7), y=int(self.height*0.56))
+            dropdown_kp1.place(x=int(self.width*0.7), y=int(self.height*0.56))
+            ttk.Label(self.frame_5f, text="2",
+                                   ).place(x=int(self.width*0.65), y=int(self.height*0.61))
+            dropdown_kp2 = SingleDropDown(self.frame_5f,options=self.config["keypoints"],
+                                     x=int(self.width*0.7), y=int(self.height*0.61))
+            dropdown_kp2.place(x=int(self.width*0.7), y=int(self.height*0.61))
+
+            save_option = tk.StringVar(value="scatter")
+            save_options = ["pickle (for further use in MARIPoSA)",
+                             "csv (for external use)",
+                             "pickle AND csv"]
+            style_vars = ["pickle", "csv", "both"]
+            ttk.Label(self.frame_5f, text="How should the data be saved?",
+                                   ).place(x=int(self.width*0.65), y=int(self.height*0.68))
+            for s in range(len(style_vars)):
+                radio_btn = ttk.Radiobutton(self.frame_5f, text=save_options[s],
+                                                         variable=save_option, value=style_vars[s],
+                                                         )
+                radio_btn.place(x=int(self.width*0.65), y=int(self.height*(0.73+0.05*s)))
+
+            ttk.Button(self.frame_5f, text="Analyze & Save",
+                        command=lambda: self.save_keypoint_kinematics(dropdown_kp1.get_selected_option(),
+                                                                      dropdown_kp2.get_selected_option(),
+                                                                      self.try_int(start.get()),
+                                                                      self.try_int(end.get()),
+                                                                      dropdown.get_selected_options(),
+                                                                      binsize.get(),
+                                                                      dropdown_kin.get_selected_option(),
+                                                                      save_option.get()),
+                       ).place(x=int(self.width*0.8), y=int(self.height*0.9))
+
+        elif selected=="Plot kinematics":
+                ttk.Label(self.frame_5f, text="Path to kinematics .pickle:",
+                                       ).place(x=int(self.width*0.3), y=int(self.height*0.42))
+                pickle_path = ttk.Entry(self.frame_5f)
+                pickle_path.insert(0, pickle_path_prefill)
+                pickle_path.place(x=int(self.width*0.6), y=int(self.height*0.42))
+                ttk.Button(self.frame_5f,
+                                        text="Browse",
+                                        command=lambda: self.window_browse(pickle_path, type="file")).place(x=int(self.width*0.8), y=int(self.height*0.42))
+                ttk.Label(self.frame_5f, text="Colormap",
+                                       ).place(x=int(self.width*0.65), y=int(self.height*0.5))
+                color = ttk.Combobox(self.frame_5f, values=["jet", "cividis", "viridis", "magma"])
+                color.place(x=int(self.width*0.75), y=int(self.height*0.5))
+                color.set("jet")
+                legend_bool = tk.BooleanVar()
+                legend_button = ttk.Checkbutton(self.frame_5f, text="Legend", variable=legend_bool)
+                legend_button.place(x=int(self.width*0.65), y=int(self.height*0.58))
+                legend_bool.set(True)
+                ttk.Label(self.frame_5f, text="Figure dimensions",
+                                       ).place(x=int(self.width*0.65), y=int(self.height*0.66))
+                ttk.Label(self.frame_5f, text="H",
+                                       ).place(x=int(self.width*0.65), y=int(self.height*0.72))
+                figH = ttk.Entry(self.frame_5f)
+                figH.insert(0, "3")
+                figH.place(x=int(self.width*0.67), y=int(self.height*0.72), relwidth=0.05)
+                ttk.Label(self.frame_5f, text="W",
+                                       ).place(x=int(self.width*0.8), y=int(self.height*0.72))
+                figW = ttk.Entry(self.frame_5f)
+                figW.insert(0, "6")
+                figW.place(x=int(self.width*0.82), y=int(self.height*0.72), relwidth=0.05)
+                # Choose style for plot
+                ttk.Label(self.frame_5f, text="What should the usage plot style be?",
+                                       ).place(x=int(self.width*0.3), y=int(self.height*0.5))
+                style = tk.StringVar(value="scatter")
+                style_options = ["Bar with scattered individual points",
+                                 "Bar with standard error of the mean",
+                                 "Points with standard error of the mean"]
+                style_vars = ["bar_scatter", "bar_error", "points"]
+                for s in range(len(style_vars)):
+                    radio_btn = ttk.Radiobutton(self.frame_5f, text=style_options[s],
+                                                             variable=style, value=style_vars[s],
+                                                             )
+                    radio_btn.place(x=int(self.width*0.3), y=int(self.height*(0.56+0.05*s)))
+                ttk.Button(self.frame_5f, text="Plot it!",
+                                        command=lambda: self.plot_kinematics(pickle_path.get(), style.get(), color.get(), legend_bool.get(), self.try_float(figH.get()), self.try_float(figW.get())),
                                         ).place(x=int(self.width*0.8), y=int(self.height*0.9))
 
 
@@ -1808,7 +2036,7 @@ class Application(tk.Tk):
     def save_keypoint_travel(self, keypoint, start, end, subgroups, binsize, thresh, save_to):
         if len(binsize)>0:
             bin = True
-            binsize = int(binsize)
+            binsize = float(binsize)
         else:
             bin = False
         if subgroups == ["all combined"]:
@@ -1845,6 +2073,59 @@ class Application(tk.Tk):
             self.append_log(f"kf_df = keypoint_travel.to_df()")
             self.append_log(f"kf_df.to_csv('{file_path}_KEYPOINT_TRAVEL.csv')")
 
+    def save_keypoint_kinematics(self, keypoint1, keypoint2, start, end, subgroups, binsize, metric_input, save_to):
+
+        if len(binsize)>0:
+            bin = True
+            binsize = float(binsize)
+        else:
+            bin = False
+
+        if metric_input=="Travel relative to ego-center":
+            metric="travel"
+        elif metric_input=="Mean angle relative to ego-center":
+            metric="angle_m"
+        elif metric_input=="Std devation angle relative to ego-center":
+            metric="angle_sd"
+        elif metric_input=="Mean keypoint distance from ego-center":
+            metric="distance_m"
+        elif metric_input=="Std devation keypoint distance from ego-center":
+            metric="distance_sd"
+
+        if subgroups == ["all combined"]:
+            if bin:
+                kinematics = analyze.get_keypoint_kinematics(self.config, keypoint1, keypoint2, start, end, binsize=binsize, metric=metric, selected_subgroups='all', return_as_df=False)
+                self.append_log(f"kinematics = analyze.get_keypoint_kinematics(config, '{keypoint1}', '{keypoint2}', {start}, {end}, binsize={binsize}, metric='{metric}', selected_subgroups='all', return_as_df=False)")
+            else:
+                kinematics = analyze.get_keypoint_kinematics(self.config, keypoint1, keypoint2, start, end, metric=metric, selected_subgroups='all', return_as_df=False)
+                self.append_log(f"kinematics = analyze.get_keypoint_kinematics(config, '{keypoint1}', '{keypoint2}', {start}, {end}, metric='{metric}', selected_subgroups='all', return_as_df=False)")
+        else:
+            selected_subgroups=[i for i in subgroups if (i!="all combined")]
+            if bin:
+                kinematics = analyze.get_keypoint_kinematics(self.config, keypoint1, keypoint2, start, end, binsize=binsize, metric=metric, selected_subgroups=selected_subgroups, return_as_df=False)
+                self.append_log(f"kinematics = analyze.get_keypoint_kinematics(config, '{keypoint1}', '{keypoint2}', {start}, {end}, binsize={binsize}, metric='{metric}', selected_subgroups={selected_subgroups}, return_as_df=False)")
+            else:
+                kinematics = analyze.get_keypoint_kinematics(self.config, keypoint1, keypoint2, start, end, binsize=binsize, metric=metric, selected_subgroups=selected_subgroups, return_as_df=False)
+                self.append_log(f"kinematics = analyze.get_keypoint_kinematics(config, '{keypoint1}', '{keypoint2}', {start}, {end}, binsize={binsize}, metric='{metric}', selected_subgroups={selected_subgroups}, return_as_df=False)")
+        file_path = filedialog.asksaveasfilename(defaultextension='.pickle',
+                                                 filetypes=[("pickle files", "*.pickle"),
+                                                            ("All Files", "*.*")])
+        if save_to=="pickle":
+            kinematics.save(file_path+"_KINEMATICS.pickle")
+            self.append_log(f"kinematics.save('{file_path}_KINEMATICS.pickle')")
+        elif save_to=="csv":
+            kf_df = kinematics.to_df()
+            kf_df.to_csv(file_path+"_KINEMATICS.csv")
+            self.append_log(f"kf_df = kinematics.to_df()")
+            self.append_log(f"kf_df.to_csv('{file_path}_KINEMATICS.csv')")
+        elif save_to=="both":
+            kinematics.save(file_path+"_KINEMATICS.pickle")
+            self.append_log(f"kinematics.save('{file_path}_KINEMATICS.pickle')")
+            kf_df = kinematics.to_df()
+            kf_df.to_csv(file_path+"_KINEMATICS.csv")
+            self.append_log(f"kf_df = kinematics.to_df()")
+            self.append_log(f"kf_df.to_csv('{file_path}_KINEMATICS.csv')")
+
     def save_action_units(self, start, end, subgroups, binsize, aus_to_include, save_to):
         if "all" in aus_to_include:
             aus_to_include="all"
@@ -1852,7 +2133,7 @@ class Application(tk.Tk):
             aus_to_include = [self.try_int(i.split("AU")[1].split("_")[0]) for i in aus_to_include]
         if len(binsize)>0:
             bin = True
-            binsize = int(binsize)
+            binsize = float(binsize)
         else:
             bin = False
         if subgroups == ["all combined"]:
@@ -1889,17 +2170,17 @@ class Application(tk.Tk):
                 self.append_log(f"au_df = au.to_df()")
                 self.append_log(f"au_df.to_csv('{file_path}_ACTION_UNITS.csv')")
 
-    def plot_usage(self, pickle_path, style, color, legend_TF, figH, figW):
-        try:
-            module_usage = analyze.load_module_feature_object(pickle_path)
-            fig = plot.plot_module_usage(self.config, module_usage, style=style, cmap=color, legend=legend_TF, figH=figH, figW=figW)
-            self.append_log(f"module_usage = analyze.load_module_feature_object('{pickle_path}')")
-            self.append_log(f"fig = plot.plot_module_usage(config, module_usage, style='{style}', cmap='{color}', legend={legend_TF}, figH={figH}, figW={figW})")
-            self.plots_generated = self.plots_generated + 1
-            self.plot_window = PlotWindow(fig = fig, plot_number = self.plots_generated, master = self)
-            self.plot_window.mainloop()
-        except Exception as e:
-            self.error_window(e)
+    def plot_usage(self, pickle_path, style, color, legend_TF, remap, figH, figW):
+        # try:
+        module_usage = analyze.load_module_feature_object(pickle_path)
+        fig = plot.plot_module_usage(self.config, module_usage, style=style, cmap=color, legend=legend_TF, figH=figH, remap=remap, figW=figW)
+        self.append_log(f"module_usage = analyze.load_module_feature_object('{pickle_path}')")
+        self.append_log(f"fig = plot.plot_module_usage(config, module_usage, style='{style}', cmap='{color}', legend={legend_TF}, figH={figH}, figW={figW})")
+        self.plots_generated = self.plots_generated + 1
+        self.plot_window = PlotWindow(fig = fig, plot_number = self.plots_generated, master = self)
+        self.plot_window.mainloop()
+        # except Exception as e:
+        #     self.error_window(e)
 
     def plot_action_units(self, pickle_path, style, color, legend_TF, figH, figW):
         try:
@@ -1907,6 +2188,18 @@ class Application(tk.Tk):
             fig = plot.plot_action_units(self.config, action_units, style=style, cmap=color, legend=legend_TF, figH=figH, figW=figW)
             self.append_log(f"action_units = analyze.load_module_feature_object('{pickle_path}')")
             self.append_log(f"fig = plot.plot_action_units(config, action_units, style='{style}', cmap='{color}', legend={legend_TF}, figH={figH}, figW={figW})")
+            self.plots_generated = self.plots_generated + 1
+            self.plot_window = PlotWindow(fig = fig, plot_number = self.plots_generated, master = self)
+            self.plot_window.mainloop()
+        except Exception as e:
+            self.error_window(e)
+
+    def plot_kinematics(self, pickle_path, style, color, legend_TF, figH, figW):
+        try:
+            kinematics = analyze.load_module_feature_object(pickle_path)
+            fig = plot.plot_keypoint_kinematics(self.config, kinematics, style=style, cmap=color, legend=legend_TF, figH=figH, figW=figW)
+            self.append_log(f"kinematics = analyze.load_module_feature_object('{pickle_path}')")
+            self.append_log(f"fig = plot.plot_keypoint_kinematics(config, kinematics, style='{style}', cmap='{color}', legend={legend_TF}, figH={figH}, figW={figW})")
             self.plots_generated = self.plots_generated + 1
             self.plot_window = PlotWindow(fig = fig, plot_number = self.plots_generated, master = self)
             self.plot_window.mainloop()
@@ -1927,12 +2220,12 @@ class Application(tk.Tk):
         except Exception as e:
             self.error_window(e)
 
-    def plot_sandplot(self, pickle_path):
+    def plot_sandplot(self, pickle_path, remap, figH, figW):
         try:
             module_usage = analyze.load_module_feature_object(pickle_path)
-            fig = plot.module_usage_sandplot(self.config, module_usage)
+            fig = plot.module_usage_sandplot(self.config, module_usage, figH=figH, figW=figW, remap=remap)
             self.append_log(f"module_usage = analyze.load_module_feature_object('{pickle_path}')")
-            self.append_log(f"fig = plot.module_usage_sandplot(config, module_usage)")
+            self.append_log(f"fig = plot.module_usage_sandplot(config, module_usage, figH={figH}, figW={figW}, remap={remap})")
             self.plots_generated = self.plots_generated + 1
             self.plot_window = PlotWindow(fig = fig, plot_number = self.plots_generated, master = self)
             self.plot_window.mainloop()

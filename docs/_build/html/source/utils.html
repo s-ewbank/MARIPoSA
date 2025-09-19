@@ -126,7 +126,7 @@ line up with what pose modules</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="utils.analyze.KeypointFeature">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">utils.analyze.</span></span><span class="sig-name descname"><span class="pre">KeypointFeature</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">keypoint_feature</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group_labels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">observation_labels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feat_names</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scaler</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/utils/analyze.html#KeypointFeature"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.analyze.KeypointFeature" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">utils.analyze.</span></span><span class="sig-name descname"><span class="pre">KeypointFeature</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">keypoint_feature</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group_labels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">observation_labels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feat_names</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scaler</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feature_type</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/utils/analyze.html#KeypointFeature"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.analyze.KeypointFeature" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="utils.analyze.KeypointFeature.save">
@@ -321,7 +321,7 @@ line up with what pose modules</p>
 <li><p><strong>start</strong> – start time in seconds</p></li>
 <li><p><strong>end</strong> – end time in seconds</p></li>
 <li><p><strong>binsize</strong> – if binned output is desired, size of timebins (default is None for no binning)</p></li>
-<li><p><strong>metric</strong> – metric to assess for all non-keypoint1/2 keypoints; must be “angle”, “distance”, or “travel”</p></li>
+<li><p><strong>metric</strong> – metric to assess for all non-keypoint1/2 keypoints; options are “angle_m” (for mean angle), “angle_sd” (for std deviation of angle), “distance_m” (for mean distance of keypoints to ego-center), “distance_sd” (for std deviation of distance of keypoints to ego-center), or “travel” (for movement of keypoints relative to ego-center)</p></li>
 <li><p><strong>thresh</strong> – threshold for when distance ‘jump’ is too large and should be excluded; default 70</p></li>
 <li><p><strong>selected_subgroups</strong> – subgroups to analyze as defined in config; default “all”</p></li>
 <li><p><strong>return_as_df</strong> – return as a dataframe or return as KeypointTravel class (for embedding, classification)</p></li>
@@ -497,6 +497,11 @@ line up with what pose modules</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="utils.analyze.read_openface_csv">
 <span class="sig-prename descclassname"><span class="pre">utils.analyze.</span></span><span class="sig-name descname"><span class="pre">read_openface_csv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">of_config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filepath</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/utils/analyze.html#read_openface_csv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.analyze.read_openface_csv" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="utils.analyze.read_sleap_csv">
+<span class="sig-prename descclassname"><span class="pre">utils.analyze.</span></span><span class="sig-name descname"><span class="pre">read_sleap_csv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filepath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">track_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/utils/analyze.html#read_sleap_csv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.analyze.read_sleap_csv" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
@@ -773,6 +778,33 @@ line up with what pose modules</p>
 <li><p><strong>cmap</strong> – matplotlib colormap</p></li>
 <li><p><strong>title</strong> – title string, or None</p></li>
 <li><p><strong>legend</strong> – True or False</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>fig</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="utils.plot.plot_keypoint_kinematics">
+<span class="sig-prename descclassname"><span class="pre">utils.plot.</span></span><span class="sig-name descname"><span class="pre">plot_keypoint_kinematics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kinematics</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figW</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figH</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">style</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'bar_scatter'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'jet'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legend_pos</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'outside_right'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alt_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alt_xticks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_stats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/utils/plot.html#plot_keypoint_kinematics"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.plot.plot_keypoint_kinematics" title="Permalink to this definition"></a></dt>
+<dd><p>Plot mean action units</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config</strong> – config</p></li>
+<li><p><strong>action_units</strong> – output of analyze.get_keypoint_kinematics</p></li>
+<li><p><strong>figW</strong> – figure width (default: 4)</p></li>
+<li><p><strong>figH</strong> – figure height (default: 2)</p></li>
+<li><p><strong>style</strong> – plot style; “bar_scatter”, “bar_error”, “points”</p></li>
+<li><p><strong>cmap</strong> – colormap (default: jet)</p></li>
+<li><p><strong>legend_pos</strong> – legend position (default: outside)</p></li>
+<li><p><strong>legend</strong> – boolean to include or not include legend (default: False)</p></li>
+<li><p><strong>alt_labels</strong> – alternative group label dictionary (default: None)</p></li>
+<li><p><strong>alt_xticks</strong> – alternative xticklabels (list), for stacked plot style only (default: None)</p></li>
+<li><p><strong>title</strong> – plot title (default: None)</p></li>
+<li><p><strong>plot_stats</strong> – include stats on plot (default: False)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>

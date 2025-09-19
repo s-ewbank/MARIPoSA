@@ -63,6 +63,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#utils.plot.plot_distance_matrix"><code class="docutils literal notranslate"><span class="pre">plot_distance_matrix()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#utils.plot.plot_distance_results"><code class="docutils literal notranslate"><span class="pre">plot_distance_results()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#utils.plot.plot_embeddings"><code class="docutils literal notranslate"><span class="pre">plot_embeddings()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#utils.plot.plot_keypoint_kinematics"><code class="docutils literal notranslate"><span class="pre">plot_keypoint_kinematics()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#utils.plot.plot_keypoint_travel"><code class="docutils literal notranslate"><span class="pre">plot_keypoint_travel()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#utils.plot.plot_module_usage"><code class="docutils literal notranslate"><span class="pre">plot_module_usage()</span></code></a></li>
 </ul>
@@ -251,6 +252,33 @@
 <li><p><strong>cmap</strong> – matplotlib colormap</p></li>
 <li><p><strong>title</strong> – title string, or None</p></li>
 <li><p><strong>legend</strong> – True or False</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>fig</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="utils.plot.plot_keypoint_kinematics">
+<span class="sig-prename descclassname"><span class="pre">utils.plot.</span></span><span class="sig-name descname"><span class="pre">plot_keypoint_kinematics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kinematics</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figW</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figH</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">style</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'bar_scatter'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'jet'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legend_pos</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'outside_right'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alt_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alt_xticks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_stats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/utils/plot.html#plot_keypoint_kinematics"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.plot.plot_keypoint_kinematics" title="Permalink to this definition"></a></dt>
+<dd><p>Plot mean action units</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config</strong> – config</p></li>
+<li><p><strong>action_units</strong> – output of analyze.get_keypoint_kinematics</p></li>
+<li><p><strong>figW</strong> – figure width (default: 4)</p></li>
+<li><p><strong>figH</strong> – figure height (default: 2)</p></li>
+<li><p><strong>style</strong> – plot style; “bar_scatter”, “bar_error”, “points”</p></li>
+<li><p><strong>cmap</strong> – colormap (default: jet)</p></li>
+<li><p><strong>legend_pos</strong> – legend position (default: outside)</p></li>
+<li><p><strong>legend</strong> – boolean to include or not include legend (default: False)</p></li>
+<li><p><strong>alt_labels</strong> – alternative group label dictionary (default: None)</p></li>
+<li><p><strong>alt_xticks</strong> – alternative xticklabels (list), for stacked plot style only (default: None)</p></li>
+<li><p><strong>title</strong> – plot title (default: None)</p></li>
+<li><p><strong>plot_stats</strong> – include stats on plot (default: False)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>

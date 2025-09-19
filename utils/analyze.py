@@ -18,6 +18,7 @@ from sklearn.neural_network import MLPClassifier
 from scipy import stats
 from statsmodels.stats.multitest import multipletests
 import pickle
+import h5py
 
 import scipy
 from scipy.spatial import distance
@@ -53,7 +54,7 @@ def pickle_load(object_path):
     return obj
 
 class KeypointFeature:
-    def __init__(self, keypoint_feature, group_labels, observation_labels, feat_names, group_dict, scaler):
+    def __init__(self, keypoint_feature, group_labels, observation_labels, feat_names, group_dict, scaler, feature_type):
         self.keypoint_feature = keypoint_feature
         self.group_labels = group_labels
         self.observation_labels = observation_labels
@@ -63,6 +64,7 @@ class KeypointFeature:
         mean_check = np.allclose(np.mean(keypoint_feature, axis=0), 0, atol=0.1)
         std_check = np.allclose(np.std(keypoint_feature, axis=0), 1, atol=0.1)
         self.scaled = mean_check and std_check
+        self.feature_type = feature_type
 
     def to_df(self):
         colnames = []
@@ -85,7 +87,7 @@ class KeypointFeature:
         scaler = StandardScaler()
         keypoint_feature_scaled = scaler.fit_transform(self.keypoint_feature)
         return KeypointFeature(keypoint_feature_scaled, self.group_labels, self.observation_labels, self.feat_names,
-                           self.group_dict, scaler)
+                           self.group_dict, scaler, self.feature_type)
 
     def save(self, save_path):
         if ((save_path.endswith(".pkl")==False) and (save_path.endswith(".pickle")==False)):
@@ -279,8 +281,10 @@ def get_keypoint_travel(PE_config,
             if PE_config["data_source"]=="DeepLabCut":
                 data = pd.read_csv(filepath, header=[1, 2])
             elif PE_config["data_source"]=="OpenFace":
-                data = pd.read_csv(filepath)
-                data.columns = data.columns.str.replace(' ', '')
+                data = read_openface_csv(PE_config, filepath)
+            elif PE_config["data_source"]=="SLEAP":
+                final_filepath, track_name = tuple(filepath.split(":::"))
+                data = read_sleap_csv(final_filepath, track_name)
             if binsize == None:
                 binsize = end - start
                 nbins = 1
@@ -289,22 +293,8 @@ def get_keypoint_travel(PE_config,
             dist_i = np.zeros(nbins)
             fps = int(PE_config["fps"])
             for b in range(nbins):
-                if PE_config["data_source"]=="DeepLabCut":
-                    x = np.array(data[keypoint]['x'])[(start + b * binsize) * fps:(start + (b + 1) * binsize) * fps]
-                    y = np.array(data[keypoint]['y'])[(start + b * binsize) * fps:(start + (b + 1) * binsize) * fps]
-                elif PE_config["data_source"]=="OpenFace":
-                    x_col_lower = "x"+keypoint.split("kp")[1]
-                    y_col_lower = "y"+keypoint.split("kp")[1]
-                    x_col_upper = "X"+keypoint.split("kp")[1]
-                    y_col_upper = "Y"+keypoint.split("kp")[1]
-                    if x_col_upper in data.columns and y_col_upper in data.columns:
-                        x_col = x_col_upper
-                        y_col = y_col_upper
-                    elif x_col_lower in data.columns and y_col_lower in data.columns:
-                        x_col = x_col_lower
-                        y_col = y_col_lower
-                    x = np.array(data[x_col])[(start + b * binsize) * fps:(start + (b + 1) * binsize) * fps]
-                    y = np.array(data[y_col])[(start + b * binsize) * fps:(start + (b + 1) * binsize) * fps]
+                x = np.array(data[keypoint]['x'])[(start + b * binsize) * fps:(start + (b + 1) * binsize) * fps]
+                y = np.array(data[keypoint]['y'])[(start + b * binsize) * fps:(start + (b + 1) * binsize) * fps]
                 for i in range(len(x) - 1):
                     if np.absolute(x[i + 1] - x[i]) > thresh:
                         x[i + 1] = x[i]
@@ -318,11 +308,11 @@ def get_keypoint_travel(PE_config,
     else:
         feat_names="travel"
     if return_as_df:
-        kf = KeypointFeature(travel_data, group_labels, observation_labels, feat_names, group_dict, None)
+        kf = KeypointFeature(travel_data, group_labels, observation_labels, feat_names, group_dict, None, "travel")
         kf_df = kf.to_df()
         return kf_df
     else:
-        return KeypointFeature(travel_data, group_labels, observation_labels, feat_names, group_dict, None)
+        return KeypointFeature(travel_data, group_labels, observation_labels, feat_names, group_dict, None, "travel")
 
 
 def ego_center(config, data, keypoint_ego1, keypoint_ego2):
@@ -371,6 +361,25 @@ def read_openface_csv(of_config, filepath):
         data_dlc[(keypoint, "y")] = data[keypoints_y].to_numpy().T[0]
 
     return pd.DataFrame(data_dlc)
+
+def read_sleap_csv(filepath, track_name):
+    with h5py.File(filepath, "r") as f:
+        node_names = f['node_names'][:]
+        node_names = [node.decode('utf-8') for node in node_names]
+        track_names = f['track_names'][:]
+        track_names = [tr.decode('utf-8') for tr in track_names]
+        track_occupancy = f['track_occupancy'][:]
+        tracks = f['tracks'][:]
+
+    track_idx = np.argmax([i == track_name for i in track_names])
+
+    df = {}
+    for n, node in enumerate(node_names):
+        df[(node, "x")] = tracks[track_idx][0][n]
+        df[(node, "y")] = tracks[track_idx][1][n]
+    df = pd.DataFrame(df)
+
+    return pd.DataFrame(df)
 def get_keypoint_kinematics(PE_config,
                             keypoint_ego1,
                             keypoint_ego2,
@@ -390,13 +399,26 @@ def get_keypoint_kinematics(PE_config,
     :param start: start time in seconds
     :param end: end time in seconds
     :param binsize: if binned output is desired, size of timebins (default is None for no binning)
-    :param metric: metric to assess for all non-keypoint1/2 keypoints; must be "angle", "distance", or "travel"
+    :param metric: metric to assess for all non-keypoint1/2 keypoints; options are "angle_m" (for mean angle), "angle_sd" (for std deviation of angle), "distance_m" (for mean distance of keypoints to ego-center), "distance_sd" (for std deviation of distance of keypoints to ego-center), or "travel" (for movement of keypoints relative to ego-center)
     :param thresh: threshold for when distance 'jump' is too large and should be excluded; default 70
     :param selected_subgroups: subgroups to analyze as defined in config; default "all"
     :param return_as_df: return as a dataframe or return as KeypointTravel class (for embedding, classification)
     :return:
 
     """
+
+    if metric=="travel":
+        feature_type = "Keypoint travel relative to ego-center"
+    elif metric=="angle_m":
+        feature_type = "Keypoint mean angle relative to ego-center"
+    elif metric=="angle_sd":
+        feature_type = "Keypoint std deviation angle relative to ego-center"
+    elif metric=="distance_m":
+        feature_type =  "Keypoint mean distance to ego-center"
+    elif metric=="distance_sd":
+        feature_type =  "Keypoint std deviation distance to ego-center"
+    else:
+        return ValueError(f"Invalid metric ({metric}) - must be one of: 'angle_m' (for mean angle), 'angle_sd' (for std deviation of angle), 'distance_m' (for mean distance of keypoints to ego-center), 'distance_sd' (for std deviation of distance of keypoints to ego-center), or 'travel' (for movement of keypoints relative to ego-center)")
 
     if selected_subgroups == "all":
         selected_subgroups = PE_config["subgroups"].keys()
@@ -432,6 +454,13 @@ def get_keypoint_kinematics(PE_config,
                     print("Ego-centering")
                 data_new = ego_center(PE_config, data, keypoint_ego1, keypoint_ego2)
                 data = data_new
+            elif PE_config["data_source"]=="SLEAP":
+                final_filepath, track_name = tuple(filepath.split(":::"))
+                data = read_sleap_csv(final_filepath, track_name)
+                if verbose:
+                    print("Ego-centering")
+                data_new = ego_center(PE_config, data, keypoint_ego1, keypoint_ego2)
+                data = data_new
             if binsize == None:
                 binsize = end - start
                 nbins = 1
@@ -454,10 +483,14 @@ def get_keypoint_kinematics(PE_config,
                         if metric == "travel":
                             kin_i[(kp * nbins) + b] = kin_i[(kp * nbins) + b] + np.sqrt(
                                 (x[i + 1] - x[i]) ** 2 + (y[i + 1] - y[i]) ** 2)
-                    if metric == "angle":
+                    if metric == "angle_m":
                         kin_i[(kp * nbins) + b] = np.mean(np.arctan2(y, x))
-                    elif metric == "distance":
+                    if metric == "angle_sd":
+                        kin_i[(kp * nbins) + b] = np.std(np.arctan2(y, x))
+                    elif metric == "distance_m":
                         kin_i[(kp * nbins) + b] = np.mean(np.sqrt((x ** 2) + (y ** 2)))
+                    elif metric == "distance_sd":
+                        kin_i[(kp * nbins) + b] = np.std(np.sqrt((x ** 2) + (y ** 2)))
             kinematic_data.append(kin_i)
     kinematic_data = np.array(kinematic_data)
     feat_names = []
@@ -468,11 +501,11 @@ def get_keypoint_kinematics(PE_config,
         else:
             feat_names.append(metric + "_" + kp)
     if return_as_df:
-        kf = KeypointFeature(kinematic_data, group_labels, observation_labels, feat_names, group_dict, None)
+        kf = KeypointFeature(kinematic_data, group_labels, observation_labels, feat_names, group_dict, None, feature_type)
         kf_df = kf.to_df()
         return kf_df
     else:
-        return KeypointFeature(kinematic_data, group_labels, observation_labels, feat_names, group_dict, None)
+        return KeypointFeature(kinematic_data, group_labels, observation_labels, feat_names, group_dict, None, feature_type)
 
 
 class ActionUnits:

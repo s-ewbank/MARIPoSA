@@ -5,6 +5,7 @@ import subprocess
 import sys
 import pandas as pd
 import numpy as np
+import h5py
 
 def create_PS_project(project_name,data_directory,data_source,output_directory,fps,n_modules):
     """
@@ -83,10 +84,18 @@ def create_PE_project(project_name,data_directory,data_source,output_directory,f
         project_files=[i for i in sorted(os.listdir(data_directory)) if i.endswith(".csv")]
         test_df = pd.read_csv(data_directory + "/" + project_files[0], header=[0, 1, 2])
         keypoints = [str(i) for i in np.unique([i[1] for i in test_df.columns]) if str(i)!="bodyparts"]
-        print(keypoints)
     elif data_source=="SLEAP":
-        project_files=sorted(os.listdir(data_directory))
-        keypoints=[]
+        prediction_files=sorted(os.listdir(data_directory))
+        project_files=[]
+        for file in prediction_files:
+            with h5py.File(data_directory+"/"+file, "r") as f:
+                node_names = f['node_names'][:]
+                node_names = [node.decode('utf-8') for node in node_names]
+                track_names = f['track_names'][:]
+                track_names = [tr.decode('utf-8') for tr in track_names]
+                for tr in track_names:
+                    project_files.append(file+":::"+tr)
+        keypoints=node_names
     elif data_source=="OpenFace":
         project_files=[i for i in sorted(os.listdir(data_directory)) if i.endswith(".csv")]
         test_df = pd.read_csv(data_directory+"/"+project_files[0])
