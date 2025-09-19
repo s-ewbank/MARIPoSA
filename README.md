@@ -70,9 +70,11 @@ There exist 7 Jupyter notebook demos, labeled "PS" or "PE" based on whether they
   * 6.2: Simulating module usage
 * **Demo 7 (PE): Analyzing Keypoint Displacement in Pose Estimation Data**
   * 7.1: Measuring and plotting keypoint travel in animals
-  * 7.2 Using keypoint travel in animals for embedding and classification
+  * 7.2: Using keypoint travel in animals for embedding and classification
+  * 7.3: Measuring and using ego-centered kinematics from pose estimation data
 * **Demo 8 (PE): Analyzing Keypoint Displacement and Action Units in human facial pose data from OpenFace**
   * 8.0: Getting familiar with OpenFace data
-  * 8.1 Measuring and Analyzing Keypoint Travel in OpenFace Data
-  * 8.2 Working with Action Units
+  * 8.1: Measuring and Analyzing Keypoint Travel in OpenFace Data
+  * 8.2: Measuring and using ego-centered facial kinematics from OpenFace data
+  * 8.3: Working with Action Units
 
