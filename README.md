@@ -47,7 +47,7 @@ The MARIPoSA python command utilities can be learned from three main resources:
 2. The console log window of the GUI, which records the functions being executed in the GUI and can be exported to a text file for not only reviewing executed analyses but also learning the python command structure
 3. The Jupyter notebook demos!
 
-There exist 7 Jupyter notebook demos, labeled "PS" or "PE" based on whether they apply to pose segmentation or estimation data. The notebooks can be found in the "demo" folder of the Github repository or in the documentation website, and their contents are as follows:
+There exist 8 Jupyter notebook demos, labeled "PS" or "PE" based on whether they apply to pose segmentation or estimation data. The notebooks can be found in the "demo" folder of the Github repository or in the documentation website, and their contents are as follows:
 
 * **Demo 1 (PS/PE): Project Creation**
   * 1.0 Import and Setup
