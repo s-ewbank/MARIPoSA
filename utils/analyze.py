@@ -729,16 +729,20 @@ def combine_pose_modules(config, labels_df, force_no_numeric=False):
 
     :param config: config
     :param labels_df: from label_counter (subgroups or no_subgroups)
-    :return:
+    :return: labels_df_remapped
+
     """
-    n_rules=len(config["remappings"])
-    print("Applying " + str(n_rules) + " remapping rules from config.")
-    for r, remapping in enumerate(config["remappings"]):
-        print(str(r+1) + " of " + str(n_rules) + ": Remapping " + str(remapping[0]) + " to " + str(remapping[1]))
-        if remapping[0] is not None:
-            for old_val in remapping[0]:
-                for column in labels_df.columns:
-                    labels_df.replace(old_val, remapping[1], inplace=True)
+    try:
+        n_rules=len(config["remappings"])
+        print("Applying " + str(n_rules) + " remapping rules from config.")
+        for r, remapping in enumerate(config["remappings"]):
+            print(str(r+1) + " of " + str(n_rules) + ": Remapping " + str(remapping[0]) + " to " + str(remapping[1]))
+            if remapping[0] is not None:
+                for old_val in remapping[0]:
+                    for column in labels_df.columns:
+                        labels_df.replace(old_val, remapping[1], inplace=True)
+    except:
+        raise ValueError("Could not apply module remappings - check to see if something is wrong in the config.")
     if force_no_numeric:
         labels_flat = np.array(labels_df)
         labels_flat = [item for sublist in labels_flat for item in sublist]
@@ -1051,11 +1055,17 @@ def get_module_transitions(config, labels_df, modules_altered=False):
     fps = int(config["fps"])
     labels_flat = np.array(labels_df)
     labels_flat = [item for sublist in labels_flat for item in sublist]
-    modules = np.unique(labels_flat)
     if modules_altered:
+        modules = np.unique(labels_flat)
         n_modules = len(modules)
     else:
         n_modules = int(config["n_modules"])
+        modules = np.arange(0, n_modules, 1)
+        modules_detect = np.unique(labels_flat)
+        for m in modules_detect:
+            if is_nonnum(m):
+                print("Warning, detected non-numeric modules - consider setting 'modules_altered' to True (False by defualt)")
+                break
 
     transition_counts = []
     transition_count_matrices = []

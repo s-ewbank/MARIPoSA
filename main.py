@@ -100,7 +100,7 @@ class Application(tk.Tk):
         self.option_5b = tk.StringVar(value="")
         self.option_5c = tk.StringVar(value="")
         self.option_6a = tk.StringVar(value="")
-        self.option_simmode = tk.StringVar(value="multivariate_normal")
+        self.option_simmode = tk.StringVar(value="multivariate_gaussian")
         self.window1_start()
         self.log_text = ""
         self.log_window_ref = None
@@ -110,6 +110,7 @@ class Application(tk.Tk):
         """
         Int, but error window if not possible
         :return:
+
         """
         try:
             return int(value)
@@ -118,8 +119,9 @@ class Application(tk.Tk):
 
     def try_float(self, value):
         """
-        Int, but error window if not possible
+        Float, but error window if not possible
         :return:
+
         """
         try:
             return float(value)
@@ -130,6 +132,7 @@ class Application(tk.Tk):
         """
         Clear window
         :return:
+
         """
         for widget in self.winfo_children():
             if not isinstance(widget, tk.Toplevel):
@@ -170,12 +173,11 @@ class Application(tk.Tk):
         ok_button = ttk.Button(container, text="OK", command=error_win.destroy)
         ok_button.pack()
 
-        # Set a fixed width (e.g., 250px) but keep the height dynamic
-        custom_width = 300  # Adjust this value to make it skinnier or wider
+        custom_width = 300
         error_win.update_idletasks()
-        height = error_win.winfo_height()  # Get the current height of the window
-        x = (error_win.winfo_screenwidth() // 2) - (custom_width // 2)  # Center horizontally
-        y = (error_win.winfo_screenheight() // 2) - (height // 2)  # Center vertically
+        height = error_win.winfo_height()
+        x = (error_win.winfo_screenwidth() // 2) - (custom_width // 2)
+        y = (error_win.winfo_screenheight() // 2) - (height // 2)
         error_win.geometry(f"{custom_width}x{height}+{x}+{y}")
 
         error_win.transient()
@@ -243,6 +245,7 @@ class Application(tk.Tk):
         :param item_path_entry:
         :param type:
         :return:
+
         """
         if type == "file":
             filename = filedialog.askopenfilename()
@@ -844,10 +847,16 @@ class Application(tk.Tk):
                                  x=int(self.width*0.65), y=int(self.height*0.43))
         dropdown.place(x=int(self.width*0.65), y=int(self.height*0.43))
 
+        remap_bool = tk.BooleanVar()
+        remap_button = ttk.Checkbutton(self, text="Apply config remappings", variable=remap_bool)
+        remap_button.place(x=int(self.width*0.65), y=int(self.height*0.56))
+        remap_bool.set(False)
+
         ttk.Button(self, text="Analyze & Save",
                                 command=lambda: self.make_save_labels_df(self.try_int(start.get()),
-                                                                            self.try_int(end.get()),
-                                                                            dropdown.get_selected_options())
+                                                                         self.try_int(end.get()),
+                                                                         remap_bool.get(),
+                                                                         dropdown.get_selected_options())
                                 ).place(x=int(self.width*0.8), y=int(self.height*0.9))
 
         ttk.Button(self, text="◀ back to analysis menu", command=self.window3b_PS_menu,
@@ -924,18 +933,24 @@ class Application(tk.Tk):
                              "pickle AND csv"]
             style_vars = ["pickle", "csv", "both"]
             ttk.Label(self.frame_5a, text="How should the data be saved?",
-                                   ).place(x=int(self.width*0.65), y=int(self.height*0.6))
+                                   ).place(x=int(self.width*0.65), y=int(self.height*0.51))
             for s in range(len(style_vars)):
                 radio_btn = ttk.Radiobutton(self.frame_5a, text=save_options[s],
                                                          variable=save_option, value=style_vars[s],
                                                          )
-                radio_btn.place(x=int(self.width*0.65), y=int(self.height*(0.67+0.05*s)))
+                radio_btn.place(x=int(self.width*0.65), y=int(self.height*(0.58+0.05*s)))
+
+            remap_bool = tk.BooleanVar()
+            remap_button = ttk.Checkbutton(self.frame_5a, text="Apply config remappings", variable=remap_bool)
+            remap_button.place(x=int(self.width*0.65), y=int(self.height*0.79))
+            remap_bool.set(False)
 
             ttk.Button(self.frame_5a, text="Analyze & Save",
                                     command=lambda: self.save_usage_transitions(self.try_int(start.get()),
                                                                                 self.try_int(end.get()),
                                                                                 dropdown.get_selected_options(),
                                                                                 binsize.get(),
+                                                                                remap_bool.get(),
                                                                                 save_to=save_option.get()),
                                     ).place(x=int(self.width*0.8), y=int(self.height*0.9))
 
@@ -1270,10 +1285,10 @@ class Application(tk.Tk):
             scrollbox.place(x=int(self.width*0.65), y=int(self.height*0.53), relwidth=0.25, relheight=0.2)
 
             ttk.Button(self.frame_5c, text="Leave-one-out-cross-validation (LOOCV)",
-                                    command=lambda: self.regress(self.pickle_path_5c.get(), method.get(), scrollbox.get_values(), self.try_float(alpha.get()), "loocv"),
+                                    command=lambda: self.regress(self.pickle_path_5c.get(), method.get(), scrollbox.get_values(), alpha.get(), "loocv"),
                                     ).place(x=int(self.width*0.65), y=int(self.height*0.8))
             ttk.Button(self.frame_5c, text="Fit and save regression model",
-                                    command=lambda: self.regress(self.pickle_path_5c.get(), method.get(), scrollbox.get_values(), self.try_float(alpha.get()), "fullfit"),
+                                    command=lambda: self.regress(self.pickle_path_5c.get(), method.get(), scrollbox.get_values(), alpha.get(), "fullfit"),
                                     ).place(x=int(self.width*0.65), y=int(self.height*0.9))
 
     def window5d_keypoint_displacement_menu(self):
@@ -1804,7 +1819,7 @@ class Application(tk.Tk):
             ttk.Label(self.frame_6a, text="Simulation mode:",
                                    ).place(x=int(self.width*0.3), y=int(self.height*0.5))
             ttk.Radiobutton(self.frame_6a, text="multivariate normal (recommended)", variable=self.option_simmode,
-                            value="multivariate_normal").place(x=int(self.width * 0.3),y=int(self.height * 0.55))
+                            value="multivariate_gaussian").place(x=int(self.width * 0.3),y=int(self.height * 0.55))
             ttk.Radiobutton(self.frame_6a, text="log normal", variable=self.option_simmode,
                             value="log-normal").place(x=int(self.width * 0.3), y=int(self.height * 0.6))
 
@@ -1847,7 +1862,7 @@ class Application(tk.Tk):
             ttk.Label(self.frame_6a, text="Simulation mode:",
                                    ).place(x=int(self.width*0.3), y=int(self.height*0.6))
             ttk.Radiobutton(self.frame_6a, text="multivariate normal (recommended)", variable=self.option_simmode,
-                            value="multivariate_normal").place(x=int(self.width * 0.3),y=int(self.height * 0.65))
+                            value="multivariate_gaussian").place(x=int(self.width * 0.3),y=int(self.height * 0.65))
             ttk.Radiobutton(self.frame_6a, text="log normal", variable=self.option_simmode,
                             value="log-normal").place(x=int(self.width * 0.3), y=int(self.height * 0.7))
 
@@ -1918,29 +1933,35 @@ class Application(tk.Tk):
         self.plot_window = PlotWindow(fig = fig, plot_number = self.plots_generated, master = self)
         self.plot_window.mainloop()
 
-    def make_save_labels_df(self, start, end, subgroups):
+    def make_save_labels_df(self, start, end, remap, subgroups):
         try:
             if subgroups == ["all combined"]:
                 labels_df = analyze.get_module_labels(self.config, start, end)
+                self.append_log(f"labels_df = analyze.get_module_labels(config, {start}, {end})")
+                if remap:
+                    labels_df = analyze.combine_pose_modules(self.config, labels_df)
+                    self.append_log(f"labels_df = analyze.combine_pose_modules(config, labels_df)")
                 file_path = filedialog.asksaveasfilename(defaultextension='.csv',
                                                          filetypes=[("csvs", "*.csv"),
                                                                     ("All Files", "*.*")])
                 labels_df.to_csv(file_path)
-                self.append_log(f"labels_df = analyze.get_module_labels(config, {start}, {end}")
                 self.append_log(f"labels_df.to_csv('{file_path}')")
             else:
                 selected_subgroups=[i for i in subgroups if (i!="all combined")]
                 labels_df = analyze.get_module_labels(self.config, start, end, subgroups=selected_subgroups)
+                self.append_log(f"labels_df = analyze.get_module_labels(config, {start}, {end}, subgroups={selected_subgroups})")
+                if remap:
+                    labels_df = analyze.combine_pose_modules(self.config, labels_df)
+                    self.append_log(f"labels_df = analyze.combine_pose_modules(config, labels_df)")
                 file_path = filedialog.asksaveasfilename(defaultextension='.csv',
                                                          filetypes=[("csvs", "*.csv"),
                                                                     ("All Files", "*.*")])
                 labels_df.to_csv(file_path)
-                self.append_log(f"labels_df = analyze.get_module_labels(config, {start}, {end}, subgroups={selected_subgroups})")
                 self.append_log(f"labels_df.to_csv('{file_path}')")
         except Exception as e:
             self.error_window(e)
 
-    def save_usage_transitions(self, start, end, subgroups, binsize, save_to):
+    def save_usage_transitions(self, start, end, subgroups, binsize, remap, save_to):
         try:
             if len(binsize)>0:
                 bin = True
@@ -1950,12 +1971,17 @@ class Application(tk.Tk):
             if subgroups == ["all combined"]:
                 labels_df = analyze.get_module_labels(self.config, start, end)
                 self.append_log(f"labels_df = analyze.get_module_labels(config, {start}, {end})")
+                if remap:
+                    labels_df = analyze.combine_pose_modules(self.config, labels_df)
+                    self.append_log(f"labels_df = analyze.combine_pose_modules(config, labels_df)")
                 if bin:
-                    module_usage = analyze.get_module_usage(self.config, labels_df, binsize=binsize)
-                    self.append_log(f"module_usage = analyze.get_module_usage(config, labels_df, binsize={binsize})")
+                    module_usage = analyze.get_module_usage(self.config, labels_df, binsize=binsize,modules_altered=remap)
+                    self.append_log(f"module_usage = analyze.get_module_usage(config, labels_df, binsize={binsize},modules_altered={remap})")
                 else:
-                    module_usage = analyze.get_module_usage(self.config, labels_df)
-                module_transitions = analyze.get_module_transitions(self.config, labels_df)
+                    module_usage = analyze.get_module_usage(self.config, labels_df, modules_altered=remap)
+                    self.append_log(f"module_usage = analyze.get_module_usage(config, labels_df, modules_altered={remap})")
+                module_transitions = analyze.get_module_transitions(self.config, labels_df,modules_altered=remap)
+                self.append_log(f"module_transitions = analyze.get_module_transitions(config, labels_df,modules_altered=remap)")
                 file_path = filedialog.asksaveasfilename(defaultextension='.pickle',
                                                          filetypes=[("pickle files", "*.pickle"),
                                                                     ("All Files", "*.*")])
@@ -1992,14 +2018,17 @@ class Application(tk.Tk):
                 selected_subgroups=[i for i in subgroups if (i!="all combined")]
                 labels_df = analyze.get_module_labels(self.config, start, end, subgroups=selected_subgroups)
                 self.append_log(f"labels_df = analyze.get_module_labels(config, {start}, {end}, subgroups={selected_subgroups})")
+                if remap:
+                    labels_df = analyze.combine_pose_modules(self.config, labels_df)
+                    self.append_log(f"labels_df = analyze.combine_pose_modules(config, labels_df)")
                 if bin:
-                    module_usage = analyze.get_module_usage(self.config, labels_df, binsize=binsize)
-                    self.append_log(f"module_usage = analyze.get_module_usage(config, labels_df, binsize={binsize})")
+                    module_usage = analyze.get_module_usage(self.config, labels_df, binsize=binsize,modules_altered=remap)
+                    self.append_log(f"module_usage = analyze.get_module_usage(config, labels_df, binsize={binsize}, modules_altered={remap})")
                 else:
-                    module_usage = analyze.get_module_usage(self.config, labels_df)
-                    self.append_log(f"module_usage = analyze.get_module_usage(config, labels_df)")
-                module_transitions = analyze.get_module_transitions(self.config, labels_df)
-                self.append_log(f"module_transitions = analyze.get_module_transitions(config, labels_df)")
+                    module_usage = analyze.get_module_usage(self.config, labels_df, modules_altered=remap)
+                    self.append_log(f"module_usage = analyze.get_module_usage(config, labels_df, modules_altered={remap})")
+                module_transitions = analyze.get_module_transitions(self.config, labels_df, modules_altered=remap)
+                self.append_log(f"module_transitions = analyze.get_module_transitions(config, labels_df, modules_altered={remap})")
                 file_path = filedialog.asksaveasfilename(defaultextension='.pickle',
                                                          filetypes=[("pickle files", "*.pickle"),
                                                                     ("All Files", "*.*")])
@@ -2171,16 +2200,16 @@ class Application(tk.Tk):
                 self.append_log(f"au_df.to_csv('{file_path}_ACTION_UNITS.csv')")
 
     def plot_usage(self, pickle_path, style, color, legend_TF, remap, figH, figW):
-        # try:
-        module_usage = analyze.load_module_feature_object(pickle_path)
-        fig = plot.plot_module_usage(self.config, module_usage, style=style, cmap=color, legend=legend_TF, figH=figH, remap=remap, figW=figW)
-        self.append_log(f"module_usage = analyze.load_module_feature_object('{pickle_path}')")
-        self.append_log(f"fig = plot.plot_module_usage(config, module_usage, style='{style}', cmap='{color}', legend={legend_TF}, figH={figH}, figW={figW})")
-        self.plots_generated = self.plots_generated + 1
-        self.plot_window = PlotWindow(fig = fig, plot_number = self.plots_generated, master = self)
-        self.plot_window.mainloop()
-        # except Exception as e:
-        #     self.error_window(e)
+        try:
+            module_usage = analyze.load_module_feature_object(pickle_path)
+            fig = plot.plot_module_usage(self.config, module_usage, style=style, cmap=color, legend=legend_TF, figH=figH, remap=remap, figW=figW)
+            self.append_log(f"module_usage = analyze.load_module_feature_object('{pickle_path}')")
+            self.append_log(f"fig = plot.plot_module_usage(config, module_usage, style='{style}', cmap='{color}', legend={legend_TF}, figH={figH}, figW={figW})")
+            self.plots_generated = self.plots_generated + 1
+            self.plot_window = PlotWindow(fig = fig, plot_number = self.plots_generated, master = self)
+            self.plot_window.mainloop()
+        except Exception as e:
+            self.error_window(e)
 
     def plot_action_units(self, pickle_path, style, color, legend_TF, figH, figW):
         try:
@@ -2299,10 +2328,19 @@ class Application(tk.Tk):
             self.error_window(e)
 
     def regress(self, pickle_path, method, dose_dict, alpha, fullfit_or_loocv):
+
+        if len(alpha)>0:
+            alpha = True
+            alpha = float(alpha)
+        else:
+            alpha = False
+
         try:
             if fullfit_or_loocv == "fullfit":
                 module_feature_object = analyze.load_module_feature_object(pickle_path)
-                reg = analyze.regress(module_feature_object, dose_dict, method=method, alpha=alpha)
+                reg, dose_labels = analyze.regress(module_feature_object, dose_dict, method=method, alpha=alpha)
+                self.append_log(f"module_feature_object = analyze.load_module_feature_object('{pickle_path}')")
+                self.append_log(f"reg, dose_labels = analyze.regress(module_feature_object, {dose_dict}, method='{method}', alpha={alpha})")
                 save_path = filedialog.asksaveasfilename(defaultextension='.pickle',
                                                          filetypes=[("pickle files", "*.pickle"),
                                                                     ("All Files", "*.*")])
@@ -2357,9 +2395,9 @@ class Application(tk.Tk):
             bins_low = np.arange(binstart,binstop,bininterval)
             bins_hi = bins_low + bininterval
             bins = np.array([bins_low,bins_hi]).T
-            simulate.generate_usage_labeled(module_usage, int(n_samples), bins, reg, max_iters="default",
-                                   random_state=int(rs), mode=method, scale=10, verbosity="medium")
-            sim_module_usage = simulate.generate_usage(module_usage, int(n_samples), random_state=int(rs), mode=method)
+            sim_module_usage = simulate.generate_usage_labeled(module_usage, int(n_samples), bins, reg, max_iters="default",
+                                                               random_state=int(rs), mode=method, scale=10, verbosity="medium")
+            print(type(sim_module_usage))
             self.append_log(f"module_usage = analyze.load_module_feature_object('{pickle_path}')")
             self.append_log(f"reg = analyze.load_module_feature_object('{reg_path}')")
             self.append_log(f"bins_low = np.arange({binstart},{binstop},{bininterval})")

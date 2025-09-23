@@ -178,9 +178,6 @@ def generate_usage_labeled(module_feature_object, n_samples_per_bin, bins, regre
             if count>max_iters:
                 raise ValueError(f"Maximum number of iterations ({max_iters}) reached!")
 
-        else:
-            return ValueError("Mode invalid! Must be log-normal or multivariate_gaussian")
-
         simulated_X = np.array(simulated_X)
         simulated_X = np.squeeze(simulated_X,axis=1)
 
@@ -191,6 +188,9 @@ def generate_usage_labeled(module_feature_object, n_samples_per_bin, bins, regre
             print("Warning - generating module transitions currently not tested for this function")
             return analyze.ModuleTransitions(simulated_X, np.nan, group_labels,
                                              module_feature_object.feat_names, {i:i for i in bins[:,0]}, None)
+
+        else:
+            return ValueError("Mode invalid! Must be log-normal or multivariate_gaussian")
 
 def generate_sequence(config, labels_df, T, n_subjs = 1, random_state=42, verbose=False):
     """
