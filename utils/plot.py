@@ -280,7 +280,7 @@ def plot_module_usage(config,
                 leg_handles_col1 = []
                 leg_labels = [""] * n_behaviors
                 bottom = True
-                cm_list = ['magma', 'YlOrBr', 'Blues', 'copper', 'BuGn', 'Greys_r', 'Reds_r', 'magma_r', 'Purples', 'YlGn',
+                cm_list = ['magma', 'YlOrBr', 'Blues', 'copper', 'Greys_r', 'BuGn', 'Reds_r', 'magma_r', 'Purples', 'YlGn',
                            'YlGnBu', 'YlOrRd']
                 modules_plotted=[] #To account for modules not seen in remapping
                 for remap in range(n_behaviors):
@@ -980,7 +980,7 @@ def module_usage_sandplot(config,
         leg_handles_col0 = []
         leg_handles_col1 = []
         leg_labels = [""] * n_behaviors
-        cm_list = ['magma', 'YlOrBr', 'Blues', 'copper', 'BuGn', 'Greys_r', 'Reds_r', 'magma_r', 'Purples', 'YlGn',
+        cm_list = ['magma', 'YlOrBr', 'Blues', 'copper', 'Greys_r', 'BuGn', 'Reds_r', 'magma_r', 'Purples', 'YlGn',
                    'YlGnBu', 'YlOrRd']
         modules_plotted = []  # To account for modules not seen in remapping
         for remap in range(n_behaviors):

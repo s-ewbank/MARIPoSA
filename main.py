@@ -9,6 +9,7 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import os
 from PIL import Image, ImageTk
 import cProfile
+import traceback
 
 factor=0.6
 
@@ -156,7 +157,7 @@ class Application(tk.Tk):
 
         error_message = tk.Text(
             container,
-            height=4,
+            height=10,
             wrap="word",
             bg=bg_color,
             fg=text_color,
@@ -173,7 +174,7 @@ class Application(tk.Tk):
         ok_button = ttk.Button(container, text="OK", command=error_win.destroy)
         ok_button.pack()
 
-        custom_width = 300
+        custom_width = 500
         error_win.update_idletasks()
         height = error_win.winfo_height()
         x = (error_win.winfo_screenwidth() // 2) - (custom_width // 2)
@@ -478,7 +479,8 @@ class Application(tk.Tk):
                 self.clear_window()
                 self.window3b_PS_menu()
         except Exception as e:
-            self.error_window("Problem loading config. Did you choose a wrong file? Or rename from config_<PS/PE>.yaml?")
+            full_traceback = traceback.format_exc()
+            self.error_window("Problem loading config. Did you choose a wrong file? Or rename from config_<PS/PE>.yaml?\n\n----\n\n"+full_traceback)
 
     def load_project_BORIS(self):
         self.clear_window()
@@ -1152,6 +1154,10 @@ class Application(tk.Tk):
             color = ttk.Combobox(self.frame_5b, values=["jet", "cividis", "viridis", "magma"])
             color.place(x=int(self.width*0.3), y=int(self.height*0.71))
             color.set("jet")
+            scale_bool = tk.BooleanVar()
+            scale_button = ttk.Checkbutton(self.frame_5b, text="Fit and apply standard scaler", variable=scale_bool)
+            scale_button.place(x=int(self.width*0.65), y=int(self.height*0.52))
+            scale_bool.set(False)
             legend_bool = tk.BooleanVar()
             legend_button = ttk.Checkbutton(self.frame_5b, text="Legend", variable=legend_bool)
             legend_button.place(x=int(self.width*0.65), y=int(self.height*0.58))
@@ -1169,7 +1175,7 @@ class Application(tk.Tk):
             figW.insert(0, "6")
             figW.place(x=int(self.width*0.82), y=int(self.height*0.72), relwidth=0.05)
             ttk.Button(self.frame_5b, text="Plot embeddings",
-                                    command=lambda: self.embed_plot(self.pickle_path_5b.get(), embedding_type.get(), color.get(), legend_bool.get(), self.try_float(figH.get()), self.try_float(figW.get())),
+                                    command=lambda: self.embed_plot(self.pickle_path_5b.get(), embedding_type.get(), scale_bool.get(), color.get(), legend_bool.get(), self.try_float(figH.get()), self.try_float(figW.get())),
                                     ).place(x=int(self.width*0.8), y=int(self.height*0.9))
         elif selected=="distance":
             ttk.Label(self.frame_5b, text="Distance metric to use",
@@ -1269,7 +1275,8 @@ class Application(tk.Tk):
                 groups = list(group_dict.keys())
             except Exception:
                 module_feature_object_path = self.pickle_path_5c.get()
-                self.error_window(f"Issue loading module feature object - is the pickle path valid? {module_feature_object_path}")
+                full_traceback = traceback.format_exc()
+                self.error_window(f"Issue loading module feature object - is the pickle path valid? {module_feature_object_path}\n\n----\n\n"+full_traceback)
             ttk.Label(self.frame_5c, text="Regression method to use",
                                    ).place(x=int(self.width*0.3), y=int(self.height*0.48))
             method = ttk.Combobox(self.frame_5c, values=["LinearRegression","Ridge","Lasso"])
@@ -1960,7 +1967,8 @@ class Application(tk.Tk):
                 labels_df.to_csv(file_path)
                 self.append_log(f"labels_df.to_csv('{file_path}')")
         except Exception as e:
-            self.error_window(e)
+            full_traceback = traceback.format_exc()
+            self.error_window(str(e)+"\n\n----\n\n"+full_traceback)
 
     def save_usage_transitions(self, start, end, subgroups, binsize, remap, save_to):
         try:
@@ -2061,7 +2069,8 @@ class Application(tk.Tk):
                     self.append_log(f"transitions_df = module_transitions.to_df()")
                     self.append_log(f"transitions_df.to_csv('{file_path}_TRANSITIONS.csv')")
         except Exception as e:
-            self.error_window(e)
+            full_traceback = traceback.format_exc()
+            self.error_window(str(e)+"\n\n----\n\n"+full_traceback)
 
     def save_keypoint_travel(self, keypoint, start, end, subgroups, binsize, thresh, save_to):
         if len(binsize)>0:
@@ -2210,7 +2219,8 @@ class Application(tk.Tk):
             self.plot_window = PlotWindow(fig = fig, plot_number = self.plots_generated, master = self)
             self.plot_window.mainloop()
         except Exception as e:
-            self.error_window(e)
+            full_traceback = traceback.format_exc()
+            self.error_window(str(e)+"\n\n----\n\n"+full_traceback)
 
     def plot_action_units(self, pickle_path, style, color, legend_TF, figH, figW):
         try:
@@ -2222,7 +2232,8 @@ class Application(tk.Tk):
             self.plot_window = PlotWindow(fig = fig, plot_number = self.plots_generated, master = self)
             self.plot_window.mainloop()
         except Exception as e:
-            self.error_window(e)
+            full_traceback = traceback.format_exc()
+            self.error_window(str(e)+"\n\n----\n\n"+full_traceback)
 
     def plot_kinematics(self, pickle_path, style, color, legend_TF, figH, figW):
         try:
@@ -2234,7 +2245,8 @@ class Application(tk.Tk):
             self.plot_window = PlotWindow(fig = fig, plot_number = self.plots_generated, master = self)
             self.plot_window.mainloop()
         except Exception as e:
-            self.error_window(e)
+            full_traceback = traceback.format_exc()
+            self.error_window(str(e)+"\n\n----\n\n"+full_traceback)
 
     def plot_network(self, pickle_path, tx_pickle_path, color):
         try:
@@ -2248,7 +2260,8 @@ class Application(tk.Tk):
             self.plot_window = PlotWindow(fig = fig, plot_number = self.plots_generated, master = self)
             self.plot_window.mainloop()
         except Exception as e:
-            self.error_window(e)
+            full_traceback = traceback.format_exc()
+            self.error_window(str(e)+"\n\n----\n\n"+full_traceback)
 
     def plot_sandplot(self, pickle_path, remap, figH, figW):
         try:
@@ -2260,7 +2273,8 @@ class Application(tk.Tk):
             self.plot_window = PlotWindow(fig = fig, plot_number = self.plots_generated, master = self)
             self.plot_window.mainloop()
         except Exception as e:
-            self.error_window(e)
+            full_traceback = traceback.format_exc()
+            self.error_window(str(e)+"\n\n----\n\n"+full_traceback)
 
     def plot_keypoint_travel(self,kpf_pickle_path,color,plottype):
         try:
@@ -2272,11 +2286,14 @@ class Application(tk.Tk):
             self.plot_window = PlotWindow(fig = fig, plot_number = self.plots_generated, master = self)
             self.plot_window.mainloop()
         except Exception as e:
-            self.error_window(e)
+            full_traceback = traceback.format_exc()
+            self.error_window(str(e)+"\n\n----\n\n"+full_traceback)
 
-    def embed_plot(self, pickle_path, embedding_type, color, legend_TF, figH, figW):
+    def embed_plot(self, pickle_path, embedding_type, scale, color, legend_TF, figH, figW):
         try:
             module_feature_object = analyze.load_module_feature_object(pickle_path)
+            if scale:
+                module_feature_object = module_feature_object.scale()
             emb = analyze.embed(module_feature_object, method=embedding_type, n_components=2)
             fig = plot.plot_embeddings(module_feature_object, emb, cmap=color, legend=legend_TF, figH=figH, figW=figW)
             self.append_log(f"module_feature_object = analyze.load_module_feature_object('{pickle_path}')")
@@ -2286,7 +2303,8 @@ class Application(tk.Tk):
             self.plot_window = PlotWindow(fig = fig, plot_number = self.plots_generated, master = self)
             self.plot_window.mainloop()
         except Exception as e:
-            self.error_window(e)
+            full_traceback = traceback.format_exc()
+            self.error_window(str(e)+"\n\n----\n\n"+full_traceback)
 
     def distance_plot(self, pickle_path, dist_metric, pairwise_centroid_opt, plot_type):
         try:
@@ -2304,7 +2322,8 @@ class Application(tk.Tk):
             self.plot_window = PlotWindow(fig = fig, plot_number = self.plots_generated, master = self)
             self.plot_window.mainloop()
         except Exception as e:
-            self.error_window(e)
+            full_traceback = traceback.format_exc()
+            self.error_window(str(e)+"\n\n----\n\n"+full_traceback)
 
     def classify(self, pickle_path, method, fullfit_or_loocv):
         try:
@@ -2326,7 +2345,8 @@ class Application(tk.Tk):
                 print(f"Confusion matrix: \n{conf_mat}")
 
         except Exception as e:
-            self.error_window(e)
+            full_traceback = traceback.format_exc()
+            self.error_window(str(e)+"\n\n----\n\n"+full_traceback)
 
     def regress(self, pickle_path, method, dose_dict, alpha, fullfit_or_loocv):
 
@@ -2359,7 +2379,8 @@ class Application(tk.Tk):
                     print(f"  {handle} ({dose_dict[handle]}): {np.mean(y_preds_h)} ± {np.std(y_preds_h)}")
 
         except Exception as e:
-            self.error_window(e)
+            full_traceback = traceback.format_exc()
+            self.error_window(str(e)+"\n\n----\n\n"+full_traceback)
 
     def simulate_sequence(self, labels_df_path, T, n_samples, rs):
         labels_df = pd.read_csv(labels_df_path, index_col=0, header=[0, 1])
@@ -2387,7 +2408,8 @@ class Application(tk.Tk):
             analyze.pickle_dump(sim_module_usage, save_path)
             self.append_log(f"analyze.pickle_dump(sim_module_usage, '{save_path}')")
         except Exception as e:
-            self.error_window(e)
+            full_traceback = traceback.format_exc()
+            self.error_window(str(e)+"\n\n----\n\n"+full_traceback)
 
     def simulate_usage_labeled(self, pickle_path, reg_path, method, n_samples, rs, binstart, binstop, bininterval):
         try:
@@ -2411,7 +2433,8 @@ class Application(tk.Tk):
             analyze.pickle_dump(sim_module_usage, save_path)
             self.append_log(f"analyze.pickle_dump(sim_module_usage, '{save_path}')")
         except Exception as e:
-            self.error_window(e)
+            full_traceback = traceback.format_exc()
+            self.error_window(str(e)+"\n\n----\n\n"+full_traceback)
 
 class MultiDropDown(ttk.Frame):
     def __init__(self, parent, options, x, y):

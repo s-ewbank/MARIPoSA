@@ -30,7 +30,8 @@ Run the GUI:
 In the GUI:
 1. Click "New project"
 2. Enter project metadata. 
-   - NOTE: For "Path to data directory" - if you datatype is B-SOiD or Keypoints-MoSeq, you should enter the path to a folder containing all the label .csv files with their original names; if your datatype is VAME you should enter the path to the "results" folder ouptut by VAME which contains nested subdirectories of a structure like "video1/VAME/hmm-15/15_km_label_video1.npy"
+   - NOTE FOR POSE SEGMENTATION PROJECTS: For "Path to data directory" - if your datatype is B-SOiD or Keypoints-MoSeq, you should enter the path to a folder containing all the label .csv files with their original names; if your datatype is VAME you should enter the path to the "results" folder ouptut by VAME which contains nested subdirectories of a structure like "video1/VAME/hmm-15/15_km_label_video1.npy"
+   - NOTE FOR POSE ESTIMATION PROJECTS: For "Path to data directory" - if your datatype is DeepLabCut or OpenFace, you should enter the path to a folder containing the .csv pose estimation / action unit files; if your datatype is SLEAP, you should enter the path to a folder containing .h5 keypoint prediction files
 4. Start your analysis!
 
 

@@ -8,7 +8,7 @@ dependencies:
   - python-dateutil
   - h5py
   - pip:
-    - customtkinter
+    - pillow
     - darkdetect
     - joblib
     - networkx
@@ -17,4 +17,5 @@ dependencies:
     - scikit-learn
     - scipy
     - statsmodels
+    - numpy
 prefix: /opt/anaconda3/envs/mariposa
