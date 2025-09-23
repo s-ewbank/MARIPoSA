@@ -333,7 +333,8 @@ class Application(tk.Tk):
 
             ttk.Label(self, text="Project name",
                                    ).place(x=int(self.width*0.2), y=int(self.height*0.2))
-            project_name = ttk.Entry(self).place(x=int(self.width*0.5), y=int(self.height*0.2))
+            project_name = ttk.Entry(self)
+            project_name.place(x=int(self.width*0.5), y=int(self.height*0.2))
 
             # Enter data directory
             ttk.Label(self, text="Path to data directory",
