@@ -637,10 +637,16 @@ def plot_keypoint_kinematics(config,
                 marker="o", markersize=2.5, linewidth=0.75,
                 capsize=2, markeredgewidth=0.75
             )
-        ax.set_xlabel(config["data_source"] + ' Pose Label')
-        ax.set_ylabel('Usage')
-        ax.set_xticks(np.arange(0, n_modules, 1), labels=[i.split("module")[1] for i in modules])
-        ax.tick_params(axis='x', rotation=90, labelsize=plt.rcParams['font.size'] * 0.5, pad=2)
+        ax.set_xlabel(config["data_source"] + ' Keypoint')
+        ax.set_ylabel(kinematics.feature_type)
+        all_num_modules = np.sum([isinstance(module, str) for module in modules]) == 0
+        if ((all_num_modules) and (n_modules >= 20)):
+            xticks = np.arange(0, n_modules, 5, dtype=int)
+            ax.set_xticks(xticks)
+            ax.set_xticklabels(modules[xticks])
+        else:
+            ax.set_xticks(np.arange(0, n_modules, 1))
+            ax.set_xticklabels(modules)
         plt.tight_layout()
 
     else:
@@ -739,10 +745,7 @@ def plot_keypoint_kinematics(config,
             ax.set_xticklabels(modules[xticks])
         else:
             ax.set_xticks(np.arange(0, n_modules, 1))
-            try:
-                ax.set_xticklabels([i.split("_")[0].split("AU")[1] for i in modules])
-            except:
-                ax.set_xticklabels(modules)
+            ax.set_xticklabels(modules)
         ax.tick_params(axis='x', rotation=90, labelsize=plt.rcParams['font.size'] * 0.2 * n_groups, pad=2)
         if plot_stats:
             ylim = plt.ylim()

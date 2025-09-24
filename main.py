@@ -2133,10 +2133,10 @@ class Application(tk.Tk):
 
         if subgroups == ["all combined"]:
             if bin:
-                kinematics = analyze.get_keypoint_kinematics(self.config, keypoint1, keypoint2, start, end, binsize=binsize, metric=metric, selected_subgroups='all', return_as_df=False)
+                kinematics = analyze.get_keypoint_kinematics(self.config, keypoint1, keypoint2, start, end, binsize=binsize, metric=metric, return_as_df=False)
                 self.append_log(f"kinematics = analyze.get_keypoint_kinematics(config, '{keypoint1}', '{keypoint2}', {start}, {end}, binsize={binsize}, metric='{metric}', selected_subgroups='all', return_as_df=False)")
             else:
-                kinematics = analyze.get_keypoint_kinematics(self.config, keypoint1, keypoint2, start, end, metric=metric, selected_subgroups='all', return_as_df=False)
+                kinematics = analyze.get_keypoint_kinematics(self.config, keypoint1, keypoint2, start, end, metric=metric, return_as_df=False)
                 self.append_log(f"kinematics = analyze.get_keypoint_kinematics(config, '{keypoint1}', '{keypoint2}', {start}, {end}, metric='{metric}', selected_subgroups='all', return_as_df=False)")
         else:
             selected_subgroups=[i for i in subgroups if (i!="all combined")]

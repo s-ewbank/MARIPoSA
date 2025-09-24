@@ -250,7 +250,7 @@ def get_keypoint_travel(PE_config,
                         end,
                         binsize=None,
                         thresh=70,
-                        selected_subgroups="all",
+                        selected_subgroups=None,
                         return_as_df=True):
     """
     Measure keypodint distance travelled across group of subjects
@@ -265,24 +265,24 @@ def get_keypoint_travel(PE_config,
     :param return_as_df: return as a dataframe or return as KeypointTravel class (for embedding, classification)
     :return:
     """
-    if selected_subgroups=="all":
-        selected_subgroups=PE_config["subgroups"].keys()
+    if selected_subgroups == None:
+        if selected_subgroups == "all":
+            selected_subgroups = PE_config["subgroups"].keys()
 
-    group_dict = {selected_subgroups[i]: i for i in range(len(selected_subgroups))}
+        group_dict = {"no_assigned_subgroup": 0}
 
-    group_labels=[]
-    travel_data=[]
-    observation_labels=[]
-    for g, group in enumerate(selected_subgroups):
-        for s, sess in enumerate(PE_config["subgroups"][group]):
+        group_labels = []
+        travel_data = []
+        observation_labels = []
+        for s, sess in enumerate(PE_config["project_files"]):
             observation_labels.append(sess)
-            group_labels.append(group_dict[group])
-            filepath = PE_config["data_directory"]+"/"+sess
-            if PE_config["data_source"]=="DeepLabCut":
+            group_labels.append(0)
+            filepath = PE_config["data_directory"] + "/" + sess
+            if PE_config["data_source"] == "DeepLabCut":
                 data = pd.read_csv(filepath, header=[1, 2])
-            elif PE_config["data_source"]=="OpenFace":
+            elif PE_config["data_source"] == "OpenFace":
                 data = read_openface_csv(PE_config, filepath)
-            elif PE_config["data_source"]=="SLEAP":
+            elif PE_config["data_source"] == "SLEAP":
                 final_filepath, track_name = tuple(filepath.split(":::"))
                 data = read_sleap_csv(final_filepath, track_name)
             if binsize == None:
@@ -302,11 +302,55 @@ def get_keypoint_travel(PE_config,
                         y[i + 1] = y[i]
                     dist_i[b] = dist_i[b] + np.sqrt((x[i + 1] - x[i]) ** 2 + (y[i + 1] - y[i]) ** 2)
             travel_data.append(dist_i)
-    travel_data = np.array(travel_data)
-    if binsize is not None:
-        feat_names=np.arange(start/60,end/60,binsize/60)
+        travel_data = np.array(travel_data)
+        if binsize is not None:
+            feat_names = np.arange(start / 60, end / 60, binsize / 60)
+        else:
+            feat_names = "travel"
+
     else:
-        feat_names="travel"
+        if selected_subgroups=="all":
+            selected_subgroups=PE_config["subgroups"].keys()
+
+        group_dict = {selected_subgroups[i]: i for i in range(len(selected_subgroups))}
+
+        group_labels=[]
+        travel_data=[]
+        observation_labels=[]
+        for g, group in enumerate(selected_subgroups):
+            for s, sess in enumerate(PE_config["subgroups"][group]):
+                observation_labels.append(sess)
+                group_labels.append(group_dict[group])
+                filepath = PE_config["data_directory"]+"/"+sess
+                if PE_config["data_source"]=="DeepLabCut":
+                    data = pd.read_csv(filepath, header=[1, 2])
+                elif PE_config["data_source"]=="OpenFace":
+                    data = read_openface_csv(PE_config, filepath)
+                elif PE_config["data_source"]=="SLEAP":
+                    final_filepath, track_name = tuple(filepath.split(":::"))
+                    data = read_sleap_csv(final_filepath, track_name)
+                if binsize == None:
+                    binsize = end - start
+                    nbins = 1
+                else:
+                    nbins = int((end - start) / binsize)
+                dist_i = np.zeros(nbins)
+                fps = int(PE_config["fps"])
+                for b in range(nbins):
+                    x = np.array(data[keypoint]['x'])[(start + b * binsize) * fps:(start + (b + 1) * binsize) * fps]
+                    y = np.array(data[keypoint]['y'])[(start + b * binsize) * fps:(start + (b + 1) * binsize) * fps]
+                    for i in range(len(x) - 1):
+                        if np.absolute(x[i + 1] - x[i]) > thresh:
+                            x[i + 1] = x[i]
+                        if np.absolute(y[i + 1] - y[i]) > thresh:
+                            y[i + 1] = y[i]
+                        dist_i[b] = dist_i[b] + np.sqrt((x[i + 1] - x[i]) ** 2 + (y[i + 1] - y[i]) ** 2)
+                travel_data.append(dist_i)
+        travel_data = np.array(travel_data)
+        if binsize is not None:
+            feat_names=np.arange(start/60,end/60,binsize/60)
+        else:
+            feat_names="travel"
     if return_as_df:
         kf = KeypointFeature(travel_data, group_labels, observation_labels, feat_names, group_dict, None, "travel")
         kf_df = kf.to_df()
@@ -388,7 +432,7 @@ def get_keypoint_kinematics(PE_config,
                             binsize=None,
                             metric="angle",
                             thresh=70,
-                            selected_subgroups="all",
+                            selected_subgroups=None,
                             return_as_df=True, verbose=False):
     """
     Measure keypoint kinematics (egocentrically aligned angle, distance, and travel of keypoints) across group of subjects
@@ -420,27 +464,25 @@ def get_keypoint_kinematics(PE_config,
     else:
         return ValueError(f"Invalid metric ({metric}) - must be one of: 'angle_m' (for mean angle), 'angle_sd' (for std deviation of angle), 'distance_m' (for mean distance of keypoints to ego-center), 'distance_sd' (for std deviation of distance of keypoints to ego-center), or 'travel' (for movement of keypoints relative to ego-center)")
 
-    if selected_subgroups == "all":
-        selected_subgroups = PE_config["subgroups"].keys()
+    if selected_subgroups==None:
 
-    group_dict = {selected_subgroups[i]: i for i in range(len(selected_subgroups))}
+        group_dict = {"no_assigned_subgroup": 0}
 
-    non_ego_keypoints = [i for i in PE_config["keypoints"] if ((i != keypoint_ego1) and (i != keypoint_ego2))]
+        non_ego_keypoints = [i for i in PE_config["keypoints"] if ((i != keypoint_ego1) and (i != keypoint_ego2))]
 
-    group_labels = []
-    kinematic_data = []
-    observation_labels = []
+        group_labels = []
+        kinematic_data = []
+        observation_labels = []
 
-    n_observations = np.sum([len(PE_config["subgroups"][group]) for group in selected_subgroups])
+        n_observations = len(PE_config["project_files"])
 
-    count = 0
-    for g, group in enumerate(selected_subgroups):
-        for s, sess in enumerate(PE_config["subgroups"][group]):
+        count = 0
+        for s, sess in enumerate(PE_config["project_files"]):
             count += 1
             observation_labels.append(sess)
             if verbose:
                 print(f"Working on {metric} kinematics for observation {count} of {n_observations}")
-            group_labels.append(group_dict[group])
+            group_labels.append(0)
             filepath = PE_config["data_directory"] + "/" + sess
             if PE_config["data_source"] == "DeepLabCut":
                 data = pd.read_csv(filepath, header=[1, 2])
@@ -449,12 +491,12 @@ def get_keypoint_kinematics(PE_config,
                 data_new = ego_center(PE_config, data, keypoint_ego1, keypoint_ego2)
                 data = data_new
             elif PE_config["data_source"] == "OpenFace":
-                data = read_openface_csv(PE_config,filepath)
+                data = read_openface_csv(PE_config, filepath)
                 if verbose:
                     print("Ego-centering")
                 data_new = ego_center(PE_config, data, keypoint_ego1, keypoint_ego2)
                 data = data_new
-            elif PE_config["data_source"]=="SLEAP":
+            elif PE_config["data_source"] == "SLEAP":
                 final_filepath, track_name = tuple(filepath.split(":::"))
                 data = read_sleap_csv(final_filepath, track_name)
                 if verbose:
@@ -492,14 +534,95 @@ def get_keypoint_kinematics(PE_config,
                     elif metric == "distance_sd":
                         kin_i[(kp * nbins) + b] = np.std(np.sqrt((x ** 2) + (y ** 2)))
             kinematic_data.append(kin_i)
-    kinematic_data = np.array(kinematic_data)
-    feat_names = []
-    for kp in non_ego_keypoints:
-        if binsize is not None:
-            feat_name_kp = np.arange(start / 60, end / 60, binsize / 60)
-            feat_names += [metric + "_" + kp + "_" + str(i) for i in feat_name_kp]
-        else:
-            feat_names.append(metric + "_" + kp)
+        kinematic_data = np.array(kinematic_data)
+        feat_names = []
+        for kp in non_ego_keypoints:
+            if binsize is not None:
+                feat_name_kp = np.arange(start / 60, end / 60, binsize / 60)
+                feat_names += [metric + "_" + kp + "_" + str(i) for i in feat_name_kp]
+            else:
+                feat_names.append(metric + "_" + kp)
+    else:
+        if selected_subgroups == "all":
+            selected_subgroups = PE_config["subgroups"].keys()
+
+        group_dict = {selected_subgroups[i]: i for i in range(len(selected_subgroups))}
+
+        non_ego_keypoints = [i for i in PE_config["keypoints"] if ((i != keypoint_ego1) and (i != keypoint_ego2))]
+
+        group_labels = []
+        kinematic_data = []
+        observation_labels = []
+
+        n_observations = np.sum([len(PE_config["subgroups"][group]) for group in selected_subgroups])
+
+        count = 0
+        for g, group in enumerate(selected_subgroups):
+            for s, sess in enumerate(PE_config["subgroups"][group]):
+                count += 1
+                observation_labels.append(sess)
+                if verbose:
+                    print(f"Working on {metric} kinematics for observation {count} of {n_observations}")
+                group_labels.append(group_dict[group])
+                filepath = PE_config["data_directory"] + "/" + sess
+                if PE_config["data_source"] == "DeepLabCut":
+                    data = pd.read_csv(filepath, header=[1, 2])
+                    if verbose:
+                        print("Ego-centering")
+                    data_new = ego_center(PE_config, data, keypoint_ego1, keypoint_ego2)
+                    data = data_new
+                elif PE_config["data_source"] == "OpenFace":
+                    data = read_openface_csv(PE_config,filepath)
+                    if verbose:
+                        print("Ego-centering")
+                    data_new = ego_center(PE_config, data, keypoint_ego1, keypoint_ego2)
+                    data = data_new
+                elif PE_config["data_source"]=="SLEAP":
+                    final_filepath, track_name = tuple(filepath.split(":::"))
+                    data = read_sleap_csv(final_filepath, track_name)
+                    if verbose:
+                        print("Ego-centering")
+                    data_new = ego_center(PE_config, data, keypoint_ego1, keypoint_ego2)
+                    data = data_new
+                if binsize == None:
+                    binsize = end - start
+                    nbins = 1
+                else:
+                    nbins = int((end - start) / binsize)
+                kin_i = np.zeros(nbins * len(non_ego_keypoints))
+                fps = int(PE_config["fps"])
+
+                if verbose:
+                    print(f"Computing {metric}")
+                for kp, keypoint in enumerate(non_ego_keypoints):
+                    for b in range(nbins):
+                        x = np.array(data[keypoint]['x'])[(start + b * binsize) * fps:(start + (b + 1) * binsize) * fps]
+                        y = np.array(data[keypoint]['y'])[(start + b * binsize) * fps:(start + (b + 1) * binsize) * fps]
+                        for i in range(len(x) - 1):
+                            if np.absolute(x[i + 1] - x[i]) > thresh:
+                                x[i + 1] = x[i]
+                            if np.absolute(y[i + 1] - y[i]) > thresh:
+                                y[i + 1] = y[i]
+                            if metric == "travel":
+                                kin_i[(kp * nbins) + b] = kin_i[(kp * nbins) + b] + np.sqrt(
+                                    (x[i + 1] - x[i]) ** 2 + (y[i + 1] - y[i]) ** 2)
+                        if metric == "angle_m":
+                            kin_i[(kp * nbins) + b] = np.mean(np.arctan2(y, x))
+                        if metric == "angle_sd":
+                            kin_i[(kp * nbins) + b] = np.std(np.arctan2(y, x))
+                        elif metric == "distance_m":
+                            kin_i[(kp * nbins) + b] = np.mean(np.sqrt((x ** 2) + (y ** 2)))
+                        elif metric == "distance_sd":
+                            kin_i[(kp * nbins) + b] = np.std(np.sqrt((x ** 2) + (y ** 2)))
+                kinematic_data.append(kin_i)
+        kinematic_data = np.array(kinematic_data)
+        feat_names = []
+        for kp in non_ego_keypoints:
+            if binsize is not None:
+                feat_name_kp = np.arange(start / 60, end / 60, binsize / 60)
+                feat_names += [metric + "_" + kp + "_" + str(i) for i in feat_name_kp]
+            else:
+                feat_names.append(metric + "_" + kp)
     if return_as_df:
         kf = KeypointFeature(kinematic_data, group_labels, observation_labels, feat_names, group_dict, None, feature_type)
         kf_df = kf.to_df()
