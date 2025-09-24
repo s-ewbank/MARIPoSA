@@ -1,0 +1,276 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Demo 3 (PS): Embedding of Pose Segmentation Data &mdash; MARIPoSA 0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=44496db0"></script>
+      <script src="../_static/doctools.js?v=888ff710"></script>
+      <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Demo 4 (PS): Regression and Classification of Group Conditions in Pose Segmentation Data" href="Demo4-PoseSegmentation-ClassificationAndRegression.html" />
+    <link rel="prev" title="Demo 2 (PS): Visualization of Pose Module Usage" href="Demo2-PoseSegmentation-Visualize.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            MARIPoSA
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="Demo1-ProjectCreation.html">Demo 1 (PS/PE): Project Creation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Demo2-PoseSegmentation-Visualize.html">Demo 2 (PS): Visualization of Pose Module Usage</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Demo 3 (PS): Embedding of Pose Segmentation Data</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#embedding-with-pca">3.1: Embedding with PCA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#embedding-with-lda">3.2: Embedding with LDA</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="Demo4-PoseSegmentation-ClassificationAndRegression.html">Demo 4 (PS): Regression and Classification of Group Conditions in Pose Segmentation Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Demo5-PoseSegmentation-ManualScoring.html">Demo 5 (PS): Comparing Pose Modules to Manual Scoring Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Demo6-PoseSegmentation-Simulation.html">Demo 6 (PS): Simulating Pose Segmentation Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Demo7-PoseEstimation-KeypointTravel.html">Demo 7 (PE): Analyzing Keypoint Movement and Kinematics in Pose Estimation Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Demo8-PoseEstimation-OpenFace.html">Demo 8 (PE): Analyzing Keypoint Displacement and Action Units in human facial pose data from OpenFace</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../metadata.html">Metadata</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../analyze.html">Analyze</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../plot.html">Plot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../simulate.html">Simulate</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">MARIPoSA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Demo 3 (PS): Embedding of Pose Segmentation Data</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/demo/Demo3-PoseSegmentation-Embed.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="demo-3-ps-embedding-of-pose-segmentation-data">
+<h1>Demo 3 (PS): Embedding of Pose Segmentation Data<a class="headerlink" href="#demo-3-ps-embedding-of-pose-segmentation-data" title="Permalink to this heading"></a></h1>
+<p><em>Written and last updated July 19, 2025 by Sedona Ewbank, snewbank&#64;stanford.edu</em></p>
+<p>The purpose of this demo is to demonstrate how to load pose segmentation data and visualize it in various ways.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">importlib</span>
+
+<span class="c1">#This block only important for running as script</span>
+<span class="c1">#script_dir = os.path.dirname(os.path.abspath(__file__))</span>
+<span class="n">mariposa_dir</span> <span class="o">=</span> <span class="s2">&quot;/Users/snewbank/PycharmProjects/MARIPoSA&quot;</span>
+<span class="n">utils_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">mariposa_dir</span><span class="p">,</span> <span class="s1">&#39;utils&#39;</span><span class="p">)</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">utils_dir</span><span class="p">)</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mariposa_dir</span><span class="p">)</span>
+
+<span class="c1">#import utils</span>
+<span class="kn">from</span> <span class="nn">utils</span> <span class="kn">import</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">analyze</span><span class="p">,</span> <span class="n">plot</span><span class="p">,</span> <span class="n">simulate</span>
+
+<span class="n">importlib</span><span class="o">.</span><span class="n">reload</span><span class="p">(</span><span class="n">metadata</span><span class="p">)</span>
+<span class="n">importlib</span><span class="o">.</span><span class="n">reload</span><span class="p">(</span><span class="n">analyze</span><span class="p">)</span>
+<span class="n">importlib</span><span class="o">.</span><span class="n">reload</span><span class="p">(</span><span class="n">plot</span><span class="p">)</span>
+<span class="n">importlib</span><span class="o">.</span><span class="n">reload</span><span class="p">(</span><span class="n">simulate</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;module &#39;utils.simulate&#39; from &#39;/Users/snewbank/PycharmProjects/MARIPoSA/utils/simulate.py&#39;&gt;
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">demo_dir</span><span class="o">=</span><span class="s2">&quot;/Users/snewbank/Behavior/MARIPoSA_demo_data/&quot;</span>
+<span class="n">config</span><span class="o">=</span><span class="n">metadata</span><span class="o">.</span><span class="n">load_project</span><span class="p">(</span><span class="n">demo_dir</span><span class="o">+</span><span class="s2">&quot;250719_test/config_PS.yaml&quot;</span><span class="p">)</span>
+<span class="n">save</span><span class="o">=</span><span class="kc">True</span>
+<span class="n">save_path</span> <span class="o">=</span> <span class="n">demo_dir</span><span class="o">+</span><span class="s2">&quot;demo_figures/&quot;</span>
+<span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">save_path</span><span class="p">):</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">save_path</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<section id="embedding-with-pca">
+<h2>3.1: Embedding with PCA<a class="headerlink" href="#embedding-with-pca" title="Permalink to this heading"></a></h2>
+<p>We can first try embedding our data agnostic to the subgroups with principal components analysis (PCA). Here we can make use here of the scaling function of module_usage and module_transitions - each can be scaled to unit variance with zero mean across features with .scale(), and scaling can be checked with .scaled. We can then use analyze.embed to embed and plot.plot_embeddings to visualize.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">help</span><span class="p">(</span><span class="n">analyze</span><span class="o">.</span><span class="n">embed</span><span class="p">)</span>
+
+<span class="n">help</span><span class="p">(</span><span class="n">plot</span><span class="o">.</span><span class="n">plot_embeddings</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Help on function embed in module utils.analyze:
+
+embed(module_feature_object, method=&#39;lda&#39;, n_components=2)
+    Get dimensionally reduced space embeddings of the data with LDA or PCA
+    
+    :param module_feature_object: module feature object
+    :param method: LDA or PCA; default LDA
+    :param n_components: number of components
+    :return:
+
+Help on function plot_embeddings in module utils.plot:
+
+plot_embeddings(module_feature_object, embeddings_object, figW=3, figH=3, cmap=&#39;viridis&#39;, title=None, legend=False, draw_ellipse=True, alt_legend=None)
+    Plot embeddings
+    
+    :param module_feature_object: module feature object (ModuleUsage or ModuleTransitions) from analyze.get_module_{xx}
+    :param embeddings_object: embeddings object (LDA or PCA) from analyze.embed
+    :param figW: figure width
+    :param figH: figure height
+    :param cmap: matplotlib colormap
+    :param title: title string, or None
+    :param legend: True or False
+    :return: fig
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Get and scale module usage</span>
+<span class="n">labels_df</span> <span class="o">=</span> <span class="n">analyze</span><span class="o">.</span><span class="n">get_module_labels</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1200</span><span class="p">,</span> <span class="n">subgroups</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;sal&quot;</span><span class="p">,</span><span class="s2">&quot;k1&quot;</span><span class="p">,</span><span class="s2">&quot;k5&quot;</span><span class="p">,</span><span class="s2">&quot;k10&quot;</span><span class="p">])</span>
+<span class="n">module_usage</span> <span class="o">=</span> <span class="n">analyze</span><span class="o">.</span><span class="n">get_module_usage</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">labels_df</span><span class="p">,</span> <span class="n">binsize</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Is module usage scaled? </span><span class="si">{</span><span class="n">module_usage</span><span class="o">.</span><span class="n">scaled</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">module_usage</span> <span class="o">=</span> <span class="n">module_usage</span><span class="o">.</span><span class="n">scale</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Is module usage scaled now?? </span><span class="si">{</span><span class="n">module_usage</span><span class="o">.</span><span class="n">scaled</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1">#Embed module usage</span>
+<span class="n">alt_legend</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;sal&quot;</span><span class="p">:</span><span class="s2">&quot;0&quot;</span><span class="p">,</span><span class="s2">&quot;k1&quot;</span><span class="p">:</span><span class="s2">&quot;1&quot;</span><span class="p">,</span><span class="s2">&quot;k5&quot;</span><span class="p">:</span><span class="s2">&quot;5&quot;</span><span class="p">,</span><span class="s2">&quot;k10&quot;</span><span class="p">:</span><span class="s2">&quot;10&quot;</span><span class="p">}</span>
+<span class="n">emb</span> <span class="o">=</span> <span class="n">analyze</span><span class="o">.</span><span class="n">embed</span><span class="p">(</span><span class="n">module_usage</span><span class="p">,</span><span class="n">method</span><span class="o">=</span><span class="s2">&quot;PCA&quot;</span><span class="p">,</span><span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plot</span><span class="o">.</span><span class="n">plot_embeddings</span><span class="p">(</span><span class="n">module_usage</span><span class="p">,</span> <span class="n">emb</span><span class="p">,</span> <span class="n">figW</span><span class="o">=</span><span class="mf">3.5</span><span class="p">,</span> <span class="n">figH</span><span class="o">=</span><span class="mf">2.5</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;viridis_r&quot;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;PCA usage&quot;</span><span class="p">,</span><span class="n">legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">alt_legend</span><span class="o">=</span><span class="n">alt_legend</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">save</span><span class="p">:</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">save_path</span><span class="o">+</span><span class="s2">&quot;demo3-1_pca_embed_usage.png&quot;</span><span class="p">,</span><span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
+    
+<span class="c1"># Get and scale module transitions</span>
+<span class="n">module_transitions</span> <span class="o">=</span> <span class="n">analyze</span><span class="o">.</span><span class="n">get_module_transitions</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">labels_df</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Are module transitions scaled? </span><span class="si">{</span><span class="n">module_transitions</span><span class="o">.</span><span class="n">scaled</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">module_transitions</span> <span class="o">=</span> <span class="n">module_transitions</span><span class="o">.</span><span class="n">scale</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Are module transitions scaled now?? </span><span class="si">{</span><span class="n">module_transitions</span><span class="o">.</span><span class="n">scaled</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    
+<span class="c1"># Embed module transitions</span>
+<span class="n">emb</span> <span class="o">=</span> <span class="n">analyze</span><span class="o">.</span><span class="n">embed</span><span class="p">(</span><span class="n">module_transitions</span><span class="p">,</span><span class="n">method</span><span class="o">=</span><span class="s2">&quot;PCA&quot;</span><span class="p">,</span><span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plot</span><span class="o">.</span><span class="n">plot_embeddings</span><span class="p">(</span><span class="n">module_transitions</span><span class="p">,</span> <span class="n">emb</span><span class="p">,</span> <span class="n">figW</span><span class="o">=</span><span class="mf">3.5</span><span class="p">,</span> <span class="n">figH</span><span class="o">=</span><span class="mf">2.5</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;viridis_r&quot;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;PCA transitions&quot;</span><span class="p">,</span><span class="n">legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">alt_legend</span><span class="o">=</span><span class="n">alt_legend</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">save</span><span class="p">:</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">save_path</span><span class="o">+</span><span class="s2">&quot;demo3-1_pca_embed_tx.png&quot;</span><span class="p">,</span><span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Is module usage scaled? False
+Is module usage scaled now?? True
+Ellipse only drawn for embeddings_object of class LDA, not &lt;class &#39;sklearn.decomposition._pca.PCA&#39;&gt;
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Are module transitions scaled? False
+Are module transitions scaled now?? True
+Ellipse only drawn for embeddings_object of class LDA, not &lt;class &#39;sklearn.decomposition._pca.PCA&#39;&gt;
+</pre></div>
+</div>
+<img alt="../_images/e5409c129bce6bf47103dd93f20d9f1402a36c16492b7009f4f31dac1b4d6745.png" src="../_images/e5409c129bce6bf47103dd93f20d9f1402a36c16492b7009f4f31dac1b4d6745.png" />
+<img alt="../_images/4bc3db8e5bfc7089aa7fa1c119474c005e1059891c71751776ac8e5d129d11fa.png" src="../_images/4bc3db8e5bfc7089aa7fa1c119474c005e1059891c71751776ac8e5d129d11fa.png" />
+</div>
+</div>
+</section>
+<section id="embedding-with-lda">
+<h2>3.2: Embedding with LDA<a class="headerlink" href="#embedding-with-lda" title="Permalink to this heading"></a></h2>
+<p>We can also embed based on class comparison (maximizing between-class distance and minimizing within-class distance) using linear discriminant analysis (LDA). Here again we make use of analyze.embed to embed and plot.plot_embeddings to visualize.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">emb</span> <span class="o">=</span> <span class="n">analyze</span><span class="o">.</span><span class="n">embed</span><span class="p">(</span><span class="n">module_usage</span><span class="p">,</span><span class="n">method</span><span class="o">=</span><span class="s2">&quot;LDA&quot;</span><span class="p">,</span><span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plot</span><span class="o">.</span><span class="n">plot_embeddings</span><span class="p">(</span><span class="n">module_usage</span><span class="p">,</span> <span class="n">emb</span><span class="p">,</span> <span class="n">figW</span><span class="o">=</span><span class="mf">3.5</span><span class="p">,</span> <span class="n">figH</span><span class="o">=</span><span class="mf">2.5</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;viridis_r&quot;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;LDA usage&quot;</span><span class="p">,</span><span class="n">legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">draw_ellipse</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">alt_legend</span><span class="o">=</span><span class="n">alt_legend</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">save</span><span class="p">:</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">save_path</span><span class="o">+</span><span class="s2">&quot;demo3-2_lda_embed_usage.png&quot;</span><span class="p">,</span><span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
+
+<span class="n">emb</span> <span class="o">=</span> <span class="n">analyze</span><span class="o">.</span><span class="n">embed</span><span class="p">(</span><span class="n">module_transitions</span><span class="p">,</span><span class="n">method</span><span class="o">=</span><span class="s2">&quot;LDA&quot;</span><span class="p">,</span><span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plot</span><span class="o">.</span><span class="n">plot_embeddings</span><span class="p">(</span><span class="n">module_transitions</span><span class="p">,</span> <span class="n">emb</span><span class="p">,</span> <span class="n">figW</span><span class="o">=</span><span class="mf">3.5</span><span class="p">,</span> <span class="n">figH</span><span class="o">=</span><span class="mf">2.5</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;viridis_r&quot;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;LDA transitions&quot;</span><span class="p">,</span><span class="n">legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">draw_ellipse</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">alt_legend</span><span class="o">=</span><span class="n">alt_legend</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">save</span><span class="p">:</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">save_path</span><span class="o">+</span><span class="s2">&quot;demo3-2_lda_embed_tx.png&quot;</span><span class="p">,</span><span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/9a19c1f4417f3dda236fdf8df08932a1e52a4a23cc597667e6f913994c0600d0.png" src="../_images/9a19c1f4417f3dda236fdf8df08932a1e52a4a23cc597667e6f913994c0600d0.png" />
+<img alt="../_images/ac1edca31f0c78bcdd3e8e7ffcce9e5c4ad6f7052a1fcd6d2865bd9e6796b661.png" src="../_images/ac1edca31f0c78bcdd3e8e7ffcce9e5c4ad6f7052a1fcd6d2865bd9e6796b661.png" />
+</div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="Demo2-PoseSegmentation-Visualize.html" class="btn btn-neutral float-left" title="Demo 2 (PS): Visualization of Pose Module Usage" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Demo4-PoseSegmentation-ClassificationAndRegression.html" class="btn btn-neutral float-right" title="Demo 4 (PS): Regression and Classification of Group Conditions in Pose Segmentation Data" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Sedona Ewbank.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

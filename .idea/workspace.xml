@@ -1,0 +1,702 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="7fb76900-29a9-459d-bd45-1760d8ecd8bb" name="Changes" comment="Fixed keypoint travel and kinematics functions to handle non-subgrouped data appropriately" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+        <option value="Jupyter Notebook" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;s-ewbank&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">
+    <option name="selectedUrlAndAccountId">
+      <UrlAndAccount>
+        <option name="accountId" value="239f114f-d454-40d0-88f7-b57e85efd7a1" />
+        <option name="url" value="https://github.com/s-ewbank/MARIPOSA.git" />
+      </UrlAndAccount>
+    </option>
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 2
+}</component>
+  <component name="ProjectId" id="2cPYwH6mRX3JWYmLbe1oEwJjPK5" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_ADD_EXTERNAL_FILES": "true",
+    "Python.main.executor": "Run",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "git-widget-placeholder": "main",
+    "last_opened_file_path": "/Users/snewbank/PycharmProjects/MARIPoSA",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$" />
+      <recent name="$PROJECT_DIR$/demo" />
+      <recent name="$PROJECT_DIR$" />
+      <recent name="$PROJECT_DIR$/demo" />
+      <recent name="$PROJECT_DIR$/demo" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$" />
+    </key>
+  </component>
+  <component name="RunManager">
+    <configuration name="main" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
+      <module name="MARIPoSA" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/main.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-python-sdk-5a2391486177-2887949eec09-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-233.13763.11" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="7fb76900-29a9-459d-bd45-1760d8ecd8bb" name="Changes" comment="" />
+      <created>1708014919105</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1708014919105</updated>
+      <workItem from="1708311152809" duration="143000" />
+      <workItem from="1708311303578" duration="108000" />
+      <workItem from="1708311431504" duration="71000" />
+      <workItem from="1708311507431" duration="116000" />
+      <workItem from="1708311630697" duration="388000" />
+      <workItem from="1708312024522" duration="80000" />
+      <workItem from="1708312116928" duration="35693000" />
+      <workItem from="1708650016484" duration="1168000" />
+      <workItem from="1708969465369" duration="60000" />
+      <workItem from="1708980299189" duration="602000" />
+      <workItem from="1709005788066" duration="28000" />
+      <workItem from="1709005879634" duration="370000" />
+      <workItem from="1709006918470" duration="605000" />
+      <workItem from="1709057256553" duration="726000" />
+      <workItem from="1709081781606" duration="1968000" />
+      <workItem from="1709513385907" duration="1598000" />
+      <workItem from="1709568708088" duration="1202000" />
+      <workItem from="1709760372608" duration="5341000" />
+      <workItem from="1709766332159" duration="8936000" />
+      <workItem from="1710890404915" duration="4314000" />
+      <workItem from="1711142075882" duration="3193000" />
+      <workItem from="1713829145016" duration="8822000" />
+      <workItem from="1713908360555" duration="1785000" />
+      <workItem from="1713910160742" duration="485000" />
+      <workItem from="1714014208220" duration="2112000" />
+      <workItem from="1714156748549" duration="9921000" />
+      <workItem from="1715761268938" duration="1441000" />
+      <workItem from="1716353597447" duration="6771000" />
+      <workItem from="1716416038574" duration="3272000" />
+      <workItem from="1716837735086" duration="3142000" />
+      <workItem from="1717015958917" duration="6896000" />
+      <workItem from="1717036642921" duration="1201000" />
+      <workItem from="1717387240192" duration="16377000" />
+      <workItem from="1723495150946" duration="62000" />
+      <workItem from="1723520701774" duration="598000" />
+      <workItem from="1723571712983" duration="69284000" />
+      <workItem from="1723924830630" duration="1356000" />
+      <workItem from="1724043719478" duration="22146000" />
+      <workItem from="1724820706712" duration="1657000" />
+      <workItem from="1725243171473" duration="1754000" />
+      <workItem from="1725464870024" duration="1895000" />
+      <workItem from="1726459166241" duration="13562000" />
+      <workItem from="1727538639313" duration="51039000" />
+      <workItem from="1727754942597" duration="1251000" />
+      <workItem from="1727803927907" duration="57665000" />
+      <workItem from="1727982198515" duration="45050000" />
+      <workItem from="1728053187546" duration="12016000" />
+      <workItem from="1728143600532" duration="32396000" />
+      <workItem from="1728494455300" duration="4391000" />
+      <workItem from="1729631624071" duration="1234000" />
+      <workItem from="1730130155054" duration="2493000" />
+      <workItem from="1730999224721" duration="14000" />
+      <workItem from="1731028474093" duration="932000" />
+      <workItem from="1731461312871" duration="5722000" />
+      <workItem from="1731958413800" duration="2774000" />
+      <workItem from="1738875774063" duration="13411000" />
+      <workItem from="1741641377448" duration="16272000" />
+      <workItem from="1741894498280" duration="20583000" />
+      <workItem from="1741971776987" duration="609000" />
+      <workItem from="1741974431964" duration="19099000" />
+      <workItem from="1742186679371" duration="8744000" />
+      <workItem from="1742246839275" duration="3434000" />
+      <workItem from="1743012730563" duration="8824000" />
+      <workItem from="1743046838418" duration="9689000" />
+      <workItem from="1743270225110" duration="47270000" />
+      <workItem from="1743546837991" duration="26442000" />
+      <workItem from="1743655469613" duration="35919000" />
+      <workItem from="1743801082105" duration="2286000" />
+      <workItem from="1743807798350" duration="11474000" />
+      <workItem from="1743916113499" duration="207000" />
+      <workItem from="1743916356027" duration="17137000" />
+      <workItem from="1744063883453" duration="1786000" />
+      <workItem from="1744915736429" duration="2244000" />
+      <workItem from="1745450158736" duration="1456000" />
+      <workItem from="1745596879266" duration="1215000" />
+      <workItem from="1748211705499" duration="3483000" />
+      <workItem from="1748277495693" duration="2702000" />
+      <workItem from="1748551856496" duration="4084000" />
+      <workItem from="1748570652783" duration="2302000" />
+      <workItem from="1748622078208" duration="7865000" />
+      <workItem from="1748751618215" duration="6001000" />
+      <workItem from="1748887464629" duration="12027000" />
+      <workItem from="1749001489634" duration="20627000" />
+      <workItem from="1749224037594" duration="9225000" />
+      <workItem from="1749573671542" duration="8479000" />
+      <workItem from="1750797719667" duration="793000" />
+      <workItem from="1750973862737" duration="3632000" />
+      <workItem from="1751310813395" duration="7534000" />
+      <workItem from="1752178518752" duration="2074000" />
+      <workItem from="1752521979885" duration="2233000" />
+      <workItem from="1752695902291" duration="687000" />
+      <workItem from="1752888583622" duration="1351000" />
+      <workItem from="1752958092199" duration="13664000" />
+      <workItem from="1753029043190" duration="6390000" />
+      <workItem from="1753472527287" duration="3645000" />
+      <workItem from="1753478343162" duration="1057000" />
+      <workItem from="1753678582960" duration="12705000" />
+      <workItem from="1755171888387" duration="8411000" />
+      <workItem from="1755730740663" duration="618000" />
+      <workItem from="1755819347969" duration="11642000" />
+      <workItem from="1756409081129" duration="28098000" />
+      <workItem from="1757009680053" duration="13147000" />
+      <workItem from="1757034849069" duration="22440000" />
+      <workItem from="1757355224654" duration="57272000" />
+      <workItem from="1757527051680" duration="13804000" />
+      <workItem from="1757541187907" duration="11277000" />
+      <workItem from="1757606509951" duration="15962000" />
+      <workItem from="1757709506788" duration="224000" />
+      <workItem from="1757711453928" duration="1454000" />
+      <workItem from="1757740971733" duration="3350000" />
+      <workItem from="1757787498556" duration="1749000" />
+      <workItem from="1757954073040" duration="13563000" />
+      <workItem from="1758044820555" duration="18885000" />
+      <workItem from="1758209469456" duration="10953000" />
+      <workItem from="1758224921701" duration="19113000" />
+      <workItem from="1758564548683" duration="1587000" />
+      <workItem from="1758580492212" duration="2969000" />
+      <workItem from="1758591411175" duration="42000" />
+      <workItem from="1758596114480" duration="3342000" />
+      <workItem from="1758639097501" duration="3404000" />
+      <workItem from="1758659652308" duration="4291000" />
+      <workItem from="1758674265493" duration="4224000" />
+    </task>
+    <task id="LOCAL-00033" summary="Updates to keypoint analysis and module number detection">
+      <option name="closed" value="true" />
+      <created>1751556530155</created>
+      <option name="number" value="00033" />
+      <option name="presentableId" value="LOCAL-00033" />
+      <option name="project" value="LOCAL" />
+      <updated>1751556530155</updated>
+    </task>
+    <task id="LOCAL-00034" summary="Small fixes to module plotting">
+      <option name="closed" value="true" />
+      <created>1752695990479</created>
+      <option name="number" value="00034" />
+      <option name="presentableId" value="LOCAL-00034" />
+      <option name="project" value="LOCAL" />
+      <updated>1752695990479</updated>
+    </task>
+    <task id="LOCAL-00035" summary="Added random state control for simulation">
+      <option name="closed" value="true" />
+      <created>1752998953125</created>
+      <option name="number" value="00035" />
+      <option name="presentableId" value="LOCAL-00035" />
+      <option name="project" value="LOCAL" />
+      <updated>1752998953125</updated>
+    </task>
+    <task id="LOCAL-00036" summary="bug fix and error control for VAME project creation (model state number discrepancy); added function for saving edited project from Python">
+      <option name="closed" value="true" />
+      <created>1752999008197</created>
+      <option name="number" value="00036" />
+      <option name="presentableId" value="LOCAL-00036" />
+      <option name="project" value="LOCAL" />
+      <updated>1752999008197</updated>
+    </task>
+    <task id="LOCAL-00037" summary="Updated plot docstrings and fixed bugs.">
+      <option name="closed" value="true" />
+      <created>1752999086536</created>
+      <option name="number" value="00037" />
+      <option name="presentableId" value="LOCAL-00037" />
+      <option name="project" value="LOCAL" />
+      <updated>1752999086536</updated>
+    </task>
+    <task id="LOCAL-00038" summary="Added demo notebooks (1-6)">
+      <option name="closed" value="true" />
+      <created>1752999131448</created>
+      <option name="number" value="00038" />
+      <option name="presentableId" value="LOCAL-00038" />
+      <option name="project" value="LOCAL" />
+      <updated>1752999131448</updated>
+    </task>
+    <task id="LOCAL-00039" summary="Updated documentation">
+      <option name="closed" value="true" />
+      <created>1753821427098</created>
+      <option name="number" value="00039" />
+      <option name="presentableId" value="LOCAL-00039" />
+      <option name="project" value="LOCAL" />
+      <updated>1753821427098</updated>
+    </task>
+    <task id="LOCAL-00040" summary="Added to demo notebooks 4-5">
+      <option name="closed" value="true" />
+      <created>1753821483252</created>
+      <option name="number" value="00040" />
+      <option name="presentableId" value="LOCAL-00040" />
+      <option name="project" value="LOCAL" />
+      <updated>1753821483252</updated>
+    </task>
+    <task id="LOCAL-00041" summary="Minor changes to usage density calculation and plotting">
+      <option name="closed" value="true" />
+      <created>1753821552706</created>
+      <option name="number" value="00041" />
+      <option name="presentableId" value="LOCAL-00041" />
+      <option name="project" value="LOCAL" />
+      <updated>1753821552706</updated>
+    </task>
+    <task id="LOCAL-00042" summary="Bug fixes for module-remapped plots">
+      <option name="closed" value="true" />
+      <created>1753942175593</created>
+      <option name="number" value="00042" />
+      <option name="presentableId" value="LOCAL-00042" />
+      <option name="project" value="LOCAL" />
+      <updated>1753942175593</updated>
+    </task>
+    <task id="LOCAL-00043" summary="Added polynomial regression option">
+      <option name="closed" value="true" />
+      <created>1756232541795</created>
+      <option name="number" value="00043" />
+      <option name="presentableId" value="LOCAL-00043" />
+      <option name="project" value="LOCAL" />
+      <updated>1756232541795</updated>
+    </task>
+    <task id="LOCAL-00044" summary="Added generate_usage_labeled simulate function and additional options and modalities for generate_usage and generate_usage_labeled functions">
+      <option name="closed" value="true" />
+      <created>1756232694595</created>
+      <option name="number" value="00044" />
+      <option name="presentableId" value="LOCAL-00044" />
+      <option name="project" value="LOCAL" />
+      <updated>1756232694595</updated>
+    </task>
+    <task id="LOCAL-00045" summary="Bug fixes for keypoint tracking, removing unmaintained functions">
+      <option name="closed" value="true" />
+      <created>1756831744867</created>
+      <option name="number" value="00045" />
+      <option name="presentableId" value="LOCAL-00045" />
+      <option name="project" value="LOCAL" />
+      <updated>1756831744867</updated>
+    </task>
+    <task id="LOCAL-00046" summary="Updates to documentation">
+      <option name="closed" value="true" />
+      <created>1757031361828</created>
+      <option name="number" value="00046" />
+      <option name="presentableId" value="LOCAL-00046" />
+      <option name="project" value="LOCAL" />
+      <updated>1757031361828</updated>
+    </task>
+    <task id="LOCAL-00047" summary="Updated demo notebooks">
+      <option name="closed" value="true" />
+      <created>1757031386020</created>
+      <option name="number" value="00047" />
+      <option name="presentableId" value="LOCAL-00047" />
+      <option name="project" value="LOCAL" />
+      <updated>1757031386020</updated>
+    </task>
+    <task id="LOCAL-00048" summary="Switched to tkinter for efficiency">
+      <option name="closed" value="true" />
+      <created>1757031407328</created>
+      <option name="number" value="00048" />
+      <option name="presentableId" value="LOCAL-00048" />
+      <option name="project" value="LOCAL" />
+      <updated>1757031407328</updated>
+    </task>
+    <task id="LOCAL-00049" summary="GUI updates">
+      <option name="closed" value="true" />
+      <created>1757100019205</created>
+      <option name="number" value="00049" />
+      <option name="presentableId" value="LOCAL-00049" />
+      <option name="project" value="LOCAL" />
+      <updated>1757100019205</updated>
+    </task>
+    <task id="LOCAL-00050" summary="Updated demos">
+      <option name="closed" value="true" />
+      <created>1757121045079</created>
+      <option name="number" value="00050" />
+      <option name="presentableId" value="LOCAL-00050" />
+      <option name="project" value="LOCAL" />
+      <updated>1757121045080</updated>
+    </task>
+    <task id="LOCAL-00051" summary="updated simulate.generate_sequence function">
+      <option name="closed" value="true" />
+      <created>1757121182524</created>
+      <option name="number" value="00051" />
+      <option name="presentableId" value="LOCAL-00051" />
+      <option name="project" value="LOCAL" />
+      <updated>1757121182524</updated>
+    </task>
+    <task id="LOCAL-00052" summary="Updated simulation functions and demo">
+      <option name="closed" value="true" />
+      <created>1757363842039</created>
+      <option name="number" value="00052" />
+      <option name="presentableId" value="LOCAL-00052" />
+      <option name="project" value="LOCAL" />
+      <updated>1757363842039</updated>
+    </task>
+    <task id="LOCAL-00053" summary="Updated documentation">
+      <option name="closed" value="true" />
+      <created>1757364118812</created>
+      <option name="number" value="00053" />
+      <option name="presentableId" value="LOCAL-00053" />
+      <option name="project" value="LOCAL" />
+      <updated>1757364118812</updated>
+    </task>
+    <task id="LOCAL-00054" summary="Updated simulation docstrings">
+      <option name="closed" value="true" />
+      <created>1757408881806</created>
+      <option name="number" value="00054" />
+      <option name="presentableId" value="LOCAL-00054" />
+      <option name="project" value="LOCAL" />
+      <updated>1757408881806</updated>
+    </task>
+    <task id="LOCAL-00055" summary="Updated GUI">
+      <option name="closed" value="true" />
+      <created>1757409742850</created>
+      <option name="number" value="00055" />
+      <option name="presentableId" value="LOCAL-00055" />
+      <option name="project" value="LOCAL" />
+      <updated>1757409742850</updated>
+    </task>
+    <task id="LOCAL-00056" summary="Bug fixes for transition probability in sequence simulation">
+      <option name="closed" value="true" />
+      <created>1757487581152</created>
+      <option name="number" value="00056" />
+      <option name="presentableId" value="LOCAL-00056" />
+      <option name="project" value="LOCAL" />
+      <updated>1757487581152</updated>
+    </task>
+    <task id="LOCAL-00057" summary="Significant updates to GUI - added simulation functions, command log, error windows, within-window menu updating">
+      <option name="closed" value="true" />
+      <created>1757487701772</created>
+      <option name="number" value="00057" />
+      <option name="presentableId" value="LOCAL-00057" />
+      <option name="project" value="LOCAL" />
+      <updated>1757487701772</updated>
+    </task>
+    <task id="LOCAL-00058" summary="Updates to keypoint / pose estimation functionalities in analysis functions, demo notebooks, and GUI">
+      <option name="closed" value="true" />
+      <created>1757540706283</created>
+      <option name="number" value="00058" />
+      <option name="presentableId" value="LOCAL-00058" />
+      <option name="project" value="LOCAL" />
+      <updated>1757540706283</updated>
+    </task>
+    <task id="LOCAL-00059" summary="Updates to functionalities pertaining to OpenFace data in metadata and analysis functions, demo notebooks, and documentation">
+      <option name="closed" value="true" />
+      <created>1757620762400</created>
+      <option name="number" value="00059" />
+      <option name="presentableId" value="LOCAL-00059" />
+      <option name="project" value="LOCAL" />
+      <updated>1757620762400</updated>
+    </task>
+    <task id="LOCAL-00060" summary="Cleaning old main functions,">
+      <option name="closed" value="true" />
+      <created>1757629409499</created>
+      <option name="number" value="00060" />
+      <option name="presentableId" value="LOCAL-00060" />
+      <option name="project" value="LOCAL" />
+      <updated>1757629409499</updated>
+    </task>
+    <task id="LOCAL-00061" summary="Minor GUI updates (empty menus removed)">
+      <option name="closed" value="true" />
+      <created>1757629459375</created>
+      <option name="number" value="00061" />
+      <option name="presentableId" value="LOCAL-00061" />
+      <option name="project" value="LOCAL" />
+      <updated>1757629459375</updated>
+    </task>
+    <task id="LOCAL-00062" summary="Readme update">
+      <option name="closed" value="true" />
+      <created>1757639854954</created>
+      <option name="number" value="00062" />
+      <option name="presentableId" value="LOCAL-00062" />
+      <option name="project" value="LOCAL" />
+      <updated>1757639854954</updated>
+    </task>
+    <task id="LOCAL-00063" summary="Readme update">
+      <option name="closed" value="true" />
+      <created>1757643387886</created>
+      <option name="number" value="00063" />
+      <option name="presentableId" value="LOCAL-00063" />
+      <option name="project" value="LOCAL" />
+      <updated>1757643387886</updated>
+    </task>
+    <task id="LOCAL-00064" summary="Deleting test file">
+      <option name="closed" value="true" />
+      <created>1757645282303</created>
+      <option name="number" value="00064" />
+      <option name="presentableId" value="LOCAL-00064" />
+      <option name="project" value="LOCAL" />
+      <updated>1757645282304</updated>
+    </task>
+    <task id="LOCAL-00065" summary="GUI bug fixes">
+      <option name="closed" value="true" />
+      <created>1757954110690</created>
+      <option name="number" value="00065" />
+      <option name="presentableId" value="LOCAL-00065" />
+      <option name="project" value="LOCAL" />
+      <updated>1757954110690</updated>
+    </task>
+    <task id="LOCAL-00066" summary="Updated get_distance function to have ActionUnits compatibility">
+      <option name="closed" value="true" />
+      <created>1758003450764</created>
+      <option name="number" value="00066" />
+      <option name="presentableId" value="LOCAL-00066" />
+      <option name="project" value="LOCAL" />
+      <updated>1758003450764</updated>
+    </task>
+    <task id="LOCAL-00067" summary="GUI bug fixes">
+      <option name="closed" value="true" />
+      <created>1758003464228</created>
+      <option name="number" value="00067" />
+      <option name="presentableId" value="LOCAL-00067" />
+      <option name="project" value="LOCAL" />
+      <updated>1758003464228</updated>
+    </task>
+    <task id="LOCAL-00068" summary="Improvements to GUI functionality (labeled simulation parameters, action units, plot parameters, log bug fixes)">
+      <option name="closed" value="true" />
+      <created>1758164766026</created>
+      <option name="number" value="00068" />
+      <option name="presentableId" value="LOCAL-00068" />
+      <option name="project" value="LOCAL" />
+      <updated>1758164766026</updated>
+    </task>
+    <task id="LOCAL-00069" summary="Added plot.plot_action_units, additional legend position controls">
+      <option name="closed" value="true" />
+      <created>1758164860467</created>
+      <option name="number" value="00069" />
+      <option name="presentableId" value="LOCAL-00069" />
+      <option name="project" value="LOCAL" />
+      <updated>1758164860467</updated>
+    </task>
+    <task id="LOCAL-00070" summary="Updated keypoint list creation in pose estimation project creation function">
+      <option name="closed" value="true" />
+      <created>1758164959486</created>
+      <option name="number" value="00070" />
+      <option name="presentableId" value="LOCAL-00070" />
+      <option name="project" value="LOCAL" />
+      <updated>1758164959486</updated>
+    </task>
+    <task id="LOCAL-00071" summary="Added AU selection to get_action_units">
+      <option name="closed" value="true" />
+      <created>1758164997838</created>
+      <option name="number" value="00071" />
+      <option name="presentableId" value="LOCAL-00071" />
+      <option name="project" value="LOCAL" />
+      <updated>1758164997838</updated>
+    </task>
+    <task id="LOCAL-00072" summary="Added kinematics functions to analyze and demo scripts">
+      <option name="closed" value="true" />
+      <created>1758233099539</created>
+      <option name="number" value="00072" />
+      <option name="presentableId" value="LOCAL-00072" />
+      <option name="project" value="LOCAL" />
+      <updated>1758233099539</updated>
+    </task>
+    <task id="LOCAL-00073" summary="Updated GUI (added plot color remapping, config updating with remappings, pose estimation kinematics functionalities), added plot.plot_keypoint_kinematics, added SLEAP compatibility in metadata and analyze functions, updated documentation">
+      <option name="closed" value="true" />
+      <created>1758308149682</created>
+      <option name="number" value="00073" />
+      <option name="presentableId" value="LOCAL-00073" />
+      <option name="project" value="LOCAL" />
+      <updated>1758308149682</updated>
+    </task>
+    <task id="LOCAL-00074" summary="Slight text edits in README and demos">
+      <option name="closed" value="true" />
+      <created>1758310028954</created>
+      <option name="number" value="00074" />
+      <option name="presentableId" value="LOCAL-00074" />
+      <option name="project" value="LOCAL" />
+      <updated>1758310028954</updated>
+    </task>
+    <task id="LOCAL-00075" summary="Slight text edits in README and demos">
+      <option name="closed" value="true" />
+      <created>1758310090810</created>
+      <option name="number" value="00075" />
+      <option name="presentableId" value="LOCAL-00075" />
+      <option name="project" value="LOCAL" />
+      <updated>1758310090810</updated>
+    </task>
+    <task id="LOCAL-00076" summary="Minor bug fixes in simulation, analysis, and GUI functions">
+      <option name="closed" value="true" />
+      <created>1758639191253</created>
+      <option name="number" value="00076" />
+      <option name="presentableId" value="LOCAL-00076" />
+      <option name="project" value="LOCAL" />
+      <updated>1758639191253</updated>
+    </task>
+    <task id="LOCAL-00077" summary="Minor bug fix to GUI">
+      <option name="closed" value="true" />
+      <created>1758639972786</created>
+      <option name="number" value="00077" />
+      <option name="presentableId" value="LOCAL-00077" />
+      <option name="project" value="LOCAL" />
+      <updated>1758639972786</updated>
+    </task>
+    <task id="LOCAL-00078" summary="Minor bug fix to GUI">
+      <option name="closed" value="true" />
+      <created>1758641390267</created>
+      <option name="number" value="00078" />
+      <option name="presentableId" value="LOCAL-00078" />
+      <option name="project" value="LOCAL" />
+      <updated>1758641390267</updated>
+    </task>
+    <task id="LOCAL-00079" summary="Slight edits to conda environment file and README, minor bug fixes in GUI and plotting functions">
+      <option name="closed" value="true" />
+      <created>1758660095658</created>
+      <option name="number" value="00079" />
+      <option name="presentableId" value="LOCAL-00079" />
+      <option name="project" value="LOCAL" />
+      <updated>1758660095658</updated>
+    </task>
+    <task id="LOCAL-00080" summary="Updated documentation">
+      <option name="closed" value="true" />
+      <created>1758660578981</created>
+      <option name="number" value="00080" />
+      <option name="presentableId" value="LOCAL-00080" />
+      <option name="project" value="LOCAL" />
+      <updated>1758660578981</updated>
+    </task>
+    <task id="LOCAL-00081" summary="Fixed keypoint travel and kinematics functions to handle non-subgrouped data appropriately">
+      <option name="closed" value="true" />
+      <created>1758675548247</created>
+      <option name="number" value="00081" />
+      <option name="presentableId" value="LOCAL-00081" />
+      <option name="project" value="LOCAL" />
+      <updated>1758675548247</updated>
+    </task>
+    <option name="localTasksCounter" value="82" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="RECENT_FILTERS">
+      <map>
+        <entry key="User">
+          <value>
+            <list>
+              <RecentGroup>
+                <option name="FILTER_VALUES">
+                  <option value="*" />
+                </option>
+              </RecentGroup>
+            </list>
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Updated simulation functions and demo" />
+    <MESSAGE value="Updated simulation docstrings" />
+    <MESSAGE value="Updated GUI" />
+    <MESSAGE value="Bug fixes for transition probability in sequence simulation" />
+    <MESSAGE value="Significant updates to GUI - added simulation functions, command log, error windows, within-window menu updating" />
+    <MESSAGE value="Updates to keypoint / pose estimation functionalities in analysis functions, demo notebooks, and GUI" />
+    <MESSAGE value="Updates to functionalities pertaining to OpenFace data in metadata and analysis functions, demo notebooks, and documentation" />
+    <MESSAGE value="Cleaning old main functions," />
+    <MESSAGE value="Minor GUI updates (empty menus removed)" />
+    <MESSAGE value="Readme update" />
+    <MESSAGE value="Deleting test file" />
+    <MESSAGE value="Updated get_distance function to have ActionUnits compatibility" />
+    <MESSAGE value="GUI bug fixes" />
+    <MESSAGE value="Improvements to GUI functionality (labeled simulation parameters, action units, plot parameters, log bug fixes)" />
+    <MESSAGE value="Added plot.plot_action_units, additional legend position controls" />
+    <MESSAGE value="Updated keypoint list creation in pose estimation project creation function" />
+    <MESSAGE value="Added AU selection to get_action_units" />
+    <MESSAGE value="Added kinematics functions to analyze and demo scripts" />
+    <MESSAGE value="Updated GUI (added plot color remapping, config updating with remappings, pose estimation kinematics functionalities), added plot.plot_keypoint_kinematics, added SLEAP compatibility in metadata and analyze functions, updated documentation" />
+    <MESSAGE value="Slight text edits in README and demos" />
+    <MESSAGE value="Minor bug fixes in simulation, analysis, and GUI functions" />
+    <MESSAGE value="Minor bug fix to GUI" />
+    <MESSAGE value="Slight edits to conda environment file and README, minor bug fixes in GUI and plotting functions" />
+    <MESSAGE value="Updated documentation" />
+    <MESSAGE value="Fixed keypoint travel and kinematics functions to handle non-subgrouped data appropriately" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixed keypoint travel and kinematics functions to handle non-subgrouped data appropriately" />
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/MARIPoSA$main.coverage" NAME="main Coverage Results" MODIFIED="1758675462240" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/PoseVis$main.coverage" NAME="main Coverage Results" MODIFIED="1708980301815" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/MARIPOSA$main.coverage" NAME="main Coverage Results" MODIFIED="1727728813845" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+  </component>
+</project>

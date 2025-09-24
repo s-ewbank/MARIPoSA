@@ -1,0 +1,211 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>utils &mdash; MARIPoSA 0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=44496db0"></script>
+      <script src="../_static/doctools.js?v=888ff710"></script>
+      <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            MARIPoSA
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../demo/Demo1-ProjectCreation.html">Demo 1 (PS/PE): Project Creation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../demo/Demo2-PoseSegmentation-Visualize.html">Demo 2 (PS): Visualization of Pose Module Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../demo/Demo3-PoseSegmentation-Embed.html">Demo 3 (PS): Embedding of Pose Segmentation Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../demo/Demo4-PoseSegmentation-ClassificationAndRegression.html">Demo 4 (PS): Regression and Classification of Group Conditions in Pose Segmentation Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../demo/Demo5-PoseSegmentation-ManualScoring.html">Demo 5 (PS): Comparing Pose Modules to Manual Scoring Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../demo/Demo6-PoseSegmentation-Simulation.html">Demo 6 (PS): Simulating Pose Segmentation Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../demo/Demo7-PoseEstimation-KeypointTravel.html">Demo 7 (PE): Analyzing Keypoint Movement and Kinematics in Pose Estimation Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../demo/Demo8-PoseEstimation-OpenFace.html">Demo 8 (PE): Analyzing Keypoint Displacement and Action Units in human facial pose data from OpenFace</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../metadata.html">Metadata</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../analyze.html">Analyze</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../plot.html">Plot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../simulate.html">Simulate</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">MARIPoSA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">utils</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/source/modules.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="utils">
+<h1>utils<a class="headerlink" href="#utils" title="Permalink to this heading"></a></h1>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="utils.html">utils package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="utils.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html#module-utils.analyze">utils.analyze module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#utils.analyze.ActionUnits"><code class="docutils literal notranslate"><span class="pre">ActionUnits</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#utils.analyze.ActionUnits.save"><code class="docutils literal notranslate"><span class="pre">ActionUnits.save()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#utils.analyze.ActionUnits.scale"><code class="docutils literal notranslate"><span class="pre">ActionUnits.scale()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#utils.analyze.ActionUnits.to_df"><code class="docutils literal notranslate"><span class="pre">ActionUnits.to_df()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#utils.analyze.BORIS_to_pose"><code class="docutils literal notranslate"><span class="pre">BORIS_to_pose()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#utils.analyze.KeypointFeature"><code class="docutils literal notranslate"><span class="pre">KeypointFeature</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#utils.analyze.KeypointFeature.save"><code class="docutils literal notranslate"><span class="pre">KeypointFeature.save()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#utils.analyze.KeypointFeature.scale"><code class="docutils literal notranslate"><span class="pre">KeypointFeature.scale()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#utils.analyze.KeypointFeature.to_df"><code class="docutils literal notranslate"><span class="pre">KeypointFeature.to_df()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#utils.analyze.ModuleTransitions"><code class="docutils literal notranslate"><span class="pre">ModuleTransitions</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#utils.analyze.ModuleTransitions.save"><code class="docutils literal notranslate"><span class="pre">ModuleTransitions.save()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#utils.analyze.ModuleTransitions.scale"><code class="docutils literal notranslate"><span class="pre">ModuleTransitions.scale()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#utils.analyze.ModuleTransitions.to_df"><code class="docutils literal notranslate"><span class="pre">ModuleTransitions.to_df()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#utils.analyze.ModuleUsage"><code class="docutils literal notranslate"><span class="pre">ModuleUsage</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#utils.analyze.ModuleUsage.apply_picks"><code class="docutils literal notranslate"><span class="pre">ModuleUsage.apply_picks()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#utils.analyze.ModuleUsage.collapse_timebins"><code class="docutils literal notranslate"><span class="pre">ModuleUsage.collapse_timebins()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#utils.analyze.ModuleUsage.f_oneway"><code class="docutils literal notranslate"><span class="pre">ModuleUsage.f_oneway()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#utils.analyze.ModuleUsage.save"><code class="docutils literal notranslate"><span class="pre">ModuleUsage.save()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#utils.analyze.ModuleUsage.scale"><code class="docutils literal notranslate"><span class="pre">ModuleUsage.scale()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#utils.analyze.ModuleUsage.to_df"><code class="docutils literal notranslate"><span class="pre">ModuleUsage.to_df()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#utils.analyze.ModuleUsage.usage_density"><code class="docutils literal notranslate"><span class="pre">ModuleUsage.usage_density()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#utils.analyze.classify"><code class="docutils literal notranslate"><span class="pre">classify()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#utils.analyze.combine_pose_modules"><code class="docutils literal notranslate"><span class="pre">combine_pose_modules()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#utils.analyze.ego_center"><code class="docutils literal notranslate"><span class="pre">ego_center()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#utils.analyze.embed"><code class="docutils literal notranslate"><span class="pre">embed()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#utils.analyze.get_action_units"><code class="docutils literal notranslate"><span class="pre">get_action_units()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#utils.analyze.get_distance"><code class="docutils literal notranslate"><span class="pre">get_distance()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#utils.analyze.get_keypoint_kinematics"><code class="docutils literal notranslate"><span class="pre">get_keypoint_kinematics()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#utils.analyze.get_keypoint_travel"><code class="docutils literal notranslate"><span class="pre">get_keypoint_travel()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#utils.analyze.get_module_labels"><code class="docutils literal notranslate"><span class="pre">get_module_labels()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#utils.analyze.get_module_transitions"><code class="docutils literal notranslate"><span class="pre">get_module_transitions()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#utils.analyze.get_module_usage"><code class="docutils literal notranslate"><span class="pre">get_module_usage()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#utils.analyze.is_nonnum"><code class="docutils literal notranslate"><span class="pre">is_nonnum()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#utils.analyze.load_module_feature_object"><code class="docutils literal notranslate"><span class="pre">load_module_feature_object()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#utils.analyze.loocv"><code class="docutils literal notranslate"><span class="pre">loocv()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#utils.analyze.loocv_regression"><code class="docutils literal notranslate"><span class="pre">loocv_regression()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#utils.analyze.make_remappings_from_BORIS"><code class="docutils literal notranslate"><span class="pre">make_remappings_from_BORIS()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#utils.analyze.packed_moving_average"><code class="docutils literal notranslate"><span class="pre">packed_moving_average()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#utils.analyze.pickle_dump"><code class="docutils literal notranslate"><span class="pre">pickle_dump()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#utils.analyze.pickle_load"><code class="docutils literal notranslate"><span class="pre">pickle_load()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#utils.analyze.read_openface_csv"><code class="docutils literal notranslate"><span class="pre">read_openface_csv()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#utils.analyze.read_sleap_csv"><code class="docutils literal notranslate"><span class="pre">read_sleap_csv()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#utils.analyze.regress"><code class="docutils literal notranslate"><span class="pre">regress()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html#module-utils.metadata">utils.metadata module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#utils.metadata.create_PE_project"><code class="docutils literal notranslate"><span class="pre">create_PE_project()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#utils.metadata.create_PS_project"><code class="docutils literal notranslate"><span class="pre">create_PS_project()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#utils.metadata.edit_config"><code class="docutils literal notranslate"><span class="pre">edit_config()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#utils.metadata.load_project"><code class="docutils literal notranslate"><span class="pre">load_project()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#utils.metadata.save_edited_project"><code class="docutils literal notranslate"><span class="pre">save_edited_project()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html#module-utils.plot">utils.plot module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#utils.plot.BORIS_to_pose_matrix_plot"><code class="docutils literal notranslate"><span class="pre">BORIS_to_pose_matrix_plot()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#utils.plot.fig_to_array"><code class="docutils literal notranslate"><span class="pre">fig_to_array()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#utils.plot.is_nonnum"><code class="docutils literal notranslate"><span class="pre">is_nonnum()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#utils.plot.make_and_plot_ellipse"><code class="docutils literal notranslate"><span class="pre">make_and_plot_ellipse()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#utils.plot.module_usage_sandplot"><code class="docutils literal notranslate"><span class="pre">module_usage_sandplot()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#utils.plot.moving_average"><code class="docutils literal notranslate"><span class="pre">moving_average()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#utils.plot.network_plot"><code class="docutils literal notranslate"><span class="pre">network_plot()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#utils.plot.plot_action_units"><code class="docutils literal notranslate"><span class="pre">plot_action_units()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#utils.plot.plot_distance_box"><code class="docutils literal notranslate"><span class="pre">plot_distance_box()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#utils.plot.plot_distance_matrix"><code class="docutils literal notranslate"><span class="pre">plot_distance_matrix()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#utils.plot.plot_distance_results"><code class="docutils literal notranslate"><span class="pre">plot_distance_results()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#utils.plot.plot_embeddings"><code class="docutils literal notranslate"><span class="pre">plot_embeddings()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#utils.plot.plot_keypoint_kinematics"><code class="docutils literal notranslate"><span class="pre">plot_keypoint_kinematics()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#utils.plot.plot_keypoint_travel"><code class="docutils literal notranslate"><span class="pre">plot_keypoint_travel()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#utils.plot.plot_module_usage"><code class="docutils literal notranslate"><span class="pre">plot_module_usage()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html#module-utils.simulate">utils.simulate module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#utils.simulate.generate_sequence"><code class="docutils literal notranslate"><span class="pre">generate_sequence()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#utils.simulate.generate_usage"><code class="docutils literal notranslate"><span class="pre">generate_usage()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#utils.simulate.generate_usage_labeled"><code class="docutils literal notranslate"><span class="pre">generate_usage_labeled()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html#module-utils">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Sedona Ewbank.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,378 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Demo 6 (PS): Simulating Pose Segmentation Data &mdash; MARIPoSA 0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=44496db0"></script>
+      <script src="../_static/doctools.js?v=888ff710"></script>
+      <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Demo 7 (PE): Analyzing Keypoint Movement and Kinematics in Pose Estimation Data" href="Demo7-PoseEstimation-KeypointTravel.html" />
+    <link rel="prev" title="Demo 5 (PS): Comparing Pose Modules to Manual Scoring Data" href="Demo5-PoseSegmentation-ManualScoring.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            MARIPoSA
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="Demo1-ProjectCreation.html">Demo 1 (PS/PE): Project Creation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Demo2-PoseSegmentation-Visualize.html">Demo 2 (PS): Visualization of Pose Module Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Demo3-PoseSegmentation-Embed.html">Demo 3 (PS): Embedding of Pose Segmentation Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Demo4-PoseSegmentation-ClassificationAndRegression.html">Demo 4 (PS): Regression and Classification of Group Conditions in Pose Segmentation Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Demo5-PoseSegmentation-ManualScoring.html">Demo 5 (PS): Comparing Pose Modules to Manual Scoring Data</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Demo 6 (PS): Simulating Pose Segmentation Data</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#simulating-time-series-categorical-pose-segmentation-data">6.1: Simulating time-series categorical pose segmentation data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#simulating-module-usage">6.2: Simulating module usage</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="Demo7-PoseEstimation-KeypointTravel.html">Demo 7 (PE): Analyzing Keypoint Movement and Kinematics in Pose Estimation Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Demo8-PoseEstimation-OpenFace.html">Demo 8 (PE): Analyzing Keypoint Displacement and Action Units in human facial pose data from OpenFace</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../metadata.html">Metadata</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../analyze.html">Analyze</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../plot.html">Plot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../simulate.html">Simulate</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">MARIPoSA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Demo 6 (PS): Simulating Pose Segmentation Data</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/demo/Demo6-PoseSegmentation-Simulation.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="demo-6-ps-simulating-pose-segmentation-data">
+<h1>Demo 6 (PS): Simulating Pose Segmentation Data<a class="headerlink" href="#demo-6-ps-simulating-pose-segmentation-data" title="Permalink to this heading"></a></h1>
+<p><em>Written and last updated September 10, 2025 by Sedona Ewbank, snewbank&#64;stanford.edu</em></p>
+<p>The purpose of this demo is to demonstrate how to use the simulation functions of MARIPoSA, specifically for generating three different kinds of output data:</p>
+<ol class="arabic simple">
+<li><p>Time-series categorical pose segmentation data (generated by measuring and applying transition frequency)</p></li>
+<li><p>Pose module usage data without labels</p></li>
+<li><p>Pose module usage data with labels from a regression model</p></li>
+</ol>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">importlib</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="c1">#This block only important for running as script</span>
+<span class="c1">#script_dir = os.path.dirname(os.path.abspath(__file__))</span>
+<span class="n">mariposa_dir</span> <span class="o">=</span> <span class="s2">&quot;/Users/snewbank/PycharmProjects/MARIPoSA&quot;</span>
+<span class="n">utils_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">mariposa_dir</span><span class="p">,</span> <span class="s1">&#39;utils&#39;</span><span class="p">)</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">utils_dir</span><span class="p">)</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mariposa_dir</span><span class="p">)</span>
+
+<span class="c1">#import utils</span>
+<span class="kn">from</span> <span class="nn">utils</span> <span class="kn">import</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">analyze</span><span class="p">,</span> <span class="n">plot</span><span class="p">,</span> <span class="n">simulate</span>
+
+<span class="n">importlib</span><span class="o">.</span><span class="n">reload</span><span class="p">(</span><span class="n">metadata</span><span class="p">)</span>
+<span class="n">importlib</span><span class="o">.</span><span class="n">reload</span><span class="p">(</span><span class="n">analyze</span><span class="p">)</span>
+<span class="n">importlib</span><span class="o">.</span><span class="n">reload</span><span class="p">(</span><span class="n">plot</span><span class="p">)</span>
+<span class="n">importlib</span><span class="o">.</span><span class="n">reload</span><span class="p">(</span><span class="n">simulate</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;module &#39;utils.simulate&#39; from &#39;/Users/snewbank/PycharmProjects/MARIPoSA/utils/simulate.py&#39;&gt;
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">demo_dir</span><span class="o">=</span><span class="s2">&quot;/Users/snewbank/Behavior/MARIPoSA_demo_data/&quot;</span>
+<span class="n">config</span><span class="o">=</span><span class="n">metadata</span><span class="o">.</span><span class="n">load_project</span><span class="p">(</span><span class="n">demo_dir</span><span class="o">+</span><span class="s2">&quot;250719_test/config_PS.yaml&quot;</span><span class="p">)</span>
+<span class="n">save</span><span class="o">=</span><span class="kc">True</span>
+<span class="n">save_path</span> <span class="o">=</span> <span class="n">demo_dir</span><span class="o">+</span><span class="s2">&quot;demo_figures/&quot;</span>
+<span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">save_path</span><span class="p">):</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">save_path</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<section id="simulating-time-series-categorical-pose-segmentation-data">
+<h2>6.1: Simulating time-series categorical pose segmentation data<a class="headerlink" href="#simulating-time-series-categorical-pose-segmentation-data" title="Permalink to this heading"></a></h2>
+<p>The most granular form of simulation in MARIPoSA is to simulate time-series categorical pose segmentation data to generate new data emulating existing data. This is acheived in simulate.generate_sequence(), which outputs a pose module labels dataframe in the same format as analyze.get_module_labels (with pose module usage and transition probabilities based on the input labels_df). The simulated labels dataframe output will have the same group structure as the input data (if there are subgroups, it will have subgroups).</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">labels_df</span> <span class="o">=</span> <span class="n">analyze</span><span class="o">.</span><span class="n">get_module_labels</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1200</span><span class="p">,</span><span class="n">subgroups</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;sal&quot;</span><span class="p">])</span>
+<span class="n">sim_labels_df</span> <span class="o">=</span> <span class="n">simulate</span><span class="o">.</span><span class="n">generate_sequence</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="n">labels_df</span><span class="p">,</span><span class="mi">1200</span><span class="o">*</span><span class="nb">int</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;fps&quot;</span><span class="p">]),</span><span class="n">n_subjs</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span><span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Analyzing input labels dataframe
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/Users/snewbank/PycharmProjects/MARIPoSA/utils/simulate.py:218: RuntimeWarning: invalid value encountered in divide
+  transition_mat = transition_mat / np.sum(transition_mat, axis=1, keepdims=True)
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Generating data for subject 1 of 20
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Generating data for subject 2 of 20
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Generating data for subject 3 of 20
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Generating data for subject 4 of 20
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Generating data for subject 5 of 20
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Generating data for subject 6 of 20
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Generating data for subject 7 of 20
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Generating data for subject 8 of 20
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Generating data for subject 9 of 20
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Generating data for subject 10 of 20
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Generating data for subject 11 of 20
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Generating data for subject 12 of 20
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Generating data for subject 13 of 20
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Generating data for subject 14 of 20
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Generating data for subject 15 of 20
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Generating data for subject 16 of 20
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Generating data for subject 17 of 20
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Generating data for subject 18 of 20
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Generating data for subject 19 of 20
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Generating data for subject 20 of 20
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">real_usage</span> <span class="o">=</span> <span class="n">analyze</span><span class="o">.</span><span class="n">get_module_usage</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="n">labels_df</span><span class="p">)</span>
+<span class="n">plot</span><span class="o">.</span><span class="n">plot_module_usage</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="n">real_usage</span><span class="p">,</span><span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;Blues_r&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Real data&quot;</span><span class="p">)</span>
+<span class="n">real_usage</span> <span class="o">=</span> <span class="n">analyze</span><span class="o">.</span><span class="n">get_module_usage</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="n">labels_df</span><span class="p">,</span><span class="n">binsize</span><span class="o">=</span><span class="mi">60</span><span class="p">)</span>
+<span class="n">plot</span><span class="o">.</span><span class="n">module_usage_sandplot</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="n">real_usage</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Real data&quot;</span><span class="p">)</span>
+
+<span class="n">sim_usage</span> <span class="o">=</span> <span class="n">analyze</span><span class="o">.</span><span class="n">get_module_usage</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="n">sim_labels_df</span><span class="p">)</span>
+<span class="n">plot</span><span class="o">.</span><span class="n">plot_module_usage</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="n">sim_usage</span><span class="p">,</span><span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;Reds_r&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Simulated data&quot;</span><span class="p">)</span>
+<span class="n">sim_usage</span> <span class="o">=</span> <span class="n">analyze</span><span class="o">.</span><span class="n">get_module_usage</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="n">sim_labels_df</span><span class="p">,</span><span class="n">binsize</span><span class="o">=</span><span class="mi">60</span><span class="p">)</span>
+<span class="n">plot</span><span class="o">.</span><span class="n">module_usage_sandplot</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="n">sim_usage</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Simulated data&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Text(0.5, 1.0, &#39;Simulated data&#39;)
+</pre></div>
+</div>
+<img alt="../_images/cbdfcb773064a359d630cfa0c3ae772d0a2e0f6283ddbce10da80d6a009f36cd.png" src="../_images/cbdfcb773064a359d630cfa0c3ae772d0a2e0f6283ddbce10da80d6a009f36cd.png" />
+<img alt="../_images/78f085edc185a5755dd6bf4cadbab40b18042ee9da64cb3ebb248ce6fce5fdb2.png" src="../_images/78f085edc185a5755dd6bf4cadbab40b18042ee9da64cb3ebb248ce6fce5fdb2.png" />
+<img alt="../_images/0187188f28af06f438b962b9397ced6017f14abfdd39d66344b729b39c9f0ed3.png" src="../_images/0187188f28af06f438b962b9397ced6017f14abfdd39d66344b729b39c9f0ed3.png" />
+<img alt="../_images/5e27414adb9b283d832830f539dd6092f688cc8f2672573baa7882c524ae8202.png" src="../_images/5e27414adb9b283d832830f539dd6092f688cc8f2672573baa7882c524ae8202.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">labels_df</span> <span class="o">=</span> <span class="n">analyze</span><span class="o">.</span><span class="n">get_module_labels</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1200</span><span class="p">,</span><span class="n">subgroups</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;sal&quot;</span><span class="p">,</span><span class="s2">&quot;k1&quot;</span><span class="p">,</span><span class="s2">&quot;k5&quot;</span><span class="p">,</span><span class="s2">&quot;k10&quot;</span><span class="p">])</span>
+<span class="n">sim_labels_df</span> <span class="o">=</span> <span class="n">simulate</span><span class="o">.</span><span class="n">generate_sequence</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="n">labels_df</span><span class="p">,</span><span class="mi">1200</span><span class="o">*</span><span class="nb">int</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;fps&quot;</span><span class="p">]),</span><span class="n">n_subjs</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/Users/snewbank/PycharmProjects/MARIPoSA/utils/simulate.py:253: RuntimeWarning: invalid value encountered in divide
+  transition_mat = transition_mat / np.sum(transition_mat, axis=1, keepdims=True)
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/Users/snewbank/PycharmProjects/MARIPoSA/utils/simulate.py:253: RuntimeWarning: invalid value encountered in divide
+  transition_mat = transition_mat / np.sum(transition_mat, axis=1, keepdims=True)
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/Users/snewbank/PycharmProjects/MARIPoSA/utils/simulate.py:253: RuntimeWarning: invalid value encountered in divide
+  transition_mat = transition_mat / np.sum(transition_mat, axis=1, keepdims=True)
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/Users/snewbank/PycharmProjects/MARIPoSA/utils/simulate.py:253: RuntimeWarning: invalid value encountered in divide
+  transition_mat = transition_mat / np.sum(transition_mat, axis=1, keepdims=True)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">real_usage</span> <span class="o">=</span> <span class="n">analyze</span><span class="o">.</span><span class="n">get_module_usage</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="n">labels_df</span><span class="p">)</span>
+<span class="n">plot</span><span class="o">.</span><span class="n">plot_module_usage</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="n">real_usage</span><span class="p">,</span><span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;viridis&quot;</span><span class="p">,</span><span class="n">figH</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span><span class="n">figW</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Real data&quot;</span><span class="p">)</span>
+
+
+<span class="n">sim_usage</span> <span class="o">=</span> <span class="n">analyze</span><span class="o">.</span><span class="n">get_module_usage</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="n">sim_labels_df</span><span class="p">)</span>
+<span class="n">plot</span><span class="o">.</span><span class="n">plot_module_usage</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="n">sim_usage</span><span class="p">,</span><span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;viridis&quot;</span><span class="p">,</span><span class="n">figH</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span><span class="n">figW</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Simulated data&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Text(0.5, 1.0, &#39;Simulated data&#39;)
+</pre></div>
+</div>
+<img alt="../_images/a558821f68c682988724eb6884db64c96b046f06e5a8515b197a51b6a6d78e93.png" src="../_images/a558821f68c682988724eb6884db64c96b046f06e5a8515b197a51b6a6d78e93.png" />
+<img alt="../_images/2b402acbddd2def39fb085270409b3dcbe20dc81fdf765cba930d1a3dbe6b9cf.png" src="../_images/2b402acbddd2def39fb085270409b3dcbe20dc81fdf765cba930d1a3dbe6b9cf.png" />
+</div>
+</div>
+</section>
+<section id="simulating-module-usage">
+<h2>6.2: Simulating module usage<a class="headerlink" href="#simulating-module-usage" title="Permalink to this heading"></a></h2>
+<p>Since many analyses can be performed on pose module usage summary data without the full time-series categorical sequence of pose modules, it is also possible to just simulate pose module usage based on input data, as shown below, using simulate.generate_usage (to generate module usage with no group labels) or simulate.generate_usage_labeled (to generate module usage with continuous labels based on a regression model).</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">labels_df</span> <span class="o">=</span> <span class="n">analyze</span><span class="o">.</span><span class="n">get_module_labels</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1200</span><span class="p">,</span> <span class="n">subgroups</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;sal&quot;</span><span class="p">,</span><span class="s2">&quot;k1&quot;</span><span class="p">,</span><span class="s2">&quot;k5&quot;</span><span class="p">,</span><span class="s2">&quot;k10&quot;</span><span class="p">])</span>
+<span class="n">module_usage</span> <span class="o">=</span> <span class="n">analyze</span><span class="o">.</span><span class="n">get_module_usage</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">labels_df</span><span class="p">)</span>
+<span class="n">plot</span><span class="o">.</span><span class="n">plot_module_usage</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="n">module_usage</span><span class="p">,</span><span class="n">style</span><span class="o">=</span><span class="s2">&quot;stacked&quot;</span><span class="p">,</span><span class="n">legend</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">alt_xticks</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">10</span><span class="p">])</span>
+
+<span class="n">dose_dict</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;sal&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;k1&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;k5&#39;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="s1">&#39;k10&#39;</span><span class="p">:</span> <span class="mi">10</span><span class="p">}</span>
+<span class="n">reg</span><span class="p">,</span> <span class="n">dose_labels</span> <span class="o">=</span> <span class="n">analyze</span><span class="o">.</span><span class="n">regress</span><span class="p">(</span><span class="n">module_usage</span><span class="p">,</span> <span class="n">dose_dict</span><span class="p">)</span>
+
+<span class="n">bin_low</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="n">bin_high</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mf">0.5</span><span class="p">)</span><span class="o">+</span><span class="mf">0.5</span>
+<span class="n">bins</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">bin_low</span><span class="p">,</span><span class="n">bin_high</span><span class="p">])</span><span class="o">.</span><span class="n">T</span>
+
+<span class="c1">#sim_module_usage_sal = simulate.generate_usage(sal_module_usage, 1000, random_state=rs, mode=&quot;multivariate_gaussian&quot;)</span>
+<span class="n">sim_module_usage</span> <span class="o">=</span> <span class="n">simulate</span><span class="o">.</span><span class="n">generate_usage_labeled</span><span class="p">(</span><span class="n">module_usage</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="n">bins</span><span class="p">,</span> <span class="n">reg</span><span class="p">,</span> <span class="n">max_iters</span> <span class="o">=</span> <span class="mf">1e100</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;multivariate_gaussian&quot;</span><span class="p">,</span><span class="n">verbosity</span><span class="o">=</span><span class="s2">&quot;medium&quot;</span><span class="p">)</span>
+
+<span class="n">ticks</span><span class="o">=</span><span class="p">[]</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">sim_module_usage</span><span class="o">.</span><span class="n">group_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span> 
+    <span class="k">if</span> <span class="n">i</span><span class="o">%</span><span class="k">2</span>==0:
+        <span class="n">ticks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="p">)))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">ticks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+<span class="n">plot</span><span class="o">.</span><span class="n">plot_module_usage</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="n">sim_module_usage</span><span class="p">,</span><span class="n">style</span><span class="o">=</span><span class="s2">&quot;stacked&quot;</span><span class="p">,</span><span class="n">legend</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">alt_xticks</span><span class="o">=</span><span class="n">ticks</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Iter 500: 69.3% samples generated (18 of 20 bins not filled)
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Iter 1000: 95.3% samples generated (4 of 20 bins not filled)
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Iter 1500: 99.8% samples generated (1 of 20 bins not filled)
+</pre></div>
+</div>
+<img alt="../_images/dcb372cf636bccf5ef3c62b07bb86a67f4719c5a7bcfeda7db690b7cdecbad90.png" src="../_images/dcb372cf636bccf5ef3c62b07bb86a67f4719c5a7bcfeda7db690b7cdecbad90.png" />
+<img alt="../_images/01f3624a0841d791cd123cfee386f63210c861d68cda8a3f2185b616ba8d0438.png" src="../_images/01f3624a0841d791cd123cfee386f63210c861d68cda8a3f2185b616ba8d0438.png" />
+<img alt="../_images/dcb372cf636bccf5ef3c62b07bb86a67f4719c5a7bcfeda7db690b7cdecbad90.png" src="../_images/dcb372cf636bccf5ef3c62b07bb86a67f4719c5a7bcfeda7db690b7cdecbad90.png" />
+</div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="Demo5-PoseSegmentation-ManualScoring.html" class="btn btn-neutral float-left" title="Demo 5 (PS): Comparing Pose Modules to Manual Scoring Data" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Demo7-PoseEstimation-KeypointTravel.html" class="btn btn-neutral float-right" title="Demo 7 (PE): Analyzing Keypoint Movement and Kinematics in Pose Estimation Data" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Sedona Ewbank.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
