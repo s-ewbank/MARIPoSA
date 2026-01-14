@@ -9,6 +9,7 @@ import networkx as nx
 rcParams['font.family'] = 'sans-serif'
 rcParams['font.sans-serif'] = ['Arial']
 from matplotlib.patches import Patch, Ellipse, Rectangle
+from sklearn.preprocessing import StandardScaler
 from utils import analyze
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
 from sklearn.decomposition import PCA
@@ -46,6 +47,9 @@ def plot_module_usage(config,
                       figW=4,
                       figH=2,
                       style="bar_scatter",
+                      points_norm_control=None,
+                      points_sorting="numerical",
+                      class_opacity=0.3,
                       cmap="jet",
                       legend_pos="outside_right",
                       remap=False,
@@ -54,7 +58,8 @@ def plot_module_usage(config,
                       alt_labels=None,
                       alt_xticks=None,
                       title=None,
-                      plot_stats=False):
+                      plot_stats=False,
+                      stat_correction_method="fdr_bh"):
     """
     Plot module usage
 
@@ -62,7 +67,10 @@ def plot_module_usage(config,
     :param usage_feats: output of analyze.get_module_usage
     :param figW: figure width (default: 4)
     :param figH: figure height (default: 2)
-    :param style: plot style; "bar_scatter", "bar_error", "points", or "stacked"
+    :param style: plot style; "bar_scatter", "bar_error", "points", "points_norm", or "stacked"
+    :param points_norm_control: for points_norm only, control group for normalizing module usage to; default None
+    :param points_sorting: for points_norm only, sort points by numerical order ("numerical") or by class ("class"); default "numerical"
+    :param class_opacity: for points_norm with sorting as "class" only, opacity of patches indicating classes; default 0.3
     :param cmap: colormap (default: jet)
     :param legend_pos: legend position (default: outside)
     :param remap: whether to remap modules acording to config["remappings"] (default: False)
@@ -71,14 +79,15 @@ def plot_module_usage(config,
     :param alt_labels: alternative group label dictionary (default: None)
     :param alt_xticks: alternative xticklabels (list), for stacked plot style only (default: None)
     :param title: plot title (default: None)
-    :param plot_stats: include stats on plot (default: False)
+    :param plot_stats: plot statistical comparisons, boolean (default: False)
+    :param stat_correction_method: what correction method to apply across modules; default fdr_bh, alternatives include "bonferroni", "holm-sidak", "sidak"
     :return: fig
 
     """
     if usage_feats.__class__.__name__!="ModuleUsage":
         raise ValueError(f'usage_feats object class must be ModuleUsage, not {usage_feats.__class__}')
 
-    if ((style!="bar_scatter") and (style!="bar_error") and (style!="stacked") and (style!="points")):
+    if ((style!="bar_scatter") and (style!="bar_error") and (style!="stacked") and (style!="points") and (style!="points_norm")):
         raise ValueError(f'style must be one of "bar_scatter", "bar_error", "stacked", or "points", not {style}')
 
     if len(np.unique(usage_feats.group_labels)) == 1:
@@ -87,6 +96,8 @@ def plot_module_usage(config,
         data_subgrouped = True
 
     if not data_subgrouped:
+        if style=="points_norm":
+            raise ValueError("Style cannot be points_norm if data is not subgrouped!")
         usage_df = usage_feats.to_df()
         usage_df.drop("group", axis=1, inplace=True)
 
@@ -97,7 +108,8 @@ def plot_module_usage(config,
         bar_sems = np.std(usage_df, axis=0) / np.sqrt(usage_df.shape[1])
 
         fig, ax = plt.subplots(figsize=(figW, figH), dpi=100)
-        cmap = plt.get_cmap(cmap)
+        if type(cmap)==str:
+            cmap = plt.get_cmap(cmap)
         if ((style == "bar_scatter") or (style == "bar_error")):
             ax.bar(
                 x=np.arange(0, n_modules, 1),
@@ -157,7 +169,8 @@ def plot_module_usage(config,
             bar_sems[g, :] = subgroup_usage.std(axis=0) / np.sqrt(subgroup_usage.shape[0])
         fig, ax = plt.subplots(figsize=(figW, figH), dpi=100)
         scale = 1 / (n_groups + .7)
-        cmap = plt.get_cmap(cmap)
+        if type(cmap)==str:
+            cmap = plt.get_cmap(cmap)
         colors = [cmap([i]) for i in np.linspace(0, 1, n_groups)]
         if ((style == "bar_scatter") or (style == "bar_error")):
             if style == "bar_scatter":
@@ -172,6 +185,11 @@ def plot_module_usage(config,
                             color="black",
                             s=0.5
                         )
+                    if g==0:
+                        top = bar_heights[g]+bar_sems[g]
+                    else:
+                        top_g = bar_heights[g]+bar_sems[g]
+                        top = np.max([top_g, top],axis=0)
                 bar_alpha = 0.5
             elif style == "bar_error":
                 for g in range(n_groups):
@@ -182,6 +200,11 @@ def plot_module_usage(config,
                         linestyle="none", linewidth=0.6,
                         color="black", capsize=0.3, markeredgewidth=0.75, alpha=0.8
                     )
+                    if g==0:
+                        top = bar_heights[g]+bar_sems[g]
+                    else:
+                        top_g = bar_heights[g]+bar_sems[g]
+                        top = np.max([top_g, top],axis=0)
                 bar_alpha = 0.85
             for g in range(n_groups):
                 if alt_labels is not None:
@@ -197,6 +220,26 @@ def plot_module_usage(config,
                     label=label_g
                 )
         elif style == "points":
+            if points_sorting=="class":
+                classes = list(np.unique([i[1] for i in config["remappings"]]))
+                resorted_modules = []
+                class_cm_list = ['magma', 'YlOrBr', 'Blues', 'copper', 'Greys_r', 'BuGn', 'Reds_r', 'magma_r',
+                                 'Purples', 'YlGn','YlGnBu', 'YlOrRd']
+                for c_i,class_i in enumerate(classes):
+                    class_mods = list(np.argwhere([1 if config["remappings"][i][1] == class_i else 0 for i in
+                                                          range(len(config["remappings"]))]).T[0])
+                    resorted_modules += class_mods
+                    class_cmap = plt.get_cmap(class_cm_list[c_i])
+                    ax.add_patch(
+                        Rectangle(
+                            (len(resorted_modules)-len(class_mods)-0.3, -1500), len(class_mods)-0.2, 3000,
+                            edgecolor='none',
+                            facecolor=class_cmap([0.4],class_opacity),
+                        )
+                    )
+                for g in range(n_groups):
+                    bar_heights[g] = bar_heights[g][resorted_modules]
+                    bar_sems[g] = bar_sems[g][resorted_modules]
             for g in range(n_groups):
                 if alt_labels is not None:
                     label_g = alt_labels[groupnames[g]]
@@ -212,6 +255,58 @@ def plot_module_usage(config,
                     marker="o", markersize=4, linewidth=0.75,
                     capsize=2, markeredgewidth=0.75
                 )
+                if g==0:
+                    top = bar_heights[g]+bar_sems[g]
+                    bottom = bar_heights[g] - bar_sems[g]
+                else:
+                    top_g = bar_heights[g]+bar_sems[g]
+                    bottom_g = bar_heights[g]-bar_sems[g]
+                    top = np.max([top_g, top],axis=0)
+                    bottom = np.min([bottom_g,bottom],axis=0)
+            pad_y = (np.max(top)-np.min(bottom)) * 0.08
+            ax.set_ylim([np.min(bottom)-pad_y,np.max(top)+pad_y])
+        elif style == "points_norm":
+            sl = np.array(usage_feats.group_labels) == usage_feats.group_dict[points_norm_control]
+            control_data = usage_feats.label_counts[sl]
+            scaler = StandardScaler()
+            n_groups = len(usage_feats.group_dict.keys())
+            control_data_z = scaler.fit(control_data)
+            scaled_data = np.zeros_like(usage_feats.label_counts)
+            for obs in range(usage_feats.label_counts.shape[0]):
+                scaled_data[obs,:]=scaler.transform(np.array([usage_feats.label_counts[obs,:]]))
+            if points_sorting=="class":
+                classes = list(np.unique([i[1] for i in config["remappings"]]))
+                resorted_modules = []
+                class_cm_list = ['magma', 'YlOrBr', 'Blues', 'copper', 'Greys_r', 'BuGn', 'Reds_r', 'magma_r',
+                                 'Purples', 'YlGn','YlGnBu', 'YlOrRd']
+                for c_i,class_i in enumerate(classes):
+                    class_mods = list(np.argwhere([1 if config["remappings"][i][1] == class_i else 0 for i in
+                                                          range(len(config["remappings"]))]).T[0])
+                    resorted_modules += class_mods
+                    class_cmap = plt.get_cmap(class_cm_list[c_i])
+                    ax.add_patch(
+                        Rectangle(
+                            (len(resorted_modules)-len(class_mods)-0.3, -1500), len(class_mods)-0.2, 3000,
+                            edgecolor='none',
+                            facecolor=class_cmap([0.4],class_opacity),
+                        )
+                    )
+                scaled_data = scaled_data[:, resorted_modules]
+            for k, key in enumerate(usage_feats.group_dict.keys()):
+                group_sl = np.array(usage_feats.group_labels) == usage_feats.group_dict[key]
+                m = np.mean(scaled_data[group_sl, :], axis=0)
+                sd = np.std(scaled_data[group_sl, :], axis=0)
+                ax.errorbar(np.arange(0, n_modules, 1), m, yerr=sd, color=cmap([k/n_groups]), marker="o", capsize=2, label=key)
+                if k==0:
+                    top = m+sd
+                    bottom = m-sd
+                else:
+                    top_k = m+sd
+                    bottom_k = m-sd
+                    top = np.max([top_k, top],axis=0)
+                    bottom = np.min([bottom_k, bottom],axis=0)
+            pad_y = (np.max(top)-np.min(bottom)) * 0.08
+            ax.set_ylim([np.min(bottom)-pad_y,np.max(top)+pad_y])
         if style != "stacked":
             if legend:
                 if legend_pos == "inside":
@@ -234,24 +329,40 @@ def plot_module_usage(config,
             else:
                 ax.set_xticks(np.arange(0, n_modules, 1))
                 try:
-                    ax.set_xticklabels([i.split("module")[1] for i in modules])
+                    if points_sorting=="class":
+                        ax.set_xticklabels(np.array([i.split("module")[1] for i in modules])[resorted_modules])
+                    else:
+                        ax.set_xticklabels([i.split("module")[1] for i in modules])
                 except:
-                    ax.set_xticklabels(modules)
-            ax.tick_params(axis='x', rotation=90, labelsize=plt.rcParams['font.size'] * 0.2 * n_groups, pad=2)
+                    if points_sorting=="class":
+                        ax.set_xticklabels(np.array(modules)[resorted_modules])
+                    else:
+                        ax.set_xticklabels(modules)
+            if "points" not in style:
+                ax.tick_params(axis='x', rotation=90, labelsize=plt.rcParams['font.size'] * 0.2 * n_groups, pad=2)
             if plot_stats:
                 ylim = plt.ylim()
                 plt.ylim(ylim[0], ylim[1] * 1.2)
-                stat_result = usage_feats.f_oneway()
+                stat_result = usage_feats.f_oneway(correction=stat_correction_method)
                 for m, module in enumerate(stat_result["module"]):
-                    if stat_result[stat_result["module"] == module]["p_uncorr"].values[0] < 0.001:
-                        plt.plot([m - 0.1, m + 0.7], [ylim[1] * 1.05] * 2, color="black", linewidth=0.5)
-                        plt.text(m + 0.3, ylim[1] * 1.08, "***", ha="center")
-                    elif stat_result[stat_result["module"] == module]["p_uncorr"].values[0] < 0.01:
-                        plt.plot([m - 0.1, m + 0.7], [ylim[1] * 1.05] * 2, color="black", linewidth=0.5)
-                        plt.text(m + 0.3, ylim[1] * 1.08, "**", ha="center")
+                    if stat_result[stat_result["module"] == module]["p_corr"].values[0] < 0.001:
+                        if "point" in style:
+                            plt.text(m, top[m] * 1.08, "***", ha="center")
+                        else:
+                            plt.plot([m - 0.1, m + 0.7], [top[m] * 1.05] * 2, color="black", linewidth=0.5)
+                            plt.text(m + 0.3, top[m] * 1.08, "***", ha="center")
+                    elif stat_result[stat_result["module"] == module]["p_corr"].values[0] < 0.01:
+                        if "point" in style:
+                            plt.text(m, top[m] * 1.08, "**", ha="center")
+                        else:
+                            plt.plot([m - 0.1, m + 0.7], [top[m] * 1.05] * 2, color="black", linewidth=0.5)
+                            plt.text(m + 0.3, top[m] * 1.08, "**", ha="center")
                     elif stat_result[stat_result["module"] == module]["p_uncorr"].values[0] < 0.05:
-                        plt.plot([m - 0.1, m + 0.7], [ylim[1] * 1.05] * 2, color="black", linewidth=0.5)
-                        plt.text(m + 0.3, ylim[1] * 1.08, "*", ha="center")
+                        if "point" in style:
+                            plt.text(m, top[m] * 1.08, "*", ha="center")
+                        else:
+                            plt.plot([m - 0.1, m + 0.7], [top[m] * 1.05] * 2, color="black", linewidth=0.5)
+                            plt.text(m + 0.3, top[m] * 1.08, "*", ha="center")
             plt.tight_layout()
         else:
             any_nonint = False
@@ -535,19 +646,20 @@ def plot_action_units(config,
                 ax.set_xticklabels(modules)
         ax.tick_params(axis='x', rotation=90, labelsize=plt.rcParams['font.size'] * 0.2 * n_groups, pad=2)
         if plot_stats:
-            ylim = plt.ylim()
-            plt.ylim(ylim[0], ylim[1] * 1.2)
-            stat_result = action_units.f_oneway()
-            for m, module in enumerate(stat_result["module"]):
-                if stat_result[stat_result["module"] == module]["p_uncorr"].values[0] < 0.001:
-                    plt.plot([m - 0.1, m + 0.7], [ylim[1] * 1.05] * 2, color="black", linewidth=0.5)
-                    plt.text(m + 0.3, ylim[1] * 1.08, "***", ha="center")
-                elif stat_result[stat_result["module"] == module]["p_uncorr"].values[0] < 0.01:
-                    plt.plot([m - 0.1, m + 0.7], [ylim[1] * 1.05] * 2, color="black", linewidth=0.5)
-                    plt.text(m + 0.3, ylim[1] * 1.08, "**", ha="center")
-                elif stat_result[stat_result["module"] == module]["p_uncorr"].values[0] < 0.05:
-                    plt.plot([m - 0.1, m + 0.7], [ylim[1] * 1.05] * 2, color="black", linewidth=0.5)
-                    plt.text(m + 0.3, ylim[1] * 1.08, "*", ha="center")
+            print("Stats not yet supported for action units!")
+            # ylim = plt.ylim()
+            # plt.ylim(ylim[0], ylim[1] * 1.2)
+            # stat_result = action_units.f_oneway()
+            # for m, module in enumerate(stat_result["module"]):
+            #     if stat_result[stat_result["module"] == module]["p_corr"].values[0] < 0.001:
+            #         plt.plot([m - 0.1, m + 0.7], [ylim[1] * 1.05] * 2, color="black", linewidth=0.5)
+            #         plt.text(m + 0.3, ylim[1] * 1.08, "***", ha="center")
+            #     elif stat_result[stat_result["module"] == module]["p_corr"].values[0] < 0.01:
+            #         plt.plot([m - 0.1, m + 0.7], [ylim[1] * 1.05] * 2, color="black", linewidth=0.5)
+            #         plt.text(m + 0.3, ylim[1] * 1.08, "**", ha="center")
+            #     elif stat_result[stat_result["module"] == module]["p_corr"].values[0] < 0.05:
+            #         plt.plot([m - 0.1, m + 0.7], [ylim[1] * 1.05] * 2, color="black", linewidth=0.5)
+            #         plt.text(m + 0.3, ylim[1] * 1.08, "*", ha="center")
         plt.tight_layout()
     return fig
 
@@ -564,7 +676,7 @@ def plot_keypoint_kinematics(config,
                       title=None,
                       plot_stats=False):
     """
-    Plot mean action units
+    Plot pose estimation keypoint kinematics
 
     :param config: config
     :param action_units: output of analyze.get_keypoint_kinematics
@@ -748,19 +860,20 @@ def plot_keypoint_kinematics(config,
             ax.set_xticklabels(modules)
         ax.tick_params(axis='x', rotation=90, labelsize=plt.rcParams['font.size'] * 0.2 * n_groups, pad=2)
         if plot_stats:
-            ylim = plt.ylim()
-            plt.ylim(ylim[0], ylim[1] * 1.2)
-            stat_result = kinematics.f_oneway()
-            for m, module in enumerate(stat_result["module"]):
-                if stat_result[stat_result["module"] == module]["p_uncorr"].values[0] < 0.001:
-                    plt.plot([m - 0.1, m + 0.7], [ylim[1] * 1.05] * 2, color="black", linewidth=0.5)
-                    plt.text(m + 0.3, ylim[1] * 1.08, "***", ha="center")
-                elif stat_result[stat_result["module"] == module]["p_uncorr"].values[0] < 0.01:
-                    plt.plot([m - 0.1, m + 0.7], [ylim[1] * 1.05] * 2, color="black", linewidth=0.5)
-                    plt.text(m + 0.3, ylim[1] * 1.08, "**", ha="center")
-                elif stat_result[stat_result["module"] == module]["p_uncorr"].values[0] < 0.05:
-                    plt.plot([m - 0.1, m + 0.7], [ylim[1] * 1.05] * 2, color="black", linewidth=0.5)
-                    plt.text(m + 0.3, ylim[1] * 1.08, "*", ha="center")
+            print("Stats not yet supported for kinematics!")
+            # ylim = plt.ylim()
+            # plt.ylim(ylim[0], ylim[1] * 1.2)
+            # stat_result = kinematics.f_oneway()
+            # for m, module in enumerate(stat_result["module"]):
+            #     if stat_result[stat_result["module"] == module]["p_uncorr"].values[0] < 0.001:
+            #         plt.plot([m - 0.1, m + 0.7], [ylim[1] * 1.05] * 2, color="black", linewidth=0.5)
+            #         plt.text(m + 0.3, ylim[1] * 1.08, "***", ha="center")
+            #     elif stat_result[stat_result["module"] == module]["p_uncorr"].values[0] < 0.01:
+            #         plt.plot([m - 0.1, m + 0.7], [ylim[1] * 1.05] * 2, color="black", linewidth=0.5)
+            #         plt.text(m + 0.3, ylim[1] * 1.08, "**", ha="center")
+            #     elif stat_result[stat_result["module"] == module]["p_uncorr"].values[0] < 0.05:
+            #         plt.plot([m - 0.1, m + 0.7], [ylim[1] * 1.05] * 2, color="black", linewidth=0.5)
+            #         plt.text(m + 0.3, ylim[1] * 1.08, "*", ha="center")
         plt.tight_layout()
     return fig
 

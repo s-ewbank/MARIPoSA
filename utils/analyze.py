@@ -1004,7 +1004,7 @@ class ModuleUsage:
         return ModuleUsage(label_counts_scaled, self.group_labels, self.observation_labels, self.feat_names,
                            self.group_dict, scaler)
 
-    def f_oneway(self):
+    def f_oneway(self,correction="fdr_bh"):
         df = self.to_df()
         all_mod_usage = {}
         module_names = [i for i in list(df.columns) if i != "group"]
@@ -1020,7 +1020,7 @@ class ModuleUsage:
             results_df.append({"module": m, "f": result.statistic, "p_uncorr": result.pvalue})
         results_df = pd.DataFrame(results_df)
         p_uncorr = np.array(results_df["p_uncorr"])
-        results_df["p_corr"] = multipletests(p_uncorr, method="fdr_bh")[1]
+        results_df["p_corr"] = multipletests(p_uncorr, method=correction)[1]
         return results_df
 
     def save(self, save_path):
