@@ -17,6 +17,9 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.neural_network import MLPClassifier
 from scipy import stats
 from statsmodels.stats.multitest import multipletests
+import statsmodels.formula.api as smf
+from statsmodels.stats.multicomp import pairwise_tukeyhsd
+from itertools import combinations
 import pickle
 import h5py
 
@@ -1004,6 +1007,95 @@ class ModuleUsage:
         return ModuleUsage(label_counts_scaled, self.group_labels, self.observation_labels, self.feat_names,
                            self.group_dict, scaler)
 
+    def module_group_comparisons_fdr(self, baseline_group, alpha=0.1):
+
+        df = self.to_df()
+        subjs = df.index
+        modules = [col for col in df.columns if col != "group"]
+
+        long_df = []
+        for s, subj in enumerate(subjs):
+            for mod in modules:
+                long_df.append({
+                    "subj_id": subj,
+                    "group": df.at[subj, "group"],
+                    "module": mod,
+                    "value": df.at[subj, mod]
+                })
+        long_df = pd.DataFrame(long_df)
+
+        formula = f"value ~ C(group, Treatment(reference='{baseline_group}')) * module"
+        model = smf.mixedlm(formula, long_df, groups=long_df["subj_id"])
+        result = model.fit()
+
+        # Get model params and covariance
+        coefs = result.params
+        cov = result.cov_params()
+
+        comparisons = []
+        groups = long_df["group"].unique()
+
+        # Loop over modules and groups
+        for mod in modules:
+            for g in groups:
+                if g == baseline_group:
+                    continue  # skip baseline, already in intercept
+
+                # Construct the coefficient name for this interaction
+                coef_name = f"C(group, Treatment(reference='{baseline_group}'))[T.{g}]:module[T.{mod}]"
+
+                # If the module is the baseline module, the main effect is enough
+                if f"module[T.{mod}]" not in coefs.index and coef_name not in coefs.index:
+                    # baseline module
+                    coef_name = f"C(group, Treatment(reference='{baseline_group}'))[T.{g}]"
+
+                if coef_name in coefs.index:
+                    est = coefs[coef_name]
+                    se = np.sqrt(cov.loc[coef_name, coef_name])
+                    z = est / se
+                    p = 2 * (1 - stats.norm.cdf(np.abs(z)))
+                else:
+                    est = 0
+                    se = np.nan
+                    z = np.nan
+                    p = np.nan
+
+                comparisons.append({
+                    "module": mod,
+                    "group": g,
+                    "diff_from_baseline": est,
+                    "se": se,
+                    "z": z,
+                    "p": p
+                })
+
+        comp_df = pd.DataFrame(comparisons)
+
+        # Apply BH FDR correction
+        comp_df = comp_df.dropna(subset=["p"])
+        reject, p_adj, _, _ = multipletests(comp_df["p"], alpha=alpha, method='fdr_bh')
+        comp_df["p_adj"] = p_adj
+        comp_df["significant"] = reject
+
+        return comp_df, result
+
+    def mixed_model(self):
+        df = self.to_df()
+        subjs = df.index
+        modules = [col for col in df.columns if col != "group"]
+
+        long_df = []
+        for s, subj in enumerate(subjs):
+            for mod in modules:
+                long_df.append({"subj_n": s, "subj_id": subj, "group": df.at[subj, "group"], "module": mod,
+                                "value": df.at[subj, mod]})
+
+        long_df = pd.DataFrame(long_df)
+        model = smf.mixedlm("value ~ group * module", long_df, groups=long_df["subj_id"])
+        result = model.fit()
+
+        return result.summary().tables[1]
+
     def f_oneway(self,correction="fdr_bh"):
         df = self.to_df()
         all_mod_usage = {}
@@ -1022,6 +1114,24 @@ class ModuleUsage:
         p_uncorr = np.array(results_df["p_uncorr"])
         results_df["p_corr"] = multipletests(p_uncorr, method=correction)[1]
         return results_df
+
+    def tukeyhsd(self,f_step_correction="fdr_bh",f_step_alpha=0.05,tukey_step_alpha=0.05):
+        results_df = self.f_oneway(correction=f_step_correction)
+        df = self.to_df()
+        tukey_res_df = []
+        for _, row in results_df.iterrows():
+            if row["p_corr"] < f_step_alpha:
+                tuk_endog = df[row["module"]].to_numpy()
+                tuk_groups = df["group"].to_numpy()
+                res = pairwise_tukeyhsd(endog=tuk_endog, groups=tuk_groups, alpha=tukey_step_alpha)
+                res = pd.DataFrame(res._results_table.data[1:], columns=res._results_table.data[0])
+                res["module"] = row["module"]
+                tukey_res_df.append(res)
+        try:
+            tukey_res_df = pd.concat(tukey_res_df)
+        except:
+            tukey_res_df = None
+        return tukey_res_df
 
     def save(self, save_path):
         if ((save_path.endswith(".pkl")==False) and (save_path.endswith(".pickle")==False)):

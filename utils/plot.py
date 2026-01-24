@@ -3,16 +3,20 @@ from scipy import stats
 import matplotlib.pyplot as plt
 from matplotlib import rcParams, gridspec
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+from matplotlib.colors import ListedColormap
 import numpy as np
 import pandas as pd
 import networkx as nx
-rcParams['font.family'] = 'sans-serif'
-rcParams['font.sans-serif'] = ['Arial']
+from scipy.stats import f_oneway
+from statsmodels.stats.multicomp import pairwise_tukeyhsd
+from statsmodels.stats.multitest import multipletests
 from matplotlib.patches import Patch, Ellipse, Rectangle
 from sklearn.preprocessing import StandardScaler
 from utils import analyze
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
 from sklearn.decomposition import PCA
+rcParams['font.family'] = 'sans-serif'
+rcParams['font.sans-serif'] = ['Arial']
 
 def is_nonnum(value):
     try:
@@ -47,6 +51,8 @@ def plot_module_usage(config,
                       figW=4,
                       figH=2,
                       style="bar_scatter",
+                      linewidth=0.5,
+                      tickfontsize="default",
                       points_norm_control=None,
                       points_sorting="numerical",
                       class_opacity=0.3,
@@ -58,8 +64,11 @@ def plot_module_usage(config,
                       alt_labels=None,
                       alt_xticks=None,
                       title=None,
+                      ax=None,
+                      simple_spines=False,
                       plot_stats=False,
-                      stat_correction_method="fdr_bh"):
+                      stat_correction_method="fdr_bh",
+                      stat_post_hoc=True):
     """
     Plot module usage
 
@@ -67,10 +76,10 @@ def plot_module_usage(config,
     :param usage_feats: output of analyze.get_module_usage
     :param figW: figure width (default: 4)
     :param figH: figure height (default: 2)
-    :param style: plot style; "bar_scatter", "bar_error", "points", "points_norm", or "stacked"
-    :param points_norm_control: for points_norm only, control group for normalizing module usage to; default None
-    :param points_sorting: for points_norm only, sort points by numerical order ("numerical") or by class ("class"); default "numerical"
-    :param class_opacity: for points_norm with sorting as "class" only, opacity of patches indicating classes; default 0.3
+    :param style: plot style; "bar_scatter", "bar_error", "points", "points_norm", or "stacked" (default: "bar_scatter")
+    :param points_norm_control: for points_norm only, control group for normalizing module usage to (default: None)
+    :param points_sorting: for points_norm only, sort points by numerical order ("numerical") or by class ("class") (default: "numerical")
+    :param class_opacity: for points_norm with sorting as "class" only, opacity of patches indicating classes (default: 0.3)
     :param cmap: colormap (default: jet)
     :param legend_pos: legend position (default: outside)
     :param remap: whether to remap modules acording to config["remappings"] (default: False)
@@ -79,8 +88,12 @@ def plot_module_usage(config,
     :param alt_labels: alternative group label dictionary (default: None)
     :param alt_xticks: alternative xticklabels (list), for stacked plot style only (default: None)
     :param title: plot title (default: None)
+    :param simple_spines: if True, removes top and right spines; if False, leaves all four spines in place (default: False)
+    :param ax: matplotlib axis (default: None)
     :param plot_stats: plot statistical comparisons, boolean (default: False)
-    :param stat_correction_method: what correction method to apply across modules; default fdr_bh, alternatives include "bonferroni", "holm-sidak", "sidak"
+    :param stat_correction_method: what correction method to apply across modules - includes (from statsmodels): "fdr_bh", "bonferroni", "holm-sidak", "sidak", "tukey_hsd" (default: "fdr_bh")
+    :param stat_post_hoc: if computing statistics, boolean option to perform post-hoc Tukey test or not (default: True)
+
     :return: fig
 
     """
@@ -95,6 +108,12 @@ def plot_module_usage(config,
     else:
         data_subgrouped = True
 
+    if linewidth==0:
+        linestyle="none"
+        linewidth=0.75
+    else:
+        linestyle="solid"
+
     if not data_subgrouped:
         if style=="points_norm":
             raise ValueError("Style cannot be points_norm if data is not subgrouped!")
@@ -107,7 +126,12 @@ def plot_module_usage(config,
         bar_heights = np.mean(usage_df, axis=0)
         bar_sems = np.std(usage_df, axis=0) / np.sqrt(usage_df.shape[1])
 
-        fig, ax = plt.subplots(figsize=(figW, figH), dpi=100)
+        if ax is None:
+            fig, ax = plt.subplots(figsize=(figW, figH), dpi=100)
+        else:
+            fig = ax.figure
+            ax.clear()
+
         if type(cmap)==str:
             cmap = plt.get_cmap(cmap)
         if ((style == "bar_scatter") or (style == "bar_error")):
@@ -130,8 +154,8 @@ def plot_module_usage(config,
                     x=np.arange(0, n_modules, 1),
                     y=bar_heights,
                     yerr=bar_sems,
-                    linestyle="none", linewidth=0.6,
-                    color="black", capsize=1, markeredgewidth=0.75
+                    linestyle="none", linewidth=linewidth,
+                    color="black", capsize=1, markeredgewidth=linewidth
                 )
         elif style == "points":
             ax.errorbar(
@@ -140,13 +164,16 @@ def plot_module_usage(config,
                 yerr=bar_sems,
                 color=cmap([0.1]),
                 linestyle="none",
-                marker="o", markersize=2.5, linewidth=0.75,
-                capsize=2, markeredgewidth=0.75
+                marker="o", markersize=2.5, linewidth=linewidth,
+                capsize=2, markeredgewidth=linewidth
             )
         ax.set_xlabel(config["data_source"] + ' Pose Label')
         ax.set_ylabel('Usage')
         ax.set_xticks(np.arange(0, n_modules, 1), labels=[i.split("module")[1] for i in modules])
         ax.tick_params(axis='x', rotation=90, labelsize=plt.rcParams['font.size'] * 0.5, pad=2)
+        if simple_spines:
+            ax.spines['top'].set_visible(False)
+            ax.spines['right'].set_visible(False)
         plt.tight_layout()
 
     else:
@@ -167,7 +194,13 @@ def plot_module_usage(config,
             subgroup_usage.drop("group", axis=1, inplace=True)
             bar_heights[g, :] = subgroup_usage.mean(axis=0)
             bar_sems[g, :] = subgroup_usage.std(axis=0) / np.sqrt(subgroup_usage.shape[0])
-        fig, ax = plt.subplots(figsize=(figW, figH), dpi=100)
+
+        if ax is None:
+            fig, ax = plt.subplots(figsize=(figW, figH), dpi=100)
+        else:
+            fig = ax.figure
+            ax.clear()
+
         scale = 1 / (n_groups + .7)
         if type(cmap)==str:
             cmap = plt.get_cmap(cmap)
@@ -197,8 +230,8 @@ def plot_module_usage(config,
                         x=np.arange(0 + scale * g, n_modules + scale * g, 1),
                         y=bar_heights[g],
                         yerr=bar_sems[g],
-                        linestyle="none", linewidth=0.6,
-                        color="black", capsize=0.3, markeredgewidth=0.75, alpha=0.8
+                        linestyle="none", linewidth=linewidth,
+                        color="black", capsize=0.3, markeredgewidth=linewidth, alpha=0.8
                     )
                     if g==0:
                         top = bar_heights[g]+bar_sems[g]
@@ -251,9 +284,9 @@ def plot_module_usage(config,
                     yerr=bar_sems[g],
                     color=colors[g],
                     label=groupnames[g],
-                    linestyle="none",
-                    marker="o", markersize=4, linewidth=0.75,
-                    capsize=2, markeredgewidth=0.75
+                    linestyle=linestyle,
+                    marker="o", markersize=4, linewidth=linewidth,
+                    capsize=0.5, markeredgewidth=linewidth
                 )
                 if g==0:
                     top = bar_heights[g]+bar_sems[g]
@@ -268,12 +301,10 @@ def plot_module_usage(config,
         elif style == "points_norm":
             sl = np.array(usage_feats.group_labels) == usage_feats.group_dict[points_norm_control]
             control_data = usage_feats.label_counts[sl]
-            scaler = StandardScaler()
-            n_groups = len(usage_feats.group_dict.keys())
-            control_data_z = scaler.fit(control_data)
+            control_data_z = control_data - np.mean(control_data, axis=0)
             scaled_data = np.zeros_like(usage_feats.label_counts)
             for obs in range(usage_feats.label_counts.shape[0]):
-                scaled_data[obs,:]=scaler.transform(np.array([usage_feats.label_counts[obs,:]]))
+                scaled_data[obs, :] = np.array([usage_feats.label_counts[obs, :]]) - np.mean(control_data, axis=0)
             if points_sorting=="class":
                 classes = list(np.unique([i[1] for i in config["remappings"]]))
                 resorted_modules = []
@@ -296,7 +327,8 @@ def plot_module_usage(config,
                 group_sl = np.array(usage_feats.group_labels) == usage_feats.group_dict[key]
                 m = np.mean(scaled_data[group_sl, :], axis=0)
                 sd = np.std(scaled_data[group_sl, :], axis=0)
-                ax.errorbar(np.arange(0, n_modules, 1), m, yerr=sd, color=cmap([k/n_groups]), marker="o", capsize=2, label=key)
+                ax.errorbar(np.arange(0, n_modules, 1), m, yerr=sd, color=cmap([k/n_groups]), marker="o",markersize=3,
+                            label=key, linewidth=linewidth, capsize=0.5, markeredgewidth=linewidth, linestyle=linestyle)
                 if k==0:
                     top = m+sd
                     bottom = m-sd
@@ -338,31 +370,97 @@ def plot_module_usage(config,
                         ax.set_xticklabels(np.array(modules)[resorted_modules])
                     else:
                         ax.set_xticklabels(modules)
-            if "points" not in style:
-                ax.tick_params(axis='x', rotation=90, labelsize=plt.rcParams['font.size'] * 0.2 * n_groups, pad=2)
+
+            if tickfontsize=="default":
+                ax.tick_params(axis='x', rotation=90, labelsize=plt.rcParams['font.size'] * 0.18 * n_groups, pad=2)
+            else:
+                ax.tick_params(axis='x', rotation=90, labelsize=tickfontsize, pad=2)
             if plot_stats:
                 ylim = plt.ylim()
                 plt.ylim(ylim[0], ylim[1] * 1.2)
-                stat_result = usage_feats.f_oneway(correction=stat_correction_method)
-                for m, module in enumerate(stat_result["module"]):
-                    if stat_result[stat_result["module"] == module]["p_corr"].values[0] < 0.001:
-                        if "point" in style:
-                            plt.text(m, top[m] * 1.08, "***", ha="center")
+                shift = (ylim[1] - ylim[0])*0.05
+                if ((not stat_post_hoc) or ("point" in style)):
+                    if (("point" in style) and (stat_post_hoc)):
+                        print("Post-hoc stat plotting not supported for points/points_norm style - defaulting to corrected ANOVA results.")
+                    stat_result = usage_feats.f_oneway(correction=stat_correction_method)
+                    for m, module in enumerate(stat_result["module"]):
+                        if stat_result[stat_result["module"] == module]["p_corr"].values[0] < 0.001:
+                            st_symbol = "***"
+                        elif stat_result[stat_result["module"] == module]["p_corr"].values[0] < 0.01:
+                            st_symbol = "**"
+                        elif stat_result[stat_result["module"] == module]["p_corr"].values[0] < 0.05:
+                            st_symbol = "*"
                         else:
-                            plt.plot([m - 0.1, m + 0.7], [top[m] * 1.05] * 2, color="black", linewidth=0.5)
-                            plt.text(m + 0.3, top[m] * 1.08, "***", ha="center")
-                    elif stat_result[stat_result["module"] == module]["p_corr"].values[0] < 0.01:
-                        if "point" in style:
-                            plt.text(m, top[m] * 1.08, "**", ha="center")
-                        else:
-                            plt.plot([m - 0.1, m + 0.7], [top[m] * 1.05] * 2, color="black", linewidth=0.5)
-                            plt.text(m + 0.3, top[m] * 1.08, "**", ha="center")
-                    elif stat_result[stat_result["module"] == module]["p_uncorr"].values[0] < 0.05:
-                        if "point" in style:
-                            plt.text(m, top[m] * 1.08, "*", ha="center")
-                        else:
-                            plt.plot([m - 0.1, m + 0.7], [top[m] * 1.05] * 2, color="black", linewidth=0.5)
-                            plt.text(m + 0.3, top[m] * 1.08, "*", ha="center")
+                            st_symbol = "ns"
+                        if st_symbol!="ns":
+                            if "point" in style:
+                                if points_sorting == "class":
+                                    m_pos = np.argwhere(np.array(resorted_modules)==m)[0][0]
+                                else:
+                                    m_pos = m
+                                plt.text(m_pos - 0.1, top[m_pos] +shift, st_symbol,rotation=90,ha="left", va="bottom",fontsize=14)
+                            else:
+                                plt.plot([m - 0.1, m + 0.7], [top[m] +shift] * 2, color="black", linewidth=0.5)
+                                plt.text(m + 0.3, top[m] +shift, st_symbol, ha="center")
+                else:
+                    yl = ax.get_ylim()
+                    yspan0 = yl[1]-yl[0]
+                    shift = (ylim[1] - ylim[0]) * 0.06
+                    scale = 1 / (n_groups + .7)
+                    stat_result = usage_feats.tukeyhsd(f_step_correction=stat_correction_method)
+                    if isinstance(stat_result, pd.DataFrame):
+                        usage_df = usage_feats.to_df()
+                        modnames = [i for i in usage_df.columns if i!="group"]
+                        mod_lvl = {m: 1 for m in modnames}
+                        for _, row in stat_result.iterrows():
+                            if row["p-adj"] < 0.05:
+                                if row["p-adj"] < 0.001:
+                                    st_symbol="***"
+                                elif row["p-adj"] < 0.01:
+                                    st_symbol="**"
+                                elif row["p-adj"] < 0.05:
+                                    st_symbol="*"
+                                g1=np.argwhere(np.array(groupnames)==row["group1"])[0][0]
+                                g2=np.argwhere(np.array(groupnames)==row["group2"])[0][0]
+                                m=np.argwhere(np.array(modnames)==row["module"])[0][0]
+                                mod_lvl[row["module"]]+=1
+                                sig_p1 = m + (scale * g1)
+                                sig_p2 = m+ (scale * g2)
+                                if sig_p1>sig_p2:
+                                    sig_left=sig_p2
+                                    sig_right=sig_p1
+                                else:
+                                    sig_right=sig_p2
+                                    sig_left=sig_p1
+                                sig_y = top[m] + shift*mod_lvl[row["module"]]
+                                if yl[1]<sig_y:
+                                    yspan = ax.get_ylim()[1]-yl[0]
+                                    ax.set_ylim([yl[0],sig_y+yspan*0.15])
+                                plt.plot([sig_left,sig_right], [sig_y+yspan0*0.012] * 2, color="black", linewidth=0.5)
+                                plt.text(np.mean([sig_left,sig_right]), sig_y, st_symbol, ha="center")
+
+                            # if stat_result[stat_result["module"] == module]["p_corr"].values[0] < 0.001:
+                            #     st_symbol = "***"
+                            # elif stat_result[stat_result["module"] == module]["p_corr"].values[0] < 0.01:
+                            #     st_symbol = "**"
+                            # elif stat_result[stat_result["module"] == module]["p_corr"].values[0] < 0.05:
+                            #     st_symbol = "*"
+                            # else:
+                            #     st_symbol = "ns"
+                            # if st_symbol!="ns":
+                            #     if "point" in style:
+                            #         if points_sorting == "class":
+                            #             m_pos = np.argwhere(np.array(resorted_modules)==m)[0][0]
+                            #         else:
+                            #             m_pos = m
+                            #         plt.text(m_pos - 0.1, top[m_pos] +shift, st_symbol,rotation=90,ha="left", va="bottom",fontsize=14)
+                            #     else:
+                            #         plt.plot([m - 0.1, m + 0.7], [top[m] +shift] * 2, color="black", linewidth=0.5)
+                            #         plt.text(m + 0.3, top[m] +shift, st_symbol, ha="center")
+
+            if simple_spines:
+                ax.spines['top'].set_visible(False)
+                ax.spines['right'].set_visible(False)
             plt.tight_layout()
         else:
             any_nonint = False
@@ -452,6 +550,189 @@ def plot_module_usage(config,
     return fig
 
 
+def plot_single_module_usage(config,
+                             usage_feats,
+                             module_name,
+                             figW=6,
+                             figH=3,
+                             legend=True,
+                             legend_pos="outside_right",
+                             cmap="jet",
+                             style="bar",
+                             alt_labels=None,
+                             alt_xticks=None,
+                             simple_spines=False,
+                             plot_stats=True,
+                             stat_test="mannwhitneyu",
+                             compare_between="all",
+                             stat_correction_method="fdr_bh",
+                             ax=None):
+    if usage_feats.__class__.__name__ != "ModuleUsage":
+        raise ValueError(f'usage_feats object class must be ModuleUsage, not {usage_feats.__class__}')
+    if len(np.unique(usage_feats.group_labels)) == 1:
+        data_subgrouped = False
+    else:
+        data_subgrouped = True
+
+    if not data_subgrouped:
+        usage_df = usage_feats.to_df()
+        mod_columns = [i for i in usage_df.columns if "module" + str(module_name) + "_t" in i] + ["group"]
+        bin_names = [i for i in mod_columns if i != "group"]
+        bin_starts = [float(i.split("_t")[1].split("-")[0]) for i in bin_names]
+        mod_usage_df = usage_df[mod_columns]
+        n_timebins = len(mod_columns) - 1
+        groupnames = list(usage_feats.group_dict.keys())
+        n_groups = len(groupnames)
+
+        mod_data_m = np.zeros([n_groups, n_timebins])
+        mod_data_sems = np.zeros([n_groups, n_timebins])
+
+        if ax is None:
+            fig, ax = plt.subplots(figsize=(figW, figH), dpi=100)
+        else:
+            fig = ax.figure
+            ax.clear()
+
+        if type(cmap) == str:
+            cmap = plt.get_cmap(cmap)
+        colors = [cmap([i]) for i in np.linspace(0, 1, n_groups)]
+
+        long_df = []
+
+        for g, group in enumerate(groupnames):
+            group_mod_data = mod_usage_df[mod_usage_df["group"] == group].copy()
+            group_mod_data.drop("group", axis=1, inplace=True)
+            for subj in group_mod_data.index:
+                for t, tpt in enumerate(bin_names):
+                    long_df.append({"subj": subj, "group": group, "tpt": t, "value": group_mod_data.at[subj, tpt]})
+            mod_data_m[g, :] = np.mean(group_mod_data, axis=0)
+            mod_data_sems[g, :] = np.std(group_mod_data, axis=0) / np.sqrt(group_mod_data.shape[1])
+            if style == "bar":
+                ax.errorbar(bin_starts, mod_data_m[g, :], yerr=mod_data_sems[g, :], color=colors[g], label=group,
+                            capsize=2, marker="o")
+            elif style == "band":
+                ax.plot(bin_starts, mod_data_m[g, :], color=colors[g], label=group, marker="o")
+                ax.fill_between(bin_starts, mod_data_m[g, :] - mod_data_sems[g, :],
+                                mod_data_m[g, :] + mod_data_sems[g, :],
+                                color=colors[g], alpha=0.2, edgecolor="none")
+        if legend:
+            if legend_pos == "inside":
+                ax.legend()
+            elif legend_pos == "outside_right":
+                ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+            elif legend_pos == "outside_above":
+                ax.legend(loc='upper center', bbox_to_anchor=(0.5, 1.2), ncol=4)
+            else:
+                print(
+                    "Warning - invalid legend position given (should be inside, outside_right, or outside_above), using default")
+                ax.legend()
+
+        if simple_spines:
+            ax.spines['top'].set_visible(False)
+            ax.spines['right'].set_visible(False)
+        plt.tight_layout()
+
+    elif data_subgrouped:
+        usage_df = usage_feats.to_df()
+        mod_columns = [i for i in usage_df.columns if "module" + str(module_name) + "_t" in i] + ["group"]
+        bin_names = [i for i in mod_columns if i != "group"]
+        bin_starts = [float(i.split("_t")[1].split("-")[0]) for i in bin_names]
+        mod_usage_df = usage_df[mod_columns]
+        n_timebins = len(mod_columns) - 1
+        groupnames = list(usage_feats.group_dict.keys())
+        n_groups = len(groupnames)
+
+        mod_data_m = np.zeros([n_groups, n_timebins])
+        mod_data_sems = np.zeros([n_groups, n_timebins])
+
+        if ax is None:
+            fig, ax = plt.subplots(figsize=(figW, figH), dpi=100)
+        else:
+            fig = ax.figure
+            ax.clear()
+
+        if type(cmap) == str:
+            cmap = plt.get_cmap(cmap)
+        colors = [cmap([i]) for i in np.linspace(0, 1, n_groups)]
+
+        long_df = []
+
+        for g, group in enumerate(groupnames):
+            group_mod_data = mod_usage_df[mod_usage_df["group"] == group].copy()
+            group_mod_data.drop("group", axis=1, inplace=True)
+            for subj in group_mod_data.index:
+                for t, tpt in enumerate(bin_names):
+                    long_df.append({"subj": subj, "group": group, "tpt": t, "value": group_mod_data.at[subj, tpt]})
+            mod_data_m[g, :] = np.mean(group_mod_data, axis=0)
+            mod_data_sems[g, :] = np.std(group_mod_data, axis=0) / np.sqrt(group_mod_data.shape[1])
+            if style == "bar":
+                ax.errorbar(bin_starts, mod_data_m[g, :], yerr=mod_data_sems[g, :], color=colors[g], label=group,
+                            capsize=2, marker="o")
+            elif style == "band":
+                ax.plot(bin_starts, mod_data_m[g, :], color=colors[g], label=group, marker="o")
+                ax.fill_between(bin_starts, mod_data_m[g, :] - mod_data_sems[g, :],
+                                mod_data_m[g, :] + mod_data_sems[g, :],
+                                color=colors[g], alpha=0.2, edgecolor="none")
+
+        top = np.max(mod_data_m + mod_data_sems, axis=0)
+        long_df = pd.DataFrame(long_df)
+
+        F = []
+        p_uncorr = []
+        for t, tpt in enumerate(bin_names):
+            long_df_t = long_df[long_df["tpt"] == t]
+            aov_data = [long_df_t[long_df_t["group"] == g]["value"].values for g in groupnames]
+            F_t, p_t = f_oneway(*aov_data)
+            F.append(F_t)
+            p_uncorr.append(p_t)
+
+        reject, p_corr, _, _ = multipletests(p_uncorr, alpha=0.05, method=stat_correction_method)
+
+        top = np.max(mod_data_m + mod_data_sems, axis=0)
+        ylim = ax.get_ylim()
+        ax.set_ylim([ylim[0], ylim[1] * (1 + 0.05 * n_groups)])
+
+        for t, tpt in enumerate(bin_names):
+            if p_corr[t] < 0.05:
+                tuk_endog = long_df[long_df["tpt"] == t]["value"].to_numpy()
+                tuk_groups = long_df[long_df["tpt"] == t]["group"].to_numpy()
+                res = pairwise_tukeyhsd(endog=tuk_endog, groups=tuk_groups)
+                res = pd.DataFrame(res._results_table.data[1:], columns=res._results_table.data[0])
+                for index, row in res.iterrows():
+                    g1 = np.argmax(np.array(groupnames) == row["group1"])
+                    g2 = np.argmax(np.array(groupnames) == row["group2"])
+                    if row["group1"] == compare_between:
+                        out = g2
+                    else:
+                        out = g1
+                    if row["p-adj"] < 0.05:
+                        if ((row["group1"] == compare_between) or (row["group2"] == compare_between)):
+                            sig_str = "*"
+                            plt.text(bin_starts[t], ylim[1] * (1 + 0.05 * out), sig_str,
+                                     ha="center", va="center", fontsize=18, color=colors[out])
+
+        ax.set_xlabel("Time (s)")
+        ax.set_ylabel(f"Proportion of time spent in module {module_name}")
+
+        if legend:
+            if legend_pos == "inside":
+                ax.legend()
+            elif legend_pos == "outside_right":
+                ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+            elif legend_pos == "outside_above":
+                ax.legend(loc='upper center', bbox_to_anchor=(0.5, 1.2), ncol=4)
+            else:
+                print(
+                    "Warning - invalid legend position given (should be inside, outside_right, or outside_above), using default")
+                ax.legend()
+
+        if simple_spines:
+            ax.spines['top'].set_visible(False)
+            ax.spines['right'].set_visible(False)
+        plt.tight_layout()
+
+    return fig
+
 def plot_action_units(config,
                       action_units,
                       figW=4,
@@ -459,6 +740,7 @@ def plot_action_units(config,
                       style="bar_scatter",
                       cmap="jet",
                       legend_pos="outside_right",
+                      linewidth=0.75,
                       legend=True,
                       alt_labels=None,
                       alt_xticks=None,
@@ -525,7 +807,7 @@ def plot_action_units(config,
                     x=np.arange(0, n_modules, 1),
                     y=bar_heights,
                     yerr=bar_sems,
-                    linestyle="none", linewidth=0.6,
+                    linestyle="none", linewidth=linewidth,
                     color="black", capsize=1, markeredgewidth=0.75
                 )
         elif style == "points":
@@ -535,7 +817,7 @@ def plot_action_units(config,
                 yerr=bar_sems,
                 color=cmap([0.1]),
                 linestyle="none",
-                marker="o", markersize=2.5, linewidth=0.75,
+                marker="o", markersize=2.5, linewidth=linewidth,
                 capsize=2, markeredgewidth=0.75
             )
         ax.set_xlabel(config["data_source"] + ' Pose Label')
@@ -1036,6 +1318,62 @@ def network_plot(config,
     return fig
 
 
+def module_usage_raster(config, labels_df, remap=True, hlinewidth=0.3, figW=4, figH=2.5):
+    if remap:
+        labels_df_coded = labels_df.copy()
+        for remapping in config["remappings"]:
+            labels_df_coded.replace(remapping[0][0], remapping[1],inplace=True)
+        beh = list(np.unique([i[1] for i in config["remappings"]]))
+        onehot = {key: num for num, key in enumerate(beh)}
+        for k in onehot.keys():
+            labels_df_coded[labels_df_coded == k] = int(onehot[k])
+        labels_df = labels_df_coded.astype(int)
+        cm_list = ['magma', 'YlOrBr', 'Blues', 'copper', 'Greys_r', 'BuGn', 'Reds_r', 'magma_r', 'Purples', 'YlGn',
+                   'YlGnBu', 'YlOrRd']
+        colors = []
+
+        for c in range(len(beh)):
+            cm = plt.get_cmap(cm_list[c])
+            if cm_list[c] == "BuGn":
+                colors.append(cm([0.5]))
+            elif cm_list[c] == "Blues":
+                colors.append(cm([0.35]))
+            elif cm_list[c] == "YlOrBr":
+                colors.append(cm([0.35]))
+            else:
+                colors.append(cm([0.45]))
+
+        custom_cmap = ListedColormap(colors)
+    else:
+        np.random.seed(42)
+        rand_colors = []
+        for c in range(int(config["n_modules"])):
+            rand_colors.append(np.random.random(3))
+        custom_cmap = ListedColormap(rand_colors)
+
+    fig, ax = plt.subplots(figsize=(figW, figH), dpi=500)
+    plt.imshow(labels_df.T, aspect="auto", interpolation="none", cmap=custom_cmap)
+    group_labels = [i[0] for i in labels_df.columns]
+    yticks = [0]
+    yticklabels = [group_labels[0]]
+    for i in range(len(group_labels) - 1):
+        if group_labels[i + 1] == group_labels[i]:
+            continue
+        else:
+            yticklabels.append(group_labels[i + 1])
+            yticks.append(i)
+            plt.axhline(i - 0.5, linewidth=hlinewidth, color="white")
+    plt.yticks(ticks=yticks, labels=yticklabels)
+    xticks = np.arange(0, labels_df.shape[0], int(config["fps"]) * 60 * 5)
+    xticklabels = np.arange(0, labels_df.shape[0] / (int(config["fps"]) * 60), 5)
+    if np.sum([i % 1 for i in xticklabels])==0:
+        xticklabels=[int(i) for i in xticklabels]
+    plt.xticks(xticks,xticklabels)
+    plt.xlabel("Time (m)")
+    for spine in ax.spines.values():
+        spine.set_visible(False)
+    return fig
+
 def module_usage_sandplot(config,
                           module_usage,
                           remap=False,
@@ -1150,7 +1488,8 @@ def plot_keypoint_travel(keypoint_feature, cmap="viridis", plottype="band", figW
     fig, ax = plt.subplots(figsize=(figW, figH), dpi=100)
     if len(keypoint_feature.feat_names) == 1:
         plottype = "bar"
-    cmap = plt.get_cmap(cmap)
+    if type(cmap) == str:
+        cmap = plt.get_cmap(cmap)
     colors = [cmap([i]) for i in np.linspace(0, 1, n_groups)]
     xticks = keypoint_feature.feat_names
     for g, group in enumerate(groups):
@@ -1179,7 +1518,8 @@ def plot_keypoint_travel(keypoint_feature, cmap="viridis", plottype="band", figW
     ax.set_ylabel("Keypoint travel (pix)")
     return fig
 
-def plot_embeddings(module_feature_object, embeddings_object, figW=3, figH=3, cmap="viridis",title=None,legend=False,draw_ellipse=True,alt_legend=None):
+def plot_embeddings(module_feature_object, embeddings_object, figW=3, figH=3, cmap="viridis",title=None,
+                    legend=False,draw_ellipse=True,alt_legend=None):
     """
     Plot embeddings
 
@@ -1202,7 +1542,8 @@ def plot_embeddings(module_feature_object, embeddings_object, figW=3, figH=3, cm
     elif module_feature_object.__class__.__name__=="ActionUnits":
         X_tfm = embeddings_object.transform(module_feature_object.action_units)
     y=module_feature_object.group_labels
-    cmap = plt.get_cmap(cmap)
+    if type(cmap) == str:
+        cmap = plt.get_cmap(cmap)
     colors=[cmap([i]) for i in np.arange(0,len(np.unique(y)),1/(len(np.unique(y))-0.9))]
     fig = plt.figure(figsize=(figW,figH))
     if embeddings_object.__class__==LDA:
