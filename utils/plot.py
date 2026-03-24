@@ -1753,7 +1753,6 @@ def BORIS_to_pose_matrix_plot(config, boris_to_pose_output, figW=4, figH=2.5, cm
     if outline_top_match==True:
         for col in range(num_cols):
             max_row = np.argmax(data[:, col])
-            print(np.sum(data[:, col]==data[max_row, col]))
             if np.sum(data[:, col]==data[max_row, col])==1:
                 rect = Rectangle((col - 0.5, max_row - 0.5), 1, 1, edgecolor='purple', facecolor='none', linewidth=0.5)
                 ax.add_patch(rect)
