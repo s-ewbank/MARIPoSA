@@ -1472,7 +1472,7 @@ def module_usage_sandplot(config,
     plt.tight_layout()
     return fig
 
-def plot_keypoint_travel(keypoint_feature, cmap="viridis", plottype="band", figW=6, figH=3):
+def plot_keypoint_travel(keypoint_feature, cmap="viridis", plottype="band", figW=6, figH=3, legend=True):
     """
     Plots displacement of a keypoint either over time or in bins from dist_df (output of analyze.dist_df_subgroups)
 
@@ -1505,7 +1505,8 @@ def plot_keypoint_travel(keypoint_feature, cmap="viridis", plottype="band", figW
             ax.plot(xticks, group_mean, label=group, marker="o", color=colors[g])
             ax.fill_between(xticks, group_mean - group_sem, group_mean + group_sem, alpha=0.2, color=colors[g],
                             edgecolor="none")
-            ax.legend()
+            if legend:
+                ax.legend()
             ax.set_xlabel("Time (m)")
         elif plottype == "bar":
             xticks = np.arange(0, n_groups, 1)
@@ -1516,6 +1517,7 @@ def plot_keypoint_travel(keypoint_feature, cmap="viridis", plottype="band", figW
                 ax.set_xticks(xticks)
                 ax.set_xticklabels(groups)
     ax.set_ylabel("Keypoint travel (pix)")
+    plt.tight_layout()
     return fig
 
 def plot_embeddings(module_feature_object, embeddings_object, figW=3, figH=3, cmap="viridis",title=None,
@@ -1743,7 +1745,7 @@ def plot_distance_box(module_feature_object, dist_mat, cmap="Blues",figW=3,figH=
 #     plt.tight_layout()
 #     return fig
 #
-def BORIS_to_pose_matrix_plot(config, boris_to_pose_output, figW=4, figH=2.5, cmap="Greens",outline_top_match=True):
+def BORIS_to_pose_matrix_plot(config, boris_to_pose_output, figW=4, figH=2.5, cmap="Greens",outline_top_match=True,include_default_match_outline=True):
     fig, ax = plt.subplots(figsize=(figW, figH), dpi=100)
     plt.imshow(boris_to_pose_output.to_numpy(dtype='float'),cmap=cmap,aspect="auto",interpolation="none")
     data = boris_to_pose_output.to_numpy(dtype='float')
@@ -1751,7 +1753,11 @@ def BORIS_to_pose_matrix_plot(config, boris_to_pose_output, figW=4, figH=2.5, cm
     if outline_top_match==True:
         for col in range(num_cols):
             max_row = np.argmax(data[:, col])
+            print(np.sum(data[:, col]==data[max_row, col]))
             if np.sum(data[:, col]==data[max_row, col])==1:
+                rect = Rectangle((col - 0.5, max_row - 0.5), 1, 1, edgecolor='purple', facecolor='none', linewidth=0.5)
+                ax.add_patch(rect)
+            elif include_default_match_outline:
                 rect = Rectangle((col - 0.5, max_row - 0.5), 1, 1, edgecolor='purple', facecolor='none', linewidth=0.5)
                 ax.add_patch(rect)
     if len(boris_to_pose_output.columns>=20):
